@@ -90,16 +90,29 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
   <section id="tab-home" class="space-y-4 pt-2">
    <div id="clean-state-banner" class="toss-card text-center py-10 hidden"><span class="text-4xl">🌱</span><h2 class="text-[18px] font-extrabold my-2">연동 대기중</h2><p class="text-[13px] text-[#8B95A1]">설정에서 내 코드를 남자친구에게 알려주거나<br>상대 코드를 입력해 연동해보세요!</p></div>
    <div id="profile-container" class="space-y-4">
-    <div id="soldier-card" class="toss-card cursor-pointer hidden" onclick="evoPreview()">
-     <div class="flex items-center gap-5">
-      <div class="w-[76px] h-[76px] rounded-[22px] bg-[var(--mil-soft)] flex items-center justify-center overflow-hidden flex-shrink-0 border border-[var(--mil-border)]" id="bf-img-container"></div>
-      <div class="flex-1">
-       <div class="flex justify-between items-start">
-        <div><div class="text-[12px] text-[var(--mil-green)] font-bold mb-0.5">대한민국 <span id="bf-branch">육군</span></div><div class="text-[19px] font-extrabold flex items-baseline"><span id="bf-rank">-</span><span id="bf-dday" class="text-[#8B95A1] text-[15px] font-semibold ml-1">D-0</span></div></div>
-        <div id="bf-pct" class="text-[15px] font-black tabular-nums">0%</div></div>
-       <div class="mt-3"><div class="flex justify-between text-[11px] font-bold text-[#8B95A1] mb-1.5"><span id="bf-next-promo">-</span><span id="bf-served-days">0일</span></div>
-        <div class="w-full h-2.5 bg-[#F2F3F5] rounded-full overflow-hidden"><div id="bf-progress" class="h-full bg-[var(--mil-green)] rounded-full" style="width:0"></div></div></div>
+    <div id="soldier-card" class="toss-card hidden">
+     <div class="flex items-center gap-4">
+      <div onclick="evoPreview()" class="w-[76px] h-[76px] rounded-[22px] bg-[var(--mil-soft)] flex items-center justify-center overflow-hidden flex-shrink-0 border border-[var(--mil-border)]" id="bf-img-container"></div>
+      <div class="flex-1 min-w-0">
+       <div class="text-[12px] text-[var(--mil-green)] font-bold mb-0.5">대한민국 <span id="bf-branch">육군</span><span id="bf-unit"></span></div>
+       <div class="text-[21px] font-extrabold flex items-baseline gap-1.5"><span id="bf-rank">-</span><span id="bf-ho" class="text-[15px] text-[var(--mil-green)]"></span></div>
+       <div class="text-[11px] text-[#8B95A1] mt-0.5 leading-snug">입대 <b id="bf-enlist" class="text-[#4E5968]">-</b> · 전역 <b id="bf-dis" class="text-[#4E5968]">-</b></div>
       </div></div>
+     <div class="mt-4 rounded-2xl p-4 text-white" style="background:var(--mil-dark)">
+      <div class="flex justify-between text-[12px] font-bold mb-1.5"><span>전역</span><span id="bf-dday">D-0</span></div>
+      <div class="relative h-9 rounded-lg overflow-hidden bg-white/10"><div id="bf-progress" class="absolute inset-y-0 left-0" style="background:var(--mil-green);width:0"></div><div id="bf-pct" class="relative px-3 h-full flex items-center text-[15px] font-black tabular-nums">0%</div></div>
+      <div class="grid grid-cols-2 gap-3 mt-4">
+       <div><div class="flex justify-between text-[11px] font-bold"><span id="bf-ho-label">-</span><span id="bf-ho-dday">-</span></div><div class="relative h-6 rounded-md bg-white/10 overflow-hidden mt-1"><div id="bf-ho-bar" class="absolute inset-y-0 left-0 bg-white/25" style="width:0"></div><div id="bf-ho-pct" class="relative px-2 h-full flex items-center text-[11px] tabular-nums">0%</div></div></div>
+       <div><div class="flex justify-between text-[11px] font-bold"><span id="bf-pr-label">-</span><span id="bf-pr-dday">-</span></div><div class="relative h-6 rounded-md bg-white/10 overflow-hidden mt-1"><div id="bf-pr-bar" class="absolute inset-y-0 left-0 bg-white/25" style="width:0"></div><div id="bf-pr-pct" class="relative px-2 h-full flex items-center text-[11px] tabular-nums">0%</div></div></div>
+      </div></div>
+     <div class="grid grid-cols-3 gap-y-5 mt-5 text-center">
+      <div><div id="st-total" class="text-[20px] font-black tabular-nums">0</div><div class="text-[11px] text-[#8B95A1]">전체 복무일</div></div>
+      <div><div id="st-cur" class="text-[20px] font-black tabular-nums">0</div><div class="text-[11px] text-[#8B95A1]">현재 복무일</div></div>
+      <div><div id="st-left" class="text-[20px] font-black tabular-nums">0</div><div class="text-[11px] text-[#8B95A1]">남은 복무일</div></div>
+      <div><div id="st-promo" class="text-[20px] font-black tabular-nums">0</div><div class="text-[11px] text-[#8B95A1]">계급 진급일</div></div>
+      <div><div id="st-work" class="text-[20px] font-black tabular-nums">0</div><div class="text-[11px] text-[#8B95A1]">남은 일과일</div></div>
+      <div><div id="st-vac" class="text-[20px] font-black tabular-nums">-</div><div class="text-[11px] text-[#8B95A1]">다음 휴가일</div></div>
+     </div>
     </div>
     <div id="gf-profile-card" class="toss-card border-[1.5px] border-[var(--pink-light)] hidden">
      <div class="flex items-center gap-5">
@@ -112,6 +125,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
     </div>
    </div>
 
+   <div id="menu-btn-row" class="flex justify-end hidden"><button onclick="openMenu()" class="text-[12px] font-bold bg-white border border-[#E5E8EB] rounded-full px-3.5 py-1.5 shadow-sm active:scale-95">🍚 식단표</button></div>
    <div id="salary-card" class="toss-card bg-[var(--mil-dark)] text-white relative overflow-hidden hidden" onclick="rainBurst(15)">
     <div id="money-rain-container" class="absolute inset-0 pointer-events-none z-10 overflow-hidden"></div>
     <div class="relative z-20 flex justify-between items-start mb-6">
@@ -122,13 +136,14 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
    </div>
 
    <div class="toss-card hidden" id="vacation-card">
-    <div class="flex justify-between items-center mb-4"><h3 class="text-[16px] font-bold">📅 우리의 일정 / 휴가</h3><button onclick="openVac()" class="bg-[#F5F6F8] px-3 py-1.5 rounded-full text-[12px] font-bold">+ 일정 추가</button></div>
+    <div class="flex justify-between items-center mb-4"><h3 class="text-[16px] font-bold">🏖 휴가</h3><button onclick="openVac()" class="bg-[#F5F6F8] px-3 py-1.5 rounded-full text-[12px] font-bold">+ 휴가 등록</button></div>
     <div id="vacation-list" class="space-y-3"></div>
    </div>
 
    <div class="toss-card">
-    <div class="flex justify-between items-center mb-4"><h3 class="text-[16px] font-bold">🧭 기동 경로 탐색기</h3><button onclick="getGPS()" class="bg-[#F2F3F5] text-[#4E5968] text-[11px] font-bold px-3 py-1.5 rounded-full">📍 현위치</button></div>
-    <div class="space-y-3 mb-4"><input id="route-start" placeholder="출발지 (부대 위치)" class="inp font-semibold" value="강원 화천"><input id="route-end" placeholder="도착지 (우리 집)" class="inp font-semibold" value="서울역"><button onclick="calcRoute()" class="w-full bg-[#191F28] text-white py-3 rounded-xl font-bold text-[14px]">경로 탐색 ⚡</button></div>
+    <div class="flex justify-between items-center mb-4"><h3 class="text-[16px] font-bold">🏠 집으로가기</h3><button onclick="getGPS()" class="bg-[#F2F3F5] text-[#4E5968] text-[11px] font-bold px-3 py-1.5 rounded-full">📍 현위치</button></div>
+    <div class="space-y-3 mb-4"><div class="relative"><input id="route-start" placeholder="출발지 (현위치 · 자대 · 장소 검색)" class="inp font-semibold" autocomplete="off" oninput="placeInput('start')"><div id="sug-start" class="hidden absolute z-30 left-0 right-0 bg-white border border-[#E5E8EB] rounded-xl shadow-lg mt-1 max-h-60 overflow-y-auto"></div></div>
+    <div class="relative"><input id="route-end" placeholder="도착지 (아파트·상가 이름이나 주소)" class="inp font-semibold" autocomplete="off" oninput="placeInput('end')"><div id="sug-end" class="hidden absolute z-30 left-0 right-0 bg-white border border-[#E5E8EB] rounded-xl shadow-lg mt-1 max-h-60 overflow-y-auto"></div></div><button onclick="calcRoute()" class="w-full bg-[#191F28] text-white py-3 rounded-xl font-bold text-[14px]">경로 탐색 ⚡</button></div>
     <div id="route-results" class="hidden"></div>
    </div>
   </section>
@@ -177,33 +192,51 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
  <nav class="bg-white/95 backdrop-blur-md px-6 pt-3 pb-safe flex justify-between items-center z-40 border-t border-[#F2F3F5] shrink-0 absolute bottom-0 left-0 right-0" id="bottom-nav"></nav>
 
  <!-- 설정 -->
- <div id="modal-settings" class="fixed inset-0 z-50 bg-[#191F28]/60 backdrop-blur-sm hidden items-end sm:items-center justify-center p-4">
-  <div class="bg-white w-full max-w-sm rounded-[32px] p-6 shadow-2xl flex flex-col max-h-[85vh]">
-   <div class="flex justify-between items-center mb-5"><h3 class="font-bold text-[18px]">환경설정</h3><button onclick="closeModal('modal-settings')" class="w-8 h-8 rounded-full bg-[#F5F6F8] font-bold">✕</button></div>
-   <div class="overflow-y-auto no-scrollbar space-y-6 pb-6">
-    <div class="border-b border-[#F2F3F5] pb-5"><h4 class="text-[13px] font-bold mb-3 text-[var(--pink-main)]">❤️ 커플 연동</h4>
-     <div id="couple-link-ui"><div class="bg-[#FFF0F3] p-3 rounded-xl flex justify-between items-center mb-2"><span class="text-[12px] font-semibold text-[#D94867]">나의 연결 코드</span><span id="my-couple-code" class="font-black text-[#D94867] tracking-widest text-[14px] select-text">-</span></div>
-      <div class="flex gap-2"><input id="partner-code-input" maxlength="6" placeholder="상대방 코드 입력" class="flex-1 bg-white border border-[#E5E8EB] rounded-xl px-3 py-2.5 text-[13px] outline-none uppercase"><button onclick="linkC()" class="bg-[#191F28] text-white px-4 rounded-xl font-bold text-[12px]">연결</button></div></div>
-     <div id="couple-linked-ui" class="hidden bg-[var(--mil-green-light)] p-3 rounded-xl text-center border border-[var(--mil-border)]"><div class="text-[13px] font-bold text-[var(--mil-green)]">✅ 연동 중</div><button onclick="unlinkC()" class="text-[11px] text-[#8B95A1] underline mt-1">연동 해제</button></div></div>
-    <div id="settings-service"><h4 class="text-[13px] font-bold mb-2">복무 정보 (1일자 진급 적용)</h4>
-     <div class="grid grid-cols-4 gap-1.5 mb-2" id="set-branches"></div>
-     <div class="flex gap-2"><input type="date" id="set-enlist" class="flex-1 bg-[#F5F6F8] border border-[#E5E8EB] rounded-xl px-2 py-2.5 text-[12px] font-bold outline-none" onchange="autoD()"><input type="date" id="set-discharge" class="flex-1 bg-[#F5F6F8] border border-[#E5E8EB] rounded-xl px-2 py-2.5 text-[12px] font-bold outline-none"></div></div>
-    <div id="settings-theme-bf" class="hidden"><h4 class="text-[13px] font-bold mb-2">나의 캐릭터 (군인)</h4><div class="grid grid-cols-2 gap-2"><button onclick="cTh('bf','gamja')" id="theme-bf-gamja" class="py-2.5 rounded-xl border-2 font-bold text-[12px]">🥔 감자돌이</button><button onclick="cTh('bf','tiger')" id="theme-bf-tiger" class="py-2.5 rounded-xl border-2 font-bold text-[12px]">🐯 짬타이거</button></div></div>
-    <div id="settings-theme-gf" class="hidden"><h4 class="text-[13px] font-bold mb-2">나의 캐릭터 (곰신)</h4><div class="grid grid-cols-2 gap-2"><button onclick="cTh('gf','gomsin')" id="theme-gf-gomsin" class="py-2.5 rounded-xl border-2 font-bold text-[12px]">🐻 곰신 베어</button><button onclick="cTh('gf','cat')" id="theme-gf-cat" class="py-2.5 rounded-xl border-2 font-bold text-[12px]">🐈‍⬛ 꽃냥이</button></div></div>
-    <button onclick="logout()" class="w-full text-center text-[#8B95A1] text-[12px] font-bold underline">로그아웃</button>
-   </div>
-   <button onclick="saveS()" class="w-full mt-2 bg-[#191F28] text-white py-3.5 rounded-xl font-bold text-[15px] active:scale-95">저장</button>
-  </div>
- </div>
+ <div id="modal-settings" class="fixed inset-0 z-50 bg-white hidden flex-col">
+  <div class="max-w-md mx-auto w-full h-full flex flex-col" style="padding-top:env(safe-area-inset-top)">
+   <div class="flex items-center justify-between px-4 py-3"><button onclick="setBack()" class="w-10 h-10 rounded-full bg-[#F5F6F8] text-xl font-bold">‹</button><div id="set-title" class="font-bold text-[17px]">설정</div><div class="w-10"></div></div>
+   <div class="flex-1 overflow-y-auto no-scrollbar pb-12">
+    <div id="set-p-main"><div class="flex items-center gap-4 px-5 py-4"><div id="set-avatar" class="w-16 h-16 rounded-2xl bg-[var(--mil-soft)] overflow-hidden flex items-center justify-center flex-shrink-0"></div><div class="flex-1 min-w-0"><div id="set-name" class="font-extrabold text-[18px]"></div><div id="set-email" class="text-[13px] text-[#8B95A1] truncate"></div></div><button onclick="setGo('account')" class="border border-[#E5E8EB] rounded-full px-3.5 py-1.5 text-[12px] font-bold">관리</button></div><div id="set-rows"></div></div>
+    <div id="set-p-couple" class="hidden px-5 pt-2"><div id="couple-link-ui"><div class="bg-[#FFF0F3] p-4 rounded-xl flex justify-between items-center mb-3"><span class="text-[13px] font-semibold text-[#D94867]">나의 연결 코드</span><span id="my-couple-code" class="font-black text-[#D94867] tracking-widest text-[16px] select-text">-</span></div><p class="text-[12px] text-[#8B95A1] mb-3">내 코드를 연인에게 알려주거나, 연인의 코드를 아래에 입력하면 연동돼요.</p><div class="flex gap-2"><input id="partner-code-input" maxlength="6" placeholder="상대방 코드 6자리" class="flex-1 bg-white border border-[#E5E8EB] rounded-xl px-3 py-3 text-[14px] outline-none uppercase"><button onclick="linkC()" class="bg-[#191F28] text-white px-5 rounded-xl font-bold text-[13px]">연결</button></div></div>
+     <div id="couple-linked-ui" class="hidden bg-[var(--mil-green-light)] p-5 rounded-xl text-center border border-[var(--mil-border)]"><div class="text-[15px] font-bold text-[var(--mil-green)]">✅ 연동 중이에요</div><button onclick="unlinkC()" class="text-[12px] text-[#8B95A1] underline mt-2">연동 해제</button></div></div>
+    <div id="set-p-service" class="hidden px-5 pt-2"><div id="set-service-note" class="hidden text-[13px] text-[#8B95A1] bg-[#F5F6F8] rounded-xl p-4">복무 정보는 군인 계정에서 설정해요. 연동하면 남자친구의 정보가 홈에 보여요.</div>
+     <div id="set-service-form"><label class="text-[12px] font-bold text-[#4E5968] block mb-2">군종</label><div class="grid grid-cols-4 gap-1.5 mb-4" id="set-branches"></div><label class="text-[12px] font-bold text-[#4E5968] block mb-2">입대일 · 전역일</label><div class="flex gap-2 mb-1"><input type="date" id="set-enlist" class="flex-1 bg-[#F5F6F8] border border-[#E5E8EB] rounded-xl px-2 py-3 text-[13px] font-bold outline-none" onchange="autoD()"><input type="date" id="set-discharge" class="flex-1 bg-[#F5F6F8] border border-[#E5E8EB] rounded-xl px-2 py-3 text-[13px] font-bold outline-none"></div><p class="text-[11px] text-[#8B95A1] mb-5">입대일을 바꾸면 전역일이 군종에 맞춰 자동 계산돼요. (진급은 매월 1일 기준)</p><button onclick="saveS()" class="w-full bg-[#191F28] text-white py-3.5 rounded-xl font-bold text-[15px]">저장</button></div></div>
+    <div id="set-p-unit" class="hidden px-5 pt-2"><div id="set-unit-note" class="hidden text-[13px] text-[#8B95A1] bg-[#F5F6F8] rounded-xl p-4">자대는 군인 계정에서 등록해요. 등록하면 연동된 곰신도 식단표를 볼 수 있어요.</div>
+     <div id="set-unit-form"><label class="text-[12px] font-bold text-[#4E5968] block mb-2">부대명</label><input id="set-unit-name" maxlength="30" placeholder="예) 제00사단 00연대 0대대" class="inp mb-4"><label class="text-[12px] font-bold text-[#4E5968] block mb-2">부대 위치 (선택 · 집으로가기 출발지로 쓰여요)</label><div class="relative mb-5"><input id="set-unit-addr" placeholder="부대 주소나 근처 장소 검색" class="inp" autocomplete="off" oninput="placeInput('unit')"><div id="sug-unit" class="hidden absolute z-30 left-0 right-0 bg-white border border-[#E5E8EB] rounded-xl shadow-lg mt-1 max-h-60 overflow-y-auto"></div></div><button onclick="saveUnit()" class="w-full bg-[#191F28] text-white py-3.5 rounded-xl font-bold text-[15px]">자대 등록</button></div></div>
+    <div id="set-p-theme" class="hidden px-5 pt-2"><div id="settings-theme-bf" class="hidden"><h4 class="text-[13px] font-bold mb-2">나의 캐릭터 (군인)</h4><div class="grid grid-cols-2 gap-2 mb-5"><button onclick="cTh('bf','gamja')" id="theme-bf-gamja" class="py-3 rounded-xl border-2 font-bold text-[13px]">🥔 감자돌이</button><button onclick="cTh('bf','tiger')" id="theme-bf-tiger" class="py-3 rounded-xl border-2 font-bold text-[13px]">🐯 짬타이거</button></div></div>
+     <div id="settings-theme-gf" class="hidden"><h4 class="text-[13px] font-bold mb-2">나의 캐릭터 (곰신)</h4><div class="grid grid-cols-2 gap-2 mb-5"><button onclick="cTh('gf','gomsin')" id="theme-gf-gomsin" class="py-3 rounded-xl border-2 font-bold text-[13px]">🐻 곰신 베어</button><button onclick="cTh('gf','cat')" id="theme-gf-cat" class="py-3 rounded-xl border-2 font-bold text-[13px]">🐈‍⬛ 꽃냥이</button></div></div><button onclick="saveS()" class="w-full bg-[#191F28] text-white py-3.5 rounded-xl font-bold text-[15px]">저장</button></div>
+    <div id="set-p-account" class="hidden px-5 pt-2"><div class="bg-[#F5F6F8] rounded-xl p-4 mb-5"><div class="text-[11px] text-[#8B95A1]">로그인 계정</div><div id="set-acc-email" class="text-[14px] font-bold break-all"></div></div><button onclick="logout()" class="w-full border border-[#E5E8EB] text-[#E5484D] py-3.5 rounded-xl font-bold text-[14px]">로그아웃</button></div>
+   </div></div></div>
 
- <!-- 휴가 추가 -->
- <div id="modal-vac" class="fixed inset-0 z-50 bg-[#191F28]/60 backdrop-blur-sm hidden items-center justify-center p-4">
-  <div class="bg-white w-full max-w-sm rounded-[28px] p-6 space-y-3">
-   <h3 class="font-bold text-[17px]">일정 추가</h3>
-   <input id="vac-title" maxlength="30" placeholder="제목 (예: 첫 휴가 💖)" class="inp"><label class="text-[12px] font-bold text-[#4E5968]">시작일</label><input type="date" id="vac-start" class="inp"><label class="text-[12px] font-bold text-[#4E5968]">종료일</label><input type="date" id="vac-end" class="inp">
-   <div class="flex gap-2 pt-2"><button onclick="closeModal('modal-vac')" class="flex-1 py-3 rounded-xl bg-[#F5F6F8] font-bold text-[14px]">취소</button><button onclick="saveVac()" class="flex-1 py-3 rounded-xl bg-[#191F28] text-white font-bold text-[14px]">저장</button></div>
-  </div>
- </div>
+ <div id="modal-vac" class="fixed inset-0 z-50 bg-[#191F28]/60 backdrop-blur-sm hidden items-end sm:items-center justify-center p-4">
+  <div class="bg-white w-full max-w-sm rounded-[28px] p-5 max-h-[92vh] overflow-y-auto no-scrollbar">
+   <h3 class="font-bold text-[17px] mb-3">휴가 등록</h3>
+   <input id="vac-title" maxlength="30" placeholder="제목 (예: 첫 휴가 💖)" class="inp mb-4">
+   <div class="flex items-center justify-between mb-2"><button onclick="calNav(-1)" class="w-9 h-9 rounded-full bg-[#F5F6F8] font-bold">‹</button><div id="cal-title" class="font-bold text-[15px]"></div><button onclick="calNav(1)" class="w-9 h-9 rounded-full bg-[#F5F6F8] font-bold">›</button></div>
+   <div class="grid grid-cols-7 text-center text-[11px] font-bold text-[#8B95A1] mb-1"><div class="text-[#E5484D]">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="text-[#3B82F6]">토</div></div>
+   <div id="cal-grid" class="grid grid-cols-7 text-center"></div>
+   <div id="cal-summary" class="text-[12px] font-bold text-[var(--pink-main)] text-center my-3 min-h-[18px]"></div>
+   <p class="text-[10px] text-[#8B95A1] text-center mb-3">시작일을 누르고 종료일을 누르세요 · 초록 점은 이미 등록된 휴가</p>
+   <div class="flex gap-2"><button onclick="closeModal('modal-vac')" class="flex-1 py-3 rounded-xl bg-[#F5F6F8] font-bold text-[14px]">취소</button><button onclick="saveVac()" class="flex-1 py-3 rounded-xl bg-[#191F28] text-white font-bold text-[14px]">저장</button></div>
+  </div></div>
+
+ <div id="modal-menu" class="fixed inset-0 z-50 bg-[var(--bg-main)] hidden flex-col">
+  <div class="max-w-md mx-auto w-full h-full flex flex-col" style="padding-top:env(safe-area-inset-top)">
+   <div class="flex items-center justify-between px-4 py-3 bg-white"><button onclick="closeModal('modal-menu')" class="w-10 h-10 rounded-full bg-[#F5F6F8] text-xl font-bold">‹</button><div class="font-bold text-[17px]">🍚 식단표</div><button id="menu-edit-btn" onclick="menuEditToggle()" class="text-[13px] font-bold text-[var(--mil-green)] w-10">편집</button></div>
+   <div class="flex-1 overflow-y-auto no-scrollbar px-5 py-4 space-y-3">
+    <div id="menu-unit" class="text-[12px] text-[#8B95A1]"></div>
+    <div class="flex items-center justify-between"><button onclick="menuGo(-1)" class="w-10 h-10 rounded-full bg-white shadow-sm font-bold">◀</button><div id="menu-date-label" class="text-[16px] font-extrabold"></div><button onclick="menuGo(1)" class="w-10 h-10 rounded-full bg-white shadow-sm font-bold">▶</button></div>
+    <div class="flex gap-2 items-center"><button onclick="menuSet(ymd(new Date()))" class="text-[12px] font-bold bg-white border border-[#E5E8EB] rounded-full px-3 py-1.5">오늘</button><button onclick="menuSet(ymd(new Date(Date.now()+864e5)))" class="text-[12px] font-bold bg-white border border-[#E5E8EB] rounded-full px-3 py-1.5">내일</button><input type="date" id="menu-date-input" onchange="menuSet(this.value)" class="text-[12px] font-bold bg-white border border-[#E5E8EB] rounded-full px-3 py-1 outline-none flex-1"></div>
+    <div id="menu-cards" class="space-y-3"></div>
+    <div id="menu-edit" class="hidden toss-card !p-5 space-y-3">
+     <div class="bg-[var(--mil-green-light)] rounded-xl p-3 space-y-2"><div class="text-[13px] font-extrabold">📥 공공데이터포털 식단 가져오기</div><p class="text-[11px] text-[#4E5968] leading-relaxed">① 아래 버튼으로 공공데이터포털에서 우리 부대 '식단정보' CSV를 내려받고 ② 파일을 선택하면 날짜별로 한꺼번에 자동 등록돼요. (부대가 데이터를 공개한 경우에만 있어요)</p><a id="menu-dg-link" target="_blank" rel="noopener" href="https://www.data.go.kr/tcs/dss/selectDataSetList.do?keyword=%EA%B5%AD%EB%B0%A9%EB%B6%80+%EC%8B%9D%EB%8B%A8%EC%A0%95%EB%B3%B4" class="block text-center bg-white border border-[#E5E8EB] rounded-lg py-2.5 text-[12px] font-bold text-[var(--mil-green)]">공공데이터포털에서 우리 부대 찾기 ▶</a><label class="block text-center bg-[var(--mil-green)] text-white rounded-lg py-2.5 text-[12px] font-bold cursor-pointer">CSV 파일 선택해서 가져오기<input type="file" accept=".csv,text/csv,text/plain" class="hidden" onchange="importMenuCsv(this)"></label></div><div class="text-[14px] font-extrabold">이 날 식단 입력</div>
+     <label class="text-[12px] font-bold">🌅 조식</label><textarea id="menu-in-b" class="w-full bg-[#F5F6F8] rounded-xl p-3 text-[13px] outline-none h-16 resize-none" placeholder="쉼표(,)로 구분 · 예) 쌀밥, 미역국, 계란말이"></textarea>
+     <label class="text-[12px] font-bold">☀️ 중식</label><textarea id="menu-in-l" class="w-full bg-[#F5F6F8] rounded-xl p-3 text-[13px] outline-none h-16 resize-none"></textarea>
+     <label class="text-[12px] font-bold">🌙 석식</label><textarea id="menu-in-d" class="w-full bg-[#F5F6F8] rounded-xl p-3 text-[13px] outline-none h-16 resize-none"></textarea>
+     <button onclick="saveMenu()" class="w-full bg-[#191F28] text-white py-3 rounded-xl font-bold text-[14px]">이 날 저장</button>
+     <div class="border-t border-[#F2F3F5] pt-3"><div class="text-[13px] font-extrabold mb-1">여러 날 한 번에 입력</div><p class="text-[11px] text-[#8B95A1] mb-2">한 줄에 하루씩, 날짜 뒤에 조식·중식·석식을 적어요.<br>예) 10/21 조식: 밥, 국 중식: 카레, 샐러드 석식: 불고기, 김치</p><textarea id="menu-bulk" class="w-full bg-[#F5F6F8] rounded-xl p-3 text-[12px] outline-none h-28 resize-none"></textarea><button onclick="saveBulk()" class="w-full mt-2 bg-[var(--mil-green)] text-white py-3 rounded-xl font-bold text-[14px]">일괄 저장</button></div>
+     <p class="text-[11px] text-[#8B95A1]">식단은 부대 밴드·더캠프 공지, 공공데이터포털의 '국방부 식단정보'에서 확인해 옮겨 적을 수 있어요.</p></div>
+   </div></div></div>
 
  <div id="modal-alert" class="fixed inset-0 z-[110] bg-[#191F28]/60 backdrop-blur-sm hidden items-center justify-center p-4"><div class="bg-white w-full max-w-[320px] rounded-[24px] p-6 text-center shadow-2xl"><h3 id="alert-title" class="font-bold text-[17px] mb-3">알림</h3><div id="alert-message" class="text-[13px] text-[#4E5968] mb-6 whitespace-pre-line text-left leading-relaxed max-h-[60vh] overflow-y-auto no-scrollbar"></div><button onclick="closeModal('modal-alert')" class="w-full py-3.5 bg-[#191F28] text-white rounded-xl font-bold text-[14px]">확인</button></div></div>
 </div>
@@ -213,6 +246,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 const SUPABASE_URL = 'https://fziblqwqtyhntmmvzhgv.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_OSLMwUUK8XTIEmwWLV2d9Q_t416LU_s';
 /* =================================================================== */
+const KAKAO_JS_KEY = ''; // (선택) 카카오 개발자 JavaScript 키 → 아파트·상가 이름 검색이 정확해져요
 const configured = !SUPABASE_URL.includes('YOUR-PROJECT');
 const sb = configured ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 const q = id => document.getElementById(id);
@@ -276,6 +310,7 @@ async function loadAll(first) {
     sb.from('vacations').select('*').order('start_date')
   ]);
   wishes = (w.data || []).map(x => x.item_id); pWishes = (pw.data || []).map(x => x.item_id); vacs = v.data || [];
+  { const sid = me.gender === 'M' ? me.id : me.partner_id; menus = {}; if (sid) { const { data: mm } = await sb.from('menus').select('*').eq('created_by', sid); (mm || []).forEach(x => menus[x.menu_date] = x); } }
   if (first) { sav = Object.assign({ banks: [], amts: {}, opts: {} }, me.savings || {}); }
   await loadQ();
 }
@@ -329,9 +364,35 @@ function milInfo(S) {
   const grad = new Date(e.getTime() + 35 * 864e5), d1 = firstOnOrAfter1st(addM(e, 2)), d2 = new Date(d1.getFullYear(), d1.getMonth() + ab[0], 1), d3 = new Date(d1.getFullYear(), d1.getMonth() + ab[1], 1);
   return { e, dis, grad, d1, d2, d3, b };
 }
+let hoC = null;
+function hoInfo(S, now) {
+  const I = milInfo(S), r = rankOf(S, now); let rr = r;
+  if (r.r === '훈련병') rr = { r: '이병', nD: I.d1, nN: '일병' };
+  const start = { '이병': I.e, '일병': I.d1, '상병': I.d2, '병장': I.d3 }[rr.r] || I.d3, end = rr.r === '병장' || rr.r === '전역' ? new Date(I.dis.getTime() + 864e5) : rr.nD;
+  let hs = new Date(start), n = 1, nx = new Date(hs.getFullYear(), hs.getMonth() + 1, 1);
+  while (nx <= now && nx < end) { n++; hs = nx; nx = new Date(hs.getFullYear(), hs.getMonth() + 1, 1); }
+  return { rank: rr.r, next: rr.nN || '전역', start, end, n, hs, nx, nxIsPromo: nx >= end, left: r.r === '전역' };
+}
+function fillSoldier(S, now) {
+  const I = milInfo(S), h = hoInfo(S, now), rk = rankOf(S, now).r; hoC = h;
+  const T0 = new Date(now.getFullYear(), now.getMonth(), now.getDate()), dd = d => Math.max(0, Math.ceil((d - T0) / 864e5)), f = d => `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+  const td = Math.round((I.dis - I.e) / 864e5) + 1, sd = Math.min(td, Math.max(0, Math.round((T0 - I.e) / 864e5) + 1));
+  q('bf-rank').innerText = rk; q('bf-ho').innerText = rk === '전역' ? '' : `${h.n}호봉`; q('bf-branch').innerText = I.b.k; q('bf-unit').innerText = S.unit_name ? ' · ' + S.unit_name : '';
+  q('bf-enlist').innerText = f(I.e); q('bf-dis').innerText = f(I.dis); q('bf-dday').innerText = sd >= td ? '전역!' : `D-${td - sd}`;
+  q('bf-ho-label').innerText = h.nxIsPromo ? (h.rank === '병장' ? '마지막 호봉' : `${h.next} 1호봉`) : `${h.n + 1}호봉 승급`; q('bf-ho-dday').innerText = h.nxIsPromo && h.rank === '병장' ? '' : `D-${dd(h.nx)}`;
+  q('bf-pr-label').innerText = h.rank === '병장' ? '전역' : `${h.next} 진급`; q('bf-pr-dday').innerText = `D-${dd(h.end)}`;
+  let wk = 0; for (let d = new Date(T0); d <= I.dis; d.setDate(d.getDate() + 1)) if (d.getDay() !== 0 && d.getDay() !== 6) wk++;
+  const nv = vacs.filter(v => v.end_date >= ymd(T0)).sort((a, b) => a.start_date.localeCompare(b.start_date))[0];
+  q('st-total').innerText = td; q('st-cur').innerText = sd; q('st-left').innerText = Math.max(0, td - sd); q('st-promo').innerText = dd(h.end); q('st-work').innerText = wk;
+  q('st-vac').innerText = nv ? (nv.start_date <= ymd(T0) ? '휴가중' : `D-${dd(pd(nv.start_date))}`) : '-';
+  return rk;
+}
 function tickPct(S, n) {
-  const I = milInfo(S), tot = I.dis.getTime() + 864e5 - I.e.getTime(), pct = Math.min(100, Math.max(0, (n - I.e.getTime()) / tot * 100));
-  q('bf-pct').innerText = pct.toFixed(8) + '%'; q('bf-progress').style.width = pct + '%';
+  const I = milInfo(S), tot = I.dis.getTime() + 864e5 - I.e.getTime(), P = x => Math.min(100, Math.max(0, x)), all = P((n - I.e.getTime()) / tot * 100);
+  q('bf-pct').innerText = all.toFixed(8) + '%'; q('bf-progress').style.width = all + '%';
+  if (!hoC || n >= hoC.nx || n >= hoC.end) hoC = hoInfo(S, new Date(n));
+  const ho = P((n - hoC.hs) / (hoC.nx - hoC.hs) * 100), pr = P((n - hoC.start) / (hoC.end - hoC.start) * 100);
+  q('bf-ho-pct').innerText = ho.toFixed(5) + '%'; q('bf-ho-bar').style.width = ho + '%'; q('bf-pr-pct').innerText = pr.toFixed(5) + '%'; q('bf-pr-bar').style.width = pr + '%';
 }
 function rankOf(S, now) {
   const I = milInfo(S);
@@ -382,15 +443,11 @@ function render(full) {
   if (!me) return;
   const S = S_(), G = G_(), now = new Date(); applyTheme((S && S.branch) || 'army');
   q('clean-state-banner').classList.toggle('hidden', !!S);
-  ['salary-card', 'vacation-card'].forEach(i => q(i).classList.toggle('hidden', !S));
+  ['salary-card', 'vacation-card', 'menu-btn-row'].forEach(i => q(i).classList.toggle('hidden', !S));
   q('soldier-card').classList.toggle('hidden', !S); q('gf-profile-card').classList.toggle('hidden', !G);
   let rank = '훈련병';
   if (S && S.enlist_date) {
-    const ri = rankOf(S, now); rank = ri.r; const I = milInfo(S);
-    const td = Math.ceil((I.dis - I.e) / 864e5) + 1, sd = Math.max(0, Math.floor((now - I.e) / 864e5) + 1), pct = Math.min(100, sd / td * 100);
-    q('bf-rank').innerText = ri.r; q('bf-dday').innerText = sd >= td ? '전역!' : `D-${td - sd}`; q('bf-branch').innerText = I.b.k;
-    q('bf-pct').innerText = pct.toFixed(1) + '%'; q('bf-served-days').innerText = `${Math.min(sd, td)}일 / ${td}일`; q('bf-progress').style.width = pct + '%';
-    q('bf-next-promo').innerText = ri.nD ? `다음 진급(${ri.nN}): ${ri.nD.getFullYear()}.${ri.nD.getMonth() + 1}.${ri.nD.getDate()}` : '전역 완료';
+    rank = fillSoldier(S, now); const ri = { r: rank };
     q('bf-img-container').innerHTML = bfImg(S.bf_theme, ri.r);
     const lk = 'lastRank_' + S.id, last = localStorage.getItem(lk); if (last && last !== ri.r) cutscene(ri.r); localStorage.setItem(lk, ri.r);
     if (full || !salT) startSal(S);
@@ -408,6 +465,7 @@ function render(full) {
   const showCart = me.gender === 'M' && partner && partner.px_sent_at && pWishes.length > 0;
   q('btn-cart').classList.toggle('hidden', !showCart);
   if (showCart) q('cart-dot').classList.toggle('hidden', localStorage.getItem('pxseen') === partner.px_sent_at);
+  if (S && S.unit_lat && !q('route-start').value && !picks.start) { const lb = S.unit_name || S.unit_addr || '자대'; q('route-start').value = lb; picks.start = { label: lb, name: lb, lat: S.unit_lat, lng: S.unit_lng }; }
   renderVac(); renderPX(); renderQ(!qInit || full); if (curTab === 'savings') renderSav();
   qInit = true;
 }
@@ -430,14 +488,39 @@ function switchTab(t) {
 function setBr(k) { setBranchV = k; applyTheme(k); Object.keys(BR).forEach(b => q('sb-' + b).className = 'py-2 rounded-lg border-2 font-bold text-[11px] ' + (b === k ? 'border-[var(--mil-green)] bg-[var(--mil-green-light)] text-[var(--mil-green)]' : 'border-[#E5E8EB] bg-[#F5F6F8] text-[#8B95A1]')); autoD(); }
 function autoD() { const e = q('set-enlist').value; if (e) q('set-discharge').value = ymd(calcDischarge(pd(e), setBranchV)); }
 let thTmp = {};
-function openSettings() {
-  q('my-couple-code').innerText = me.code || '-'; const linked = !!me.partner_id;
-  q('couple-link-ui').classList.toggle('hidden', linked); q('couple-linked-ui').classList.toggle('hidden', !linked);
-  q('settings-service').classList.toggle('hidden', me.gender !== 'M');
-  q('settings-theme-bf').classList.toggle('hidden', me.gender !== 'M'); q('settings-theme-gf').classList.toggle('hidden', me.gender !== 'F');
-  if (me.gender === 'M') { q('set-enlist').value = me.enlist_date || ''; q('set-discharge').value = me.discharge_date || ''; setBr(me.branch || 'army'); q('set-discharge').value = me.discharge_date || ''; }
-  thTmp = { bf: me.bf_theme, gf: me.gf_theme }; cTh('bf', thTmp.bf, true); cTh('gf', thTmp.gf, true); openM('modal-settings');
+const SET_TITLES = { main: '설정', couple: '커플 연동', service: '복무 정보', unit: '자대 등록', theme: '캐릭터 테마', account: '계정' };
+let setPage = 'main';
+function setGo(p) {
+  setPage = p; Object.keys(SET_TITLES).forEach(k => q('set-p-' + k).classList.toggle('hidden', k !== p)); q('set-title').innerText = SET_TITLES[p];
+  if (p === 'main') { applyTheme((S_() || {}).branch || 'army'); renderSetRows(); }
 }
+function setBack() { if (setPage !== 'main') setGo('main'); else closeModal('modal-settings'); }
+function renderSetRows() {
+  const S = S_(), isM = me.gender === 'M', th = isM ? (me.bf_theme === 'gamja' ? '감자돌이' : '짬타이거') : (me.gf_theme === 'cat' ? '꽃냥이' : '곰신 베어');
+  const row = (ic, label, val, go, red) => `<button onclick="${go}" class="w-full flex items-center gap-4 px-5 py-4 border-b border-[#F2F3F5] active:bg-[#F5F6F8]"><span class="text-xl w-7">${ic}</span><span class="flex-1 text-left text-[15px] font-semibold ${red ? 'text-[#E5484D]' : ''}">${label}</span><span class="text-[13px] text-[#8B95A1] max-w-[45%] truncate">${esc(val || '')}</span><span class="text-[#B0B8C1]">›</span></button>`, gap = '<div class="h-2.5 bg-[#F5F6F8]"></div>';
+  q('set-rows').innerHTML = gap + row('💕', '커플 연동', me.partner_id ? '연동 중' : '미연동', "setGo('couple')") + row('👤', '계정', '', "setGo('account')") + gap
+    + row('🪖', '복무 정보', isM ? (BR[me.branch] || BR.army).k : '군인 계정에서 설정', "setGo('service')") + row('📍', '자대 등록', (S && S.unit_name) || '미등록', "setGo('unit')") + row('🎭', '캐릭터 테마', th, "setGo('theme')") + gap
+    + row('🚪', '로그아웃', '', 'logout()', true);
+}
+function openSettings() {
+  const isM = me.gender === 'M'; q('my-couple-code').innerText = me.code || '-'; const linked = !!me.partner_id;
+  q('couple-link-ui').classList.toggle('hidden', linked); q('couple-linked-ui').classList.toggle('hidden', !linked);
+  ['set-service-form', 'set-unit-form'].forEach(i => q(i).classList.toggle('hidden', !isM)); ['set-service-note', 'set-unit-note'].forEach(i => q(i).classList.toggle('hidden', isM));
+  if (isM) { q('set-enlist').value = me.enlist_date || ''; setBr(me.branch || 'army'); q('set-discharge').value = me.discharge_date || ''; q('set-unit-name').value = me.unit_name || ''; q('set-unit-addr').value = me.unit_addr || ''; picks.unit = me.unit_lat ? { label: me.unit_addr || '', name: me.unit_addr || '', lat: me.unit_lat, lng: me.unit_lng } : null; }
+  q('settings-theme-bf').classList.toggle('hidden', !isM); q('settings-theme-gf').classList.toggle('hidden', isM);
+  thTmp = { bf: me.bf_theme, gf: me.gf_theme }; cTh('bf', thTmp.bf, true); cTh('gf', thTmp.gf, true);
+  const em = (session && session.user && session.user.email) || ''; q('set-email').innerText = em; q('set-acc-email').innerText = em; q('set-name').innerText = isM ? '🪖 군인' : '💕 곰신';
+  q('set-avatar').innerHTML = isM ? bfImg(me.bf_theme, me.enlist_date ? rankOf(me, new Date()).r : '이병') : `<img src="${me.gf_theme === 'cat' ? 'gf_cat.png' : 'gf_bear.png'}" class="w-full h-full object-cover">`;
+  setGo('main'); openM('modal-settings');
+}
+async function saveUnit() {
+  const name = q('set-unit-name').value.trim(), addr = q('set-unit-addr').value.trim(), p = picks.unit && picks.unit.label === addr ? picks.unit : null;
+  if (!name) return showAlert('알림', '부대명을 입력해주세요.');
+  const { error } = await sb.from('profiles').update({ unit_name: name, unit_addr: addr || null, unit_lat: p ? p.lat : null, unit_lng: p ? p.lng : null }).eq('id', me.id);
+  if (error) return showAlert('오류', esc(error.message) + '<br><br>schema_update.sql 을 실행했는지 확인하세요.');
+  await loadAll(false); render(true); setGo('main'); showAlert('등록 완료', `자대 '${esc(name)}' 가 등록됐어요. 식단표에서 날짜별 식단을 확인·입력할 수 있어요.`);
+}
+
 function cTh(role, th, noSave) {
   thTmp[role] = th;
   ['gamja', 'tiger'].forEach(t => q('theme-bf-' + t).className = 'py-2.5 rounded-xl border-2 font-bold text-[12px] ' + (thTmp.bf === t ? 'border-[var(--mil-green)] bg-[var(--mil-green-light)] text-[var(--mil-green)]' : 'border-transparent bg-[#F5F6F8] text-[#8B95A1]'));
@@ -447,7 +530,7 @@ async function saveS() {
   const upd = { bf_theme: thTmp.bf, gf_theme: thTmp.gf };
   if (me.gender === 'M') { const e = q('set-enlist').value, d = q('set-discharge').value; if (!e || !d) return showAlert('알림', '입대일/전역일을 확인해주세요.'); Object.assign(upd, { enlist_date: e, discharge_date: d, branch: setBranchV }); }
   const { error } = await sb.from('profiles').update(upd).eq('id', me.id); if (error) return showAlert('오류', esc(error.message));
-  closeModal('modal-settings'); await loadAll(false); render(true);
+  await loadAll(false); render(true); setGo('main');
 }
 async function linkC() {
   const c = q('partner-code-input').value.trim(); if (c.length < 6) return showAlert('알림', '6자리 코드를 입력해주세요.');
@@ -455,16 +538,30 @@ async function linkC() {
   const msg = { OK: '연동 완료! 💕 이제 서로의 프로필이 보여요.', NOT_FOUND: '존재하지 않는 코드입니다.', SELF: '내 코드는 입력할 수 없어요.', SAME_GENDER: '군인(남)과 곰신(여) 계정끼리만 연동돼요.', ALREADY: '이미 연동된 계정이 있어요.' }[data] || data;
   if (data === 'OK') closeModal('modal-settings'); showAlert(data === 'OK' ? '연동 성공' : '연동 실패', msg); await loadAll(false); render(true);
 }
-async function unlinkC() { if (!confirm('정말 연동을 해제할까요?')) return; await sb.rpc('unlink_couple'); closeModal('modal-settings'); await loadAll(false); render(true); }
+async function unlinkC() { if (!confirm('정말 연동을 해제할까요?')) return; await sb.rpc('unlink_couple'); await loadAll(false); render(true); setGo('main'); }
 async function saveStatusMsg() { await sb.from('profiles').update({ status_msg: q('one-line-msg').value.slice(0, 40) }).eq('id', me.id); }
 
 /* ---------- 휴가/일정 ---------- */
-function openVac() { q('vac-title').value = ''; q('vac-start').value = ''; q('vac-end').value = ''; openM('modal-vac'); }
+let vS = null, vE = null, calY = 2026, calM = 0;
+function openVac() { vS = vE = null; const t = new Date(); calY = t.getFullYear(); calM = t.getMonth(); q('vac-title').value = ''; renderCal(); openM('modal-vac'); }
+function calNav(d) { calM += d; if (calM < 0) { calM = 11; calY--; } if (calM > 11) { calM = 0; calY++; } renderCal(); }
+function calPick(x) { if (!vS || vE) { vS = x; vE = null; } else if (x < vS) vS = x; else vE = x; renderCal(); }
+function renderCal() {
+  q('cal-title').innerText = `${calY}년 ${calM + 1}월`;
+  const first = new Date(calY, calM, 1), days = new Date(calY, calM + 1, 0).getDate(), today = ymd(new Date()); let h = '';
+  for (let i = 0; i < first.getDay(); i++) h += '<div></div>';
+  for (let d = 1; d <= days; d++) {
+    const x = ymd(new Date(calY, calM, d)), st = x === vS, en = x === vE, inr = vS && vE && x > vS && x < vE, has = vacs.some(v => x >= v.start_date && x <= v.end_date), dow = (first.getDay() + d - 1) % 7, on = st || en;
+    h += `<button onclick="calPick('${x}')" class="h-10 flex items-center justify-center relative ${inr ? 'bg-[var(--pink-light)]' : ''}"><span class="w-9 h-9 rounded-full flex items-center justify-center text-[14px] font-semibold ${on ? 'bg-[var(--pink-main)] text-white' : ''} ${!on && x === today ? 'border border-[var(--pink-main)]' : ''} ${!on && dow === 0 ? 'text-[#E5484D]' : ''} ${!on && dow === 6 ? 'text-[#3B82F6]' : ''}">${d}</span>${has ? '<i class="absolute bottom-0.5 w-1 h-1 rounded-full bg-[var(--mil-green)]"></i>' : ''}</button>`;
+  }
+  q('cal-grid').innerHTML = h;
+  const nn = vS && vE ? Math.round((pd(vE) - pd(vS)) / 864e5) : 0;
+  q('cal-summary').innerText = vS ? (vE ? `${vS} ~ ${vE} (${nn}박 ${nn + 1}일)` : `${vS} · 종료일을 누르세요 (하루면 바로 저장)`) : '시작일을 선택하세요';
+}
 async function saveVac() {
-  const t = q('vac-title').value.trim(), s = q('vac-start').value, e = q('vac-end').value || s;
-  if (!t || !s) return showAlert('알림', '제목과 시작일을 입력해주세요.'); if (e < s) return showAlert('알림', '종료일이 시작일보다 빠릅니다.');
-  const { error } = await sb.from('vacations').insert({ title: t, start_date: s, end_date: e }); if (error) return showAlert('오류', esc(error.message));
-  closeModal('modal-vac'); await loadAll(false); render(false);
+  if (!vS) return showAlert('알림', '날짜를 선택해주세요.');
+  const { error } = await sb.from('vacations').insert({ title: q('vac-title').value.trim() || '휴가 🏖', start_date: vS, end_date: vE || vS });
+  if (error) return showAlert('오류', esc(error.message)); closeModal('modal-vac'); await loadAll(false); render(false);
 }
 async function delVac(id) { if (!confirm('이 일정을 삭제할까요?')) return; await sb.from('vacations').delete().eq('id', id); await loadAll(false); render(false); }
 function renderVac() {
@@ -618,13 +715,50 @@ function renderRoute() {
   <div class="grid grid-cols-2 gap-2 mt-3"><a target="_blank" rel="noopener" href="https://map.kakao.com/link/by/publictransit/${encodeURIComponent(a.name)},${a.lat},${a.lng}/${encodeURIComponent(b.name)},${b.lat},${b.lng}" class="block text-center bg-[#FEE500] text-[#191F28] rounded-xl py-3 text-[12px] font-bold">카카오맵 ▶</a><a target="_blank" rel="noopener" href="${nv('transit')}" class="block text-center bg-[#03C75A] text-white rounded-xl py-3 text-[12px] font-bold">네이버지도 ▶</a></div>
   <p class="text-[10px] text-[#8B95A1] mt-3">※ 시간·요금은 거리 기반 단순 추정이에요. 열차·버스 실제 출발 시각과 정확한 요금은 위 링크(코레일톡·SRT·고속버스·시외버스)에서 확인하세요.</p>`;
 }
+const picks = { start: null, end: null, unit: null }, sugCache = {}, sugT = {};
+const inId = w => w === 'unit' ? 'set-unit-addr' : 'route-' + w;
+function kakaoReady() {
+  return new Promise(res => {
+    if (!KAKAO_JS_KEY) return res(false); if (window.kakao && kakao.maps && kakao.maps.services) return res(true);
+    const sc = document.createElement('script'); sc.src = 'https://dapi.kakao.com/v2/maps/sdk.js?appkey=' + KAKAO_JS_KEY + '&libraries=services&autoload=false';
+    sc.onload = () => kakao.maps.load(() => res(true)); sc.onerror = () => res(false); document.head.appendChild(sc);
+  });
+}
+async function searchPlaces(text) {
+  if (await kakaoReady()) {
+    const st = kakao.maps.services.Status, kw = await new Promise(r => new kakao.maps.services.Places().keywordSearch(text, (d, s) => r(s === st.OK ? d.slice(0, 8).map(x => ({ name: x.place_name, addr: x.road_address_name || x.address_name, lat: +x.y, lng: +x.x })) : [])));
+    if (kw.length) return kw;
+    return new Promise(r => new kakao.maps.services.Geocoder().addressSearch(text, (d, s) => r(s === st.OK ? d.slice(0, 6).map(x => ({ name: x.road_address ? x.road_address.address_name : x.address_name, addr: x.address_name, lat: +x.y, lng: +x.x })) : [])));
+  }
+  const nom = async t => { const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=6&accept-language=ko&countrycodes=kr&q=' + encodeURIComponent(t)); return (await r.json()).map(x => ({ name: x.name || x.display_name.split(',')[0], addr: x.display_name.split(',').slice(0, 4).join(','), lat: +x.lat, lng: +x.lon })); };
+  let r = await nom(text);
+  if (!r.length && text.includes(' ')) { await sleep(1100); r = await nom(text.split(/\s+/).slice(-2).join(' ')); }
+  return r;
+}
+function placeInput(w) {
+  picks[w] = null; clearTimeout(sugT[w]); const v = q(inId(w)).value.trim(), box = q('sug-' + w);
+  if (v.length < 2) { box.classList.add('hidden'); return; }
+  sugT[w] = setTimeout(async () => {
+    box.classList.remove('hidden'); box.innerHTML = '<div class="p-3 text-[12px] text-[#8B95A1]">검색 중...</div>';
+    let r = []; try { r = await searchPlaces(v); } catch (e) { }
+    if (q(inId(w)).value.trim() !== v) return; sugCache[w] = r;
+    box.innerHTML = r.length ? r.map((x, i) => `<button onclick="pickPlace('${w}',${i})" class="w-full text-left px-3 py-2.5 border-b border-[#F2F3F5] active:bg-[#F5F6F8]"><div class="text-[13px] font-bold">${esc(x.name)}</div><div class="text-[11px] text-[#8B95A1]">${esc(x.addr || '')}</div></button>`).join('')
+      : `<div class="p-3 text-[12px] text-[#8B95A1]">검색 결과가 없어요. 동·도로명이나 건물 이름을 바꿔 보세요.${KAKAO_JS_KEY ? '' : '<br>※ 아파트·상가 이름은 카카오 키를 연결하면 훨씬 정확해져요.'}</div>`;
+  }, 450);
+}
+function pickPlace(w, i) { const x = sugCache[w][i], label = x.name; q(inId(w)).value = label; picks[w] = { label, name: x.name, lat: x.lat, lng: x.lng }; q('sug-' + w).classList.add('hidden'); }
+async function resolvePlace(w) {
+  const text = q(inId(w)).value.trim(), p = picks[w]; if (p && p.label === text) return { name: p.name, lat: p.lat, lng: p.lng };
+  const c = text.match(/^\s*(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)\s*$/); if (c) return { name: '현위치', lat: +c[1], lng: +c[2] };
+  const r = await searchPlaces(text); return r.length ? { name: r[0].name, lat: r[0].lat, lng: r[0].lng } : null;
+}
 async function calcRoute() {
-  const s = q('route-start').value.trim(), e = q('route-end').value.trim();
+  const s = q('route-start').value.trim(), e = q('route-end').value.trim(); ['start', 'end'].forEach(w => q('sug-' + w).classList.add('hidden'));
   if (!s || !e) return showAlert('알림', '출발지와 도착지를 입력해주세요.');
   const box = q('route-results'); box.classList.remove('hidden'); box.innerHTML = '<div class="text-[12px] text-[#8B95A1] text-center py-3">이동 방법 비교 중... ⏳</div>';
   try {
-    const a = await geocode(s); await sleep(1100); const b = await geocode(e);
-    if (!a || !b) { const bad = !a ? s : e; box.innerHTML = `<div class="bg-[#FFF0F3] text-[#D94867] text-[12px] font-bold rounded-xl p-3 mb-2">'${esc(bad)}' 위치를 찾지 못했어요. 더 구체적으로 써보세요. (예: 서울역, 울산 북구 달천동)</div><a target="_blank" rel="noopener" href="https://map.kakao.com/?q=${encodeURIComponent(bad)}" class="block bg-[#F5F6F8] rounded-xl p-3 text-[12px] font-bold text-[var(--mil-green)]">카카오맵에서 '${esc(bad)}' 검색 ▶</a>`; return; }
+    const a = await resolvePlace('start'); const b = await resolvePlace('end');
+    if (!a || !b) { const bad = !a ? s : e; box.innerHTML = `<div class="bg-[#FFF0F3] text-[#D94867] text-[12px] font-bold rounded-xl p-3 mb-2">'${esc(bad)}' 위치를 찾지 못했어요. 입력칸 아래 검색 목록에서 항목을 직접 골라주세요.</div><a target="_blank" rel="noopener" href="https://map.kakao.com/?q=${encodeURIComponent(bad)}" class="block bg-[#F5F6F8] rounded-xl p-3 text-[12px] font-bold text-[var(--mil-green)]">카카오맵에서 '${esc(bad)}' 검색 ▶</a>`; return; }
     const km = hav(a, b); if (km < 0.3) { box.innerHTML = '<div class="text-[12px] text-[#D94867] font-bold">출발지와 도착지가 거의 같아요.</div>'; return; }
     routeCtx = { a, b, km }; routeCtx.opts = buildOpts(km, routeCtx); renderRoute();
   } catch (err) { box.innerHTML = '<div class="bg-[#FFF0F3] text-[#D94867] text-[12px] font-bold rounded-xl p-3">위치 검색에 실패했어요. 잠시 후 다시 시도해주세요.</div>'; }
@@ -635,8 +769,67 @@ function getGPS() {
   navigator.geolocation.getCurrentPosition(async p => {
     const lat = p.coords.latitude, lng = p.coords.longitude; let label = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
     try { const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&accept-language=ko&lat=${lat}&lon=${lng}`); const j = await r.json(); if (j.display_name) { const t = j.display_name.split(',').map(x => x.trim()).filter(x => x && !/^\d+$/.test(x) && x !== '대한민국'); label = t.slice(0, 3).reverse().join(' '); } } catch (e) { }
-    gpsPt = { label, lat, lng }; q('route-start').value = label;
+    q('route-start').value = label; picks.start = { label, name: label, lat, lng };
   }, () => { q('route-start').value = ''; showAlert('알림', '위치 권한을 허용해주세요.'); }, { enableHighAccuracy: true, timeout: 10000 });
+}
+
+/* ---------- 식단표 ---------- */
+let menus = {}, menuDate = '', menuEdit = false;
+function openMenu() { menuDate = ymd(new Date()); menuEdit = false; renderMenu(); openM('modal-menu'); }
+function menuSet(d) { if (d) { menuDate = d; renderMenu(); } }
+function menuGo(n) { const d = pd(menuDate); d.setDate(d.getDate() + n); menuSet(ymd(d)); }
+function menuEditToggle() { menuEdit = !menuEdit; renderMenu(); }
+function renderMenu() {
+  const S = S_(), isM = me.gender === 'M', dt = pd(menuDate), today = ymd(new Date()), tm = ymd(new Date(Date.now() + 864e5)), m = menus[menuDate] || {};
+  q('menu-date-input').value = menuDate; q('menu-date-label').innerText = `${dt.getMonth() + 1}월 ${dt.getDate()}일 (${'일월화수목금토'[dt.getDay()]})${menuDate === today ? ' · 오늘' : menuDate === tm ? ' · 내일' : ''}`;
+  q('menu-unit').innerHTML = S && S.unit_name ? `📍 ${esc(S.unit_name)}` : (isM ? `<button onclick="closeModal('modal-menu');openSettings();setGo('unit')" class="font-bold text-[var(--mil-green)]">자대를 등록하면 부대명이 표시돼요 ▶</button>` : '');
+  q('menu-dg-link').href = 'https://www.data.go.kr/tcs/dss/selectDataSetList.do?keyword=' + encodeURIComponent('국방부 식단정보 ' + ((S && S.unit_name) || '')); q('menu-edit-btn').classList.toggle('hidden', !isM); q('menu-edit').classList.toggle('hidden', !(isM && menuEdit));
+  q('menu-cards').innerHTML = [['🌅', '조식', m.breakfast], ['☀️', '중식', m.lunch], ['🌙', '석식', m.dinner]].map(([i, t, v]) => `<div class="toss-card !p-5"><div class="text-[14px] font-extrabold mb-2">${i} ${t}</div>${v ? (v.split(/\s*[,\n\/]\s*/).filter(Boolean).map(x => `<span class="inline-block bg-[#F5F6F8] rounded-full px-3 py-1 text-[12px] m-0.5">${esc(x)}</span>`).join('')) : '<div class="text-[12px] text-[#8B95A1]">등록된 식단이 없어요 (군인 계정: 우측 위 편집 → CSV 가져오기)</div>'}</div>`).join('');
+  if (isM && menuEdit) { q('menu-in-b').value = m.breakfast || ''; q('menu-in-l').value = m.lunch || ''; q('menu-in-d').value = m.dinner || ''; }
+}
+async function saveMenu() {
+  const row = { created_by: me.id, menu_date: menuDate, breakfast: q('menu-in-b').value.trim(), lunch: q('menu-in-l').value.trim(), dinner: q('menu-in-d').value.trim() };
+  const { error } = await sb.from('menus').upsert(row, { onConflict: 'created_by,menu_date' }); if (error) return showAlert('오류', esc(error.message) + '<br><br>schema_update.sql 을 실행했는지 확인하세요.');
+  menus[menuDate] = row; menuEdit = false; renderMenu();
+}
+function parseCSV(t) {
+  const rows = []; let r = [], f = '', inq = false;
+  for (let i = 0; i < t.length; i++) { const c = t[i];
+    if (inq) { if (c === '"') { if (t[i + 1] === '"') { f += '"'; i++; } else inq = false; } else f += c; }
+    else if (c === '"') inq = true; else if (c === ',') { r.push(f); f = ''; }
+    else if (c === '\n' || c === '\r') { if (c === '\r' && t[i + 1] === '\n') i++; r.push(f); f = ''; if (r.length > 1 || r[0] !== '') rows.push(r); r = []; }
+    else f += c; }
+  if (f !== '' || r.length) { r.push(f); rows.push(r); } return rows;
+}
+async function importMenuCsv(inp) {
+  const file = inp.files[0]; if (!file) return; const buf = await file.arrayBuffer();
+  let txt = new TextDecoder('utf-8').decode(buf); if (txt.includes('\uFFFD')) { try { txt = new TextDecoder('euc-kr').decode(buf); } catch (e) { } }
+  inp.value = ''; const rows = parseCSV(txt.replace(/^\uFEFF/, '')); if (rows.length < 2) return showAlert('알림', '파일 내용을 읽지 못했어요.');
+  const H = rows[0].map(x => x.trim()), idx = k => H.findIndex(h => h.includes(k) && !/열량|알레르기/.test(h)), di = H.findIndex(h => h.includes('날짜') || h.includes('일자')), bi = idx('조식'), li = idx('중식'), ni = idx('석식');
+  if (di < 0 || (bi < 0 && li < 0 && ni < 0)) return showAlert('알림', '날짜·조식·중식·석식 열을 찾지 못했어요. 공공데이터포털의 \'식단정보\' CSV가 맞는지 확인해주세요.');
+  const clean = v => (v || '').replace(/\s*[\n\/]\s*/g, ', ').replace(/,\s*,/g, ',').trim(), map = {};
+  rows.slice(1).forEach(r => { const m = (r[di] || '').match(/(\d{4})\D?(\d{1,2})\D?(\d{1,2})/); if (!m) return;
+    const d = `${m[1]}-${String(m[2]).padStart(2, '0')}-${String(m[3]).padStart(2, '0')}`; map[d] = { created_by: me.id, menu_date: d, breakfast: bi >= 0 ? clean(r[bi]) : '', lunch: li >= 0 ? clean(r[li]) : '', dinner: ni >= 0 ? clean(r[ni]) : '' }; });
+  const out = Object.values(map).sort((a, b) => a.menu_date.localeCompare(b.menu_date)); if (!out.length) return showAlert('알림', '날짜를 읽을 수 있는 줄이 없어요.');
+  for (let i = 0; i < out.length; i += 200) { const { error } = await sb.from('menus').upsert(out.slice(i, i + 200), { onConflict: 'created_by,menu_date' }); if (error) return showAlert('오류', esc(error.message)); }
+  out.forEach(r => menus[r.menu_date] = r); menuEdit = false; menuDate = out.find(r => r.menu_date >= ymd(new Date())) ? out.find(r => r.menu_date >= ymd(new Date())).menu_date : out[out.length - 1].menu_date; renderMenu();
+  showAlert('가져오기 완료', `${out.length}일치 식단을 등록했어요.<br>${out[0].menu_date} ~ ${out[out.length - 1].menu_date}`);
+}
+function parseBulk(txt) {
+  const rows = [], now = new Date();
+  txt.split(/\n+/).forEach(line => {
+    const m = line.match(/^\s*(?:(\d{4})[.\/-])?(\d{1,2})[.\/\-월]\s*(\d{1,2})일?\s*(?:\([^)]*\))?\s*(.*)$/); if (!m) return;
+    const mo = +m[2], d = +m[3]; let y = m[1] ? +m[1] : now.getFullYear(); if (!m[1] && mo < now.getMonth() + 1 - 6) y++;
+    const parts = m[4].split(/(조식|중식|석식)\s*[:：]?\s*/), o = { breakfast: '', lunch: '', dinner: '' };
+    for (let i = 1; i < parts.length; i += 2) o[{ '조식': 'breakfast', '중식': 'lunch', '석식': 'dinner' }[parts[i]]] = (parts[i + 1] || '').replace(/[\/|]\s*$/, '').trim();
+    if (o.breakfast || o.lunch || o.dinner) rows.push({ created_by: me.id, menu_date: `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`, ...o });
+  });
+  return rows;
+}
+async function saveBulk() {
+  const rows = parseBulk(q('menu-bulk').value); if (!rows.length) return showAlert('알림', '읽을 수 있는 줄이 없어요. 예) 10/21 조식: 밥, 국 중식: 카레 석식: 불고기');
+  const { error } = await sb.from('menus').upsert(rows, { onConflict: 'created_by,menu_date' }); if (error) return showAlert('오류', esc(error.message));
+  rows.forEach(r => menus[r.menu_date] = r); q('menu-bulk').value = ''; renderMenu(); showAlert('저장 완료', `${rows.length}일치 식단을 저장했어요.`);
 }
 
 /* ---------- 혜택 · 이벤트 ---------- */
