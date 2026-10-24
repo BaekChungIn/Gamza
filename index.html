@@ -96,8 +96,8 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
       <div onclick="evoPreview()" class="w-[76px] h-[76px] rounded-[22px] bg-[var(--mil-soft)] flex items-center justify-center overflow-hidden flex-shrink-0 border border-[var(--mil-border)]" id="bf-img-container"></div>
       <div class="flex-1 min-w-0">
        <div class="text-[12px] text-[var(--mil-green)] font-bold mb-0.5">대한민국 <span id="bf-branch">육군</span><span id="bf-unit"></span></div>
-       <div class="text-[21px] font-extrabold flex items-baseline gap-1.5"><span id="bf-rank">-</span><span id="bf-ho" class="text-[15px] text-[var(--mil-green)]"></span></div>
-       <div id="bf-name" class="text-[14px] font-bold text-[#4E5968] hidden"></div>
+       <div class="flex items-center gap-1.5 text-[13px] font-bold text-[#4E5968]"><span id="bf-mark" class="inline-flex"></span><span id="bf-rank">-</span><span id="bf-ho"></span></div>
+       <div id="bf-name" class="text-[26px] font-black leading-tight tracking-tight break-all hidden"></div>
        <div class="text-[11px] text-[#8B95A1] mt-0.5 leading-snug">입대 <b id="bf-enlist" class="text-[#4E5968]">-</b> · 전역 <b id="bf-dis" class="text-[#4E5968]">-</b></div>
       </div></div>
      <div class="mt-4 rounded-2xl p-4 text-white" style="background:var(--mil-dark)">
@@ -369,6 +369,10 @@ function milInfo(S) {
   return { e, dis, grad, d1, d2, d3, b };
 }
 let hoC = null;
+function rankMark(r) {
+  const n = { '훈련병': 1, '이병': 1, '일병': 2, '상병': 3, '병장': 4 }[r], bars = n ? Array.from({ length: n }, () => '<i style="display:block;width:10px;height:2.5px;border-radius:1px;background:#fff"></i>').join('') : '<b style="color:#fff;font-size:11px;line-height:1">★</b>';
+  return `<span style="width:20px;height:20px;border-radius:5px;background:var(--mil-dark);display:inline-flex;flex-direction:column;gap:2px;align-items:center;justify-content:center">${bars}</span>`;
+}
 function hoInfo(S, now) {
   const I = milInfo(S), r = rankOf(S, now); let rr = r;
   if (r.r === '훈련병') rr = { r: '이병', nD: I.d1, nN: '일병' };
@@ -381,8 +385,8 @@ function fillSoldier(S, now) {
   const I = milInfo(S), h = hoInfo(S, now), rk = rankOf(S, now).r; hoC = h;
   const T0 = new Date(now.getFullYear(), now.getMonth(), now.getDate()), dd = d => Math.max(0, Math.ceil((d - T0) / 864e5)), f = d => `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
   const td = Math.round((I.dis - I.e) / 864e5) + 1, sd = Math.min(td, Math.max(0, Math.round((T0 - I.e) / 864e5) + 1));
-  { const nm = S.nickname || '', el = q('bf-name'); el.classList.toggle('hidden', !nm && S.id !== me.id); el.innerText = nm || '✏️ 이름을 설정해보세요'; el.onclick = !nm && S.id === me.id ? openProfileSet : null; }
-  q('bf-rank').innerText = rk; q('bf-ho').innerText = rk === '전역' ? '' : `${h.n}호봉`; q('bf-branch').innerText = I.b.k; q('bf-unit').innerText = S.unit_name ? ' · ' + S.unit_name : '';
+  { const nm = S.nickname || '', el = q('bf-name'); el.className = nm ? 'text-[26px] font-black leading-tight tracking-tight break-all' : 'text-[14px] font-bold text-[#8B95A1]' + (S.id !== me.id ? ' hidden' : ''); el.innerText = nm || '✏️ 이름을 설정해보세요'; el.onclick = !nm && S.id === me.id ? openProfileSet : null; }
+  q('bf-rank').innerText = rk; q('bf-mark').innerHTML = rankMark(rk); q('bf-ho').innerText = rk === '전역' ? '' : `${h.n}호봉`; q('bf-branch').innerText = I.b.k; q('bf-unit').innerText = S.unit_name ? ' · ' + S.unit_name : '';
   q('bf-enlist').innerText = f(I.e); q('bf-dis').innerText = f(I.dis); q('bf-dday').innerText = sd >= td ? '전역!' : `D-${td - sd}`;
   q('bf-ho-label').innerText = h.nxIsPromo ? (h.rank === '병장' ? '마지막 호봉' : `${h.next} 1호봉`) : `${h.n + 1}호봉 승급`; q('bf-ho-dday').innerText = h.nxIsPromo && h.rank === '병장' ? '' : `D-${dd(h.nx)}`;
   q('bf-pr-label').innerText = h.rank === '병장' ? '전역' : `${h.next} 진급`; q('bf-pr-dday').innerText = `D-${dd(h.end)}`;
