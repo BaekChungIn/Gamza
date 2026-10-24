@@ -27,6 +27,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg-main)
 @keyframes bl{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px) scale(1.1)}}.animate-letter{animation:bl 1s infinite}
 @keyframes flash{0%{opacity:0}20%{opacity:1;background:#fff}100%{opacity:0}}
 .flash-overlay{position:fixed;inset:0;z-index:9999;pointer-events:none;animation:flash 1.5s ease-out forwards}
+@keyframes hb{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}.animate-heartbeat{animation:hb 1.4s infinite}
 svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .pb-safe{padding-bottom:max(12px,env(safe-area-inset-bottom))}
 .inp{width:100%;background:#F5F6F8;border-radius:12px;padding:14px 16px;font-size:14px;outline:none}.inp:focus{box-shadow:0 0 0 2px var(--mil-green)}
@@ -96,6 +97,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
       <div class="flex-1 min-w-0">
        <div class="text-[12px] text-[var(--mil-green)] font-bold mb-0.5">대한민국 <span id="bf-branch">육군</span><span id="bf-unit"></span></div>
        <div class="text-[21px] font-extrabold flex items-baseline gap-1.5"><span id="bf-rank">-</span><span id="bf-ho" class="text-[15px] text-[var(--mil-green)]"></span></div>
+       <div id="bf-name" class="text-[14px] font-bold text-[#4E5968] hidden"></div>
        <div class="text-[11px] text-[#8B95A1] mt-0.5 leading-snug">입대 <b id="bf-enlist" class="text-[#4E5968]">-</b> · 전역 <b id="bf-dis" class="text-[#4E5968]">-</b></div>
       </div></div>
      <div class="mt-4 rounded-2xl p-4 text-white" style="background:var(--mil-dark)">
@@ -114,6 +116,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
       <div><div id="st-vac" class="text-[20px] font-black tabular-nums">-</div><div class="text-[11px] text-[#8B95A1]">다음 휴가일</div></div>
      </div>
     </div>
+    <div id="heart-divider" class="hidden items-center gap-3 px-6" style="margin-top:-4px;margin-bottom:-4px"><div class="flex-1 h-px bg-[#FFD6DE]"></div><span class="text-[24px] animate-heartbeat">💕</span><div class="flex-1 h-px bg-[#FFD6DE]"></div></div>
     <div id="gf-profile-card" class="toss-card border-[1.5px] border-[var(--pink-light)] hidden">
      <div class="flex items-center gap-5">
       <div class="w-[76px] h-[76px] rounded-[22px] bg-[var(--pink-light)] flex items-center justify-center relative flex-shrink-0"><div class="halo-bg"></div><div id="gf-img-container" class="w-full h-full relative z-10 flex items-center justify-center overflow-hidden rounded-[22px]"></div></div>
@@ -196,7 +199,8 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
   <div class="max-w-md mx-auto w-full h-full flex flex-col" style="padding-top:env(safe-area-inset-top)">
    <div class="flex items-center justify-between px-4 py-3"><button onclick="setBack()" class="w-10 h-10 rounded-full bg-[#F5F6F8] text-xl font-bold">‹</button><div id="set-title" class="font-bold text-[17px]">설정</div><div class="w-10"></div></div>
    <div class="flex-1 overflow-y-auto no-scrollbar pb-12">
-    <div id="set-p-main"><div class="flex items-center gap-4 px-5 py-4"><div id="set-avatar" class="w-16 h-16 rounded-2xl bg-[var(--mil-soft)] overflow-hidden flex items-center justify-center flex-shrink-0"></div><div class="flex-1 min-w-0"><div id="set-name" class="font-extrabold text-[18px]"></div><div id="set-email" class="text-[13px] text-[#8B95A1] truncate"></div></div><button onclick="setGo('account')" class="border border-[#E5E8EB] rounded-full px-3.5 py-1.5 text-[12px] font-bold">관리</button></div><div id="set-rows"></div></div>
+    <div id="set-p-main"><div class="flex items-center gap-4 px-5 py-4"><div id="set-avatar" class="w-16 h-16 rounded-2xl bg-[var(--mil-soft)] overflow-hidden flex items-center justify-center flex-shrink-0"></div><div class="flex-1 min-w-0"><div id="set-name" class="font-extrabold text-[18px]"></div><div id="set-email" class="text-[13px] text-[#8B95A1] truncate"></div></div><button onclick="setGo('profile')" class="border border-[#E5E8EB] rounded-full px-3.5 py-1.5 text-[12px] font-bold">관리</button></div><div id="set-rows"></div></div>
+    <div id="set-p-profile" class="hidden px-5 pt-2"><label class="text-[12px] font-bold text-[#4E5968] block mb-2">이름 또는 별명</label><input id="set-nick" maxlength="12" placeholder="예) 백충인, 감자돌이" class="inp mb-2"><p class="text-[11px] text-[#8B95A1] mb-5">홈 화면 프로필에 표시되고, 연동된 상대에게도 보여요. (최대 12자)</p><button onclick="saveNick()" class="w-full bg-[#191F28] text-white py-3.5 rounded-xl font-bold text-[15px]">저장</button></div>
     <div id="set-p-couple" class="hidden px-5 pt-2"><div id="couple-link-ui"><div class="bg-[#FFF0F3] p-4 rounded-xl flex justify-between items-center mb-3"><span class="text-[13px] font-semibold text-[#D94867]">나의 연결 코드</span><span id="my-couple-code" class="font-black text-[#D94867] tracking-widest text-[16px] select-text">-</span></div><p class="text-[12px] text-[#8B95A1] mb-3">내 코드를 연인에게 알려주거나, 연인의 코드를 아래에 입력하면 연동돼요.</p><div class="flex gap-2"><input id="partner-code-input" maxlength="6" placeholder="상대방 코드 6자리" class="flex-1 bg-white border border-[#E5E8EB] rounded-xl px-3 py-3 text-[14px] outline-none uppercase"><button onclick="linkC()" class="bg-[#191F28] text-white px-5 rounded-xl font-bold text-[13px]">연결</button></div></div>
      <div id="couple-linked-ui" class="hidden bg-[var(--mil-green-light)] p-5 rounded-xl text-center border border-[var(--mil-border)]"><div class="text-[15px] font-bold text-[var(--mil-green)]">✅ 연동 중이에요</div><button onclick="unlinkC()" class="text-[12px] text-[#8B95A1] underline mt-2">연동 해제</button></div></div>
     <div id="set-p-service" class="hidden px-5 pt-2"><div id="set-service-note" class="hidden text-[13px] text-[#8B95A1] bg-[#F5F6F8] rounded-xl p-4">복무 정보는 군인 계정에서 설정해요. 연동하면 남자친구의 정보가 홈에 보여요.</div>
@@ -377,6 +381,7 @@ function fillSoldier(S, now) {
   const I = milInfo(S), h = hoInfo(S, now), rk = rankOf(S, now).r; hoC = h;
   const T0 = new Date(now.getFullYear(), now.getMonth(), now.getDate()), dd = d => Math.max(0, Math.ceil((d - T0) / 864e5)), f = d => `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
   const td = Math.round((I.dis - I.e) / 864e5) + 1, sd = Math.min(td, Math.max(0, Math.round((T0 - I.e) / 864e5) + 1));
+  { const nm = S.nickname || '', el = q('bf-name'); el.classList.toggle('hidden', !nm && S.id !== me.id); el.innerText = nm || '✏️ 이름을 설정해보세요'; el.onclick = !nm && S.id === me.id ? openProfileSet : null; }
   q('bf-rank').innerText = rk; q('bf-ho').innerText = rk === '전역' ? '' : `${h.n}호봉`; q('bf-branch').innerText = I.b.k; q('bf-unit').innerText = S.unit_name ? ' · ' + S.unit_name : '';
   q('bf-enlist').innerText = f(I.e); q('bf-dis').innerText = f(I.dis); q('bf-dday').innerText = sd >= td ? '전역!' : `D-${td - sd}`;
   q('bf-ho-label').innerText = h.nxIsPromo ? (h.rank === '병장' ? '마지막 호봉' : `${h.next} 1호봉`) : `${h.n + 1}호봉 승급`; q('bf-ho-dday').innerText = h.nxIsPromo && h.rank === '병장' ? '' : `D-${dd(h.nx)}`;
@@ -456,11 +461,12 @@ function render(full) {
     const gi = gfRank(rank); q('gf-rank-icon').innerText = gi[0]; q('gf-rank-name').innerText = gi[1];
     q('gf-img-container').innerHTML = `<img src="${G.gf_theme === 'cat' ? 'gf_cat.png' : 'gf_bear.png'}" class="w-full h-full object-cover transition-all duration-1000" style="transform:scale(${gi[2]})">`;
     document.documentElement.style.setProperty('--halo-op', gi[3]);
-    q('gf-name').innerText = G.gf_theme === 'cat' ? '꽃냥이' : '곰신 베어';
+    { const g = q('gf-name'); g.innerText = G.nickname || (G.id === me.id ? '✏️ 이름을 설정해보세요' : (G.gf_theme === 'cat' ? '꽃냥이' : '곰신 베어')); g.onclick = !G.nickname && G.id === me.id ? openProfileSet : null; }
     const inp = q('one-line-msg'); inp.readOnly = G.id !== me.id; inp.placeholder = G.id === me.id ? '상태 메시지 입력' : '상태 메시지 없음'; if (document.activeElement !== inp) inp.value = G.status_msg || '';
   }
   const c = q('profile-container'), bf = q('soldier-card'), gf = q('gf-profile-card');
-  if (me.gender === 'M') { c.appendChild(bf); c.appendChild(gf); } else { c.appendChild(gf); c.appendChild(bf); }
+  const ht = q('heart-divider'); ht.classList.toggle('hidden', !(S && G)); ht.classList.toggle('flex', !!(S && G));
+  if (me.gender === 'M') { c.appendChild(bf); c.appendChild(ht); c.appendChild(gf); } else { c.appendChild(gf); c.appendChild(ht); c.appendChild(bf); }
   // 장바구니 아이콘 (군인 홈)
   const showCart = me.gender === 'M' && partner && partner.px_sent_at && pWishes.length > 0;
   q('btn-cart').classList.toggle('hidden', !showCart);
@@ -488,7 +494,7 @@ function switchTab(t) {
 function setBr(k) { setBranchV = k; applyTheme(k); Object.keys(BR).forEach(b => q('sb-' + b).className = 'py-2 rounded-lg border-2 font-bold text-[11px] ' + (b === k ? 'border-[var(--mil-green)] bg-[var(--mil-green-light)] text-[var(--mil-green)]' : 'border-[#E5E8EB] bg-[#F5F6F8] text-[#8B95A1]')); autoD(); }
 function autoD() { const e = q('set-enlist').value; if (e) q('set-discharge').value = ymd(calcDischarge(pd(e), setBranchV)); }
 let thTmp = {};
-const SET_TITLES = { main: '설정', couple: '커플 연동', service: '복무 정보', unit: '자대 등록', theme: '캐릭터 테마', account: '계정' };
+const SET_TITLES = { main: '설정', profile: '프로필', couple: '커플 연동', service: '복무 정보', unit: '자대 등록', theme: '캐릭터 테마', account: '계정' };
 let setPage = 'main';
 function setGo(p) {
   setPage = p; Object.keys(SET_TITLES).forEach(k => q('set-p-' + k).classList.toggle('hidden', k !== p)); q('set-title').innerText = SET_TITLES[p];
@@ -498,7 +504,8 @@ function setBack() { if (setPage !== 'main') setGo('main'); else closeModal('mod
 function renderSetRows() {
   const S = S_(), isM = me.gender === 'M', th = isM ? (me.bf_theme === 'gamja' ? '감자돌이' : '짬타이거') : (me.gf_theme === 'cat' ? '꽃냥이' : '곰신 베어');
   const row = (ic, label, val, go, red) => `<button onclick="${go}" class="w-full flex items-center gap-4 px-5 py-4 border-b border-[#F2F3F5] active:bg-[#F5F6F8]"><span class="text-xl w-7">${ic}</span><span class="flex-1 text-left text-[15px] font-semibold ${red ? 'text-[#E5484D]' : ''}">${label}</span><span class="text-[13px] text-[#8B95A1] max-w-[45%] truncate">${esc(val || '')}</span><span class="text-[#B0B8C1]">›</span></button>`, gap = '<div class="h-2.5 bg-[#F5F6F8]"></div>';
-  q('set-rows').innerHTML = gap + row('💕', '커플 연동', me.partner_id ? '연동 중' : '미연동', "setGo('couple')") + row('👤', '계정', '', "setGo('account')") + gap
+  q('set-name').innerText = me.nickname || (isM ? '🪖 군인' : '💕 곰신');
+  q('set-rows').innerHTML = gap + row('✏️', '프로필 (이름·별명)', me.nickname || '미설정', "setGo('profile')") + row('💕', '커플 연동', me.partner_id ? '연동 중' : '미연동', "setGo('couple')") + row('👤', '계정', '', "setGo('account')") + gap
     + row('🪖', '복무 정보', isM ? (BR[me.branch] || BR.army).k : '군인 계정에서 설정', "setGo('service')") + row('📍', '자대 등록', (S && S.unit_name) || '미등록', "setGo('unit')") + row('🎭', '캐릭터 테마', th, "setGo('theme')") + gap
     + row('🚪', '로그아웃', '', 'logout()', true);
 }
@@ -509,10 +516,16 @@ function openSettings() {
   if (isM) { q('set-enlist').value = me.enlist_date || ''; setBr(me.branch || 'army'); q('set-discharge').value = me.discharge_date || ''; q('set-unit-name').value = me.unit_name || ''; q('set-unit-addr').value = me.unit_addr || ''; picks.unit = me.unit_lat ? { label: me.unit_addr || '', name: me.unit_addr || '', lat: me.unit_lat, lng: me.unit_lng } : null; }
   q('settings-theme-bf').classList.toggle('hidden', !isM); q('settings-theme-gf').classList.toggle('hidden', isM);
   thTmp = { bf: me.bf_theme, gf: me.gf_theme }; cTh('bf', thTmp.bf, true); cTh('gf', thTmp.gf, true);
-  const em = (session && session.user && session.user.email) || ''; q('set-email').innerText = em; q('set-acc-email').innerText = em; q('set-name').innerText = isM ? '🪖 군인' : '💕 곰신';
+  const em = (session && session.user && session.user.email) || ''; q('set-email').innerText = em; q('set-acc-email').innerText = em; q('set-name').innerText = me.nickname || (isM ? '🪖 군인' : '💕 곰신'); q('set-nick').value = me.nickname || '';
   q('set-avatar').innerHTML = isM ? bfImg(me.bf_theme, me.enlist_date ? rankOf(me, new Date()).r : '이병') : `<img src="${me.gf_theme === 'cat' ? 'gf_cat.png' : 'gf_bear.png'}" class="w-full h-full object-cover">`;
   setGo('main'); openM('modal-settings');
 }
+async function saveNick() {
+  const v = q('set-nick').value.trim().slice(0, 12), { error } = await sb.from('profiles').update({ nickname: v || null }).eq('id', me.id);
+  if (error) return showAlert('오류', esc(error.message) + '<br><br>schema_nickname.sql 을 실행했는지 확인하세요.');
+  await loadAll(false); render(true); setGo('main');
+}
+function openProfileSet() { openSettings(); setGo('profile'); }
 async function saveUnit() {
   const name = q('set-unit-name').value.trim(), addr = q('set-unit-addr').value.trim(), p = picks.unit && picks.unit.label === addr ? picks.unit : null;
   if (!name) return showAlert('알림', '부대명을 입력해주세요.');
