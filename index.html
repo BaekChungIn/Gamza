@@ -31,6 +31,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg-main)
 svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .pb-safe{padding-bottom:max(12px,env(safe-area-inset-bottom))}
 .inp{width:100%;background:#F5F6F8;border-radius:12px;padding:14px 16px;font-size:14px;outline:none}.inp:focus{box-shadow:0 0 0 2px var(--mil-green)}
+.pg{flex:0 0 100%;min-width:0;scroll-snap-align:center;scroll-snap-stop:always}
 </style>
 </head>
 <body class="min-h-screen flex justify-center items-start sm:p-4 select-none antialiased bg-gray-100">
@@ -90,12 +91,12 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
   <!-- 홈 -->
   <section id="tab-home" class="space-y-4 pt-2">
    <div id="clean-state-banner" class="toss-card text-center py-10 hidden"><span class="text-4xl">🌱</span><h2 class="text-[18px] font-extrabold my-2">연동 대기중</h2><p class="text-[13px] text-[#8B95A1]">설정에서 내 코드를 남자친구에게 알려주거나<br>상대 코드를 입력해 연동해보세요!</p></div>
-   <div id="profile-container" class="space-y-4">
-    <div id="soldier-card" class="toss-card hidden">
+   <div id="profile-container" class="flex overflow-x-auto no-scrollbar" style="scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;align-items:flex-start;margin:0 -6px;padding:2px 6px 14px">
+    <div id="soldier-card" class="pg toss-card hidden">
      <div class="flex items-center gap-4">
       <div onclick="evoPreview()" class="w-[76px] h-[76px] rounded-[22px] bg-[var(--mil-soft)] flex items-center justify-center overflow-hidden flex-shrink-0 border border-[var(--mil-border)]" id="bf-img-container"></div>
       <div class="flex-1 min-w-0">
-       <div class="text-[12px] text-[var(--mil-green)] font-bold mb-0.5">대한민국 <span id="bf-branch">육군</span><span id="bf-unit"></span></div>
+       <div class="flex items-center justify-between gap-2 mb-0.5"><div class="text-[12px] text-[var(--mil-green)] font-bold truncate">대한민국 <span id="bf-branch">육군</span><span id="bf-unit"></span></div><span id="bf-my" class="hidden text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[var(--mil-green-light)] text-[var(--mil-green)] whitespace-nowrap">🥔 my 감자</span></div>
        <div class="flex items-center gap-1.5 text-[13px] font-bold text-[var(--mil-green)]"><span id="bf-mark" class="inline-flex"></span><span id="bf-rank">-</span><span id="bf-ho"></span></div>
        <div id="bf-name" class="text-[25px] font-extrabold leading-tight tracking-tight break-all hidden"></div>
        <div class="text-[11px] text-[#8B95A1] mt-0.5 leading-snug">입대 <b id="bf-enlist" class="text-[#4E5968]">-</b> · 전역 <b id="bf-dis" class="text-[#4E5968]">-</b></div>
@@ -116,23 +117,35 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
       <div><div id="st-vac" class="text-[20px] font-black tabular-nums">-</div><div class="text-[11px] text-[#8B95A1]">다음 휴가일</div></div>
      </div>
     </div>
-    <div id="heart-divider" class="hidden flex-col items-center text-center" style="margin-top:-2px;margin-bottom:-2px">
-     <div id="love-date" class="text-[11px] font-bold text-[#B0B8C1] min-h-[14px]"></div>
-     <div class="flex items-center justify-center gap-2 w-full"><div id="love-n1" class="flex-1 text-right text-[16px] font-extrabold truncate"></div><svg viewBox="0 0 100 92" class="w-[68px] h-[62px] animate-heartbeat flex-shrink-0" style="filter:drop-shadow(0 4px 6px rgba(232,69,107,.35))"><defs><linearGradient id="hg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF9DB4"/><stop offset="1" stop-color="#EE4D74"/></linearGradient></defs><path d="M50 86C12 58 2 34 17 17C30 3 45 10 50 25C55 10 70 3 83 17C98 34 88 58 50 86Z" fill="url(#hg)" stroke="#8A2F44" stroke-width="3.5" stroke-linejoin="round"/><path d="M24 25C28 19 35 17 40 21" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".85"/><circle cx="21" cy="35" r="3" fill="#fff" opacity=".85"/></svg><div id="love-n2" class="flex-1 text-left text-[16px] font-extrabold truncate"></div></div>
-     <div id="love-days" class="text-[13px] font-extrabold text-[var(--pink-main)]"></div>
-    </div>
-    <div id="gf-profile-card" class="toss-card border-[1.5px] border-[var(--pink-light)] hidden">
-     <div class="flex items-center gap-5">
+    <div id="heart-divider" class="hidden items-center justify-center" style="flex:0 0 76px"><svg viewBox="0 0 100 92" class="w-[58px] h-[53px] animate-heartbeat" style="filter:drop-shadow(0 4px 6px rgba(232,69,107,.35))"><defs><linearGradient id="hg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF9DB4"/><stop offset="1" stop-color="#EE4D74"/></linearGradient></defs><path d="M50 86C12 58 2 34 17 17C30 3 45 10 50 25C55 10 70 3 83 17C98 34 88 58 50 86Z" fill="url(#hg)" stroke="#8A2F44" stroke-width="3.5" stroke-linejoin="round"/><path d="M24 25C28 19 35 17 40 21" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".85"/><circle cx="21" cy="35" r="3" fill="#fff" opacity=".85"/></svg></div>
+    <div id="gf-profile-card" class="pg toss-card border-[1.5px] border-[var(--pink-light)] relative hidden">
+     <div class="flex items-center gap-4">
       <div class="w-[76px] h-[76px] rounded-[22px] bg-[var(--pink-light)] flex items-center justify-center relative flex-shrink-0"><div class="halo-bg"></div><div id="gf-img-container" class="w-full h-full relative z-10 flex items-center justify-center overflow-hidden rounded-[22px]"></div></div>
-      <div class="flex-1">
-       <div class="text-[12px] text-[var(--pink-main)] font-bold mb-0.5"><span id="gf-rank-icon">🌱</span> <span id="gf-rank-name">씨앗</span></div>
-       <div class="text-[19px] font-extrabold" id="gf-name">곰신</div>
-       <div class="mt-2.5 bg-[#FFF5F7] px-3.5 py-2.5 rounded-xl border border-[#FFE4E8] text-[13px] text-[#D94867] font-semibold flex gap-2"><span>💬</span><input type="text" id="one-line-msg" maxlength="40" placeholder="상태 메시지" class="bg-transparent outline-none w-full text-[#D94867] placeholder-[#FCA5A5]" onchange="saveStatusMsg()"></div>
-       <div id="gf-esc" class="mt-3 hidden"><div class="flex justify-between text-[11px] font-bold text-[var(--pink-main)] mb-1"><span>곰신 탈출</span><span id="gf-esc-dday">D-0</span></div><div class="relative h-7 rounded-lg overflow-hidden" style="background:#FFE8ED"><div id="gf-esc-bar" class="absolute inset-y-0 left-0" style="background:linear-gradient(90deg,#F9B4C2,var(--pink-main));width:0"></div><div id="gf-esc-pct" class="relative px-2.5 h-full flex items-center text-[13px] font-black tabular-nums text-[#7A2E3E]">0%</div></div></div>
+      <div class="flex-1 min-w-0">
+       <div class="text-[12px] text-[var(--pink-main)] font-bold mb-0.5 truncate"><span id="gf-rank-icon">🌱</span> 곰신 <span id="gf-rank-name">씨앗</span></div>
+       <div class="flex items-center justify-between gap-2"><div id="gf-name" class="text-[25px] font-extrabold leading-tight tracking-tight truncate min-w-0">곰신</div><div id="gf-love-days" class="text-right leading-tight flex-shrink-0"></div></div>
+       <div class="mt-1.5 bg-[#FFF5F7] px-3 py-1.5 rounded-xl border border-[#FFE4E8] text-[12px] text-[#D94867] font-semibold flex gap-1.5"><span>💬</span><input type="text" id="one-line-msg" maxlength="40" placeholder="상태 메시지" class="bg-transparent outline-none w-full text-[#D94867] placeholder-[#FCA5A5]" onchange="saveStatusMsg()"></div>
+      </div>
+     </div>
+     <div id="gf-box" class="mt-4 rounded-2xl p-4 text-white hidden" style="background:#4B2A35">
+      <div class="flex justify-between text-[12px] font-bold mb-1.5"><span>곰신 탈출</span><span id="gf-esc-dday">D-0</span></div>
+      <div class="relative h-9 rounded-lg overflow-hidden bg-white/10"><div id="gf-esc-bar" class="absolute inset-y-0 left-0" style="background:linear-gradient(90deg,#E8788F,var(--pink-main));width:0"></div><div id="gf-esc-pct" class="relative px-3 h-full flex items-center text-[15px] font-black tabular-nums">0%</div></div>
+      <div class="grid grid-cols-2 gap-3 mt-4">
+       <div><div class="flex justify-between text-[11px] font-bold"><span id="gf-lv-label">-</span><span id="gf-lv-dday">-</span></div><div class="relative h-6 rounded-md bg-white/10 overflow-hidden mt-1"><div id="gf-lv-bar" class="absolute inset-y-0 left-0 bg-white/25" style="width:0"></div><div id="gf-lv-pct" class="relative px-2 h-full flex items-center text-[11px] tabular-nums">0%</div></div></div>
+       <div><div class="flex justify-between text-[11px] font-bold"><span id="gf-an-label">기념일 미설정</span><span id="gf-an-dday"></span></div><div class="relative h-6 rounded-md bg-white/10 overflow-hidden mt-1"><div id="gf-an-bar" class="absolute inset-y-0 left-0 bg-white/25" style="width:0"></div><div id="gf-an-pct" class="relative px-2 h-full flex items-center text-[11px] tabular-nums">-</div></div></div>
       </div></div>
+     <div id="gf-stats" class="grid grid-cols-3 gap-y-5 mt-5 text-center hidden">
+      <div><div id="gst-total" class="text-[20px] font-black tabular-nums">0</div><div class="text-[11px] text-[#8B95A1]">전체 기다림</div></div>
+      <div><div id="gst-cur" class="text-[20px] font-black tabular-nums">0</div><div class="text-[11px] text-[#8B95A1]">현재 기다림</div></div>
+      <div><div id="gst-left" class="text-[20px] font-black tabular-nums">0</div><div class="text-[11px] text-[#8B95A1]">남은 기다림</div></div>
+      <div><div id="gst-lv" class="text-[20px] font-black tabular-nums">0</div><div id="gst-lv-label" class="text-[11px] text-[#8B95A1]">레벨업까지</div></div>
+      <div><div id="gst-an" class="text-[20px] font-black tabular-nums">-</div><div id="gst-an-label" class="text-[11px] text-[#8B95A1]">다음 기념일</div></div>
+      <div><div id="gst-vac" class="text-[20px] font-black tabular-nums">-</div><div class="text-[11px] text-[#8B95A1]">다음 휴가일</div></div>
+     </div>
+     <div id="gf-nosoldier" class="hidden mt-4 text-[12px] text-[#8B95A1] bg-[#FFF5F7] rounded-xl p-3 text-center">남자친구와 연동하면 기다림 기록이 여기에 나타나요 💕</div>
     </div>
    </div>
-
+   <div id="pager-dots" class="hidden justify-center gap-1.5" style="margin-top:-6px"><i id="dot0" onclick="pagerGo(0)" class="block w-2 h-2 rounded-full bg-[var(--mil-green)]"></i><i id="dot1" onclick="pagerGo(1)" class="block w-2 h-2 rounded-full bg-[#D5D9DE]"></i></div>
    <div id="menu-btn-row" class="flex justify-end hidden"><button onclick="openMenu()" class="text-[12px] font-bold bg-white border border-[#E5E8EB] rounded-full px-3.5 py-1.5 shadow-sm active:scale-95">🍚 식단표</button></div>
    <div id="salary-card" class="toss-card bg-[var(--mil-dark)] text-white relative overflow-hidden hidden" onclick="rainBurst(15)">
     <div id="money-rain-container" class="absolute inset-0 pointer-events-none z-10 overflow-hidden"></div>
@@ -389,13 +402,32 @@ function rankMark(r) {
   const n = { '훈련병': 1, '이병': 1, '일병': 2, '상병': 3, '병장': 4 }[r], bars = n ? Array.from({ length: n }, () => '<i style="display:block;width:10px;height:2.5px;border-radius:1px;background:#fff"></i>').join('') : '<b style="color:#fff;font-size:11px;line-height:1">★</b>';
   return `<span style="width:20px;height:20px;border-radius:5px;background:var(--mil-green);display:inline-flex;flex-direction:column;gap:2px;align-items:center;justify-content:center">${bars}</span>`;
 }
-function fillLove(S, G) {
-  const ld = me.love_date || (partner && partner.love_date) || '', T0 = new Date(); T0.setHours(0, 0, 0, 0);
-  q('love-n1').innerText = S.nickname || '군인'; q('love-n2').innerText = G.nickname || '곰신';
-  if (!ld) { q('love-date').innerText = ''; q('love-days').innerHTML = '<button onclick="openLoveSet()" class="text-[12px] font-bold text-[#B0B8C1]">💑 사귄 날짜를 설정해보세요</button>'; return; }
-  const n = Math.floor((T0 - pd(ld)) / 864e5) + 1; q('love-date').innerText = ld.replace(/-/g, '.') + ' ~';
-  q('love-days').innerText = n >= 1 ? `사귄 지 ${n}일째` : `만나기까지 D-${1 - n}`;
+let annC = null;
+function annivInfo(ld) {
+  const T0 = new Date(); T0.setHours(0, 0, 0, 0); const b = pd(ld), addY = (d, k) => new Date(d.getFullYear() + k, d.getMonth(), d.getDate());
+  let k = 1; while (addY(b, k) < T0) k++; const end = addY(b, k), start = k === 1 ? b : addY(b, k - 1);
+  return { k, start: start.getTime(), end: end.getTime(), days: Math.round((end - T0) / 864e5) };
 }
+function fillLove(S, G) {
+  const ld = me.love_date || (partner && partner.love_date) || '', T0 = new Date(); T0.setHours(0, 0, 0, 0), box = q('gf-love-days');
+  if (!ld) {
+    box.innerHTML = '<button onclick="openLoveSet()" class="text-[10px] font-bold text-[#B0B8C1] text-right leading-tight">💑 사귄 날짜<br>설정하기</button>'; annC = null;
+    q('gst-an').innerText = '-'; q('gst-an-label').innerText = '다음 기념일'; q('gf-an-label').innerText = '기념일 미설정'; q('gf-an-dday').innerText = ''; q('gf-an-pct').innerText = '-'; q('gf-an-bar').style.width = '0'; return;
+  }
+  const n = Math.floor((T0 - pd(ld)) / 864e5) + 1;
+  box.innerHTML = n >= 1 ? `<div class="text-[10px] text-[#8B95A1]">사랑한 지</div><div class="text-[14px] font-extrabold text-[var(--pink-main)] tabular-nums">${n}일째</div>` : `<div class="text-[10px] text-[#8B95A1]">만나기까지</div><div class="text-[14px] font-extrabold text-[var(--pink-main)]">D-${1 - n}</div>`;
+  const a = annivInfo(ld); annC = { s: a.start, e: a.end };
+  q('gst-an').innerText = a.days === 0 ? '오늘!' : a.days; q('gst-an-label').innerText = `${a.k}주년까지`; q('gf-an-label').innerText = `${a.k}주년`; q('gf-an-dday').innerText = a.days === 0 ? 'D-Day' : `D-${a.days}`;
+}
+function layoutPager(S, G) {
+  const c = q('profile-container'), bf = q('soldier-card'), gf = q('gf-profile-card'), ht = q('heart-divider'), both = !!(S && G);
+  ht.classList.toggle('hidden', !both); ht.classList.toggle('flex', both);
+  const want = me.gender === 'M' ? [bf, ht, gf] : [gf, ht, bf];
+  if (want.some((el, i) => c.children[i] !== el)) { want.forEach(el => c.appendChild(el)); c.scrollLeft = 0; }
+  const d = q('pager-dots'); d.classList.toggle('hidden', !both); d.classList.toggle('flex', both); pagerDots();
+}
+function pagerDots() { const c = q('profile-container'), i = Math.round(c.scrollLeft / Math.max(1, c.clientWidth + 76)); ['dot0', 'dot1'].forEach((id, k) => q(id).className = 'block w-2 h-2 rounded-full ' + (k === i ? 'bg-[var(--mil-green)]' : 'bg-[#D5D9DE]')); }
+function pagerGo(i) { const c = q('profile-container'); c.scrollTo({ left: i * (c.clientWidth + 76), behavior: 'smooth' }); }
 function openLoveSet() { openSettings(); setGo('profile'); }
 function hoInfo(S, now) {
   const I = milInfo(S), r = rankOf(S, now); let rr = r;
@@ -418,6 +450,9 @@ function fillSoldier(S, now) {
   const nv = vacs.filter(v => v.end_date >= ymd(T0)).sort((a, b) => a.start_date.localeCompare(b.start_date))[0];
   q('st-total').innerText = td; q('st-cur').innerText = sd; q('st-left').innerText = Math.max(0, td - sd); q('st-promo').innerText = dd(h.end); q('st-work').innerText = wk;
   q('st-vac').innerText = nv ? (nv.start_date <= ymd(T0) ? '휴가중' : `D-${dd(pd(nv.start_date))}`) : '-';
+  const gl = gfRank(h.next); q('gf-lv-label').innerText = `${gl[1]} 레벨업`; q('gf-lv-dday').innerText = `D-${dd(h.end)}`;
+  q('gst-total').innerText = td; q('gst-cur').innerText = sd; q('gst-left').innerText = Math.max(0, td - sd); q('gst-lv').innerText = dd(h.end); q('gst-lv-label').innerText = `${gl[1]}까지`; q('gst-vac').innerText = q('st-vac').innerText;
+  q('bf-my').classList.toggle('hidden', me.gender !== 'F');
   return rk;
 }
 function tickPct(S, n) {
@@ -426,6 +461,7 @@ function tickPct(S, n) {
   if (!hoC || n >= hoC.nx || n >= hoC.end) hoC = hoInfo(S, new Date(n));
   const ho = P((n - hoC.hs) / (hoC.nx - hoC.hs) * 100), pr = P((n - hoC.start) / (hoC.end - hoC.start) * 100);
   q('bf-ho-pct').innerText = ho.toFixed(5) + '%'; q('bf-ho-bar').style.width = ho + '%'; q('bf-pr-pct').innerText = pr.toFixed(5) + '%'; q('bf-pr-bar').style.width = pr + '%';
+  { const lv = q('gf-lv-pct'); if (lv) { lv.innerText = pr.toFixed(5) + '%'; q('gf-lv-bar').style.width = pr + '%'; } if (annC) { const ap = P((n - annC.s) / (annC.e - annC.s) * 100); q('gf-an-pct').innerText = ap.toFixed(5) + '%'; q('gf-an-bar').style.width = ap + '%'; } }
 }
 function rankOf(S, now) {
   const I = milInfo(S);
@@ -486,7 +522,7 @@ function render(full) {
     if (full || !salT) startSal(S);
   } else { clearInterval(salT); clearInterval(rainT); salT = null; }
   if (G) {
-    q('gf-esc').classList.toggle('hidden', !S);
+    ['gf-box', 'gf-stats'].forEach(i => q(i).classList.toggle('hidden', !S)); q('gf-nosoldier').classList.toggle('hidden', !!S);
     const gi = gfRank(rank); q('gf-rank-icon').innerText = gi[0]; q('gf-rank-name').innerText = gi[1];
     q('gf-img-container').innerHTML = G.avatar ? `<img src="${G.avatar}" class="w-full h-full object-cover">` : `<img src="${G.gf_theme === 'cat' ? 'gf_cat.png' : 'gf_bear.png'}" class="w-full h-full object-cover transition-all duration-1000" style="transform:scale(${gi[2]})">`;
     document.documentElement.style.setProperty('--halo-op', gi[3]);
@@ -494,8 +530,7 @@ function render(full) {
     const inp = q('one-line-msg'); inp.readOnly = G.id !== me.id; inp.placeholder = G.id === me.id ? '상태 메시지 입력' : '상태 메시지 없음'; if (document.activeElement !== inp) inp.value = G.status_msg || '';
   }
   const c = q('profile-container'), bf = q('soldier-card'), gf = q('gf-profile-card');
-  const ht = q('heart-divider'); ht.classList.toggle('hidden', !(S && G)); ht.classList.toggle('flex', !!(S && G)); if (S && G) fillLove(S, G);
-  if (me.gender === 'M') { c.appendChild(bf); c.appendChild(ht); c.appendChild(gf); } else { c.appendChild(gf); c.appendChild(ht); c.appendChild(bf); }
+  layoutPager(S, G); if (G) fillLove(S, G);
   // 장바구니 아이콘 (군인 홈)
   const showCart = me.gender === 'M' && partner && partner.px_sent_at && pWishes.length > 0;
   q('btn-cart').classList.toggle('hidden', !showCart);
@@ -945,6 +980,7 @@ async function renderBenefits() {
 
 /* ---------- 시작 ---------- */
 authToggleHTML();
+q('profile-container').addEventListener('scroll', pagerDots, { passive: true });
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js').catch(() => {});
 if (configured) {
   sb.auth.getSession().then(({ data }) => { if (data.session) { session = data.session; boot(); } });
