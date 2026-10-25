@@ -206,7 +206,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
    <div class="flex items-center justify-between px-4 py-3"><button onclick="setBack()" class="w-10 h-10 rounded-full bg-[#F5F6F8] text-xl font-bold">‹</button><div id="set-title" class="font-bold text-[17px]">설정</div><div class="w-10"></div></div>
    <div class="flex-1 overflow-y-auto no-scrollbar pb-12">
     <div id="set-p-main"><div class="flex items-center gap-4 px-5 py-4"><div id="set-avatar" class="w-16 h-16 rounded-2xl bg-[var(--mil-soft)] overflow-hidden flex items-center justify-center flex-shrink-0"></div><div class="flex-1 min-w-0"><div id="set-name" class="font-extrabold text-[18px]"></div><div id="set-email" class="text-[13px] text-[#8B95A1] truncate"></div></div><button onclick="setGo('profile')" class="border border-[#E5E8EB] rounded-full px-3.5 py-1.5 text-[12px] font-bold">관리</button></div><div id="set-rows"></div></div>
-    <div id="set-p-profile" class="hidden px-5 pt-2"><label class="text-[12px] font-bold text-[#4E5968] block mb-2">이름 또는 별명</label><input id="set-nick" maxlength="12" placeholder="예) 백충인, 감자돌이" class="inp mb-2"><p class="text-[11px] text-[#8B95A1] mb-5">홈 화면 프로필에 표시되고, 연동된 상대에게도 보여요. (최대 12자)</p><label class="text-[12px] font-bold text-[#4E5968] block mb-2">사귄 날짜 💑</label><input type="date" id="set-love" class="inp mb-2"><p class="text-[11px] text-[#8B95A1] mb-5">둘 중 한 명이 설정하면 홈에 사귄 지 며칠째인지 보여요. 각자 다르게 입력하면 자기 화면에는 자기가 입력한 날짜가 보여요.</p><button onclick="saveNick()" class="w-full bg-[#191F28] text-white py-3.5 rounded-xl font-bold text-[15px]">저장</button></div>
+    <div id="set-p-profile" class="hidden px-5 pt-2"><div class="flex items-center gap-4 mb-6"><div id="set-ava2" class="w-20 h-20 rounded-[22px] bg-[var(--mil-soft)] overflow-hidden flex items-center justify-center flex-shrink-0"></div><div class="space-y-2"><label class="inline-block bg-[#191F28] text-white rounded-xl px-4 py-2.5 text-[13px] font-bold cursor-pointer">📷 사진 선택<input type="file" accept="image/*" class="hidden" onchange="pickAvatar(this)"></label><button onclick="removeAvatar()" class="block text-[12px] text-[#8B95A1] underline">기본 캐릭터로 되돌리기</button></div></div><label class="text-[12px] font-bold text-[#4E5968] block mb-2">이름 또는 별명</label><input id="set-nick" maxlength="12" placeholder="예) 백충인, 감자돌이" class="inp mb-2"><p class="text-[11px] text-[#8B95A1] mb-5">홈 화면 프로필에 표시되고, 연동된 상대에게도 보여요. (최대 12자)</p><label class="text-[12px] font-bold text-[#4E5968] block mb-2">사귄 날짜 💑</label><input type="date" id="set-love" class="inp mb-2"><p class="text-[11px] text-[#8B95A1] mb-5">둘 중 한 명이 설정하면 홈에 사귄 지 며칠째인지 보여요. 각자 다르게 입력하면 자기 화면에는 자기가 입력한 날짜가 보여요.</p><button onclick="saveNick()" class="w-full bg-[#191F28] text-white py-3.5 rounded-xl font-bold text-[15px]">저장</button></div>
     <div id="set-p-couple" class="hidden px-5 pt-2"><div id="couple-link-ui"><div class="bg-[#FFF0F3] p-4 rounded-xl flex justify-between items-center mb-3"><span class="text-[13px] font-semibold text-[#D94867]">나의 연결 코드</span><span id="my-couple-code" class="font-black text-[#D94867] tracking-widest text-[16px] select-text">-</span></div><p class="text-[12px] text-[#8B95A1] mb-3">내 코드를 연인에게 알려주거나, 연인의 코드를 아래에 입력하면 연동돼요.</p><div class="flex gap-2"><input id="partner-code-input" maxlength="6" placeholder="상대방 코드 6자리" class="flex-1 bg-white border border-[#E5E8EB] rounded-xl px-3 py-3 text-[14px] outline-none uppercase"><button onclick="linkC()" class="bg-[#191F28] text-white px-5 rounded-xl font-bold text-[13px]">연결</button></div></div>
      <div id="couple-linked-ui" class="hidden bg-[var(--mil-green-light)] p-5 rounded-xl text-center border border-[var(--mil-border)]"><div class="text-[15px] font-bold text-[var(--mil-green)]">✅ 연동 중이에요</div><button onclick="unlinkC()" class="text-[12px] text-[#8B95A1] underline mt-2">연동 해제</button></div></div>
     <div id="set-p-service" class="hidden px-5 pt-2"><div id="set-service-note" class="hidden text-[13px] text-[#8B95A1] bg-[#F5F6F8] rounded-xl p-4">복무 정보는 군인 계정에서 설정해요. 연동하면 남자친구의 정보가 홈에 보여요.</div>
@@ -218,6 +218,12 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
     <div id="set-p-account" class="hidden px-5 pt-2"><div class="bg-[#F5F6F8] rounded-xl p-4 mb-5"><div class="text-[11px] text-[#8B95A1]">로그인 계정</div><div id="set-acc-email" class="text-[14px] font-bold break-all"></div></div><button onclick="logout()" class="w-full border border-[#E5E8EB] text-[#E5484D] py-3.5 rounded-xl font-bold text-[14px]">로그아웃</button></div>
    </div></div></div>
 
+ <div id="modal-crop" class="fixed inset-0 z-[70] bg-black/90 hidden flex-col items-center justify-center p-4">
+  <div class="text-white font-bold text-[16px] mb-1">사진 자르기</div><div class="text-white/60 text-[12px] mb-4">드래그로 위치를, 슬라이더나 두 손가락으로 크기를 맞춰요</div>
+  <div class="relative rounded-[28%] overflow-hidden bg-black" style="width:280px;height:280px;touch-action:none"><canvas id="crop-cv" width="280" height="280" style="touch-action:none"></canvas></div>
+  <input type="range" id="crop-zoom" min="100" max="400" value="100" class="mt-5" style="width:280px" oninput="cropZoom(this.value)">
+  <div class="flex gap-3 mt-5" style="width:280px"><button onclick="closeModal('modal-crop')" class="flex-1 py-3 rounded-xl bg-white/15 text-white font-bold text-[14px]">취소</button><button onclick="cropSave()" class="flex-1 py-3 rounded-xl bg-white text-[#191F28] font-bold text-[14px]">저장</button></div>
+ </div>
  <div id="modal-vac" class="fixed inset-0 z-50 bg-[#191F28]/60 backdrop-blur-sm hidden items-end sm:items-center justify-center p-4">
   <div class="bg-white w-full max-w-sm rounded-[28px] p-5 max-h-[92vh] overflow-y-auto no-scrollbar">
    <h3 class="font-bold text-[17px] mb-3">휴가 등록</h3>
@@ -475,14 +481,14 @@ function render(full) {
   let rank = '훈련병';
   if (S && S.enlist_date) {
     rank = fillSoldier(S, now); const ri = { r: rank };
-    q('bf-img-container').innerHTML = bfImg(S.bf_theme, ri.r);
+    q('bf-img-container').innerHTML = S.avatar ? `<img src="${S.avatar}" class="w-full h-full object-cover">` : bfImg(S.bf_theme, ri.r);
     const lk = 'lastRank_' + S.id, last = localStorage.getItem(lk); if (last && last !== ri.r) cutscene(ri.r); localStorage.setItem(lk, ri.r);
     if (full || !salT) startSal(S);
   } else { clearInterval(salT); clearInterval(rainT); salT = null; }
   if (G) {
     q('gf-esc').classList.toggle('hidden', !S);
     const gi = gfRank(rank); q('gf-rank-icon').innerText = gi[0]; q('gf-rank-name').innerText = gi[1];
-    q('gf-img-container').innerHTML = `<img src="${G.gf_theme === 'cat' ? 'gf_cat.png' : 'gf_bear.png'}" class="w-full h-full object-cover transition-all duration-1000" style="transform:scale(${gi[2]})">`;
+    q('gf-img-container').innerHTML = G.avatar ? `<img src="${G.avatar}" class="w-full h-full object-cover">` : `<img src="${G.gf_theme === 'cat' ? 'gf_cat.png' : 'gf_bear.png'}" class="w-full h-full object-cover transition-all duration-1000" style="transform:scale(${gi[2]})">`;
     document.documentElement.style.setProperty('--halo-op', gi[3]);
     { const g = q('gf-name'); g.innerText = G.nickname || (G.id === me.id ? '✏️ 이름을 설정해보세요' : (G.gf_theme === 'cat' ? '꽃냥이' : '곰신 베어')); g.onclick = !G.nickname && G.id === me.id ? openProfileSet : null; }
     const inp = q('one-line-msg'); inp.readOnly = G.id !== me.id; inp.placeholder = G.id === me.id ? '상태 메시지 입력' : '상태 메시지 없음'; if (document.activeElement !== inp) inp.value = G.status_msg || '';
@@ -540,7 +546,7 @@ function openSettings() {
   q('settings-theme-bf').classList.toggle('hidden', !isM); q('settings-theme-gf').classList.toggle('hidden', isM);
   thTmp = { bf: me.bf_theme, gf: me.gf_theme }; cTh('bf', thTmp.bf, true); cTh('gf', thTmp.gf, true);
   const em = (session && session.user && session.user.email) || ''; q('set-email').innerText = em; q('set-acc-email').innerText = em; q('set-name').innerText = me.nickname || (isM ? '🪖 군인' : '💕 곰신'); q('set-nick').value = me.nickname || ''; q('set-love').value = me.love_date || '';
-  q('set-avatar').innerHTML = isM ? bfImg(me.bf_theme, me.enlist_date ? rankOf(me, new Date()).r : '이병') : `<img src="${me.gf_theme === 'cat' ? 'gf_cat.png' : 'gf_bear.png'}" class="w-full h-full object-cover">`;
+  q('set-avatar').innerHTML = myAvatarHTML(); q('set-ava2').innerHTML = myAvatarHTML();
   setGo('main'); openM('modal-settings');
 }
 async function saveNick() {
@@ -549,6 +555,45 @@ async function saveNick() {
   await loadAll(false); render(true); setGo('main');
 }
 function openProfileSet() { openSettings(); setGo('profile'); }
+function myAvatarHTML() {
+  if (me.avatar) return `<img src="${me.avatar}" class="w-full h-full object-cover">`;
+  return me.gender === 'M' ? bfImg(me.bf_theme, me.enlist_date ? rankOf(me, new Date()).r : '이병') : `<img src="${me.gf_theme === 'cat' ? 'gf_cat.png' : 'gf_bear.png'}" class="w-full h-full object-cover">`;
+}
+/* ---- 프로필 사진: 선택 → 자르기 → 저장 ---- */
+const CW = 280; let cropImg = null, cs = { s: 1, min: 1, x: 0, y: 0 }; const cptr = new Map(); let cpinch = 0;
+function cropClamp() { const w = cropImg.width * cs.s, h = cropImg.height * cs.s; cs.x = Math.min(0, Math.max(CW - w, cs.x)); cs.y = Math.min(0, Math.max(CW - h, cs.y)); }
+function drawCrop() { const c = q('crop-cv').getContext('2d'); c.fillStyle = '#111'; c.fillRect(0, 0, CW, CW); c.drawImage(cropImg, cs.x, cs.y, cropImg.width * cs.s, cropImg.height * cs.s); }
+function setCropScale(ns) { const cx = (CW / 2 - cs.x) / cs.s, cy = (CW / 2 - cs.y) / cs.s; cs.s = Math.min(cs.min * 4, Math.max(cs.min, ns)); cs.x = CW / 2 - cx * cs.s; cs.y = CW / 2 - cy * cs.s; cropClamp(); q('crop-zoom').value = Math.round(cs.s / cs.min * 100); drawCrop(); }
+function cropZoom(v) { setCropScale(cs.min * v / 100); }
+function pickAvatar(inp) {
+  const file = inp.files[0]; inp.value = ''; if (!file) return; if (!/^image\//.test(file.type)) return showAlert('알림', '이미지 파일을 선택해주세요.');
+  const img = new Image(), url = URL.createObjectURL(file);
+  img.onload = () => { cropImg = img; cs.min = Math.max(CW / img.width, CW / img.height); cs.s = cs.min; cs.x = (CW - img.width * cs.s) / 2; cs.y = (CW - img.height * cs.s) / 2; q('crop-zoom').value = 100; drawCrop(); openM('modal-crop'); URL.revokeObjectURL(url); };
+  img.onerror = () => showAlert('오류', '사진을 열 수 없어요. JPG나 PNG 사진을 골라주세요.'); img.src = url;
+}
+(function () {
+  const cv = document.getElementById('crop-cv'); if (!cv) return;
+  cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); cptr.set(e.pointerId, { x: e.clientX, y: e.clientY }); cpinch = 0; });
+  cv.addEventListener('pointermove', e => {
+    if (!cropImg || !cptr.has(e.pointerId)) return; const p = cptr.get(e.pointerId);
+    if (cptr.size === 1) { cs.x += e.clientX - p.x; cs.y += e.clientY - p.y; cropClamp(); drawCrop(); }
+    cptr.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (cptr.size === 2) { const [a, b] = [...cptr.values()], d = Math.hypot(a.x - b.x, a.y - b.y); if (cpinch) setCropScale(cs.s * d / cpinch); cpinch = d; }
+  });
+  ['pointerup', 'pointercancel'].forEach(t => cv.addEventListener(t, e => { cptr.delete(e.pointerId); cpinch = 0; }));
+  cv.addEventListener('wheel', e => { e.preventDefault(); if (cropImg) setCropScale(cs.s * (e.deltaY < 0 ? 1.08 : 0.93)); }, { passive: false });
+})();
+async function cropSave() {
+  const o = document.createElement('canvas'); o.width = o.height = 256; const k = 256 / CW, c = o.getContext('2d'); c.drawImage(cropImg, cs.x * k, cs.y * k, cropImg.width * cs.s * k, cropImg.height * cs.s * k);
+  const { error } = await sb.from('profiles').update({ avatar: o.toDataURL('image/jpeg', 0.85) }).eq('id', me.id);
+  if (error) return showAlert('오류', esc(error.message) + '<br><br>schema_avatar.sql 을 실행했는지 확인하세요.');
+  closeModal('modal-crop'); await loadAll(false); render(true); q('set-avatar').innerHTML = myAvatarHTML(); q('set-ava2').innerHTML = myAvatarHTML();
+}
+async function removeAvatar() {
+  if (!me.avatar) return showAlert('알림', '이미 기본 캐릭터를 쓰고 있어요.');
+  const { error } = await sb.from('profiles').update({ avatar: null }).eq('id', me.id); if (error) return showAlert('오류', esc(error.message));
+  await loadAll(false); render(true); q('set-avatar').innerHTML = myAvatarHTML(); q('set-ava2').innerHTML = myAvatarHTML();
+}
 async function saveUnit() {
   const name = q('set-unit-name').value.trim(), addr = q('set-unit-addr').value.trim(), p = picks.unit && picks.unit.label === addr ? picks.unit : null;
   if (!name) return showAlert('알림', '부대명을 입력해주세요.');
