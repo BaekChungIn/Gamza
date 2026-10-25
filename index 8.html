@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>감자돌이 & 곰신 올인원</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6B7B5C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="감자돌이">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+:root{--bg-main:#F7F8F9;--card-bg:#fff;--mil-green:#6B7B5C;--mil-green-light:#F0F3ED;--pink-main:#F28C9F;--pink-light:#FFF0F3;--halo-op:.2;--mil-dark:#283224;--mil-dark2:#3A4535;--mil-dark3:#485642;--mil-t0:#E8ECE5;--mil-t1:#9CAEA4;--mil-t2:#8A9A80;--mil-t3:#708075;--mil-soft:#EEF2EB;--mil-border:#D5E0CD;--mil-softtext:#7A8B70}
+body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg-main);color:#191F28;-webkit-tap-highlight-color:transparent;margin:0}
+.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
+.toss-card{background:var(--card-bg);border-radius:28px;padding:24px;box-shadow:0 8px 24px rgba(107,123,92,.04),0 2px 8px rgba(0,0,0,.02);border:1px solid rgba(107,123,92,.05)}
+@keyframes halo-pulse{0%,100%{transform:scale(1);opacity:var(--halo-op)}50%{transform:scale(1.15);opacity:calc(var(--halo-op)*1.5)}}
+.halo-bg{position:absolute;inset:-15px;border-radius:50%;background:radial-gradient(circle,#FFE4E8 0%,transparent 70%);animation:halo-pulse 3s infinite ease-in-out;z-index:0}
+@keyframes rain{0%{transform:translateY(-30px) rotate(0) scale(.9);opacity:0}10%{opacity:1}80%{opacity:1}100%{transform:translateY(220px) rotate(360deg) scale(.8);opacity:0}}
+.falling-money{position:absolute;top:-20px;pointer-events:none;animation:rain 2.2s linear forwards;z-index:10}
+@keyframes bl{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px) scale(1.1)}}.animate-letter{animation:bl 1s infinite}
+@keyframes flash{0%{opacity:0}20%{opacity:1;background:#fff}100%{opacity:0}}
+.flash-overlay{position:fixed;inset:0;z-index:9999;pointer-events:none;animation:flash 1.5s ease-out forwards}
+@keyframes hb{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}.animate-heartbeat{animation:hb 1.4s infinite}
+svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pb-safe{padding-bottom:max(12px,env(safe-area-inset-bottom))}
+.inp{width:100%;background:#F5F6F8;border-radius:12px;padding:14px 16px;font-size:14px;outline:none}.inp:focus{box-shadow:0 0 0 2px var(--mil-green)}
+</style>
+</head>
+<body class="min-h-screen flex justify-center items-start sm:p-4 select-none antialiased bg-gray-100">
+
+<!-- 로그인 -->
+<div id="auth-modal" class="fixed inset-0 z-[100] bg-[var(--bg-main)] flex items-center justify-center p-6 transition-opacity">
+ <div class="w-full max-w-sm bg-white rounded-[32px] p-8 shadow-2xl border border-[#F2F3F5] flex flex-col items-center">
+  <span class="text-5xl mb-4">🥔❤️👧</span>
+  <h2 class="text-[22px] font-extrabold mb-1" id="auth-title">로그인</h2>
+  <p class="text-[13px] text-[#8B95A1] mb-6 text-center" id="auth-subtitle">계정을 연결하고 연인과 데이터를 동기화하세요.</p>
+  <div class="w-full space-y-3 mb-5">
+   <input type="email" id="auth-email" placeholder="이메일 주소" class="inp" autocomplete="email">
+   <input type="password" id="auth-password" placeholder="비밀번호 (6자리 이상)" class="inp" autocomplete="current-password">
+   <div id="auth-signup-fields" class="hidden space-y-3">
+    <input type="password" id="auth-password-confirm" placeholder="비밀번호 재확인" class="inp">
+    <div class="flex gap-2">
+     <button id="btn-gender-M" onclick="setGender('M')" class="flex-1 py-3 rounded-xl border-2 border-[#E5E8EB] bg-[#F5F6F8] text-[#8B95A1] font-bold text-[13px]">남자 (군인)</button>
+     <button id="btn-gender-F" onclick="setGender('F')" class="flex-1 py-3 rounded-xl border-2 border-[#E5E8EB] bg-[#F5F6F8] text-[#8B95A1] font-bold text-[13px]">여자 (곰신)</button>
+    </div>
+   </div>
+  </div>
+  <button id="btn-auth-submit" onclick="submitAuth()" class="w-full bg-[#191F28] text-white py-3.5 rounded-xl font-bold text-[14px] active:scale-95 transition mb-4">이메일로 로그인</button>
+  <div class="text-[12px] text-[#4E5968] mb-5" id="auth-toggle-text"></div>
+  <div class="w-full flex items-center gap-3 mb-5"><div class="h-px bg-[#E5E8EB] flex-1"></div><span class="text-[11px] text-[#8B95A1]">또는</span><div class="h-px bg-[#E5E8EB] flex-1"></div></div>
+  <button onclick="googleAuth()" class="w-full flex items-center justify-center gap-2 bg-[#F5F6F8] py-3.5 rounded-xl font-bold text-[14px] active:scale-95 transition border border-[#E5E8EB]">
+   <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>Google 계정으로 시작</button>
+ </div>
+</div>
+
+<!-- 온보딩 -->
+<div id="onboarding-modal" class="fixed inset-0 z-[90] bg-[var(--bg-main)] flex items-center justify-center p-6 hidden">
+ <div class="w-full max-w-sm bg-white rounded-[32px] p-8 shadow-2xl border border-[#F2F3F5]">
+  <h2 class="text-[20px] font-extrabold mb-6" id="ob-title">시작하기 전에 알려주세요! 🪖</h2>
+  <div class="space-y-4">
+   <div id="ob-gender-box" class="hidden"><label class="text-[13px] font-bold text-[#4E5968] block mb-2">나는</label>
+    <div class="flex gap-2"><button id="ob-g-M" onclick="obGender('M')" class="flex-1 py-3 rounded-xl border-2 border-[#E5E8EB] bg-[#F5F6F8] text-[#8B95A1] font-bold text-[13px]">남자 (군인)</button><button id="ob-g-F" onclick="obGender('F')" class="flex-1 py-3 rounded-xl border-2 border-[#E5E8EB] bg-[#F5F6F8] text-[#8B95A1] font-bold text-[13px]">여자 (곰신)</button></div></div>
+   <div id="ob-soldier-box" class="space-y-4 hidden">
+    <div><label class="text-[13px] font-bold text-[#4E5968] block mb-2">군 분류</label><div class="grid gap-2" id="ob-branches"></div></div>
+    <div><label class="text-[13px] font-bold text-[#4E5968] block mb-2">입대일</label><input type="date" id="ob-enlist-date" class="inp font-bold"></div>
+   </div>
+   <p id="ob-f-note" class="hidden text-[13px] text-[#4E5968]">곰신은 입대 정보 없이 시작해요. 설정에서 내 연결 코드를 남자친구에게 알려주고 연동하면 남자친구의 복무 정보가 나타납니다 💕</p>
+  </div>
+  <button onclick="completeOnboarding()" class="w-full mt-8 bg-[var(--mil-green)] text-white py-4 rounded-xl font-bold text-[15px] active:scale-95 transition">설정 완료하고 시작하기</button>
+ </div>
+</div>
+
+<div class="w-full max-w-md bg-[var(--bg-main)] min-h-screen sm:min-h-[900px] sm:rounded-[40px] sm:shadow-2xl flex flex-col relative overflow-hidden sm:border-[6px] sm:border-gray-200">
+ <header class="sticky top-0 bg-[var(--bg-main)]/90 backdrop-blur-md px-6 pb-4 flex items-center justify-between z-40" style="padding-top:max(16px,env(safe-area-inset-top))">
+  <div class="flex items-center gap-2"><span class="text-2xl">🥔</span><div><h1 class="text-[19px] font-extrabold tracking-tight">감자돌이</h1><p class="text-[12px] text-[#8B95A1] font-semibold">스마트 군생활 올인원</p></div></div>
+  <div class="flex items-center gap-2">
+   <button id="btn-cart" onclick="openCart()" class="hidden relative w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center active:scale-95"><span class="text-lg">🛒</span><span id="cart-dot" class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full animate-pulse"></span></button>
+   <button onclick="openSettings()" class="w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center text-[#4E5968] active:scale-95 text-lg">⚙️</button>
+  </div>
+ </header>
+
+ <main class="flex-1 px-5 pb-28 overflow-y-auto no-scrollbar relative z-10">
+  <!-- 홈 -->
+  <section id="tab-home" class="space-y-4 pt-2">
+   <div id="clean-state-banner" class="toss-card text-center py-10 hidden"><span class="text-4xl">🌱</span><h2 class="text-[18px] font-extrabold my-2">연동 대기중</h2><p class="text-[13px] text-[#8B95A1]">설정에서 내 코드를 남자친구에게 알려주거나<br>상대 코드를 입력해 연동해보세요!</p></div>
+   <div id="profile-container" class="space-y-4">
+    <div id="soldier-card" class="toss-card hidden">
+     <div class="flex items-center gap-4">
+      <div onclick="evoPreview()" class="w-[76px] h-[76px] rounded-[22px] bg-[var(--mil-soft)] flex items-center justify-center overflow-hidden flex-shrink-0 border border-[var(--mil-border)]" id="bf-img-container"></div>
+      <div class="flex-1 min-w-0">
+       <div class="text-[12px] text-[var(--mil-green)] font-bold mb-0.5">대한민국 <span id="bf-branch">육군</span><span id="bf-unit"></span></div>
+       <div class="flex items-center gap-1.5 text-[13px] font-bold text-[var(--mil-green)]"><span id="bf-mark" class="inline-flex"></span><span id="bf-rank">-</span><span id="bf-ho"></span></div>
+       <div id="bf-name" class="text-[25px] font-extrabold leading-tight tracking-tight break-all hidden"></div>
+       <div class="text-[11px] text-[#8B95A1] mt-0.5 leading-snug">입대 <b id="bf-enlist" class="text-[#4E5968]">-</b> · 전역 <b id="bf-dis" class="text-[#4E5968]">-</b></div>
+      </div></div>
+     <div class="mt-4 rounded-2xl p-4 text-white" style="background:var(--mil-dark)">
+      <div class="flex justify-between text-[12px] font-bold mb-1.5"><span>전역</span><span id="bf-dday">D-0</span></div>
+      <div class="relative h-9 rounded-lg overflow-hidden bg-white/10"><div id="bf-progress" class="absolute inset-y-0 left-0" style="background:var(--mil-green);width:0"></div><div id="bf-pct" class="relative px-3 h-full flex items-center text-[15px] font-black tabular-nums">0%</div></div>
+      <div class="grid grid-cols-2 gap-3 mt-4">
+       <div><div class="flex justify-between text-[11px] font-bold"><span id="bf-ho-label">-</span><span id="bf-ho-dday">-</span></div><div class="relative h-6 rounded-md bg-white/10 overflow-hidden mt-1"><div id="bf-ho-bar" class="absolute inset-y-0 left-0 bg-white/25" style="width:0"></div><div id="bf-ho-pct" class="relative px-2 h-full flex items-center text-[11px] tabular-nums">0%</div></div></div>
+       <div><div class="flex justify-between text-[11px] font-bold"><span id="bf-pr-label">-</span><span id="bf-pr-dday">-</span></div><div class="relative h-6 rounded-md bg-white/10 overflow-hidden mt-1"><div id="bf-pr-bar" class="absolute inset-y-0 left-0 bg-white/25" style="width:0"></div><div id="bf-pr-pct" class="relative px-2 h-full flex items-center text-[11px] tabular-nums">0%</div></div></div>
+      </div></div>
+     <div class="grid grid-cols-3 gap-y-5 mt-5 text-center">
+      <div><div id="st-total" class="text-[20px] font-black tabular-nums">0</div><div class="text-[11px] text-[#8B95A1]">전체 복무일</div></div>
+      <div><div id="st-cur" class="text-[20px] font-black tabular-nums">0</div><div class="text-[11px] text-[#8B95A1]">현재 복무일</div></div>
+      <div><div id="st-left" class="text-[20px] font-black tabular-nums">0</div><div class="text-[11px] text-[#8B95A1]">남은 복무일</div></div>
+      <div><div id="st-promo" class="text-[20px] font-black tabular-nums">0</div><div class="text-[11px] text-[#8B95A1]">계급 진급일</div></div>
+      <div><div id="st-work" class="text-[20px] font-black tabular-nums">0</div><div class="text-[11px] text-[#8B95A1]">남은 일과일</div></div>
+      <div><div id="st-vac" class="text-[20px] font-black tabular-nums">-</div><div class="text-[11px] text-[#8B95A1]">다음 휴가일</div></div>
+     </div>
+    </div>
+    <div id="heart-divider" class="hidden items-center gap-3 px-6" style="margin-top:-4px;margin-bottom:-4px"><div class="flex-1 h-px bg-[#FFD6DE]"></div><span class="text-[24px] animate-heartbeat">💕</span><div class="flex-1 h-px bg-[#FFD6DE]"></div></div>
+    <div id="gf-profile-card" class="toss-card border-[1.5px] border-[var(--pink-light)] hidden">
+     <div class="flex items-center gap-5">
+      <div class="w-[76px] h-[76px] rounded-[22px] bg-[var(--pink-light)] flex items-center justify-center relative flex-shrink-0"><div class="halo-bg"></div><div id="gf-img-container" class="w-full h-full relative z-10 flex items-center justify-center overflow-hidden rounded-[22px]"></div></div>
+      <div class="flex-1">
+       <div class="text-[12px] text-[var(--pink-main)] font-bold mb-0.5"><span id="gf-rank-icon">🌱</span> <span id="gf-rank-name">씨앗</span></div>
+       <div class="text-[19px] font-extrabold" id="gf-name">곰신</div>
+       <div class="mt-2.5 bg-[#FFF5F7] px-3.5 py-2.5 rounded-xl border border-[#FFE4E8] text-[13px] text-[#D94867] font-semibold flex gap-2"><span>💬</span><input type="text" id="one-line-msg" maxlength="40" placeholder="상태 메시지" class="bg-transparent outline-none w-full text-[#D94867] placeholder-[#FCA5A5]" onchange="saveStatusMsg()"></div>
+      </div></div>
+    </div>
+   </div>
+
+   <div id="menu-btn-row" class="flex justify-end hidden"><button onclick="openMenu()" class="text-[12px] font-bold bg-white border border-[#E5E8EB] rounded-full px-3.5 py-1.5 shadow-sm active:scale-95">🍚 식단표</button></div>
+   <div id="salary-card" class="toss-card bg-[var(--mil-dark)] text-white relative overflow-hidden hidden" onclick="rainBurst(15)">
+    <div id="money-rain-container" class="absolute inset-0 pointer-events-none z-10 overflow-hidden"></div>
+    <div class="relative z-20 flex justify-between items-start mb-6">
+     <div><div class="text-[13px] text-[var(--mil-t1)] font-semibold">💳 실시간 복무 급여 통장</div><div class="text-[10px] text-[var(--mil-t3)] mt-1" id="salary-branch-desc"></div></div>
+     <label class="flex items-center gap-2 bg-[var(--mil-dark2)] px-3 py-1.5 rounded-full cursor-pointer border border-[var(--mil-dark3)]" onclick="event.stopPropagation()"><input type="checkbox" id="check-matching" checked class="accent-[var(--mil-t2)] w-4 h-4"><span class="text-[var(--mil-t0)] text-[11px] font-bold">매칭금(월 55만)</span></label>
+    </div>
+    <div class="relative z-20"><div class="text-[12px] text-[var(--mil-t2)] mb-1">현재까지 축적된 군 복무 총 자산</div><div class="flex items-baseline gap-1"><span id="live-total-salary" class="text-[32px] font-extrabold tabular-nums">0.00</span><span class="text-[18px] font-bold text-[var(--mil-t1)]">원</span></div></div>
+   </div>
+
+   <div class="toss-card hidden" id="vacation-card">
+    <div class="flex justify-between items-center mb-4"><h3 class="text-[16px] font-bold">🏖 휴가</h3><button onclick="openVac()" class="bg-[#F5F6F8] px-3 py-1.5 rounded-full text-[12px] font-bold">+ 휴가 등록</button></div>
+    <div id="vacation-list" class="space-y-3"></div>
+   </div>
+
+   <div class="toss-card">
+    <div class="flex justify-between items-center mb-4"><h3 class="text-[16px] font-bold">🏠 집으로가기</h3><button onclick="getGPS()" class="bg-[#F2F3F5] text-[#4E5968] text-[11px] font-bold px-3 py-1.5 rounded-full">📍 현위치</button></div>
+    <div class="space-y-3 mb-4"><div class="relative"><input id="route-start" placeholder="출발지 (현위치 · 자대 · 장소 검색)" class="inp font-semibold" autocomplete="off" oninput="placeInput('start')"><div id="sug-start" class="hidden absolute z-30 left-0 right-0 bg-white border border-[#E5E8EB] rounded-xl shadow-lg mt-1 max-h-60 overflow-y-auto"></div></div>
+    <div class="relative"><input id="route-end" placeholder="도착지 (아파트·상가 이름이나 주소)" class="inp font-semibold" autocomplete="off" oninput="placeInput('end')"><div id="sug-end" class="hidden absolute z-30 left-0 right-0 bg-white border border-[#E5E8EB] rounded-xl shadow-lg mt-1 max-h-60 overflow-y-auto"></div></div><button onclick="calcRoute()" class="w-full bg-[#191F28] text-white py-3 rounded-xl font-bold text-[14px]">경로 탐색 ⚡</button></div>
+    <div id="route-results" class="hidden"></div>
+   </div>
+  </section>
+
+  <!-- 적금 -->
+  <section id="tab-savings" class="space-y-4 pt-2 hidden">
+   <div class="toss-card">
+    <h2 class="text-[18px] font-extrabold mb-1 flex justify-between">장병내일준비적금 <span class="bg-[#191F28] text-white text-[10px] px-2 py-1 rounded-md">매칭 100%</span></h2>
+    <p class="text-[12px] text-[#4E5968] mb-4">월 최대 55만 원 · 은행 최대 4개 · 선택 내용은 자동 저장돼요.</p>
+    <h3 class="text-[14px] font-bold mb-3">1. 가입 은행 선택</h3>
+    <div class="grid grid-cols-4 gap-2 mb-5" id="bank-selector-grid"></div>
+    <div id="selected-banks-container" class="space-y-4 mb-5"></div>
+    <div id="saving-split-warning" class="text-[11px] font-bold text-[#D94867] bg-[#FFF0F3] p-3 rounded-lg text-center mb-5 hidden">⚡ 한도 초과! 총 55만원 또는 1개 은행 30만원을 초과했어요.</div>
+    <div class="bg-[var(--mil-dark)] rounded-2xl p-5 text-white"><div class="text-[12px] text-[var(--mil-t2)] mb-1">만기 시 총 예상 수령액</div><div class="text-[28px] font-black mb-2"><span id="saving-total-result">0</span>원</div>
+     <div class="flex gap-3 text-[11px] text-[var(--mil-t1)]"><span>원금 <span id="saving-prin">0</span></span><span>이자 <span id="saving-int">0</span></span></div><div class="text-[11px] text-[var(--mil-t0)] mt-1 font-bold">정부 매칭지원금: <span id="saving-match">0</span></div></div>
+    <p class="text-[10px] text-[#8B95A1] mt-3">※ 우대금리 조건·한도는 은행/시기별로 바뀔 수 있어요. 가입 전 해당 은행 공지를 꼭 확인하세요.</p>
+   </div>
+  </section>
+
+  <!-- 굿맨 -->
+  <section id="tab-goodman" class="space-y-4 pt-2 hidden">
+   <div class="toss-card"><div class="flex justify-between mb-2"><h2 class="text-[18px] font-extrabold">굿맨 스킨케어</h2><span class="bg-[#191F28] text-white text-[10px] px-2.5 py-1 rounded-full font-bold">PX TOP 24</span></div>
+    <p class="text-[12px] text-[#4E5968] mb-4" id="px-guide-text"></p><div class="space-y-2.5" id="px-items-container"></div></div>
+   <div class="h-24"></div>
+   <div class="fixed bottom-20 left-0 right-0 px-5 max-w-md mx-auto z-30"><div class="bg-[#191F28] rounded-2xl p-4 shadow-xl flex items-center justify-between">
+    <div class="text-white text-[13px] font-bold">선택 <span id="px-sel-cnt" class="text-[var(--mil-green-light)]">0</span>개</div>
+    <div class="flex gap-2"><button id="btn-px-send" onclick="sendPx()" class="hidden bg-[var(--mil-dark2)] text-white px-3 py-2 rounded-xl text-[12px] font-bold">💌 조르기</button><button onclick="showRoutine()" class="bg-[#F2BA49] text-[#191F28] px-4 py-2 rounded-xl text-[13px] font-extrabold">✨ 굿맨 변신</button></div></div></div>
+  </section>
+
+  <!-- Q&A -->
+  <section id="tab-qna" class="space-y-4 pt-2 hidden">
+   <div class="toss-card bg-gradient-to-br from-[var(--mil-soft)] to-[#FFF0F3] text-center py-8">
+    <div class="flex items-center justify-between px-2 mb-2"><button onclick="qDay(-1)" class="w-8 h-8 rounded-full bg-white/70 font-bold">◀</button><div class="text-[12px] font-bold text-[var(--mil-softtext)]" id="qna-day-badge"></div><button onclick="qDay(1)" class="w-8 h-8 rounded-full bg-white/70 font-bold">▶</button></div>
+    <h2 class="text-[17px] font-extrabold leading-snug px-4" id="qna-question-text"></h2>
+   </div>
+   <div class="toss-card space-y-5" id="qna-body">
+    <div><label class="text-[13px] font-bold mb-2 block" id="qna-my-label">나의 답변</label><textarea id="qna-ans" maxlength="500" class="w-full bg-[#F5F6F8] rounded-2xl p-4 text-[14px] outline-none h-28 resize-none" style="user-select:text"></textarea><button onclick="submitQ()" class="w-full mt-2 bg-[#191F28] text-white py-3.5 rounded-xl font-bold">저장</button></div>
+    <div id="qna-partner-box" class="pt-5 border-t border-[#F2F3F5]"><label class="text-[13px] font-bold mb-2 block">상대방의 답변</label><div class="w-full bg-[#F5F6F8] rounded-2xl p-4 min-h-[7rem] flex flex-col items-center justify-center text-center"><div id="qna-partner" class="text-[14px] text-left w-full whitespace-pre-line" style="user-select:text"></div></div></div>
+   </div>
+  </section>
+
+  <!-- 혜택 -->
+  <section id="tab-benefits" class="space-y-4 pt-2 hidden"></section>
+ </main>
+
+ <nav class="bg-white/95 backdrop-blur-md px-6 pt-3 pb-safe flex justify-between items-center z-40 border-t border-[#F2F3F5] shrink-0 absolute bottom-0 left-0 right-0" id="bottom-nav"></nav>
+
+ <!-- 설정 -->
+ <div id="modal-settings" class="fixed inset-0 z-50 bg-white hidden flex-col">
+  <div class="max-w-md mx-auto w-full h-full flex flex-col" style="padding-top:env(safe-area-inset-top)">
+   <div class="flex items-center justify-between px-4 py-3"><button onclick="setBack()" class="w-10 h-10 rounded-full bg-[#F5F6F8] text-xl font-bold">‹</button><div id="set-title" class="font-bold text-[17px]">설정</div><div class="w-10"></div></div>
+   <div class="flex-1 overflow-y-auto no-scrollbar pb-12">
+    <div id="set-p-main"><div class="flex items-center gap-4 px-5 py-4"><div id="set-avatar" class="w-16 h-16 rounded-2xl bg-[var(--mil-soft)] overflow-hidden flex items-center justify-center flex-shrink-0"></div><div class="flex-1 min-w-0"><div id="set-name" class="font-extrabold text-[18px]"></div><div id="set-email" class="text-[13px] text-[#8B95A1] truncate"></div></div><button onclick="setGo('profile')" class="border border-[#E5E8EB] rounded-full px-3.5 py-1.5 text-[12px] font-bold">관리</button></div><div id="set-rows"></div></div>
+    <div id="set-p-profile" class="hidden px-5 pt-2"><label class="text-[12px] font-bold text-[#4E5968] block mb-2">이름 또는 별명</label><input id="set-nick" maxlength="12" placeholder="예) 백충인, 감자돌이" class="inp mb-2"><p class="text-[11px] text-[#8B95A1] mb-5">홈 화면 프로필에 표시되고, 연동된 상대에게도 보여요. (최대 12자)</p><button onclick="saveNick()" class="w-full bg-[#191F28] text-white py-3.5 rounded-xl font-bold text-[15px]">저장</button></div>
+    <div id="set-p-couple" class="hidden px-5 pt-2"><div id="couple-link-ui"><div class="bg-[#FFF0F3] p-4 rounded-xl flex justify-between items-center mb-3"><span class="text-[13px] font-semibold text-[#D94867]">나의 연결 코드</span><span id="my-couple-code" class="font-black text-[#D94867] tracking-widest text-[16px] select-text">-</span></div><p class="text-[12px] text-[#8B95A1] mb-3">내 코드를 연인에게 알려주거나, 연인의 코드를 아래에 입력하면 연동돼요.</p><div class="flex gap-2"><input id="partner-code-input" maxlength="6" placeholder="상대방 코드 6자리" class="flex-1 bg-white border border-[#E5E8EB] rounded-xl px-3 py-3 text-[14px] outline-none uppercase"><button onclick="linkC()" class="bg-[#191F28] text-white px-5 rounded-xl font-bold text-[13px]">연결</button></div></div>
+     <div id="couple-linked-ui" class="hidden bg-[var(--mil-green-light)] p-5 rounded-xl text-center border border-[var(--mil-border)]"><div class="text-[15px] font-bold text-[var(--mil-green)]">✅ 연동 중이에요</div><button onclick="unlinkC()" class="text-[12px] text-[#8B95A1] underline mt-2">연동 해제</button></div></div>
+    <div id="set-p-service" class="hidden px-5 pt-2"><div id="set-service-note" class="hidden text-[13px] text-[#8B95A1] bg-[#F5F6F8] rounded-xl p-4">복무 정보는 군인 계정에서 설정해요. 연동하면 남자친구의 정보가 홈에 보여요.</div>
+     <div id="set-service-form"><label class="text-[12px] font-bold text-[#4E5968] block mb-2">군종</label><div class="grid grid-cols-4 gap-1.5 mb-4" id="set-branches"></div><label class="text-[12px] font-bold text-[#4E5968] block mb-2">입대일 · 전역일</label><div class="flex gap-2 mb-1"><input type="date" id="set-enlist" class="flex-1 bg-[#F5F6F8] border border-[#E5E8EB] rounded-xl px-2 py-3 text-[13px] font-bold outline-none" onchange="autoD()"><input type="date" id="set-discharge" class="flex-1 bg-[#F5F6F8] border border-[#E5E8EB] rounded-xl px-2 py-3 text-[13px] font-bold outline-none"></div><p class="text-[11px] text-[#8B95A1] mb-5">입대일을 바꾸면 전역일이 군종에 맞춰 자동 계산돼요. (진급은 매월 1일 기준)</p><button onclick="saveS()" class="w-full bg-[#191F28] text-white py-3.5 rounded-xl font-bold text-[15px]">저장</button></div></div>
+    <div id="set-p-unit" class="hidden px-5 pt-2"><div id="set-unit-note" class="hidden text-[13px] text-[#8B95A1] bg-[#F5F6F8] rounded-xl p-4">자대는 군인 계정에서 등록해요. 등록하면 연동된 곰신도 식단표를 볼 수 있어요.</div>
+     <div id="set-unit-form"><label class="text-[12px] font-bold text-[#4E5968] block mb-2">부대명</label><input id="set-unit-name" maxlength="30" placeholder="예) 제00사단 00연대 0대대" class="inp mb-4"><label class="text-[12px] font-bold text-[#4E5968] block mb-2">부대 위치 (선택 · 집으로가기 출발지로 쓰여요)</label><div class="relative mb-5"><input id="set-unit-addr" placeholder="부대 주소나 근처 장소 검색" class="inp" autocomplete="off" oninput="placeInput('unit')"><div id="sug-unit" class="hidden absolute z-30 left-0 right-0 bg-white border border-[#E5E8EB] rounded-xl shadow-lg mt-1 max-h-60 overflow-y-auto"></div></div><button onclick="saveUnit()" class="w-full bg-[#191F28] text-white py-3.5 rounded-xl font-bold text-[15px]">자대 등록</button></div></div>
+    <div id="set-p-theme" class="hidden px-5 pt-2"><div id="settings-theme-bf" class="hidden"><h4 class="text-[13px] font-bold mb-2">나의 캐릭터 (군인)</h4><div class="grid grid-cols-2 gap-2 mb-5"><button onclick="cTh('bf','gamja')" id="theme-bf-gamja" class="py-3 rounded-xl border-2 font-bold text-[13px]">🥔 감자돌이</button><button onclick="cTh('bf','tiger')" id="theme-bf-tiger" class="py-3 rounded-xl border-2 font-bold text-[13px]">🐯 짬타이거</button></div></div>
+     <div id="settings-theme-gf" class="hidden"><h4 class="text-[13px] font-bold mb-2">나의 캐릭터 (곰신)</h4><div class="grid grid-cols-2 gap-2 mb-5"><button onclick="cTh('gf','gomsin')" id="theme-gf-gomsin" class="py-3 rounded-xl border-2 font-bold text-[13px]">🐻 곰신 베어</button><button onclick="cTh('gf','cat')" id="theme-gf-cat" class="py-3 rounded-xl border-2 font-bold text-[13px]">🐈‍⬛ 꽃냥이</button></div></div><button onclick="saveS()" class="w-full bg-[#191F28] text-white py-3.5 rounded-xl font-bold text-[15px]">저장</button></div>
+    <div id="set-p-account" class="hidden px-5 pt-2"><div class="bg-[#F5F6F8] rounded-xl p-4 mb-5"><div class="text-[11px] text-[#8B95A1]">로그인 계정</div><div id="set-acc-email" class="text-[14px] font-bold break-all"></div></div><button onclick="logout()" class="w-full border border-[#E5E8EB] text-[#E5484D] py-3.5 rounded-xl font-bold text-[14px]">로그아웃</button></div>
+   </div></div></div>
+
+ <div id="modal-vac" class="fixed inset-0 z-50 bg-[#191F28]/60 backdrop-blur-sm hidden items-end sm:items-center justify-center p-4">
+  <div class="bg-white w-full max-w-sm rounded-[28px] p-5 max-h-[92vh] overflow-y-auto no-scrollbar">
+   <h3 class="font-bold text-[17px] mb-3">휴가 등록</h3>
+   <input id="vac-title" maxlength="30" placeholder="제목 (예: 첫 휴가 💖)" class="inp mb-4">
+   <div class="flex items-center justify-between mb-2"><button onclick="calNav(-1)" class="w-9 h-9 rounded-full bg-[#F5F6F8] font-bold">‹</button><div id="cal-title" class="font-bold text-[15px]"></div><button onclick="calNav(1)" class="w-9 h-9 rounded-full bg-[#F5F6F8] font-bold">›</button></div>
+   <div class="grid grid-cols-7 text-center text-[11px] font-bold text-[#8B95A1] mb-1"><div class="text-[#E5484D]">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="text-[#3B82F6]">토</div></div>
+   <div id="cal-grid" class="grid grid-cols-7 text-center"></div>
+   <div id="cal-summary" class="text-[12px] font-bold text-[var(--pink-main)] text-center my-3 min-h-[18px]"></div>
+   <p class="text-[10px] text-[#8B95A1] text-center mb-3">시작일을 누르고 종료일을 누르세요 · 초록 점은 이미 등록된 휴가</p>
+   <div class="flex gap-2"><button onclick="closeModal('modal-vac')" class="flex-1 py-3 rounded-xl bg-[#F5F6F8] font-bold text-[14px]">취소</button><button onclick="saveVac()" class="flex-1 py-3 rounded-xl bg-[#191F28] text-white font-bold text-[14px]">저장</button></div>
+  </div></div>
+
+ <div id="modal-menu" class="fixed inset-0 z-50 bg-[var(--bg-main)] hidden flex-col">
+  <div class="max-w-md mx-auto w-full h-full flex flex-col" style="padding-top:env(safe-area-inset-top)">
+   <div class="flex items-center justify-between px-4 py-3 bg-white"><button onclick="closeModal('modal-menu')" class="w-10 h-10 rounded-full bg-[#F5F6F8] text-xl font-bold">‹</button><div class="font-bold text-[17px]">🍚 식단표</div><button id="menu-edit-btn" onclick="menuEditToggle()" class="text-[13px] font-bold text-[var(--mil-green)] w-10">편집</button></div>
+   <div class="flex-1 overflow-y-auto no-scrollbar px-5 py-4 space-y-3">
+    <div id="menu-unit" class="text-[12px] text-[#8B95A1]"></div>
+    <div class="flex items-center justify-between"><button onclick="menuGo(-1)" class="w-10 h-10 rounded-full bg-white shadow-sm font-bold">◀</button><div id="menu-date-label" class="text-[16px] font-extrabold"></div><button onclick="menuGo(1)" class="w-10 h-10 rounded-full bg-white shadow-sm font-bold">▶</button></div>
+    <div class="flex gap-2 items-center"><button onclick="menuSet(ymd(new Date()))" class="text-[12px] font-bold bg-white border border-[#E5E8EB] rounded-full px-3 py-1.5">오늘</button><button onclick="menuSet(ymd(new Date(Date.now()+864e5)))" class="text-[12px] font-bold bg-white border border-[#E5E8EB] rounded-full px-3 py-1.5">내일</button><input type="date" id="menu-date-input" onchange="menuSet(this.value)" class="text-[12px] font-bold bg-white border border-[#E5E8EB] rounded-full px-3 py-1 outline-none flex-1"></div>
+    <div id="menu-cards" class="space-y-3"></div>
+    <div id="menu-edit" class="hidden toss-card !p-5 space-y-3">
+     <div class="bg-[var(--mil-green-light)] rounded-xl p-3 space-y-2"><div class="text-[13px] font-extrabold">📥 공공데이터포털 식단 가져오기</div><p class="text-[11px] text-[#4E5968] leading-relaxed">① 아래 버튼으로 공공데이터포털에서 우리 부대 '식단정보' CSV를 내려받고 ② 파일을 선택하면 날짜별로 한꺼번에 자동 등록돼요. (부대가 데이터를 공개한 경우에만 있어요)</p><a id="menu-dg-link" target="_blank" rel="noopener" href="https://www.data.go.kr/tcs/dss/selectDataSetList.do?keyword=%EA%B5%AD%EB%B0%A9%EB%B6%80+%EC%8B%9D%EB%8B%A8%EC%A0%95%EB%B3%B4" class="block text-center bg-white border border-[#E5E8EB] rounded-lg py-2.5 text-[12px] font-bold text-[var(--mil-green)]">공공데이터포털에서 우리 부대 찾기 ▶</a><label class="block text-center bg-[var(--mil-green)] text-white rounded-lg py-2.5 text-[12px] font-bold cursor-pointer">CSV 파일 선택해서 가져오기<input type="file" accept=".csv,text/csv,text/plain" class="hidden" onchange="importMenuCsv(this)"></label></div><div class="text-[14px] font-extrabold">이 날 식단 입력</div>
+     <label class="text-[12px] font-bold">🌅 조식</label><textarea id="menu-in-b" class="w-full bg-[#F5F6F8] rounded-xl p-3 text-[13px] outline-none h-16 resize-none" placeholder="쉼표(,)로 구분 · 예) 쌀밥, 미역국, 계란말이"></textarea>
+     <label class="text-[12px] font-bold">☀️ 중식</label><textarea id="menu-in-l" class="w-full bg-[#F5F6F8] rounded-xl p-3 text-[13px] outline-none h-16 resize-none"></textarea>
+     <label class="text-[12px] font-bold">🌙 석식</label><textarea id="menu-in-d" class="w-full bg-[#F5F6F8] rounded-xl p-3 text-[13px] outline-none h-16 resize-none"></textarea>
+     <button onclick="saveMenu()" class="w-full bg-[#191F28] text-white py-3 rounded-xl font-bold text-[14px]">이 날 저장</button>
+     <div class="border-t border-[#F2F3F5] pt-3"><div class="text-[13px] font-extrabold mb-1">여러 날 한 번에 입력</div><p class="text-[11px] text-[#8B95A1] mb-2">한 줄에 하루씩, 날짜 뒤에 조식·중식·석식을 적어요.<br>예) 10/21 조식: 밥, 국 중식: 카레, 샐러드 석식: 불고기, 김치</p><textarea id="menu-bulk" class="w-full bg-[#F5F6F8] rounded-xl p-3 text-[12px] outline-none h-28 resize-none"></textarea><button onclick="saveBulk()" class="w-full mt-2 bg-[var(--mil-green)] text-white py-3 rounded-xl font-bold text-[14px]">일괄 저장</button></div>
+     <p class="text-[11px] text-[#8B95A1]">식단은 부대 밴드·더캠프 공지, 공공데이터포털의 '국방부 식단정보'에서 확인해 옮겨 적을 수 있어요.</p></div>
+   </div></div></div>
+
+ <div id="modal-alert" class="fixed inset-0 z-[110] bg-[#191F28]/60 backdrop-blur-sm hidden items-center justify-center p-4"><div class="bg-white w-full max-w-[320px] rounded-[24px] p-6 text-center shadow-2xl"><h3 id="alert-title" class="font-bold text-[17px] mb-3">알림</h3><div id="alert-message" class="text-[13px] text-[#4E5968] mb-6 whitespace-pre-line text-left leading-relaxed max-h-[60vh] overflow-y-auto no-scrollbar"></div><button onclick="closeModal('modal-alert')" class="w-full py-3.5 bg-[#191F28] text-white rounded-xl font-bold text-[14px]">확인</button></div></div>
+</div>
+
+<script>
+/* ================= 설정: Supabase 프로젝트 값 입력 ================= */
+const SUPABASE_URL = 'https://fziblqwqtyhntmmvzhgv.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_OSLMwUUK8XTIEmwWLV2d9Q_t416LU_s';
+/* =================================================================== */
+const KAKAO_JS_KEY = ''; // (선택) 카카오 개발자 JavaScript 키 → 아파트·상가 이름 검색이 정확해져요
+const configured = !SUPABASE_URL.includes('YOUR-PROJECT');
+const sb = configured ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+const q = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const openM = id => { q(id).classList.remove('hidden'); q(id).classList.add('flex'); };
+function closeModal(id) { q(id).classList.add('hidden'); q(id).classList.remove('flex'); if (id === 'modal-settings' && typeof me !== 'undefined' && me) applyTheme((S_() || {}).branch || 'army'); }
+const showAlert = (t, m) => { q('alert-title').innerText = t; q('alert-message').innerHTML = m; openM('modal-alert'); };
+const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const pd = s => new Date(s + 'T00:00:00');
+const BR = { army: { n: '육군', m: 18, k: '육군' }, marine: { n: '해병대', m: 18, k: '해병대' }, navy: { n: '해군', m: 20, k: '해군' }, airforce: { n: '공군', m: 21, k: '공군' } };
+const PAL = {
+  army:     { g:'#6B7B5C', l:'#F0F3ED', d:'#283224', d2:'#3A4535', d3:'#485642', t0:'#E8ECE5', t1:'#9CAEA4', t2:'#8A9A80', t3:'#708075', s:'#EEF2EB', b:'#D5E0CD', st:'#7A8B70' },
+  marine:   { g:'#B5473F', l:'#FBEFEE', d:'#3A1F1D', d2:'#532B28', d3:'#6B3A36', t0:'#F6E7E5', t1:'#D9A9A4', t2:'#C68F89', t3:'#AD746E', s:'#FAECEA', b:'#EBC8C4', st:'#A9625C' },
+  navy:     { g:'#3F5F8A', l:'#EBEFF6', d:'#1D2A42', d2:'#2A3B58', d3:'#384C6E', t0:'#E6EBF4', t1:'#9DB0CE', t2:'#7F96BA', t3:'#667FA6', s:'#E9EDF5', b:'#CAD4E6', st:'#6980A8' },
+  airforce: { g:'#4A90BF', l:'#EAF4FA', d:'#23485F', d2:'#305A74', d3:'#3D6B87', t0:'#E4F1F8', t1:'#A3C6DA', t2:'#86B2CC', t3:'#6A9BB8', s:'#E6F2F9', b:'#C4DDEC', st:'#5E93B3' }
+};
+function applyTheme(br) {
+  const p = PAL[br] || PAL.army, r = document.documentElement.style;
+  [['--mil-green','g'],['--mil-green-light','l'],['--mil-dark','d'],['--mil-dark2','d2'],['--mil-dark3','d3'],['--mil-t0','t0'],['--mil-t1','t1'],['--mil-t2','t2'],['--mil-t3','t3'],['--mil-soft','s'],['--mil-border','b'],['--mil-softtext','st']].forEach(([v,k]) => r.setProperty(v, p[k]));
+  const m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', p.g);
+}
+
+let me = null, partner = null, session = null, wishes = [], pWishes = [], vacs = [], qAns = {}, curTab = 'home', qDayN = 1, qInit = false, booted = false;
+let signup = false, signupGender = null, obG = null, obBranch = 'army', setBranchV = 'army', sav = { banks: [], amts: {}, opts: {} }, pxSel = [];
+
+/* ---------- 인증 ---------- */
+function authToggleHTML() { q('auth-toggle-text').innerHTML = signup ? '이미 계정이 있나요? <span class="text-[var(--mil-green)] font-bold cursor-pointer" onclick="toggleAuthMode()">로그인</span>' : '계정이 없나요? <span class="text-[var(--mil-green)] font-bold cursor-pointer" onclick="toggleAuthMode()">새 계정 만들기</span>'; }
+function toggleAuthMode() { signup = !signup; q('auth-title').innerText = signup ? '회원가입' : '로그인'; q('auth-subtitle').innerText = signup ? '성별을 선택하고 비밀번호를 재확인해주세요.' : '계정을 연결하고 연인과 데이터를 동기화하세요.'; q('auth-signup-fields').classList.toggle('hidden', !signup); q('btn-auth-submit').innerText = signup ? '계정 생성하기' : '이메일로 로그인'; authToggleHTML(); }
+function setGender(g) { signupGender = g; q('btn-gender-M').className = 'flex-1 py-3 rounded-xl border-2 font-bold text-[13px] ' + (g === 'M' ? 'border-[var(--mil-green)] bg-[var(--mil-green-light)] text-[var(--mil-green)]' : 'border-[#E5E8EB] bg-[#F5F6F8] text-[#8B95A1]'); q('btn-gender-F').className = 'flex-1 py-3 rounded-xl border-2 font-bold text-[13px] ' + (g === 'F' ? 'border-[var(--pink-main)] bg-[var(--pink-light)] text-[var(--pink-main)]' : 'border-[#E5E8EB] bg-[#F5F6F8] text-[#8B95A1]'); }
+const needCfg = () => { if (!configured) { showAlert('설정 필요', 'index.html 맨 아래 스크립트의 SUPABASE_URL / SUPABASE_ANON_KEY 를 본인 Supabase 값으로 바꿔주세요.'); return true; } };
+async function submitAuth() {
+  if (needCfg()) return;
+  const e = q('auth-email').value.trim(), p = q('auth-password').value;
+  if (!e || p.length < 6) return showAlert('오류', '이메일과 6자리 이상의 비밀번호를 입력해주세요.');
+  if (signup) {
+    if (p !== q('auth-password-confirm').value) return showAlert('오류', '비밀번호 재확인이 일치하지 않습니다.');
+    if (!signupGender) return showAlert('오류', '성별(남자/여자)을 선택해주세요.');
+    const { data, error } = await sb.auth.signUp({ email: e, password: p, options: { data: { gender: signupGender }, emailRedirectTo: location.origin + location.pathname } });
+    if (error) return showAlert('가입 실패', esc(error.message));
+    if (data.user && data.user.identities && data.user.identities.length === 0) return showAlert('안내', '이미 가입된 이메일입니다. 로그인해주세요.');
+    if (!data.session) { showAlert('인증 메일 발송 ✉️', `${esc(e)} 로 인증 메일을 보냈어요.<br>메일의 링크를 눌러 인증한 뒤 로그인해주세요.`); toggleAuthMode(); }
+  } else {
+    const { error } = await sb.auth.signInWithPassword({ email: e, password: p });
+    if (error) showAlert('로그인 실패', /confirm/i.test(error.message) ? '이메일 인증이 아직 완료되지 않았어요. 메일함의 인증 링크를 눌러주세요.' : '이메일 또는 비밀번호가 올바르지 않습니다.');
+  }
+}
+async function googleAuth() { if (needCfg()) return; const { error } = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname } }); if (error) showAlert('오류', esc(error.message)); }
+async function logout() { await sb.auth.signOut(); location.reload(); }
+
+/* ---------- 데이터 로드 ---------- */
+async function loadAll(first) {
+  const uid = session.user.id;
+  let { data: m } = await sb.from('profiles').select('*').eq('id', uid).maybeSingle();
+  if (!m) { await new Promise(r => setTimeout(r, 800)); ({ data: m } = await sb.from('profiles').select('*').eq('id', uid).maybeSingle()); }
+  if (!m) return showAlert('오류', '프로필을 찾을 수 없습니다. schema.sql 이 실행되었는지 확인하세요.');
+  me = m; partner = null;
+  if (me.partner_id) { const { data: p } = await sb.from('profiles').select('*').eq('id', me.partner_id).maybeSingle(); partner = p; }
+  const [w, pw, v] = await Promise.all([
+    sb.from('px_wishes').select('item_id').eq('user_id', uid),
+    me.partner_id ? sb.from('px_wishes').select('item_id').eq('user_id', me.partner_id) : { data: [] },
+    sb.from('vacations').select('*').order('start_date')
+  ]);
+  wishes = (w.data || []).map(x => x.item_id); pWishes = (pw.data || []).map(x => x.item_id); vacs = v.data || [];
+  { const sid = me.gender === 'M' ? me.id : me.partner_id; menus = {}; if (sid) { const { data: mm } = await sb.from('menus').select('*').eq('created_by', sid); (mm || []).forEach(x => menus[x.menu_date] = x); } }
+  if (first) { sav = Object.assign({ banks: [], amts: {}, opts: {} }, me.savings || {}); }
+  await loadQ();
+}
+async function loadQ() {
+  const { data } = await sb.from('qna_answers').select('*').eq('day', qDayN);
+  qAns = {}; (data || []).forEach(a => qAns[a.user_id] = a.answer);
+}
+function subscribe() {
+  let t; const h = () => { clearTimeout(t); t = setTimeout(async () => { await loadAll(false); render(false); }, 250); };
+  sb.channel('rt-' + session.user.id).on('postgres_changes', { event: '*', schema: 'public' }, h).subscribe();
+}
+async function boot() {
+  if (booted) return; booted = true;
+  q('auth-modal').classList.add('hidden');
+  await loadAll(true);
+  if (!me) return;
+  if (!me.onboarded) return showOnboarding();
+  initUI(); render(true); subscribe();
+}
+
+/* ---------- 온보딩 ---------- */
+function showOnboarding() {
+  q('onboarding-modal').classList.remove('hidden');
+  obG = me.gender;
+  q('ob-gender-box').classList.toggle('hidden', !!me.gender);
+  q('ob-branches').innerHTML = Object.keys(BR).map(k => `<button onclick="obSetBranch('${k}')" id="ob-b-${k}" class="py-3 rounded-xl border-2 font-bold text-[14px]">${BR[k].n} (${BR[k].m}개월)</button>`).join('');
+  obSetBranch('army'); obRefresh();
+}
+function obSetBranch(k) { obBranch = k; applyTheme(k); Object.keys(BR).forEach(b => q('ob-b-' + b).className = 'py-3 rounded-xl border-2 font-bold text-[14px] ' + (b === k ? 'border-[var(--mil-green)] bg-[var(--mil-green-light)] text-[var(--mil-green)]' : 'border-[#E5E8EB] bg-[#F5F6F8] text-[#8B95A1]')); }
+function obGender(g) { obG = g; ['M', 'F'].forEach(x => q('ob-g-' + x).className = 'flex-1 py-3 rounded-xl border-2 font-bold text-[13px] ' + (x === g ? 'border-[var(--mil-green)] bg-[var(--mil-green-light)] text-[var(--mil-green)]' : 'border-[#E5E8EB] bg-[#F5F6F8] text-[#8B95A1]')); obRefresh(); }
+function obRefresh() { q('ob-soldier-box').classList.toggle('hidden', obG !== 'M'); q('ob-f-note').classList.toggle('hidden', obG !== 'F'); }
+async function completeOnboarding() {
+  if (!obG) return showAlert('알림', '성별을 선택해주세요.');
+  const upd = { gender: obG, onboarded: true };
+  if (obG === 'M') {
+    const e = q('ob-enlist-date').value; if (!e) return showAlert('알림', '입대일을 선택해주세요.');
+    upd.branch = obBranch; upd.enlist_date = e; upd.discharge_date = ymd(calcDischarge(pd(e), obBranch));
+  }
+  const { error } = await sb.from('profiles').update(upd).eq('id', me.id);
+  if (error) return showAlert('오류', esc(error.message));
+  q('onboarding-modal').classList.add('hidden'); await loadAll(true); initUI(); render(true); subscribe();
+}
+function calcDischarge(d, br) { const x = new Date(d); x.setMonth(x.getMonth() + BR[br].m); x.setDate(x.getDate() - 1); return x; }
+
+/* ---------- 계급/급여 ---------- */
+function addM(d, m) { const x = new Date(d.getFullYear(), d.getMonth() + m, 1); const last = new Date(x.getFullYear(), x.getMonth() + 1, 0).getDate(); x.setDate(Math.min(d.getDate(), last)); return x; }
+// 계급 복무기간을 만으로 채운 뒤 처음 돌아오는 1일에 진급 (예: 8/3 입대 → 만 2개월 10/2 → 11/1 일병)
+const firstOnOrAfter1st = d => d.getDate() === 1 ? new Date(d) : new Date(d.getFullYear(), d.getMonth() + 1, 1);
+function milInfo(S) {
+  const e = pd(S.enlist_date), dis = pd(S.discharge_date), b = BR[S.branch] || BR.army, ab = [6, 12];
+  const grad = new Date(e.getTime() + 35 * 864e5), d1 = firstOnOrAfter1st(addM(e, 2)), d2 = new Date(d1.getFullYear(), d1.getMonth() + ab[0], 1), d3 = new Date(d1.getFullYear(), d1.getMonth() + ab[1], 1);
+  return { e, dis, grad, d1, d2, d3, b };
+}
+let hoC = null;
+function rankMark(r) {
+  const n = { '훈련병': 1, '이병': 1, '일병': 2, '상병': 3, '병장': 4 }[r], bars = n ? Array.from({ length: n }, () => '<i style="display:block;width:10px;height:2.5px;border-radius:1px;background:#fff"></i>').join('') : '<b style="color:#fff;font-size:11px;line-height:1">★</b>';
+  return `<span style="width:20px;height:20px;border-radius:5px;background:var(--mil-green);display:inline-flex;flex-direction:column;gap:2px;align-items:center;justify-content:center">${bars}</span>`;
+}
+function hoInfo(S, now) {
+  const I = milInfo(S), r = rankOf(S, now); let rr = r;
+  if (r.r === '훈련병') rr = { r: '이병', nD: I.d1, nN: '일병' };
+  const start = { '이병': I.e, '일병': I.d1, '상병': I.d2, '병장': I.d3 }[rr.r] || I.d3, end = rr.r === '병장' || rr.r === '전역' ? new Date(I.dis.getTime() + 864e5) : rr.nD;
+  let hs = new Date(start), n = 1, nx = new Date(hs.getFullYear(), hs.getMonth() + 1, 1);
+  while (nx <= now && nx < end) { n++; hs = nx; nx = new Date(hs.getFullYear(), hs.getMonth() + 1, 1); }
+  return { rank: rr.r, next: rr.nN || '전역', start, end, n, hs, nx, nxIsPromo: nx >= end, left: r.r === '전역' };
+}
+function fillSoldier(S, now) {
+  const I = milInfo(S), h = hoInfo(S, now), rk = rankOf(S, now).r; hoC = h;
+  const T0 = new Date(now.getFullYear(), now.getMonth(), now.getDate()), dd = d => Math.max(0, Math.ceil((d - T0) / 864e5)), f = d => `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+  const td = Math.round((I.dis - I.e) / 864e5) + 1, sd = Math.min(td, Math.max(0, Math.round((T0 - I.e) / 864e5) + 1));
+  { const nm = S.nickname || '', el = q('bf-name'); el.className = nm ? 'text-[25px] font-extrabold leading-tight tracking-tight break-all' : 'text-[14px] font-bold text-[#8B95A1]' + (S.id !== me.id ? ' hidden' : ''); el.innerText = nm || '✏️ 이름을 설정해보세요'; el.onclick = !nm && S.id === me.id ? openProfileSet : null; }
+  q('bf-rank').innerText = rk; q('bf-mark').innerHTML = rankMark(rk); q('bf-ho').innerText = rk === '전역' ? '' : `${h.n}호봉`; q('bf-branch').innerText = I.b.k; q('bf-unit').innerText = S.unit_name ? ' · ' + S.unit_name : '';
+  q('bf-enlist').innerText = f(I.e); q('bf-dis').innerText = f(I.dis); q('bf-dday').innerText = sd >= td ? '전역!' : `D-${td - sd}`;
+  q('bf-ho-label').innerText = h.nxIsPromo ? (h.rank === '병장' ? '마지막 호봉' : `${h.next} 1호봉`) : `${h.n + 1}호봉 승급`; q('bf-ho-dday').innerText = h.nxIsPromo && h.rank === '병장' ? '' : `D-${dd(h.nx)}`;
+  q('bf-pr-label').innerText = h.rank === '병장' ? '전역' : `${h.next} 진급`; q('bf-pr-dday').innerText = `D-${dd(h.end)}`;
+  let wk = 0; for (let d = new Date(T0); d <= I.dis; d.setDate(d.getDate() + 1)) if (d.getDay() !== 0 && d.getDay() !== 6) wk++;
+  const nv = vacs.filter(v => v.end_date >= ymd(T0)).sort((a, b) => a.start_date.localeCompare(b.start_date))[0];
+  q('st-total').innerText = td; q('st-cur').innerText = sd; q('st-left').innerText = Math.max(0, td - sd); q('st-promo').innerText = dd(h.end); q('st-work').innerText = wk;
+  q('st-vac').innerText = nv ? (nv.start_date <= ymd(T0) ? '휴가중' : `D-${dd(pd(nv.start_date))}`) : '-';
+  return rk;
+}
+function tickPct(S, n) {
+  const I = milInfo(S), tot = I.dis.getTime() + 864e5 - I.e.getTime(), P = x => Math.min(100, Math.max(0, x)), all = P((n - I.e.getTime()) / tot * 100);
+  q('bf-pct').innerText = all.toFixed(8) + '%'; q('bf-progress').style.width = all + '%';
+  if (!hoC || n >= hoC.nx || n >= hoC.end) hoC = hoInfo(S, new Date(n));
+  const ho = P((n - hoC.hs) / (hoC.nx - hoC.hs) * 100), pr = P((n - hoC.start) / (hoC.end - hoC.start) * 100);
+  q('bf-ho-pct').innerText = ho.toFixed(5) + '%'; q('bf-ho-bar').style.width = ho + '%'; q('bf-pr-pct').innerText = pr.toFixed(5) + '%'; q('bf-pr-bar').style.width = pr + '%';
+}
+function rankOf(S, now) {
+  const I = milInfo(S);
+  if (now < I.grad) return { r: '훈련병', nD: I.grad, nN: '이병(수료)' };
+  if (now < I.d1) return { r: '이병', nD: I.d1, nN: '일병' };
+  if (now < I.d2) return { r: '일병', nD: I.d2, nN: '상병' };
+  if (now < I.d3) return { r: '상병', nD: I.d3, nN: '병장' };
+  if (now < I.dis) return { r: '병장', nD: I.dis, nN: '전역' };
+  return { r: '전역', nD: null };
+}
+function gfRank(r) { return ({ '훈련병': ['🌱', '씨앗', .75, .15], '이병': ['🌿', '새싹', .8, .25], '일병': ['🌷', '꽃봉오리', .9, .4], '상병': ['🌸', '예쁜 꽃', 1.05, .7], '병장': ['🌸', '활짝 핀 꽃', 1.15, .9], '전역': ['💐', '특급꽃신', 1.25, 1] })[r] || ['🌱', '씨앗', .75, .15]; }
+const MONTH = 2629800000;
+function totalPay(S, now, matching) {
+  const I = milInfo(S), end = Math.min(now, I.dis.getTime() + 864e5), seg = [[I.e, I.d1, 750000], [I.d1, I.d2, 900000], [I.d2, I.d3, 1200000], [I.d3, new Date(I.dis.getTime() + 864e5), 1500000]];
+  let t = 0; seg.forEach(([a, b, r]) => { const o = Math.min(end, b) - Math.max(I.e.getTime(), a); if (o > 0) t += o / MONTH * r; });
+  if (matching && end > I.e) t += (end - I.e) / MONTH * 550000; return t;
+}
+let salT, rainT;
+function startSal(S) {
+  clearInterval(salT); clearInterval(rainT);
+  q('salary-branch-desc').innerText = `2026 기준 (${BR[S.branch].m}개월 복무)`;
+  salT = setInterval(() => { const n = Date.now(); tickPct(S, n); if (n < pd(S.enlist_date)) { q('live-total-salary').innerText = '0.00'; return; } q('live-total-salary').innerText = totalPay(S, n, q('check-matching').checked).toLocaleString('ko-KR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }, 50);
+  rainT = setInterval(() => rainBurst(1), 900); // 터치 안 해도 일정 속도로 낙하
+}
+function rainBurst(n) {
+  const c = q('money-rain-container'); if (!c) return;
+  for (let i = 0; i < n; i++) setTimeout(() => { const p = document.createElement('div'); p.className = 'falling-money'; p.style.left = Math.floor(Math.random() * 85) + '%'; const big = Math.random() > .6;
+    p.innerHTML = big ? '<div class="px-2 py-0.5 rounded shadow-sm bg-[#F2BA49] text-[10px] text-white font-bold border border-[#D4A373]">₩50,000</div>' : '<div class="px-2 py-0.5 rounded shadow-sm bg-[var(--mil-green)] text-[10px] text-white font-bold border border-[var(--mil-dark3)]">₩10,000</div>';
+    c.appendChild(p); setTimeout(() => p.remove(), 2200); }, Math.random() * 600);
+}
+
+/* ---------- 캐릭터 이미지 ---------- */
+function gamjaSVG(st) {
+  const hair = [ '', '<path d="M38 36q12-6 24 0" stroke="#5a4326" stroke-width="2" fill="none"/>', '<path d="M34 38q4-14 16-14t16 14q-16-6-32 0z" fill="#5a4326"/>', '<path d="M32 40q2-20 18-20t18 20q-18-9-36 0z" fill="#3d2c18"/><path d="M34 34q16-6 32 0" stroke="#6d5030" stroke-width="2" fill="none"/>' ][st] || '';
+  const hat = st === 0 ? '<path d="M34 38q16-18 32 0z" fill="#6b7c55" stroke="#4a3a22" stroke-width="2"/>' : '';
+  return `<svg viewBox="0 0 100 100" class="w-full h-full"><ellipse cx="50" cy="56" rx="30" ry="34" fill="#E8C078" stroke="#8a6a35" stroke-width="2.5"/><circle cx="38" cy="50" r="2" fill="#C99A4B"/><circle cx="64" cy="66" r="2" fill="#C99A4B"/><circle cx="41" cy="55" r="3.5" fill="#2b1a14"/><circle cx="60" cy="55" r="3.5" fill="#2b1a14"/><circle cx="34" cy="63" r="5" fill="#F4A0A0" opacity=".6"/><circle cx="67" cy="63" r="5" fill="#F4A0A0" opacity=".6"/><path d="M45 66q5 5 10 0" stroke="#2b1a14" stroke-width="2" fill="none" stroke-linecap="round"/>${hair}${hat}</svg>`;
+}
+function bfImg(theme, r) {
+  if (theme === 'gamja') return gamjaSVG({ '훈련병': 0, '이병': 1, '일병': 2 }[r] ?? 3);
+  const f = { '훈련병': 'tiger_recruit.svg', '이병': 'tiger_ib.png', '일병': 'tiger_ilb.png', '상병': 'tiger_sb.png' }[r] || 'tiger_bj.png';
+  return `<img src="${f}" alt="" class="w-[120%] h-[120%] object-contain">`;
+}
+
+/* ---------- 메인 렌더 ---------- */
+const S_ = () => me.gender === 'M' ? me : (partner && partner.gender === 'M' ? partner : null);
+const G_ = () => me.gender === 'F' ? me : (partner && partner.gender === 'F' ? partner : null);
+function render(full) {
+  if (!me) return;
+  const S = S_(), G = G_(), now = new Date(); applyTheme((S && S.branch) || 'army');
+  q('clean-state-banner').classList.toggle('hidden', !!S);
+  ['salary-card', 'vacation-card', 'menu-btn-row'].forEach(i => q(i).classList.toggle('hidden', !S));
+  q('soldier-card').classList.toggle('hidden', !S); q('gf-profile-card').classList.toggle('hidden', !G);
+  let rank = '훈련병';
+  if (S && S.enlist_date) {
+    rank = fillSoldier(S, now); const ri = { r: rank };
+    q('bf-img-container').innerHTML = bfImg(S.bf_theme, ri.r);
+    const lk = 'lastRank_' + S.id, last = localStorage.getItem(lk); if (last && last !== ri.r) cutscene(ri.r); localStorage.setItem(lk, ri.r);
+    if (full || !salT) startSal(S);
+  } else { clearInterval(salT); clearInterval(rainT); salT = null; }
+  if (G) {
+    const gi = gfRank(rank); q('gf-rank-icon').innerText = gi[0]; q('gf-rank-name').innerText = gi[1];
+    q('gf-img-container').innerHTML = `<img src="${G.gf_theme === 'cat' ? 'gf_cat.png' : 'gf_bear.png'}" class="w-full h-full object-cover transition-all duration-1000" style="transform:scale(${gi[2]})">`;
+    document.documentElement.style.setProperty('--halo-op', gi[3]);
+    { const g = q('gf-name'); g.innerText = G.nickname || (G.id === me.id ? '✏️ 이름을 설정해보세요' : (G.gf_theme === 'cat' ? '꽃냥이' : '곰신 베어')); g.onclick = !G.nickname && G.id === me.id ? openProfileSet : null; }
+    const inp = q('one-line-msg'); inp.readOnly = G.id !== me.id; inp.placeholder = G.id === me.id ? '상태 메시지 입력' : '상태 메시지 없음'; if (document.activeElement !== inp) inp.value = G.status_msg || '';
+  }
+  const c = q('profile-container'), bf = q('soldier-card'), gf = q('gf-profile-card');
+  const ht = q('heart-divider'); ht.classList.toggle('hidden', !(S && G)); ht.classList.toggle('flex', !!(S && G));
+  if (me.gender === 'M') { c.appendChild(bf); c.appendChild(ht); c.appendChild(gf); } else { c.appendChild(gf); c.appendChild(ht); c.appendChild(bf); }
+  // 장바구니 아이콘 (군인 홈)
+  const showCart = me.gender === 'M' && partner && partner.px_sent_at && pWishes.length > 0;
+  q('btn-cart').classList.toggle('hidden', !showCart);
+  if (showCart) q('cart-dot').classList.toggle('hidden', localStorage.getItem('pxseen') === partner.px_sent_at);
+  if (S && S.unit_lat && !q('route-start').value && !picks.start) { const lb = S.unit_name || S.unit_addr || '자대'; q('route-start').value = lb; picks.start = { label: lb, name: lb, lat: S.unit_lat, lng: S.unit_lng }; }
+  renderVac(); renderPX(); renderQ(!qInit || full); if (curTab === 'savings') renderSav();
+  qInit = true;
+}
+function cutscene(r) { const o = document.createElement('div'); o.className = 'flash-overlay'; document.body.appendChild(o); setTimeout(() => { showAlert('진급 ✨', `[${r}] 모습으로 성장했습니다!`); o.remove(); }, 500); }
+function evoPreview() { const S = S_(); if (!S) return; const o = document.createElement('div'); o.className = 'flash-overlay'; document.body.appendChild(o); setTimeout(() => { showAlert('진화 ✨', `현재 [${rankOf(S, new Date()).r}] 모습이에요!`); o.remove(); }, 500); }
+
+/* ---------- 탭/UI ---------- */
+const TABS = [['home', '홈', '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>'], ['savings', '적금', '<rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>'], ['goodman', 'PX굿맨', '<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>'], ['qna', 'Q&A', '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>'], ['benefits', '혜택', '<path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><line x1="12" y1="22" x2="12" y2="7"/>']];
+function initUI() {
+  q('bottom-nav').innerHTML = TABS.map(t => `<button onclick="switchTab('${t[0]}')" id="nav-btn-${t[0]}" class="flex flex-col items-center gap-1"><svg class="w-6 h-6 sf-icon" viewBox="0 0 24 24">${t[2]}</svg><span class="text-[10px] font-bold">${t[1]}</span></button>`).join('');
+  q('set-branches').innerHTML = Object.keys(BR).map(k => `<button onclick="setBr('${k}')" id="sb-${k}" class="py-2 rounded-lg border-2 font-bold text-[11px]">${BR[k].k}</button>`).join('');
+  switchTab('home');
+}
+function switchTab(t) {
+  curTab = t; TABS.forEach(([id]) => { q('tab-' + id).classList.toggle('hidden', id !== t); q('nav-btn-' + id).className = 'flex flex-col items-center gap-1 transition-all ' + (id === t ? 'text-[var(--mil-green)] scale-105' : 'text-[#B0B8C1]'); });
+  if (t === 'savings') renderSav(); if (t === 'goodman') renderPX(); if (t === 'qna') renderQ(true); if (t === 'benefits') renderBenefits();
+}
+
+/* ---------- 설정 ---------- */
+function setBr(k) { setBranchV = k; applyTheme(k); Object.keys(BR).forEach(b => q('sb-' + b).className = 'py-2 rounded-lg border-2 font-bold text-[11px] ' + (b === k ? 'border-[var(--mil-green)] bg-[var(--mil-green-light)] text-[var(--mil-green)]' : 'border-[#E5E8EB] bg-[#F5F6F8] text-[#8B95A1]')); autoD(); }
+function autoD() { const e = q('set-enlist').value; if (e) q('set-discharge').value = ymd(calcDischarge(pd(e), setBranchV)); }
+let thTmp = {};
+const SET_TITLES = { main: '설정', profile: '프로필', couple: '커플 연동', service: '복무 정보', unit: '자대 등록', theme: '캐릭터 테마', account: '계정' };
+let setPage = 'main';
+function setGo(p) {
+  setPage = p; Object.keys(SET_TITLES).forEach(k => q('set-p-' + k).classList.toggle('hidden', k !== p)); q('set-title').innerText = SET_TITLES[p];
+  if (p === 'main') { applyTheme((S_() || {}).branch || 'army'); renderSetRows(); }
+}
+function setBack() { if (setPage !== 'main') setGo('main'); else closeModal('modal-settings'); }
+function renderSetRows() {
+  const S = S_(), isM = me.gender === 'M', th = isM ? (me.bf_theme === 'gamja' ? '감자돌이' : '짬타이거') : (me.gf_theme === 'cat' ? '꽃냥이' : '곰신 베어');
+  const row = (ic, label, val, go, red) => `<button onclick="${go}" class="w-full flex items-center gap-4 px-5 py-4 border-b border-[#F2F3F5] active:bg-[#F5F6F8]"><span class="text-xl w-7">${ic}</span><span class="flex-1 text-left text-[15px] font-semibold ${red ? 'text-[#E5484D]' : ''}">${label}</span><span class="text-[13px] text-[#8B95A1] max-w-[45%] truncate">${esc(val || '')}</span><span class="text-[#B0B8C1]">›</span></button>`, gap = '<div class="h-2.5 bg-[#F5F6F8]"></div>';
+  q('set-name').innerText = me.nickname || (isM ? '🪖 군인' : '💕 곰신');
+  q('set-rows').innerHTML = gap + row('✏️', '프로필 (이름·별명)', me.nickname || '미설정', "setGo('profile')") + row('💕', '커플 연동', me.partner_id ? '연동 중' : '미연동', "setGo('couple')") + row('👤', '계정', '', "setGo('account')") + gap
+    + row('🪖', '복무 정보', isM ? (BR[me.branch] || BR.army).k : '군인 계정에서 설정', "setGo('service')") + row('📍', '자대 등록', (S && S.unit_name) || '미등록', "setGo('unit')") + row('🎭', '캐릭터 테마', th, "setGo('theme')") + gap
+    + row('🚪', '로그아웃', '', 'logout()', true);
+}
+function openSettings() {
+  const isM = me.gender === 'M'; q('my-couple-code').innerText = me.code || '-'; const linked = !!me.partner_id;
+  q('couple-link-ui').classList.toggle('hidden', linked); q('couple-linked-ui').classList.toggle('hidden', !linked);
+  ['set-service-form', 'set-unit-form'].forEach(i => q(i).classList.toggle('hidden', !isM)); ['set-service-note', 'set-unit-note'].forEach(i => q(i).classList.toggle('hidden', isM));
+  if (isM) { q('set-enlist').value = me.enlist_date || ''; setBr(me.branch || 'army'); q('set-discharge').value = me.discharge_date || ''; q('set-unit-name').value = me.unit_name || ''; q('set-unit-addr').value = me.unit_addr || ''; picks.unit = me.unit_lat ? { label: me.unit_addr || '', name: me.unit_addr || '', lat: me.unit_lat, lng: me.unit_lng } : null; }
+  q('settings-theme-bf').classList.toggle('hidden', !isM); q('settings-theme-gf').classList.toggle('hidden', isM);
+  thTmp = { bf: me.bf_theme, gf: me.gf_theme }; cTh('bf', thTmp.bf, true); cTh('gf', thTmp.gf, true);
+  const em = (session && session.user && session.user.email) || ''; q('set-email').innerText = em; q('set-acc-email').innerText = em; q('set-name').innerText = me.nickname || (isM ? '🪖 군인' : '💕 곰신'); q('set-nick').value = me.nickname || '';
+  q('set-avatar').innerHTML = isM ? bfImg(me.bf_theme, me.enlist_date ? rankOf(me, new Date()).r : '이병') : `<img src="${me.gf_theme === 'cat' ? 'gf_cat.png' : 'gf_bear.png'}" class="w-full h-full object-cover">`;
+  setGo('main'); openM('modal-settings');
+}
+async function saveNick() {
+  const v = q('set-nick').value.trim().slice(0, 12), { error } = await sb.from('profiles').update({ nickname: v || null }).eq('id', me.id);
+  if (error) return showAlert('오류', esc(error.message) + '<br><br>schema_nickname.sql 을 실행했는지 확인하세요.');
+  await loadAll(false); render(true); setGo('main');
+}
+function openProfileSet() { openSettings(); setGo('profile'); }
+async function saveUnit() {
+  const name = q('set-unit-name').value.trim(), addr = q('set-unit-addr').value.trim(), p = picks.unit && picks.unit.label === addr ? picks.unit : null;
+  if (!name) return showAlert('알림', '부대명을 입력해주세요.');
+  const { error } = await sb.from('profiles').update({ unit_name: name, unit_addr: addr || null, unit_lat: p ? p.lat : null, unit_lng: p ? p.lng : null }).eq('id', me.id);
+  if (error) return showAlert('오류', esc(error.message) + '<br><br>schema_update.sql 을 실행했는지 확인하세요.');
+  await loadAll(false); render(true); setGo('main'); showAlert('등록 완료', `자대 '${esc(name)}' 가 등록됐어요. 식단표에서 날짜별 식단을 확인·입력할 수 있어요.`);
+}
+
+function cTh(role, th, noSave) {
+  thTmp[role] = th;
+  ['gamja', 'tiger'].forEach(t => q('theme-bf-' + t).className = 'py-2.5 rounded-xl border-2 font-bold text-[12px] ' + (thTmp.bf === t ? 'border-[var(--mil-green)] bg-[var(--mil-green-light)] text-[var(--mil-green)]' : 'border-transparent bg-[#F5F6F8] text-[#8B95A1]'));
+  ['gomsin', 'cat'].forEach(t => q('theme-gf-' + t).className = 'py-2.5 rounded-xl border-2 font-bold text-[12px] ' + (thTmp.gf === t ? 'border-[var(--pink-main)] bg-[var(--pink-light)] text-[var(--pink-main)]' : 'border-transparent bg-[#F5F6F8] text-[#8B95A1]'));
+}
+async function saveS() {
+  const upd = { bf_theme: thTmp.bf, gf_theme: thTmp.gf };
+  if (me.gender === 'M') { const e = q('set-enlist').value, d = q('set-discharge').value; if (!e || !d) return showAlert('알림', '입대일/전역일을 확인해주세요.'); Object.assign(upd, { enlist_date: e, discharge_date: d, branch: setBranchV }); }
+  const { error } = await sb.from('profiles').update(upd).eq('id', me.id); if (error) return showAlert('오류', esc(error.message));
+  await loadAll(false); render(true); setGo('main');
+}
+async function linkC() {
+  const c = q('partner-code-input').value.trim(); if (c.length < 6) return showAlert('알림', '6자리 코드를 입력해주세요.');
+  const { data, error } = await sb.rpc('link_couple', { c }); if (error) return showAlert('오류', esc(error.message));
+  const msg = { OK: '연동 완료! 💕 이제 서로의 프로필이 보여요.', NOT_FOUND: '존재하지 않는 코드입니다.', SELF: '내 코드는 입력할 수 없어요.', SAME_GENDER: '군인(남)과 곰신(여) 계정끼리만 연동돼요.', ALREADY: '이미 연동된 계정이 있어요.' }[data] || data;
+  if (data === 'OK') closeModal('modal-settings'); showAlert(data === 'OK' ? '연동 성공' : '연동 실패', msg); await loadAll(false); render(true);
+}
+async function unlinkC() { if (!confirm('정말 연동을 해제할까요?')) return; await sb.rpc('unlink_couple'); await loadAll(false); render(true); setGo('main'); }
+async function saveStatusMsg() { await sb.from('profiles').update({ status_msg: q('one-line-msg').value.slice(0, 40) }).eq('id', me.id); }
+
+/* ---------- 휴가/일정 ---------- */
+let vS = null, vE = null, calY = 2026, calM = 0;
+function openVac() { vS = vE = null; const t = new Date(); calY = t.getFullYear(); calM = t.getMonth(); q('vac-title').value = ''; renderCal(); openM('modal-vac'); }
+function calNav(d) { calM += d; if (calM < 0) { calM = 11; calY--; } if (calM > 11) { calM = 0; calY++; } renderCal(); }
+function calPick(x) { if (!vS || vE) { vS = x; vE = null; } else if (x < vS) vS = x; else vE = x; renderCal(); }
+function renderCal() {
+  q('cal-title').innerText = `${calY}년 ${calM + 1}월`;
+  const first = new Date(calY, calM, 1), days = new Date(calY, calM + 1, 0).getDate(), today = ymd(new Date()); let h = '';
+  for (let i = 0; i < first.getDay(); i++) h += '<div></div>';
+  for (let d = 1; d <= days; d++) {
+    const x = ymd(new Date(calY, calM, d)), st = x === vS, en = x === vE, inr = vS && vE && x > vS && x < vE, has = vacs.some(v => x >= v.start_date && x <= v.end_date), dow = (first.getDay() + d - 1) % 7, on = st || en;
+    h += `<button onclick="calPick('${x}')" class="h-10 flex items-center justify-center relative ${inr ? 'bg-[var(--pink-light)]' : ''}"><span class="w-9 h-9 rounded-full flex items-center justify-center text-[14px] font-semibold ${on ? 'bg-[var(--pink-main)] text-white' : ''} ${!on && x === today ? 'border border-[var(--pink-main)]' : ''} ${!on && dow === 0 ? 'text-[#E5484D]' : ''} ${!on && dow === 6 ? 'text-[#3B82F6]' : ''}">${d}</span>${has ? '<i class="absolute bottom-0.5 w-1 h-1 rounded-full bg-[var(--mil-green)]"></i>' : ''}</button>`;
+  }
+  q('cal-grid').innerHTML = h;
+  const nn = vS && vE ? Math.round((pd(vE) - pd(vS)) / 864e5) : 0;
+  q('cal-summary').innerText = vS ? (vE ? `${vS} ~ ${vE} (${nn}박 ${nn + 1}일)` : `${vS} · 종료일을 누르세요 (하루면 바로 저장)`) : '시작일을 선택하세요';
+}
+async function saveVac() {
+  if (!vS) return showAlert('알림', '날짜를 선택해주세요.');
+  const { error } = await sb.from('vacations').insert({ title: q('vac-title').value.trim() || '휴가 🏖', start_date: vS, end_date: vE || vS });
+  if (error) return showAlert('오류', esc(error.message)); closeModal('modal-vac'); await loadAll(false); render(false);
+}
+async function delVac(id) { if (!confirm('이 일정을 삭제할까요?')) return; await sb.from('vacations').delete().eq('id', id); await loadAll(false); render(false); }
+function renderVac() {
+  const L = q('vacation-list'), today = new Date(); today.setHours(0, 0, 0, 0);
+  if (!vacs.length) { L.innerHTML = '<div class="text-center text-[12px] text-[#8B95A1] py-3">등록된 일정이 없어요. 휴가를 추가해보세요!</div>'; return; }
+  L.innerHTML = vacs.map(v => { const s = pd(v.start_date), e = pd(v.end_date), d = Math.round((s - today) / 864e5), nights = Math.round((e - s) / 864e5);
+    const dd = d > 0 ? `D-${d}` : (today <= e ? (d === 0 ? 'D-Day' : '진행중') : '종료'); const mine = v.created_by === me.id;
+    return `<div class="bg-[#F5F6F8] p-3.5 rounded-xl flex justify-between items-center border border-[#E5E8EB] ${dd === '종료' ? 'opacity-50' : ''}"><div class="flex flex-col"><span class="text-[14px] font-bold">${esc(v.title)} ${mine ? '' : '<span class="text-[10px] text-[var(--pink-main)]">상대</span>'}</span><span class="text-[12px] text-[#8B95A1] mt-0.5">${v.start_date} ~ ${v.end_date} (${nights}박 ${nights + 1}일)</span></div><div class="flex items-center gap-2"><span class="text-[16px] font-black text-[var(--pink-main)]">${dd}</span><button onclick="delVac('${v.id}')" class="text-[#B0B8C1] text-[14px]">✕</button></div></div>`; }).join('');
+}
+
+/* ---------- Q&A ---------- */
+const QF = ["{s}, 떠올리면 가장 먼저 생각나는 장면은?", "{s} 중 가장 좋았던 순간은?", "{s}에 대해 아직 말하지 못한 게 있다면?", "{s}, 다시 할 수 있다면 무엇을 바꾸고 싶어?", "{s}을(를) 한 문장으로 표현한다면?", "{s}을(를) 색깔로 표현한다면 무슨 색이야? 이유는?", "{s}에 점수를 준다면 100점 만점에 몇 점?", "{s}, 1년 전과 지금은 어떻게 달라졌어?", "{s} 하면 떠오르는 노래나 냄새가 있어?", "{s}에서 가장 웃겼던 기억은?", "{s}에서 가장 힘들었던 기억은?", "{s}, 10년 뒤에도 기억하고 싶은 것은?", "{s}을(를) 누군가에게 자랑한다면 뭐라고 할래?", "{s}에 대해 오늘 새로 느낀 점은?", "{s} 관련해서 감사한 점 한 가지는?", "{s}에 제목을 붙인다면?", "{s}, 가장 아쉬운 점은?", "{s}에 대한 지금 기분을 이모지로 쓴다면?", "{s}, 앞으로 꼭 해보고 싶은 것은?", "{s}에 대해 3줄로 적어본다면?", "{s}, 이전엔 몰랐던 사실은?", "{s}에서 나를 가장 잘 보여주는 순간은?", "{s}이(가) 내게 어떤 의미야?", "{s}에 대해 미래의 나(우리)에게 한마디 한다면?"];
+const QC = ["우리의 첫 만남", "첫 데이트", "처음 손잡은 날", "함께 먹은 음식", "같이 간 여행", "함께 본 영화", "서로의 별명", "처음 싸운 날", "화해한 순간", "서로의 습관", "함께 들은 노래", "휴가 때의 데이트", "면회와 통화", "편지와 메시지", "기념일", "나의 장점", "너의 장점", "함께 찍은 사진", "우리의 약속", "함께 웃은 순간", "보고 싶은 순간", "서로에게 고마운 일", "우리 동네 데이트", "같이 해보고 싶은 것", "전역 후 첫날", "우리의 미래 집", "함께 키우고 싶은 것", "우리의 10년 뒤"];
+const QD = ["오늘 하루", "오늘의 식사", "오늘의 훈련·근무", "함께 근무하는 사람들", "생활관 분위기", "오늘 들은 말", "오늘 가장 힘들었던 일", "오늘 웃었던 일", "가족", "친구", "미래의 목표", "전역 후 계획", "읽고 싶은 책", "운동", "건강", "수면", "오늘 배운 점", "나의 성격", "내가 변한 점", "고마운 사람", "후회되는 일", "자랑하고 싶은 일", "보고 싶은 사람", "먹고 싶은 음식", "가고 싶은 곳", "나 자신에게 하고 싶은 말", "군생활의 의미", "오늘의 감정"];
+const qText = (day, couple) => { const i = day - 1; return QF[i % 24].replace('{s}', (couple ? QC : QD)[Math.floor(i / 24) % 28]); };
+function qInfo() {
+  const S = S_(), coupleMode = !!(me.partner_id && partner);
+  if (!S) return { none: true };
+  const I = milInfo(S), td = Math.ceil((I.dis - I.e) / 864e5) + 1, today = Math.max(1, Math.min(td, Math.floor((new Date() - I.e) / 864e5) + 1)); return { td, today, coupleMode };
+}
+async function qDay(d) { const I = qInfo(); if (I.none) return; qDayN = Math.max(1, Math.min(I.today, qDayN + d)); await loadQ(); renderQ(true); }
+function renderQ(setInput) {
+  const I = qInfo(), box = q('qna-body');
+  if (I.none) { q('qna-day-badge').innerText = ''; q('qna-question-text').innerText = '연동 후 오늘의 질문이 열려요'; box.classList.add('hidden'); return; }
+  box.classList.remove('hidden');
+  if (!qInit) qDayN = I.today; if (qDayN > I.today) qDayN = I.today;
+  q('qna-day-badge').innerText = `Day ${qDayN} / ${I.td} · ${I.coupleMode ? '커플 질문' : '군대 일기'}`;
+  q('qna-question-text').innerText = '“' + qText(qDayN, I.coupleMode) + '”';
+  q('qna-my-label').innerText = I.coupleMode ? '나의 답변' : '오늘의 기록';
+  q('qna-partner-box').classList.toggle('hidden', !I.coupleMode);
+  if (setInput || document.activeElement !== q('qna-ans')) q('qna-ans').value = qAns[me.id] || '';
+  q('qna-ans').placeholder = I.coupleMode ? '내가 답변해야 상대의 답변이 열려요.' : '오늘의 기록을 남겨보세요.';
+  if (I.coupleMode) { const pa = qAns[me.partner_id], mine = qAns[me.id];
+    q('qna-partner').innerHTML = !mine ? '<div class="text-center text-[#8B95A1] text-[12px]"><div class="text-2xl mb-1">🔒</div>먼저 내 답변을 저장해주세요</div>' : (pa ? esc(pa) : '<div class="text-center text-[#8B95A1] text-[12px]"><div class="text-2xl mb-1">⏳</div>상대방의 답변 대기중</div>'); }
+}
+async function submitQ() {
+  const v = q('qna-ans').value.trim(); if (!v) return showAlert('알림', '내용을 작성해주세요.');
+  const { error } = await sb.from('qna_answers').upsert({ user_id: me.id, day: qDayN, answer: v, updated_at: new Date().toISOString() }); if (error) return showAlert('오류', esc(error.message));
+  await loadQ(); renderQ(false); showAlert('저장 완료', qInfo().coupleMode ? '답변이 저장됐어요! 상대방도 답하면 서로의 답이 공개돼요 💕' : '오늘의 기록이 저장됐어요.');
+}
+
+/* ---------- PX 굿맨 ---------- */
+const pxI = [{ id: 1, n: 'VT 리들샷 100/300', c: '기능성/세럼', h: 1 }, { id: 2, n: 'CKD 레티노 콜라겐 크림', c: '기능성/세럼', h: 1 }, { id: 3, n: 'AHC 텐 레볼루션 아이크림', c: '기능성/세럼', h: 1 }, { id: 4, n: '본에스티스 퍼펙트 세트', c: '기능성/세럼', h: 1 }, { id: 5, n: '참존 마유 크림 에스트라', c: '크림', h: 0 }, { id: 6, n: '닥터지 로얄 블랙 스네일', c: '크림', h: 1 }, { id: 7, n: '라운드랩 독도 크림', c: '크림', h: 0 }, { id: 8, n: '피지오겔 DMT 크림', c: '크림', h: 0 }, { id: 9, n: '라운드랩 1025 독도 토너', c: '토너/패드', h: 1 }, { id: 10, n: '아누아 어성초 77 토너', c: '토너/패드', h: 1 }, { id: 11, n: '아비브 어성초 스팟 패드', c: '토너/패드', h: 0 }, { id: 12, n: '구달 청귤 비타C 패드', c: '토너/패드', h: 0 }, { id: 13, n: '아이소이 응급 진정 세럼', c: '기능성/세럼', h: 0 }, { id: 14, n: '아누아 어성초 80 앰플', c: '기능성/세럼', h: 0 }, { id: 15, n: '포맨 독도 올인원 플루이드', c: '남성/올인원', h: 0 }, { id: 16, n: '센텔리안24 마데카 옴므', c: '남성/올인원', h: 0 }, { id: 17, n: '닥터지 그린 마일드 선크림', c: '선케어', h: 1 }, { id: 18, n: '라운드랩 자작나무 선크림', c: '선케어', h: 1 }, { id: 19, n: 'AHC 내추럴 프레쉬 선스틱', c: '선케어', h: 0 }, { id: 20, n: '메이크프렘 모이스처 폼', c: '클렌징', h: 0 }, { id: 21, n: '마녀공장 클렌징 오일', c: '클렌징', h: 1 }, { id: 22, n: '카밀 핸드 앤 네일 크림', c: '기타', h: 0 }, { id: 23, n: '메디힐 에센셜 마스크팩', c: '기타', h: 0 }, { id: 24, n: '스팀베이스 아이마스크', c: '기타', h: 0 }];
+const isF = () => me.gender === 'F';
+function selIds() { return isF() ? wishes : pxSel; }
+function renderPX() {
+  if (!me) return; const c = q('px-items-container'), sel = selIds();
+  q('px-guide-text').innerHTML = isF() ? '남자친구가 사다 주길 바라는 제품을 담고 <b>💌 조르기</b>를 누르면 남자친구 홈에 🛒가 떠요.' : '🛒 표시는 여자친구가 담은 제품이에요. 체크 후 <b>✨ 굿맨 변신</b>으로 사용 순서·용량을 확인하세요.';
+  q('btn-px-send').classList.toggle('hidden', !isF()); q('px-sel-cnt').innerText = sel.length;
+  c.innerHTML = pxI.map(i => `<label class="bg-white rounded-xl p-3 border flex items-center justify-between cursor-pointer"><div><div class="text-[10px] font-bold ${i.h ? 'text-[var(--pink-main)]' : 'text-[#8B95A1]'} mb-1">${i.h ? '🔥 HOT ' : ''}${i.c} ${!isF() && pWishes.includes(i.id) ? '🛒' : ''}</div><div class="text-[13px] font-bold">${i.n}</div></div><input type="checkbox" ${sel.includes(i.id) ? 'checked' : ''} onchange="tPx(${i.id})" class="w-5 h-5 accent-[var(--mil-green)] rounded"></label>`).join('');
+}
+async function tPx(id) {
+  if (isF()) { const on = wishes.includes(id); wishes = on ? wishes.filter(x => x !== id) : [...wishes, id]; q('px-sel-cnt').innerText = wishes.length;
+    if (on) await sb.from('px_wishes').delete().eq('user_id', me.id).eq('item_id', id); else await sb.from('px_wishes').insert({ item_id: id }); }
+  else { pxSel = pxSel.includes(id) ? pxSel.filter(x => x !== id) : [...pxSel, id]; q('px-sel-cnt').innerText = pxSel.length; }
+}
+async function sendPx() {
+  if (!wishes.length) return showAlert('알림', '장바구니가 비어있어요.');
+  if (!me.partner_id) return showAlert('알림', '먼저 남자친구와 연동해주세요.');
+  const t = new Date().toISOString(); const { error } = await sb.from('profiles').update({ px_sent_at: t }).eq('id', me.id); if (error) return showAlert('오류', esc(error.message));
+  me.px_sent_at = t; showAlert('전송 완료 💌', '남자친구 홈 화면에 🛒 알림이 떴어요!');
+}
+function openCart() {
+  const L = pWishes.map(id => pxI.find(x => x.id === id)).filter(Boolean).map(x => `- ${esc(x.n)}`).join('<br>');
+  showAlert('🛒 여자친구의 장바구니', `휴가 때 꼭 사다줘! ❤️<br><br><b>${L}</b>`); localStorage.setItem('pxseen', partner.px_sent_at); q('cart-dot').classList.add('hidden');
+}
+function showRoutine() {
+  const sel = selIds(); if (!sel.length) return showAlert('알림', '먼저 제품을 체크하세요!');
+  const c = sel.map(id => pxI.find(x => x.id === id)); let r = '<div class="text-left space-y-4">';
+  if (c.some(x => x.c === '클렌징')) r += '<div><b class="text-[var(--mil-green)]">🫧 0단계. 클렌징</b><br>오일/폼을 <b>500원 동전 크기</b>만큼 덜어 녹여주세요.</div>';
+  if (c.some(x => x.c === '토너/패드')) r += '<div><b class="text-[var(--mil-green)]">💧 1단계. 토너/패드</b><br>화장솜에 <b>500원 크기</b>로 적셔 닦아냅니다.</div>';
+  if (c.some(x => x.c === '기능성/세럼')) r += '<div><b class="text-[var(--mil-green)]">✨ 2단계. 세럼/앰플</b><br><b>완두콩 1~2알 크기</b>를 흡수시키세요.</div>';
+  if (c.some(x => x.c === '크림' || x.c === '남성/올인원')) r += '<div><b class="text-[var(--mil-green)]">🛡️ 3단계. 크림/올인원</b><br><b>아몬드 1알 크기</b>로 보습막을 만들어요.</div>';
+  if (c.some(x => x.c === '선케어')) r += '<div><b class="text-[var(--mil-green)]">☀️ 4단계. 선케어</b><br><b>검지 2마디 분량</b>을 발라주세요.</div>';
+  if (c.some(x => x.c === '기타')) r += '<div><b class="text-[var(--mil-green)]">🌙 기타</b><br>마스크팩·아이마스크는 세안 후 10~15분 사용해요.</div>';
+  showAlert('✨ 굿맨 맞춤 스킨케어 루틴', r + '</div>');
+}
+
+/* ---------- 적금 (선택 저장 + 우대금리 방법) ---------- */
+const bD = [
+ { id: 'hana', n: '하나', b: 5.0, max: 7.6, o: [{ n: '급여이체 12회', r: 1.8, d: '군 급여를 하나은행 계좌로 12회 이상 입금받기' }, { n: '청약', r: .4, d: '하나은행 주택청약종합저축 보유/가입' }, { n: '공제회', r: .2, d: '군인공제회 관련 제휴 조건 충족' }, { n: '카드', r: .2, d: '하나 체크·신용카드 실적/발급' }] },
+ { id: 'ibk', n: '기업', b: 5.0, max: 7.5, o: [{ n: '급여이체 12회', r: 1.2, d: '급여를 기업은행으로 12회 이상 입금' }, { n: '청약', r: .5, d: 'IBK 주택청약 보유/가입' }, { n: '나라사랑카드', r: .3, d: '나라사랑카드(기업은행) 발급·사용' }, { n: '적금', r: .5, d: '기업은행 다른 적금/예금 동시 가입' }] },
+ { id: 'kb', n: '국민', b: 5.0, max: 7.5, o: [{ n: '급여이체', r: 1.0, d: 'KB국민은행으로 급여 이체 실적' }, { n: '청약', r: 1.0, d: 'KB 주택청약 보유/가입' }, { n: '클럽', r: .5, d: '밀리터리클럽 등 KB 군인 서비스 가입' }] },
+ { id: 'shin', n: '신한', b: 5.0, max: 7.5, o: [{ n: '급여이체', r: 1.0, d: '신한은행으로 급여 이체 실적' }, { n: '청약', r: 1.0, d: '신한 주택청약 보유/가입' }, { n: '증권', r: .5, d: '신한투자증권 계좌 개설 등 제휴 조건' }] },
+ { id: 'po', n: '우체국', b: 5.0, max: 7.7, o: [{ n: '첫거래', r: 1.1, d: '우체국 첫 거래 고객 조건 충족' }, { n: '체크카드', r: .6, d: '우체국 체크카드 이용 실적' }, { n: '이체', r: 1.0, d: '급여/자동이체 실적 충족' }] },
+ { id: 'nh', n: '농협', b: 5.0, max: 6.0, o: [{ n: '한도/횟수', r: .5, d: '월 납입 한도·횟수 조건 충족' }, { n: '청약', r: .3, d: 'NH 주택청약 보유/가입' }, { n: '카드', r: .2, d: 'NH 카드 실적/발급' }] },
+ { id: 'wo', n: '우리', b: 5.0, max: 6.0, o: [{ n: '자동이체', r: .4, d: '우리은행 자동이체(적금 납입 등) 설정' }, { n: '기타', r: .6, d: '은행 공지의 기타 우대조건 충족' }] },
+ { id: 'im', n: 'iM뱅크', b: 5.0, max: 5.5, o: [{ n: '카드', r: .3, d: 'iM뱅크 카드 실적/발급' }, { n: '청약', r: .2, d: 'iM 주택청약 보유/가입' }] }];
+let savT;
+function saveSav() { clearTimeout(savT); savT = setTimeout(() => sb.from('profiles').update({ savings: sav }).eq('id', me.id), 600); }
+function renderSav() {
+  const bG = q('bank-selector-grid'); if (!bG.innerHTML) bG.innerHTML = bD.map(b => `<button id="btn-bank-${b.id}" onclick="toggleBank('${b.id}')" class="py-2.5 rounded-lg border text-[12px] font-bold transition">${b.n}</button>`).join('');
+  bD.forEach(b => q('btn-bank-' + b.id).className = 'py-2.5 rounded-lg text-[12px] font-bold transition ' + (sav.banks.includes(b.id) ? 'border-2 border-[var(--mil-green)] bg-[var(--mil-green-light)] text-[var(--mil-green)]' : 'border border-[#E5E8EB] bg-white text-[#4E5968]'));
+  const c = q('selected-banks-container');
+  if (!sav.banks.length) { c.innerHTML = '<div class="text-center text-[12px] text-[#8B95A1] py-4 bg-[#F5F6F8] rounded-xl">가입할 은행을 위 버튼으로 선택해주세요.</div>'; calcSav(); return; }
+  c.innerHTML = sav.banks.map(id => { const b = bD.find(x => x.id === id), amt = sav.amts[id] ?? Math.floor(550000 / sav.banks.length), on = sav.opts[id] || [];
+    return `<div class="bg-white rounded-xl p-4 border border-[var(--mil-green)] shadow-sm"><div class="flex justify-between items-center mb-3"><div class="text-[14px] font-bold">${b.n} <span class="text-[11px] text-[#8B95A1]">기본 ${b.b}% · 최대 ${b.max}%</span></div><div class="flex items-center gap-1"><input type="number" id="amt-${id}" value="${amt}" step="10000" min="0" class="w-24 bg-[#F5F6F8] border border-[#E5E8EB] rounded-lg px-2 py-1.5 text-right text-[13px] font-bold outline-none" oninput="calcSav(true)"><span class="text-[12px] font-bold">원</span></div></div>
+    <div class="space-y-1.5 bg-[#F5F6F8] p-3 rounded-lg">${b.o.map((o, i) => `<label class="flex items-start gap-2 cursor-pointer"><input type="checkbox" class="w-4 h-4 mt-0.5 accent-[var(--mil-green)] opt-${id}" data-i="${i}" data-r="${o.r}" ${on.includes(i) ? 'checked' : ''} onchange="calcSav(true)"><span class="text-[11px]"><b>${o.n}</b> <b class="text-[var(--mil-green)]">+${o.r}%</b><br><span class="text-[#8B95A1]">📌 ${o.d}</span></span></label>`).join('')}</div></div>`; }).join('');
+  calcSav();
+}
+function toggleBank(id) {
+  if (sav.banks.includes(id)) { sav.banks = sav.banks.filter(x => x !== id); delete sav.amts[id]; delete sav.opts[id]; }
+  else { if (sav.banks.length >= 4) return showAlert('한도 초과', '최대 4개 은행만 선택 가능합니다.'); sav.banks.push(id); }
+  saveSav(); renderSav();
+}
+function calcSav(persist) {
+  const months = BR[(S_() || me).branch || 'army'].m; let tP = 0, tI = 0, tot = 0, warn = false;
+  sav.banks.forEach(id => { const b = bD.find(x => x.id === id), el = q('amt-' + id); const amt = el ? Math.max(0, parseInt(el.value || 0)) : (sav.amts[id] || 0);
+    if (el) { sav.amts[id] = amt; sav.opts[id] = [...document.querySelectorAll('.opt-' + id + ':checked')].map(x => +x.dataset.i); }
+    const add = (sav.opts[id] || []).reduce((s, i) => s + b.o[i].r, 0), rate = Math.min(b.max, b.b + add), prin = amt * months;
+    tot += amt; if (amt > 300000) warn = true; tP += prin; tI += Math.floor(prin * rate / 100 * (months + 1) / 24); });
+  if (tot > 550000) warn = true; q('saving-split-warning').classList.toggle('hidden', !warn);
+  q('saving-total-result').innerText = (tP * 2 + tI).toLocaleString(); q('saving-prin').innerText = tP.toLocaleString(); q('saving-int').innerText = tI.toLocaleString(); q('saving-match').innerText = tP.toLocaleString();
+  if (persist) saveSav();
+}
+
+/* ---------- 경로 (이동수단 비교) ---------- */
+let gpsPt = null, routeCtx = null, routeSort = 'time';
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+async function geocode(text) {
+  if (gpsPt && text === gpsPt.label) return { name: gpsPt.label, lat: gpsPt.lat, lng: gpsPt.lng };
+  const m = text.match(/^\s*(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)\s*$/); if (m) return { name: '현위치', lat: +m[1], lng: +m[2] };
+  const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&accept-language=ko&countrycodes=kr&q=' + encodeURIComponent(text));
+  const j = await r.json(); if (!j.length) return null; return { name: text, lat: +j[0].lat, lng: +j[0].lon };
+}
+function hav(a, b) { const d = x => x * Math.PI / 180, dl = d(b.lat - a.lat), dg = d(b.lng - a.lng), h = Math.sin(dl / 2) ** 2 + Math.cos(d(a.lat)) * Math.cos(d(b.lat)) * Math.sin(dg / 2) ** 2; return 12742 * Math.asin(Math.sqrt(h)); }
+const W = n => (Math.round(n / 100) * 100).toLocaleString('ko-KR') + '원';
+const TM = m => { m = Math.max(5, Math.round(m / 5) * 5); return m >= 60 ? `${Math.floor(m / 60)}시간${m % 60 ? ' ' + m % 60 + '분' : ''}` : `${m}분`; };
+function buildOpts(km, c) {
+  const road = km * 1.3, rail = km * 1.25, kk = m => `https://map.kakao.com/link/by/${m}/${encodeURIComponent(c.a.name)},${c.a.lat},${c.a.lng}/${encodeURIComponent(c.b.name)},${c.b.lat},${c.b.lng}`, o = [];
+  const KORAIL = ['코레일톡 시간표 ▶', 'https://www.letskorail.com'], SRT = ['SRT 시간표 ▶', 'https://etk.srail.kr'], KOBUS = ['고속버스 시간표 ▶', 'https://www.kobus.co.kr'], BUSTA = ['시외버스 시간표 ▶', 'https://www.bustago.or.kr'];
+  o.push({ n: '🚗 자가용 · 렌트', min: road / 80 * 60 + 10, cost: road * 142 + (road >= 40 ? road * 45 : 0), lines: [`유류비 약 ${W(road * 142)}${road >= 40 ? ` + 통행료 약 ${W(road * 45)}` : ''} (연비 12km/L 가정)`, `도로 약 ${Math.round(road)}km · 막히면 더 걸려요`], links: [['카카오맵 자동차 길찾기 ▶', kk('car')]] });
+  if (km < 60) o.push({ n: '🚕 택시', min: road / 45 * 60 + 5, cost: 4800 + Math.max(0, road - 1.6) * 1000, lines: ['기본요금+거리요금 단순 계산 (할증·지역별 차이)'], links: [['카카오맵 길찾기 ▶', kk('car')]] });
+  if (km < 45) o.push({ n: '🚇 시내버스 · 지하철', min: road / 20 * 60 + 15, cost: 1500 + Math.min(1500, Math.ceil(road / 10) * 150), lines: ['환승·대기 포함 단순 추정', '나라사랑카드 등 대중교통 청구할인 가능'], links: [['카카오맵 대중교통 ▶', kk('publictransit')]] });
+  if (km >= 30) { o.push({ n: '🚌 고속·시외버스 (일반)', min: road / 80 * 60 + 25, cost: road * 62, lines: ['군 장병 우대 10~20% 할인 가능(터미널 창구·티머니GO)', `할인 적용 시 약 ${W(road * 62 * 0.85)}`], links: [KOBUS, BUSTA] });
+    o.push({ n: '🚌 고속버스 (우등)', min: road / 80 * 60 + 25, cost: road * 93, lines: ['좌석이 넓은 우등 등급', `할인 적용 시 약 ${W(road * 93 * 0.85)}`], links: [KOBUS] }); }
+  if (km >= 90) { o.push({ n: '🚆 KTX · SRT', min: rail / 160 * 60 + 60, cost: rail * 143, lines: ['역 이동·대기 약 1시간 포함', `밀리패스 인증 시 약 10% 할인 → 약 ${W(rail * 143 * 0.9)}`, 'TMO 대상 휴가증(포상·위로·보상·청원)이면 무료'], links: [KORAIL, SRT] });
+    o.push({ n: '🚆 ITX · 무궁화호', min: rail / 74 * 60 + 40, cost: rail * 70, lines: ['KTX보다 느리지만 저렴', 'TMO 대상 휴가증이면 무료'], links: [KORAIL] }); }
+  return o;
+}
+function renderRoute() {
+  const { a, b, km, opts } = routeCtx, box = q('route-results'), fast = Math.min(...opts.map(x => x.min)), cheap = Math.min(...opts.map(x => x.cost));
+  const L = [...opts].sort((x, y) => routeSort === 'time' ? x.min - y.min : x.cost - y.cost);
+  const nv = m => `https://map.naver.com/p/directions/${a.lng},${a.lat},${encodeURIComponent(a.name)}/${b.lng},${b.lat},${encodeURIComponent(b.name)}/-/${m}`;
+  box.innerHTML = `<div class="text-[12px] font-bold mb-1">${esc(a.name)} → ${esc(b.name)}</div><div class="text-[11px] text-[#8B95A1] mb-3">직선 약 ${Math.round(km)}km · 아래는 <b>예상치</b>예요. 실제 출발 시각·요금은 각 시간표 링크에서 확인하세요.</div>
+  <div class="flex gap-2 mb-3"><button onclick="routeSort='time';renderRoute()" class="flex-1 py-2 rounded-lg text-[12px] font-bold ${routeSort === 'time' ? 'bg-[#191F28] text-white' : 'bg-[#F5F6F8] text-[#4E5968]'}">⏱ 빠른 순</button><button onclick="routeSort='cost';renderRoute()" class="flex-1 py-2 rounded-lg text-[12px] font-bold ${routeSort === 'cost' ? 'bg-[#191F28] text-white' : 'bg-[#F5F6F8] text-[#4E5968]'}">💰 저렴한 순</button></div>
+  <div class="space-y-3">${L.map((x, i) => `<div class="bg-[#F5F6F8] rounded-2xl p-4 border border-[#E5E8EB]"><div class="flex justify-between items-start mb-2"><div class="text-[14px] font-extrabold">${i + 1}번 · ${x.n}</div><div class="flex gap-1">${x.min === fast ? '<span class="text-[10px] font-bold bg-[#191F28] text-white px-2 py-0.5 rounded-full">최단</span>' : ''}${x.cost === cheap ? '<span class="text-[10px] font-bold bg-[var(--mil-green)] text-white px-2 py-0.5 rounded-full">최저가</span>' : ''}</div></div>
+  <div class="flex gap-4 mb-2"><div><div class="text-[10px] text-[#8B95A1]">예상 소요</div><div class="text-[16px] font-black">${TM(x.min)}</div></div><div><div class="text-[10px] text-[#8B95A1]">예상 비용</div><div class="text-[16px] font-black">${W(x.cost)}</div></div></div>
+  <div class="text-[11px] text-[#4E5968] space-y-0.5 mb-2">${x.lines.map(l => `<div>· ${esc(l)}</div>`).join('')}</div>
+  <div class="flex flex-wrap gap-2">${x.links.map(l => `<a target="_blank" rel="noopener" href="${esc(l[1])}" class="text-[11px] font-bold bg-white border border-[#E5E8EB] rounded-lg px-3 py-1.5 text-[var(--mil-green)]">${l[0]}</a>`).join('')}</div></div>`).join('')}</div>
+  <div class="grid grid-cols-2 gap-2 mt-3"><a target="_blank" rel="noopener" href="https://map.kakao.com/link/by/publictransit/${encodeURIComponent(a.name)},${a.lat},${a.lng}/${encodeURIComponent(b.name)},${b.lat},${b.lng}" class="block text-center bg-[#FEE500] text-[#191F28] rounded-xl py-3 text-[12px] font-bold">카카오맵 ▶</a><a target="_blank" rel="noopener" href="${nv('transit')}" class="block text-center bg-[#03C75A] text-white rounded-xl py-3 text-[12px] font-bold">네이버지도 ▶</a></div>
+  <p class="text-[10px] text-[#8B95A1] mt-3">※ 시간·요금은 거리 기반 단순 추정이에요. 열차·버스 실제 출발 시각과 정확한 요금은 위 링크(코레일톡·SRT·고속버스·시외버스)에서 확인하세요.</p>`;
+}
+const picks = { start: null, end: null, unit: null }, sugCache = {}, sugT = {};
+const inId = w => w === 'unit' ? 'set-unit-addr' : 'route-' + w;
+function kakaoReady() {
+  return new Promise(res => {
+    if (!KAKAO_JS_KEY) return res(false); if (window.kakao && kakao.maps && kakao.maps.services) return res(true);
+    const sc = document.createElement('script'); sc.src = 'https://dapi.kakao.com/v2/maps/sdk.js?appkey=' + KAKAO_JS_KEY + '&libraries=services&autoload=false';
+    sc.onload = () => kakao.maps.load(() => res(true)); sc.onerror = () => res(false); document.head.appendChild(sc);
+  });
+}
+async function searchPlaces(text) {
+  if (await kakaoReady()) {
+    const st = kakao.maps.services.Status, kw = await new Promise(r => new kakao.maps.services.Places().keywordSearch(text, (d, s) => r(s === st.OK ? d.slice(0, 8).map(x => ({ name: x.place_name, addr: x.road_address_name || x.address_name, lat: +x.y, lng: +x.x })) : [])));
+    if (kw.length) return kw;
+    return new Promise(r => new kakao.maps.services.Geocoder().addressSearch(text, (d, s) => r(s === st.OK ? d.slice(0, 6).map(x => ({ name: x.road_address ? x.road_address.address_name : x.address_name, addr: x.address_name, lat: +x.y, lng: +x.x })) : [])));
+  }
+  const nom = async t => { const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=6&accept-language=ko&countrycodes=kr&q=' + encodeURIComponent(t)); return (await r.json()).map(x => ({ name: x.name || x.display_name.split(',')[0], addr: x.display_name.split(',').slice(0, 4).join(','), lat: +x.lat, lng: +x.lon })); };
+  let r = await nom(text);
+  if (!r.length && text.includes(' ')) { await sleep(1100); r = await nom(text.split(/\s+/).slice(-2).join(' ')); }
+  return r;
+}
+function placeInput(w) {
+  picks[w] = null; clearTimeout(sugT[w]); const v = q(inId(w)).value.trim(), box = q('sug-' + w);
+  if (v.length < 2) { box.classList.add('hidden'); return; }
+  sugT[w] = setTimeout(async () => {
+    box.classList.remove('hidden'); box.innerHTML = '<div class="p-3 text-[12px] text-[#8B95A1]">검색 중...</div>';
+    let r = []; try { r = await searchPlaces(v); } catch (e) { }
+    if (q(inId(w)).value.trim() !== v) return; sugCache[w] = r;
+    box.innerHTML = r.length ? r.map((x, i) => `<button onclick="pickPlace('${w}',${i})" class="w-full text-left px-3 py-2.5 border-b border-[#F2F3F5] active:bg-[#F5F6F8]"><div class="text-[13px] font-bold">${esc(x.name)}</div><div class="text-[11px] text-[#8B95A1]">${esc(x.addr || '')}</div></button>`).join('')
+      : `<div class="p-3 text-[12px] text-[#8B95A1]">검색 결과가 없어요. 동·도로명이나 건물 이름을 바꿔 보세요.${KAKAO_JS_KEY ? '' : '<br>※ 아파트·상가 이름은 카카오 키를 연결하면 훨씬 정확해져요.'}</div>`;
+  }, 450);
+}
+function pickPlace(w, i) { const x = sugCache[w][i], label = x.name; q(inId(w)).value = label; picks[w] = { label, name: x.name, lat: x.lat, lng: x.lng }; q('sug-' + w).classList.add('hidden'); }
+async function resolvePlace(w) {
+  const text = q(inId(w)).value.trim(), p = picks[w]; if (p && p.label === text) return { name: p.name, lat: p.lat, lng: p.lng };
+  const c = text.match(/^\s*(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)\s*$/); if (c) return { name: '현위치', lat: +c[1], lng: +c[2] };
+  const r = await searchPlaces(text); return r.length ? { name: r[0].name, lat: r[0].lat, lng: r[0].lng } : null;
+}
+async function calcRoute() {
+  const s = q('route-start').value.trim(), e = q('route-end').value.trim(); ['start', 'end'].forEach(w => q('sug-' + w).classList.add('hidden'));
+  if (!s || !e) return showAlert('알림', '출발지와 도착지를 입력해주세요.');
+  const box = q('route-results'); box.classList.remove('hidden'); box.innerHTML = '<div class="text-[12px] text-[#8B95A1] text-center py-3">이동 방법 비교 중... ⏳</div>';
+  try {
+    const a = await resolvePlace('start'); const b = await resolvePlace('end');
+    if (!a || !b) { const bad = !a ? s : e; box.innerHTML = `<div class="bg-[#FFF0F3] text-[#D94867] text-[12px] font-bold rounded-xl p-3 mb-2">'${esc(bad)}' 위치를 찾지 못했어요. 입력칸 아래 검색 목록에서 항목을 직접 골라주세요.</div><a target="_blank" rel="noopener" href="https://map.kakao.com/?q=${encodeURIComponent(bad)}" class="block bg-[#F5F6F8] rounded-xl p-3 text-[12px] font-bold text-[var(--mil-green)]">카카오맵에서 '${esc(bad)}' 검색 ▶</a>`; return; }
+    const km = hav(a, b); if (km < 0.3) { box.innerHTML = '<div class="text-[12px] text-[#D94867] font-bold">출발지와 도착지가 거의 같아요.</div>'; return; }
+    routeCtx = { a, b, km }; routeCtx.opts = buildOpts(km, routeCtx); renderRoute();
+  } catch (err) { box.innerHTML = '<div class="bg-[#FFF0F3] text-[#D94867] text-[12px] font-bold rounded-xl p-3">위치 검색에 실패했어요. 잠시 후 다시 시도해주세요.</div>'; }
+}
+function getGPS() {
+  if (!navigator.geolocation) return showAlert('알림', '위치 기능을 지원하지 않는 기기입니다.');
+  q('route-start').value = '위치 확인 중...';
+  navigator.geolocation.getCurrentPosition(async p => {
+    const lat = p.coords.latitude, lng = p.coords.longitude; let label = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+    try { const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&accept-language=ko&lat=${lat}&lon=${lng}`); const j = await r.json(); if (j.display_name) { const t = j.display_name.split(',').map(x => x.trim()).filter(x => x && !/^\d+$/.test(x) && x !== '대한민국'); label = t.slice(0, 3).reverse().join(' '); } } catch (e) { }
+    q('route-start').value = label; picks.start = { label, name: label, lat, lng };
+  }, () => { q('route-start').value = ''; showAlert('알림', '위치 권한을 허용해주세요.'); }, { enableHighAccuracy: true, timeout: 10000 });
+}
+
+/* ---------- 식단표 ---------- */
+let menus = {}, menuDate = '', menuEdit = false;
+function openMenu() { menuDate = ymd(new Date()); menuEdit = false; renderMenu(); openM('modal-menu'); }
+function menuSet(d) { if (d) { menuDate = d; renderMenu(); } }
+function menuGo(n) { const d = pd(menuDate); d.setDate(d.getDate() + n); menuSet(ymd(d)); }
+function menuEditToggle() { menuEdit = !menuEdit; renderMenu(); }
+function renderMenu() {
+  const S = S_(), isM = me.gender === 'M', dt = pd(menuDate), today = ymd(new Date()), tm = ymd(new Date(Date.now() + 864e5)), m = menus[menuDate] || {};
+  q('menu-date-input').value = menuDate; q('menu-date-label').innerText = `${dt.getMonth() + 1}월 ${dt.getDate()}일 (${'일월화수목금토'[dt.getDay()]})${menuDate === today ? ' · 오늘' : menuDate === tm ? ' · 내일' : ''}`;
+  q('menu-unit').innerHTML = S && S.unit_name ? `📍 ${esc(S.unit_name)}` : (isM ? `<button onclick="closeModal('modal-menu');openSettings();setGo('unit')" class="font-bold text-[var(--mil-green)]">자대를 등록하면 부대명이 표시돼요 ▶</button>` : '');
+  q('menu-dg-link').href = 'https://www.data.go.kr/tcs/dss/selectDataSetList.do?keyword=' + encodeURIComponent('국방부 식단정보 ' + ((S && S.unit_name) || '')); q('menu-edit-btn').classList.toggle('hidden', !isM); q('menu-edit').classList.toggle('hidden', !(isM && menuEdit));
+  q('menu-cards').innerHTML = [['🌅', '조식', m.breakfast], ['☀️', '중식', m.lunch], ['🌙', '석식', m.dinner]].map(([i, t, v]) => `<div class="toss-card !p-5"><div class="text-[14px] font-extrabold mb-2">${i} ${t}</div>${v ? (v.split(/\s*[,\n\/]\s*/).filter(Boolean).map(x => `<span class="inline-block bg-[#F5F6F8] rounded-full px-3 py-1 text-[12px] m-0.5">${esc(x)}</span>`).join('')) : '<div class="text-[12px] text-[#8B95A1]">등록된 식단이 없어요 (군인 계정: 우측 위 편집 → CSV 가져오기)</div>'}</div>`).join('');
+  if (isM && menuEdit) { q('menu-in-b').value = m.breakfast || ''; q('menu-in-l').value = m.lunch || ''; q('menu-in-d').value = m.dinner || ''; }
+}
+async function saveMenu() {
+  const row = { created_by: me.id, menu_date: menuDate, breakfast: q('menu-in-b').value.trim(), lunch: q('menu-in-l').value.trim(), dinner: q('menu-in-d').value.trim() };
+  const { error } = await sb.from('menus').upsert(row, { onConflict: 'created_by,menu_date' }); if (error) return showAlert('오류', esc(error.message) + '<br><br>schema_update.sql 을 실행했는지 확인하세요.');
+  menus[menuDate] = row; menuEdit = false; renderMenu();
+}
+function parseCSV(t) {
+  const rows = []; let r = [], f = '', inq = false;
+  for (let i = 0; i < t.length; i++) { const c = t[i];
+    if (inq) { if (c === '"') { if (t[i + 1] === '"') { f += '"'; i++; } else inq = false; } else f += c; }
+    else if (c === '"') inq = true; else if (c === ',') { r.push(f); f = ''; }
+    else if (c === '\n' || c === '\r') { if (c === '\r' && t[i + 1] === '\n') i++; r.push(f); f = ''; if (r.length > 1 || r[0] !== '') rows.push(r); r = []; }
+    else f += c; }
+  if (f !== '' || r.length) { r.push(f); rows.push(r); } return rows;
+}
+async function importMenuCsv(inp) {
+  const file = inp.files[0]; if (!file) return; const buf = await file.arrayBuffer();
+  let txt = new TextDecoder('utf-8').decode(buf); if (txt.includes('\uFFFD')) { try { txt = new TextDecoder('euc-kr').decode(buf); } catch (e) { } }
+  inp.value = ''; const rows = parseCSV(txt.replace(/^\uFEFF/, '')); if (rows.length < 2) return showAlert('알림', '파일 내용을 읽지 못했어요.');
+  const H = rows[0].map(x => x.trim()), idx = k => H.findIndex(h => h.includes(k) && !/열량|알레르기/.test(h)), di = H.findIndex(h => h.includes('날짜') || h.includes('일자')), bi = idx('조식'), li = idx('중식'), ni = idx('석식');
+  if (di < 0 || (bi < 0 && li < 0 && ni < 0)) return showAlert('알림', '날짜·조식·중식·석식 열을 찾지 못했어요. 공공데이터포털의 \'식단정보\' CSV가 맞는지 확인해주세요.');
+  const clean = v => (v || '').replace(/\s*[\n\/]\s*/g, ', ').replace(/,\s*,/g, ',').trim(), map = {};
+  rows.slice(1).forEach(r => { const m = (r[di] || '').match(/(\d{4})\D?(\d{1,2})\D?(\d{1,2})/); if (!m) return;
+    const d = `${m[1]}-${String(m[2]).padStart(2, '0')}-${String(m[3]).padStart(2, '0')}`; map[d] = { created_by: me.id, menu_date: d, breakfast: bi >= 0 ? clean(r[bi]) : '', lunch: li >= 0 ? clean(r[li]) : '', dinner: ni >= 0 ? clean(r[ni]) : '' }; });
+  const out = Object.values(map).sort((a, b) => a.menu_date.localeCompare(b.menu_date)); if (!out.length) return showAlert('알림', '날짜를 읽을 수 있는 줄이 없어요.');
+  for (let i = 0; i < out.length; i += 200) { const { error } = await sb.from('menus').upsert(out.slice(i, i + 200), { onConflict: 'created_by,menu_date' }); if (error) return showAlert('오류', esc(error.message)); }
+  out.forEach(r => menus[r.menu_date] = r); menuEdit = false; menuDate = out.find(r => r.menu_date >= ymd(new Date())) ? out.find(r => r.menu_date >= ymd(new Date())).menu_date : out[out.length - 1].menu_date; renderMenu();
+  showAlert('가져오기 완료', `${out.length}일치 식단을 등록했어요.<br>${out[0].menu_date} ~ ${out[out.length - 1].menu_date}`);
+}
+function parseBulk(txt) {
+  const rows = [], now = new Date();
+  txt.split(/\n+/).forEach(line => {
+    const m = line.match(/^\s*(?:(\d{4})[.\/-])?(\d{1,2})[.\/\-월]\s*(\d{1,2})일?\s*(?:\([^)]*\))?\s*(.*)$/); if (!m) return;
+    const mo = +m[2], d = +m[3]; let y = m[1] ? +m[1] : now.getFullYear(); if (!m[1] && mo < now.getMonth() + 1 - 6) y++;
+    const parts = m[4].split(/(조식|중식|석식)\s*[:：]?\s*/), o = { breakfast: '', lunch: '', dinner: '' };
+    for (let i = 1; i < parts.length; i += 2) o[{ '조식': 'breakfast', '중식': 'lunch', '석식': 'dinner' }[parts[i]]] = (parts[i + 1] || '').replace(/[\/|]\s*$/, '').trim();
+    if (o.breakfast || o.lunch || o.dinner) rows.push({ created_by: me.id, menu_date: `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`, ...o });
+  });
+  return rows;
+}
+async function saveBulk() {
+  const rows = parseBulk(q('menu-bulk').value); if (!rows.length) return showAlert('알림', '읽을 수 있는 줄이 없어요. 예) 10/21 조식: 밥, 국 중식: 카레 석식: 불고기');
+  const { error } = await sb.from('menus').upsert(rows, { onConflict: 'created_by,menu_date' }); if (error) return showAlert('오류', esc(error.message));
+  rows.forEach(r => menus[r.menu_date] = r); q('menu-bulk').value = ''; renderMenu(); showAlert('저장 완료', `${rows.length}일치 식단을 저장했어요.`);
+}
+
+/* ---------- 혜택 · 이벤트 ---------- */
+const BEN = [
+ ['💰', '급여 · 금융', ['2026 병 월급: 이병 75만 · 일병 90만 · 상병 120만 · 병장 150만 원', '장병내일준비적금: 월 최대 55만 원(은행별 최대 30만 원), 납입 원금의 100%를 정부가 매칭지원 · 이자 비과세(2026.12.31까지 가입분)', '18개월 월 55만 원 기준 만기 약 2,000만 원 안팎 (원금+이자+매칭지원금)', '나라사랑카드(KB국민·IBK기업 등): 대중교통 청구할인, PX·편의점(CU·GS25) 할인·적립 (카드사별 조건 확인)']],
+ ['📚', '자기개발 · 학업', ['병 자기개발비용 연 최대 12만 원: 결제액의 80% 지원 (도서, 어학·자격시험 응시료, 강좌, 운동용품) · 나라사랑포털/앱에서 영수증 첨부 신청 · 예산 소진 시 조기 마감되니 하반기 잔여 예산 확인', '대학 원격강좌(e-Learning) 학점 인정: 수강료 80% 지원, 복무 중 최대 12학점 내외', '국가기술자격 군 정기·상시 검정: 수수료 무료']],
+ ['🚆', '교통 · 이동', ['TMO(철도수송지원반): 포상·위로·보상·청원휴가증 지참 시 철도 승차권 국비 무료', '정기휴가·평시 이동: 코레일톡·SRT 앱에서 밀리패스/군 장병 인증 시 약 10% 할인', '고속·시외버스: 터미널 창구·티머니GO에서 군 장병 우대 10~20%', '국내선 항공: 항공사별 군 장병 10% 내외 · 연안여객선 장병 할인 운임']],
+ ['🎢', '문화 · 테마파크 · 스포츠', ['영화관(국방부 안내, ~2026.12.31): CGV·롯데시네마 2D 10,000원 / 메가박스 2D 11,000원, 매점 콤보 2~3천 원 할인', '에버랜드: 휴가증 지참 시 본인 무료 (국방부 안내상 기한이 2026.9.30까지였으니 연장 여부 확인)', '롯데월드·경주월드·이월드·서울랜드: 본인·동반인 자유이용권 약 40~50% 현장 할인 (시기별 상이)', 'K리그·KBO·KBL·V-리그: 구단별 무료 또는 50% 할인 (밀리패스/휴가증 제시)']],
+ ['📱', '통신 · 쇼핑 · 휴양', ['통신 3사 현역병사 요금제: 월 3만~5만 원대, 25% 선택약정·결합 할인과 중복 가능', '영외마트(영외 PX): 휴가·외출 때도 PX 가격으로 이용 (화장품·건기식·과자 등 시중가 대비 크게 저렴)', '국군복지단 휴양시설: 밀리토피아 호텔, 대천·화진포·송정 콘도 등 시중가의 30~50% 수준 (국방복지포털 앱 예약)']],
+ ['🪪', '인증은 밀리패스로', ['오프라인 혜택(영화관·테마파크·영외마트·철도 창구 등)은 종이 휴가증 대신 국방 모바일 신분 인증 앱 밀리패스(MiliPass) 화면으로 인증해요', '휴가·외출 나가기 전에 스마트폰에 미리 인증해 두면 가장 간편해요']]
+];
+let EVT = null, showEnded = false;
+async function loadEvents() { try { const r = await fetch('events.json?' + Date.now(), { cache: 'no-store' }); EVT = await r.json(); } catch (e) { EVT = { events: [], updated: '-' }; } }
+function evInfo(ev) {
+  const t = new Date(); t.setHours(0, 0, 0, 0); const s = ev.start ? pd(ev.start) : null, e = ev.end ? pd(ev.end) : null, day = d => Math.round((d - t) / 864e5);
+  if (e && t > e) return { k: 'ended', label: '종료', d: '' };
+  if (s && t < s) return { k: 'soon', label: '예정', d: `시작까지 D-${day(s)}` };
+  return { k: 'live', label: '진행중', d: e ? (day(e) === 0 ? '오늘 마감' : `종료까지 D-${day(e)}`) : '상시' };
+}
+async function renderBenefits() {
+  if (!EVT) await loadEvents();
+  const evs = EVT.events.map(e => ({ e, i: evInfo(e) })).filter(x => showEnded || x.i.k !== 'ended').sort((a, b) => ({ live: 0, soon: 1, ended: 2 })[a.i.k] - ({ live: 0, soon: 1, ended: 2 })[b.i.k] || (a.e.end || '9').localeCompare(b.e.end || '9'));
+  const col = { live: 'bg-[var(--mil-green)] text-white', soon: 'bg-[#F2BA49] text-[#191F28]', ended: 'bg-[#B0B8C1] text-white' };
+  q('tab-benefits').innerHTML = `<div class="toss-card"><div class="flex justify-between items-center mb-1"><h2 class="text-[18px] font-extrabold">🎁 지금 진행 중인 이벤트</h2><button onclick="showEnded=!showEnded;renderBenefits()" class="text-[11px] font-bold bg-[#F5F6F8] px-3 py-1.5 rounded-full">${showEnded ? '종료 숨기기' : '종료 보기'}</button></div>
+   <p class="text-[11px] text-[#8B95A1] mb-4">마지막 업데이트 ${esc(EVT.updated || '-')} · ${esc(EVT.note || '')}</p><div class="space-y-3">${evs.length ? evs.map(({ e, i }) => `<div class="bg-[#F5F6F8] rounded-2xl p-4 border border-[#E5E8EB] ${i.k === 'ended' ? 'opacity-60' : ''}"><div class="flex justify-between items-start gap-2 mb-1"><div class="text-[14px] font-extrabold leading-snug">${esc(e.title)}</div><span class="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${col[i.k]}">${i.label}</span></div>
+   <div class="text-[11px] text-[#8B95A1] mb-2">${esc(e.org)}</div><div class="text-[12px] font-bold mb-1">${esc(e.benefit)}</div><div class="text-[11px] text-[#4E5968] space-y-0.5"><div>📅 ${e.start ? esc(e.start) : '상시'} ~ ${e.end ? esc(e.end) : '미정'} ${i.d ? `<b class="text-[var(--pink-main)]">(${i.d})</b>` : ''}</div><div>👤 ${esc(e.target)}</div>${e.note ? `<div>ℹ️ ${esc(e.note)}</div>` : ''}</div>
+   <a target="_blank" rel="noopener" href="${esc(e.url)}" class="inline-block mt-2 text-[11px] font-bold text-[var(--mil-green)]">출처 보기 ▶</a></div>`).join('') : '<div class="text-center text-[12px] text-[#8B95A1] py-4">진행 중인 이벤트가 없어요.</div>'}</div></div>
+   <div class="toss-card"><h2 class="text-[18px] font-extrabold mb-1">군인 특별 혜택 (2026)</h2><p class="text-[11px] text-[#8B95A1] mb-4">시기·업체 정책에 따라 바뀔 수 있으니 이용 전 확인하세요.</p><div class="space-y-4">${BEN.map(b => `<div><div class="text-[14px] font-extrabold mb-1.5">${b[0]} ${b[1]}</div><div class="bg-[#F5F6F8] rounded-xl p-3 space-y-1.5">${b[2].map(t => `<div class="text-[12px] text-[#4E5968] leading-relaxed">· ${esc(t)}</div>`).join('')}</div></div>`).join('')}</div></div>`;
+}
+
+/* ---------- 시작 ---------- */
+authToggleHTML();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js').catch(() => {});
+if (configured) {
+  sb.auth.getSession().then(({ data }) => { if (data.session) { session = data.session; boot(); } });
+  sb.auth.onAuthStateChange((ev, s) => { if (ev === 'SIGNED_IN' && s && !booted) { session = s; boot(); } if (ev === 'SIGNED_OUT') location.reload(); });
+}
+</script>
+</body>
+</html>
