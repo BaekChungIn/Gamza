@@ -157,7 +157,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
    </div>
 
    <div class="toss-card hidden" id="vacation-card">
-    <div class="flex justify-between items-center mb-4"><h3 class="text-[16px] font-bold">🏖 휴가</h3><button onclick="openVac()" class="bg-[#F5F6F8] px-3 py-1.5 rounded-full text-[12px] font-bold">+ 휴가 등록</button></div>
+    <div class="flex justify-between items-center mb-4"><h3 class="text-[16px] font-bold">🏖 휴가 · 외박 · 외출</h3><button onclick="openVac()" class="bg-[#F5F6F8] px-3 py-1.5 rounded-full text-[12px] font-bold">+ 등록</button></div>
     <div id="vacation-list" class="space-y-3"></div>
    </div>
 
@@ -239,13 +239,15 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
  </div>
  <div id="modal-vac" class="fixed inset-0 z-50 bg-[#191F28]/60 backdrop-blur-sm hidden items-end sm:items-center justify-center p-4">
   <div class="bg-white w-full max-w-sm rounded-[28px] p-5 max-h-[92vh] overflow-y-auto no-scrollbar">
-   <h3 class="font-bold text-[17px] mb-3">휴가 등록</h3>
-   <input id="vac-title" maxlength="30" placeholder="제목 (예: 첫 휴가 💖)" class="inp mb-4">
+   <h3 class="font-bold text-[17px] mb-3">일정 등록</h3>
+   <div class="flex gap-2 mb-3"><button id="vk-vacation" onclick="setVacKind('vacation')" class="flex-1 py-2.5 rounded-xl text-[13px] font-bold">🏖 휴가</button><button id="vk-stay" onclick="setVacKind('stay')" class="flex-1 py-2.5 rounded-xl text-[13px] font-bold">🌙 외박</button><button id="vk-out" onclick="setVacKind('out')" class="flex-1 py-2.5 rounded-xl text-[13px] font-bold">🚶 외출</button></div>
+   <input id="vac-title" maxlength="30" placeholder="제목 (비우면 기본 이름)" class="inp mb-3">
+   <div id="vac-times" class="hidden flex gap-2 mb-3"><div class="flex-1"><label class="text-[11px] font-bold text-[#4E5968]">나가는 시간</label><input type="time" id="vac-t1" class="inp !py-2.5 mt-1"></div><div class="flex-1"><label class="text-[11px] font-bold text-[#4E5968]">복귀 시간</label><input type="time" id="vac-t2" class="inp !py-2.5 mt-1"></div></div>
    <div class="flex items-center justify-between mb-2"><button onclick="calNav(-1)" class="w-9 h-9 rounded-full bg-[#F5F6F8] font-bold">‹</button><div id="cal-title" class="font-bold text-[15px]"></div><button onclick="calNav(1)" class="w-9 h-9 rounded-full bg-[#F5F6F8] font-bold">›</button></div>
    <div class="grid grid-cols-7 text-center text-[11px] font-bold text-[#8B95A1] mb-1"><div class="text-[#E5484D]">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="text-[#3B82F6]">토</div></div>
    <div id="cal-grid" class="grid grid-cols-7 text-center"></div>
    <div id="cal-summary" class="text-[12px] font-bold text-[var(--pink-main)] text-center my-3 min-h-[18px]"></div>
-   <p class="text-[10px] text-[#8B95A1] text-center mb-3">시작일을 누르고 종료일을 누르세요 · 초록 점은 이미 등록된 휴가</p>
+   <p id="cal-hint" class="text-[10px] text-[#8B95A1] text-center mb-3"></p>
    <div class="flex gap-2"><button onclick="closeModal('modal-vac')" class="flex-1 py-3 rounded-xl bg-[#F5F6F8] font-bold text-[14px]">취소</button><button onclick="saveVac()" class="flex-1 py-3 rounded-xl bg-[#191F28] text-white font-bold text-[14px]">저장</button></div>
   </div></div>
 
@@ -447,7 +449,7 @@ function fillSoldier(S, now) {
   q('bf-ho-label').innerText = h.nxIsPromo ? (h.rank === '병장' ? '마지막 호봉' : `${h.next} 1호봉`) : `${h.n + 1}호봉 승급`; q('bf-ho-dday').innerText = h.nxIsPromo && h.rank === '병장' ? '' : `D-${dd(h.nx)}`;
   q('bf-pr-label').innerText = h.rank === '병장' ? '전역' : `${h.next} 진급`; q('bf-pr-dday').innerText = `D-${dd(h.end)}`;
   let wk = 0; for (let d = new Date(T0); d <= I.dis; d.setDate(d.getDate() + 1)) if (d.getDay() !== 0 && d.getDay() !== 6) wk++;
-  const nv = vacs.filter(v => v.end_date >= ymd(T0)).sort((a, b) => a.start_date.localeCompare(b.start_date))[0];
+  const nv = vacs.filter(v => vkind(v) === 'vacation' && v.end_date >= ymd(T0)).sort((a, b) => a.start_date.localeCompare(b.start_date))[0];
   q('st-total').innerText = td; q('st-cur').innerText = sd; q('st-left').innerText = Math.max(0, td - sd); q('st-promo').innerText = dd(h.end); q('st-work').innerText = wk;
   q('st-vac').innerText = nv ? (nv.start_date <= ymd(T0) ? '휴가중' : `D-${dd(pd(nv.start_date))}`) : '-';
   const gl = gfRank(h.next); q('gf-lv-label').innerText = `${gl[1]} 레벨업`; q('gf-lv-dday').innerText = `D-${dd(h.end)}`;
@@ -658,34 +660,53 @@ async function unlinkC() { if (!confirm('정말 연동을 해제할까요?')) re
 async function saveStatusMsg() { await sb.from('profiles').update({ status_msg: q('one-line-msg').value.slice(0, 40) }).eq('id', me.id); }
 
 /* ---------- 휴가/일정 ---------- */
-let vS = null, vE = null, calY = 2026, calM = 0;
-function openVac() { vS = vE = null; const t = new Date(); calY = t.getFullYear(); calM = t.getMonth(); q('vac-title').value = ''; renderCal(); openM('modal-vac'); }
+const VK = { vacation: { n: '휴가', e: '🏖', c: '#6B7B5C', d: '휴가 🏖' }, stay: { n: '외박', e: '🌙', c: '#7C6BC9', d: '외박 🌙' }, out: { n: '외출', e: '🚶', c: '#E0A030', d: '외출 🚶' } };
+const vkind = v => VK[v.kind] ? v.kind : 'vacation';
+let vS = null, vE = null, vKind = 'vacation', calY = 2026, calM = 0;
+function setVacKind(k) {
+  vKind = k; if (k === 'out') vE = null;
+  Object.keys(VK).forEach(x => q('vk-' + x).className = 'flex-1 py-2.5 rounded-xl text-[13px] font-bold ' + (x === k ? 'text-white' : 'bg-[#F5F6F8] text-[#4E5968]')), q('vk-' + k).style.background = VK[k].c;
+  Object.keys(VK).forEach(x => { if (x !== k) q('vk-' + x).style.background = ''; });
+  q('vac-times').classList.toggle('hidden', k !== 'out'); q('vac-times').classList.toggle('flex', k === 'out');
+  q('cal-hint').innerText = k === 'out' ? '외출할 날짜를 누르고 나가는·복귀 시간을 입력하세요 (시간은 선택)' : k === 'stay' ? '시작일을 누르고 복귀일을 누르세요 · 시작일만 누르면 1박 2일' : '시작일을 누르고 종료일을 누르세요 · 점은 이미 등록된 일정';
+  renderCal();
+}
+function openVac() { vS = vE = null; const t = new Date(); calY = t.getFullYear(); calM = t.getMonth(); q('vac-title').value = ''; q('vac-t1').value = ''; q('vac-t2').value = ''; setVacKind('vacation'); openM('modal-vac'); }
 function calNav(d) { calM += d; if (calM < 0) { calM = 11; calY--; } if (calM > 11) { calM = 0; calY++; } renderCal(); }
-function calPick(x) { if (!vS || vE) { vS = x; vE = null; } else if (x < vS) vS = x; else vE = x; renderCal(); }
+function calPick(x) { if (vKind === 'out') { vS = x; vE = null; } else if (!vS || vE) { vS = x; vE = null; } else if (x < vS) vS = x; else vE = x; renderCal(); }
 function renderCal() {
   q('cal-title').innerText = `${calY}년 ${calM + 1}월`;
   const first = new Date(calY, calM, 1), days = new Date(calY, calM + 1, 0).getDate(), today = ymd(new Date()); let h = '';
   for (let i = 0; i < first.getDay(); i++) h += '<div></div>';
   for (let d = 1; d <= days; d++) {
-    const x = ymd(new Date(calY, calM, d)), st = x === vS, en = x === vE, inr = vS && vE && x > vS && x < vE, has = vacs.some(v => x >= v.start_date && x <= v.end_date), dow = (first.getDay() + d - 1) % 7, on = st || en;
-    h += `<button onclick="calPick('${x}')" class="h-10 flex items-center justify-center relative ${inr ? 'bg-[var(--pink-light)]' : ''}"><span class="w-9 h-9 rounded-full flex items-center justify-center text-[14px] font-semibold ${on ? 'bg-[var(--pink-main)] text-white' : ''} ${!on && x === today ? 'border border-[var(--pink-main)]' : ''} ${!on && dow === 0 ? 'text-[#E5484D]' : ''} ${!on && dow === 6 ? 'text-[#3B82F6]' : ''}">${d}</span>${has ? '<i class="absolute bottom-0.5 w-1 h-1 rounded-full bg-[var(--mil-green)]"></i>' : ''}</button>`;
+    const x = ymd(new Date(calY, calM, d)), st = x === vS, en = x === vE, inr = vS && vE && x > vS && x < vE, cv = vacs.find(v => x >= v.start_date && x <= v.end_date), dow = (first.getDay() + d - 1) % 7, on = st || en, kc = VK[vKind].c;
+    h += `<button onclick="calPick('${x}')" class="h-10 flex items-center justify-center relative" ${inr ? 'style="background:' + kc + '22"' : ''}><span class="w-9 h-9 rounded-full flex items-center justify-center text-[14px] font-semibold ${on ? 'text-white' : ''} ${!on && x === today ? 'border border-[#B0B8C1]' : ''} ${!on && dow === 0 ? 'text-[#E5484D]' : ''} ${!on && dow === 6 ? 'text-[#3B82F6]' : ''}" ${on ? 'style="background:' + kc + '"' : ''}>${d}</span>${cv ? `<i class="absolute bottom-0.5 w-1 h-1 rounded-full" style="background:${VK[vkind(cv)].c}"></i>` : ''}</button>`;
   }
   q('cal-grid').innerHTML = h;
   const nn = vS && vE ? Math.round((pd(vE) - pd(vS)) / 864e5) : 0;
-  q('cal-summary').innerText = vS ? (vE ? `${vS} ~ ${vE} (${nn}박 ${nn + 1}일)` : `${vS} · 종료일을 누르세요 (하루면 바로 저장)`) : '시작일을 선택하세요';
+  q('cal-summary').innerText = !vS ? (vKind === 'out' ? '외출 날짜를 선택하세요' : '시작일을 선택하세요') : vKind === 'out' ? `${vS} 외출` : vE ? `${vS} ~ ${vE} (${nn}박 ${nn + 1}일)` : (vKind === 'stay' ? `${vS} · 복귀일을 누르세요 (그대로 저장하면 1박 2일)` : `${vS} · 종료일을 누르세요 (하루면 바로 저장)`);
 }
 async function saveVac() {
   if (!vS) return showAlert('알림', '날짜를 선택해주세요.');
-  const { error } = await sb.from('vacations').insert({ title: q('vac-title').value.trim() || '휴가 🏖', start_date: vS, end_date: vE || vS });
-  if (error) return showAlert('오류', esc(error.message)); closeModal('modal-vac'); await loadAll(false); render(false);
+  const nx = new Date(pd(vS)); nx.setDate(nx.getDate() + 1);
+  const row = { title: q('vac-title').value.trim() || VK[vKind].d, start_date: vS, end_date: vKind === 'out' ? vS : (vE || (vKind === 'stay' ? ymd(nx) : vS)), kind: vKind };
+  if (vKind === 'out') { if (q('vac-t1').value) row.start_time = q('vac-t1').value; if (q('vac-t2').value) row.end_time = q('vac-t2').value; }
+  const { error } = await sb.from('vacations').insert(row);
+  if (error) return showAlert('오류', esc(error.message) + '<br><br>schema_vacation_kind.sql 을 실행했는지 확인하세요.');
+  closeModal('modal-vac'); await loadAll(false); render(false);
 }
 async function delVac(id) { if (!confirm('이 일정을 삭제할까요?')) return; await sb.from('vacations').delete().eq('id', id); await loadAll(false); render(false); }
 function renderVac() {
   const L = q('vacation-list'), today = new Date(); today.setHours(0, 0, 0, 0);
-  if (!vacs.length) { L.innerHTML = '<div class="text-center text-[12px] text-[#8B95A1] py-3">등록된 일정이 없어요. 휴가를 추가해보세요!</div>'; return; }
-  L.innerHTML = vacs.map(v => { const s = pd(v.start_date), e = pd(v.end_date), d = Math.round((s - today) / 864e5), nights = Math.round((e - s) / 864e5);
-    const dd = d > 0 ? `D-${d}` : (today <= e ? (d === 0 ? 'D-Day' : '진행중') : '종료'); const mine = v.created_by === me.id;
-    return `<div class="bg-[#F5F6F8] p-3.5 rounded-xl flex justify-between items-center border border-[#E5E8EB] ${dd === '종료' ? 'opacity-50' : ''}"><div class="flex flex-col"><span class="text-[14px] font-bold">${esc(v.title)} ${mine ? '' : '<span class="text-[10px] text-[var(--pink-main)]">상대</span>'}</span><span class="text-[12px] text-[#8B95A1] mt-0.5">${v.start_date} ~ ${v.end_date} (${nights}박 ${nights + 1}일)</span></div><div class="flex items-center gap-2"><span class="text-[16px] font-black text-[var(--pink-main)]">${dd}</span><button onclick="delVac('${v.id}')" class="text-[#B0B8C1] text-[14px]">✕</button></div></div>`; }).join('');
+  if (!vacs.length) { L.innerHTML = '<div class="text-center text-[12px] text-[#8B95A1] py-3">등록된 일정이 없어요. 휴가·외박·외출을 추가해보세요!</div>'; return; }
+  const info = v => { const s = pd(v.start_date), e = pd(v.end_date), d = Math.round((s - today) / 864e5); return { s, e, nights: Math.round((e - s) / 864e5), ended: today > e, dd: d > 0 ? `D-${d}` : (today <= e ? (d === 0 ? 'D-Day' : '진행중') : '종료') }; };
+  const list = vacs.map(v => ({ v, i: info(v) })).sort((a, b) => (a.i.ended - b.i.ended) || a.v.start_date.localeCompare(b.v.start_date)), cnt = { vacation: 0, stay: 0, out: 0 };
+  list.forEach(x => { if (!x.i.ended) cnt[vkind(x.v)]++; });
+  L.innerHTML = `<div class="text-[11px] font-bold text-[#8B95A1]">예정·진행 중 ${Object.keys(VK).map(k => `${VK[k].n} ${cnt[k]}`).join(' · ')}</div>` + list.map(({ v, i }) => {
+    const k = vkind(v), K = VK[k], mine = v.created_by === me.id;
+    const when = k === 'out' ? `${v.start_date}${v.start_time || v.end_time ? ' · ' + (v.start_time || '') + ' ~ ' + (v.end_time || '') : ''}` : `${v.start_date} ~ ${v.end_date} (${i.nights}박 ${i.nights + 1}일)`;
+    return `<div class="bg-[#F5F6F8] p-3.5 rounded-xl flex justify-between items-center gap-2 border border-[#E5E8EB] ${i.ended ? 'opacity-50' : ''}"><div class="flex flex-col min-w-0"><div class="flex items-center gap-1.5"><span class="text-[10px] font-extrabold text-white px-1.5 py-0.5 rounded-full whitespace-nowrap" style="background:${K.c}">${K.n}</span><span class="text-[14px] font-bold truncate">${esc(v.title)}</span>${mine ? '' : '<span class="text-[10px] text-[var(--pink-main)] whitespace-nowrap">상대</span>'}</div><span class="text-[12px] text-[#8B95A1] mt-0.5">${esc(when)}</span></div><div class="flex items-center gap-2 flex-shrink-0"><span class="text-[16px] font-black" style="color:${K.c}">${i.dd}</span><button onclick="delVac('${v.id}')" class="text-[#B0B8C1] text-[14px]">✕</button></div></div>`;
+  }).join('');
 }
 
 /* ---------- Q&A ---------- */
