@@ -33,6 +33,11 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 .pb-safe{padding-bottom:max(12px,env(safe-area-inset-bottom))}
 .inp{width:100%;background:#F5F6F8;border-radius:12px;padding:14px 16px;font-size:14px;outline:none}.inp:focus{box-shadow:0 0 0 2px var(--mil-green)}
 .pg{flex:0 0 100%;min-width:0;scroll-snap-align:center;scroll-snap-stop:always}
+.ic{width:1.05em;height:1.05em;display:inline-block;vertical-align:-.17em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.cm-chip{flex:0 0 auto;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:700;background:#fff;color:#4E5968;border:1px solid #E5E8EB}
+.cm-chip.on{background:#191F28;color:#fff;border-color:#191F28}
+.cm-row{padding:16px 18px;border-bottom:1px solid #F2F3F5;display:block;width:100%;text-align:left}
+.cm-row:active{background:#F5F6F8}
 </style>
 </head>
 <body class="min-h-screen flex justify-center items-start sm:p-4 select-none antialiased bg-gray-100">
@@ -216,9 +221,15 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 
   <!-- 혜택 -->
   <section id="tab-benefits" class="space-y-4 pt-2 hidden"></section>
+  <section id="tab-community" class="pt-2 hidden">
+   <div class="flex items-center justify-between mb-3"><h2 class="text-[22px] font-extrabold">커뮤니티</h2><button onclick="loadCommunity()" class="w-10 h-10 rounded-full bg-white border border-[#E5E8EB] flex items-center justify-center text-[#4E5968] text-[18px]">🔄</button></div>
+   <div id="cm-cats" class="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5 pb-3"></div>
+   <div id="cm-list" class="bg-white rounded-3xl overflow-hidden border border-[#F2F3F5]"></div>
+   <button onclick="openWrite()" class="fixed right-5 w-14 h-14 rounded-full text-white shadow-lg flex items-center justify-center text-[22px] z-30" style="background:var(--mil-green);bottom:92px">✏️</button>
+  </section>
  </main>
 
- <nav class="bg-white/95 backdrop-blur-md px-6 pt-3 pb-safe flex justify-between items-center z-40 border-t border-[#F2F3F5] shrink-0 absolute bottom-0 left-0 right-0" id="bottom-nav"></nav>
+ <nav class="bg-white/95 backdrop-blur-md px-3 pt-3 pb-safe flex justify-between items-center z-40 border-t border-[#F2F3F5] shrink-0 absolute bottom-0 left-0 right-0" id="bottom-nav"></nav>
 
  <!-- 설정 -->
  <div id="modal-settings" class="fixed inset-0 z-50 bg-white hidden flex-col">
@@ -238,14 +249,30 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
     <div id="set-p-account" class="hidden px-5 pt-2"><div class="bg-[#F5F6F8] rounded-xl p-4 mb-5"><div class="text-[11px] text-[#8B95A1]">로그인 계정</div><div id="set-acc-email" class="text-[14px] font-bold break-all"></div></div><button onclick="logout()" class="w-full border border-[#E5E8EB] text-[#E5484D] py-3.5 rounded-xl font-bold text-[14px]">로그아웃</button></div>
    </div></div></div>
 
- <div id="modal-pop" class="fixed inset-0 z-[120] bg-black/50 backdrop-blur-sm hidden items-center justify-center p-5">
-  <div class="bg-white w-full max-w-[340px] rounded-[30px] overflow-hidden text-center relative">
-   <div id="pop-cf" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
-   <div id="pop-name" class="pt-6 text-[14px] font-bold text-[#8B95A1]"></div>
-   <div id="pop-title" class="px-6 mt-1 text-[26px] font-black leading-tight tracking-tight"></div>
-   <div id="pop-sub" class="px-6 mt-2 text-[13px] text-[#8B95A1]"></div>
-   <div class="relative mt-2 h-[230px] flex items-center justify-center"><img src="tiger_cheer.png" alt="" class="h-[215px] object-contain relative z-10"><div id="pop-badge" class="absolute z-20 bottom-1 px-5 py-1.5 rounded-full text-[18px] font-black text-white" style="background:var(--mil-green)"></div></div>
-   <div class="px-5 pb-5 pt-2 space-y-2"><button id="pop-share" onclick="popShare()" class="hidden w-full py-3.5 rounded-xl text-white font-bold text-[14px]" style="background:var(--mil-green)">지인에게 공유하기</button><button onclick="popClose()" class="w-full py-3.5 rounded-xl bg-[#F5F6F8] text-[#191F28] font-bold text-[14px]">확인</button></div>
+ <div id="modal-pop" class="fixed inset-0 z-[120] hidden flex-col items-center overflow-hidden" style="background:linear-gradient(180deg,#fff 0%,#FFF3F5 100%)">
+  <div id="pop-cf" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+  <div class="relative z-10 w-full max-w-[430px] h-full px-6 flex flex-col items-center text-center" style="padding-top:max(34px,env(safe-area-inset-top))">
+   <div id="pop-name" class="text-[15px] font-bold text-[#8B95A1]"></div>
+   <div id="pop-title" class="mt-2 text-[32px] font-black leading-tight tracking-tight"></div>
+   <div id="pop-sub" class="mt-2 text-[14px] text-[#8B95A1]"></div>
+   <div class="relative flex-1 min-h-0 w-full flex items-center justify-center py-4"><img id="pop-img" src="tiger_bj.png" alt="" class="max-h-full max-w-full object-contain relative z-10"><div id="pop-badge" class="absolute z-20 bottom-3 px-6 py-2 rounded-full text-[20px] font-black text-white" style="background:var(--mil-green)"></div></div>
+   <div class="w-full pb-safe pt-2 space-y-2" style="padding-bottom:max(22px,env(safe-area-inset-bottom))"><button id="pop-share" onclick="popShare()" class="hidden w-full py-4 rounded-2xl text-white font-bold text-[15px]" style="background:var(--mil-green)">지인에게 공유하기</button><button onclick="popClose()" class="w-full py-4 rounded-2xl bg-[#191F28] text-white font-bold text-[15px]">확인</button></div>
+  </div></div>
+ <div id="modal-post" class="fixed inset-0 z-[60] bg-white hidden flex-col">
+  <div class="flex items-center gap-3 px-4 pb-3 border-b border-[#F2F3F5]" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeModal('modal-post')" class="w-10 h-10 rounded-full bg-[#F5F6F8] font-bold text-[18px]">‹</button><div class="font-bold text-[16px]" id="post-cat">게시글</div></div>
+  <div id="post-body" class="flex-1 overflow-y-auto no-scrollbar"></div>
+  <div class="border-t border-[#F2F3F5] px-3 pt-2 flex items-center gap-2 bg-white" style="padding-bottom:max(10px,env(safe-area-inset-bottom))">
+   <button id="cm-anon-btn" onclick="togCAnon()" class="shrink-0 px-3 py-2.5 rounded-xl text-[12px] font-bold border-2"></button>
+   <input id="cm-in" maxlength="500" placeholder="댓글을 입력하세요" class="inp !py-3 !text-[14px]" onkeydown="if(event.key==='Enter')sendComment()">
+   <button onclick="sendComment()" class="shrink-0 px-4 py-3 rounded-xl text-white font-bold text-[13px]" style="background:var(--mil-green)">등록</button>
+  </div></div>
+ <div id="modal-write" class="fixed inset-0 z-[60] bg-white hidden flex-col">
+  <div class="flex items-center justify-between px-4 pb-3 border-b border-[#F2F3F5]" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeModal('modal-write')" class="w-10 h-10 rounded-full bg-[#F5F6F8] font-bold text-[18px]">‹</button><div class="font-bold text-[16px]">글쓰기</div><button onclick="submitPost()" class="px-4 py-2 rounded-full text-white font-bold text-[13px]" style="background:var(--mil-green)">등록</button></div>
+  <div class="flex-1 overflow-y-auto no-scrollbar px-5 py-4 space-y-4">
+   <div><div class="text-[12px] font-bold text-[#8B95A1] mb-2">게시판</div><div id="w-cats" class="flex flex-wrap gap-2"></div></div>
+   <div><div class="text-[12px] font-bold text-[#8B95A1] mb-2">작성자 표시</div><div class="grid grid-cols-2 gap-2"><button id="w-anon-1" onclick="setWAnon(true)" class="py-3 rounded-xl border-2 font-bold text-[13px]">익명</button><button id="w-anon-0" onclick="setWAnon(false)" class="py-3 rounded-xl border-2 font-bold text-[13px]">닉네임 공개</button></div><div id="w-anon-hint" class="text-[11px] text-[#8B95A1] mt-2"></div></div>
+   <input id="w-title" maxlength="80" placeholder="제목" class="inp !font-bold">
+   <textarea id="w-body" maxlength="3000" rows="10" placeholder="솔직한 이야기를 나눠보세요" class="inp !leading-relaxed" style="resize:none"></textarea>
   </div></div>
  <div id="modal-friends" class="fixed inset-0 z-50 bg-[var(--bg-main)] hidden flex-col">
   <div class="max-w-md mx-auto w-full h-full flex flex-col" style="padding-top:env(safe-area-inset-top)">
@@ -531,7 +558,7 @@ function gamjaSVG(st) {
 }
 function bfImg(theme, r) {
   if (theme === 'gamja') return gamjaSVG({ '훈련병': 0, '이병': 1, '일병': 2 }[r] ?? 3);
-  const f = { '훈련병': 'tiger_recruit.svg', '이병': 'tiger_ib.png', '일병': 'tiger_ilb.png', '상병': 'tiger_sb.png' }[r] || 'tiger_bj.png';
+  const f = { '훈련병': 'tiger_ib.png', '이병': 'tiger_ib.png', '일병': 'tiger_ilb.png', '상병': 'tiger_sb.png' }[r] || 'tiger_bj.png';
   return `<img src="${f}" alt="" class="w-[120%] h-[120%] object-contain">`;
 }
 
@@ -572,15 +599,15 @@ function render(full) {
 function cutscene(r) { const o = document.createElement('div'); o.className = 'flash-overlay'; document.body.appendChild(o); setTimeout(() => { showAlert('진급 ✨', `[${r}] 모습으로 성장했습니다!`); o.remove(); }, 500); }
 
 /* ---------- 탭/UI ---------- */
-const TABS = [['home', '홈', '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>'], ['savings', '적금', '<rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>'], ['goodman', 'PX굿맨', '<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>'], ['qna', 'Q&A', '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>'], ['benefits', '혜택', '<path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><line x1="12" y1="22" x2="12" y2="7"/>']];
+const TABS = [['home', '홈', '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>'], ['savings', '적금', '<rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>'], ['goodman', 'PX굿맨', '<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>'], ['qna', 'Q&A', '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>'], ['community', '커뮤니티', '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'], ['benefits', '혜택', '<path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><line x1="12" y1="22" x2="12" y2="7"/>']];
 function initUI() {
-  q('bottom-nav').innerHTML = TABS.map(t => `<button onclick="switchTab('${t[0]}')" id="nav-btn-${t[0]}" class="flex flex-col items-center gap-1"><svg class="w-6 h-6 sf-icon" viewBox="0 0 24 24">${t[2]}</svg><span class="text-[10px] font-bold">${t[1]}</span></button>`).join('');
+  q('bottom-nav').innerHTML = TABS.map(t => `<button onclick="switchTab('${t[0]}')" id="nav-btn-${t[0]}" class="flex flex-col items-center gap-1 min-w-[44px]"><svg class="w-6 h-6 sf-icon" viewBox="0 0 24 24">${t[2]}</svg><span class="text-[10px] font-bold">${t[1]}</span></button>`).join('');
   q('set-branches').innerHTML = Object.keys(BR).map(k => `<button onclick="setBr('${k}')" id="sb-${k}" class="py-2 rounded-lg border-2 font-bold text-[11px]">${BR[k].k}</button>`).join('');
   switchTab('home');
 }
 function switchTab(t) {
   curTab = t; TABS.forEach(([id]) => { q('tab-' + id).classList.toggle('hidden', id !== t); q('nav-btn-' + id).className = 'flex flex-col items-center gap-1 transition-all ' + (id === t ? 'text-[var(--mil-green)] scale-105' : 'text-[#B0B8C1]'); });
-  if (t === 'savings') renderSav(); if (t === 'goodman') renderPX(); if (t === 'qna') renderQ(true); if (t === 'benefits') renderBenefits();
+  if (t === 'savings') renderSav(); if (t === 'goodman') renderPX(); if (t === 'qna') renderQ(true); if (t === 'benefits') renderBenefits(); if (t === 'community') loadCommunity();
 }
 
 /* ---------- 설정 ---------- */
@@ -661,10 +688,11 @@ async function removeAvatar() {
 /* ---------- 축하/응원 팝업 (진급 · 전역 D-day) ---------- */
 let popQ = [], popBusy = false, popReady = false, popCur = null, popChecked = false;
 function popPush(o) { popQ.push(o); if (popReady && !popBusy) popNext(); }
+const rankFile = r => ({ '훈련병': 'tiger_ib.png', '이병': 'tiger_ib.png', '일병': 'tiger_ilb.png', '상병': 'tiger_sb.png' })[r] || 'tiger_bj.png';
 function popNext() {
   const o = popQ.shift(); if (!o) { popBusy = false; return; } popBusy = true; popCur = o;
   q('pop-name').innerText = o.name || ''; q('pop-title').innerText = o.title; q('pop-sub').innerText = o.sub || ''; q('pop-badge').innerText = o.badge || ''; q('pop-badge').classList.toggle('hidden', !o.badge);
-  q('pop-share').classList.toggle('hidden', !o.share);
+  q('pop-share').classList.toggle('hidden', !o.share); q('pop-img').src = rankFile(o.rk || o.badge);
   const cf = q('pop-cf'); cf.innerHTML = ''; const cols = ['#F28C9F', '#F2BA49', '#6BC4A6', '#7FA8E8', '#B79CE8', '#F2878F'];
   for (let i = 0; i < 26; i++) { const d = document.createElement('i'); d.style.cssText = `position:absolute;top:0;left:${Math.random() * 100}%;width:${6 + Math.random() * 6}px;height:${10 + Math.random() * 8}px;background:${cols[i % cols.length]};border-radius:2px;opacity:0;animation:cf ${2.2 + Math.random() * 1.8}s ${Math.random() * 1.2}s ease-in infinite`; cf.appendChild(d); }
   openM('modal-pop');
@@ -674,18 +702,128 @@ async function popShare() { const t = popCur && popCur.share; if (!t) return; co
 const joSa = r => '일병상병병장이병'.includes(r) ? r + '으로' : r + '로';
 function promoPop(S, rank, prev) {
   const nm = (S.nickname || '군인') + '님';
-  if (rank === '전역') popPush({ name: nm, title: '전역을 축하해요! 🎉', sub: '그동안 정말 고생 많았어요', badge: '전역' });
-  else popPush({ name: nm, title: `${joSa(rank)} 진급했어요!`, sub: (prev ? prev + ' → ' : '') + rank + ' · 앞으로도 화이팅!', badge: rank });
+  if (rank === '전역') popPush({ name: nm, title: '전역을 축하해요!', sub: '그동안 정말 고생 많았어요', badge: '전역', rk: '병장' });
+  else popPush({ name: nm, title: `${joSa(rank)} 진급했어요!`, sub: (prev ? prev + ' → ' : '') + rank + ' · 앞으로도 화이팅!', badge: rank, rk: rank });
 }
 function checkDday(S) {
   const I = milInfo(S), T0 = new Date(); T0.setHours(0, 0, 0, 0), N = Math.round((I.dis - T0) / 864e5);
   if (N <= 0 || !(N % 100 === 0 || [50, 30, 10, 7].includes(N))) return;
   const k = `dpop:${S.id}:${N}`; if (localStorage.getItem(k)) return; localStorage.setItem(k, '1');
-  popPush({ name: (S.nickname || '군인') + '님', title: `전역까지 ${N}일 남았어요!`, sub: N >= 100 ? '여기까지 오느라 고생 많았어요' : '조금만 더 힘내요, 거의 다 왔어요', badge: `D-${N}`, share: `전역까지 D-${N}! 짬타이거` });
+  popPush({ name: (S.nickname || '군인') + '님', title: `전역까지 ${N}일 남았어요!`, sub: N >= 100 ? '여기까지 오느라 고생 많았어요' : '조금만 더 힘내요, 거의 다 왔어요', badge: `D-${N}`, rk: rankOf(S, new Date()).r, share: `전역까지 D-${N}! 짬타이거` });
 }
 function evoPreview() {
   const S = S_(); if (!S || !S.enlist_date) return; const h = hoInfo(S, new Date()), rk = rankOf(S, new Date()).r, T0 = new Date(); T0.setHours(0, 0, 0, 0); const dd = Math.max(0, Math.ceil((h.end - T0) / 864e5));
-  popPush({ name: (S.nickname || '군인') + '님', title: rk === '전역' ? '전역을 축하해요! 🎉' : `${rk} ${h.n}호봉이에요!`, sub: rk === '전역' ? '' : `${h.next} ${h.rank === '병장' ? '' : '진급'}까지 D-${dd}`.replace('전역 까지', '전역까지'), badge: rk });
+  popPush({ name: (S.nickname || '군인') + '님', title: rk === '전역' ? '전역을 축하해요!' : `${rk} ${h.n}호봉이에요!`, sub: rk === '전역' ? '' : `${h.next} ${h.rank === '병장' ? '' : '진급'}까지 D-${dd}`.replace('전역 까지', '전역까지'), badge: rk, rk });
+}
+
+/* ---------- 아이콘 (이모지 → 깔끔한 선 아이콘) ---------- */
+const ICONS = {
+ heart:'<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',
+ bag:'<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>',
+ moon:'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+ sparkle:'<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15v4M17 17h4"/>',
+ lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+ shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+ sprout:'<path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/>',
+ leaf:'<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>',
+ flower:'<circle cx="12" cy="12" r="3"/><path d="M12 7.5a4.5 4.5 0 1 1 4.5 4.5M12 7.5A4.5 4.5 0 1 0 7.5 12M12 7.5V9m-4.5 3H9m7.5 0H15m-3 4.5a4.5 4.5 0 1 0 4.5-4.5M12 16.5a4.5 4.5 0 1 1-4.5-4.5m4.5 4.5V15"/>',
+ award:'<circle cx="12" cy="8" r="6"/><path d="M15.48 12.89L17 22l-5-3-5 3 1.52-9.11"/>',
+ umbrella:'<path d="M23 12a11.05 11.05 0 0 0-22 0z"/><path d="M12 12v7a3 3 0 0 0 6 0"/>',
+ pin:'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+ mail:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+ walk:'<circle cx="12" cy="5" r="1.5"/><path d="M9 21l3-7 3 7M6 9l6 2 6-2M12 11v3"/>',
+ sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+ pencil:'<path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/>',
+ train:'<rect x="4" y="3" width="16" height="16" rx="2"/><path d="M4 11h16M12 3v8M8 19l-2 3M16 19l2 3"/><circle cx="8.5" cy="15" r=".6"/><circle cx="15.5" cy="15" r=".6"/>',
+ utensils:'<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>',
+ zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+ sunrise:'<path d="M17 18a5 5 0 0 0-10 0M12 2v7M4.22 10.22l1.42 1.42M1 18h2M21 18h2M18.36 11.64l1.42-1.42M23 22H1M8 6l4-4 4 4"/>',
+ user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+ users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+ bus:'<path d="M8 6v6M15 6v6M2 12h19.6M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2"/><circle cx="16" cy="18" r="2"/><path d="M9 18h5"/>',
+ wallet:'<path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/>',
+ msg:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+ card:'<rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>',
+ home:'<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+ book:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+ camera:'<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>',
+ checkc:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+ refresh:'<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>',
+ download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+ smile:'<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>',
+ logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',
+ flame:'<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
+ drop:'<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>',
+ car:'<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M9 17h6"/>',
+ ticket:'<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><path d="M13 5v2M13 17v2M13 11v2"/>',
+ phone:'<rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>',
+ idcard:'<rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="11" r="2"/><path d="M14 10h4M14 14h4M5 17c.5-1.5 1.7-2 3-2s2.5.5 3 2"/>',
+ gift:'<polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>',
+ cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+ eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+ trash:'<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>'
+};
+const ico = (n, ex = '') => `<svg class="ic" viewBox="0 0 24 24" ${ex}>${ICONS[n] || ''}</svg>`;
+const EMO = { '💕':'heart','❤':'heart','💑':'users','💌':'mail','✉':'mail','🛒':'bag','🌙':'moon','✨':'sparkle','🎉':'sparkle','🔒':'lock','🪖':'shield','🛡':'shield','🌱':'sprout','🌿':'leaf','🌷':'flower','🌸':'flower','💐':'award','🏖':'umbrella','📍':'pin','📌':'pin','🚶':'walk','☀':'sun','✏':'pencil','🚆':'train','🚇':'train','🍚':'utensils','⚡':'zap','🌅':'sunrise','👤':'user','🥔':'user','🐯':'user','🐻':'user','🐈‍⬛':'user','🐈':'user','🚌':'bus','💰':'wallet','💬':'msg','💳':'card','🏠':'home','📓':'book','📚':'book','📷':'camera','✅':'checkc','🔄':'refresh','📥':'download','🎭':'smile','🚪':'logout','🔥':'flame','💧':'drop','🫧':'drop','🚗':'car','🚕':'car','🎢':'ticket','📱':'phone','🪪':'idcard','🎁':'gift','📅':'cal' };
+const EMO_RE = new RegExp('(' + Object.keys(EMO).sort((a, b) => b.length - a.length).map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\uFE0F?', 'g');
+function emoSwap(root) {
+  if (!root) return; if (root.nodeType === 3) root = root.parentNode; if (!root || !root.nodeType) return;
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode(n) { const p = n.parentNode; if (!p || /^(SCRIPT|STYLE|TEXTAREA|OPTION|TITLE|INPUT)$/.test(p.nodeName)) return NodeFilter.FILTER_REJECT; EMO_RE.lastIndex = 0; return EMO_RE.test(n.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT; } });
+  const list = []; while (w.nextNode()) list.push(w.currentNode);
+  list.forEach(n => {
+    const t = n.nodeValue, frag = document.createDocumentFragment(); let last = 0;
+    t.replace(EMO_RE, (m, g, off) => { if (off > last) frag.appendChild(document.createTextNode(t.slice(last, off))); const tp = document.createElement('template'); tp.innerHTML = ico(EMO[g]); frag.appendChild(tp.content.firstChild); last = off + m.length; return m; });
+    if (last < t.length) frag.appendChild(document.createTextNode(t.slice(last)));
+    if (n.parentNode) n.parentNode.replaceChild(frag, n);
+  });
+}
+new MutationObserver(ms => { ms.forEach(m => { if (m.type === 'childList') m.addedNodes.forEach(n => { if (n.nodeType === 1 || n.nodeType === 3) emoSwap(n); }); else emoSwap(m.target); }); }).observe(document.body, { childList: true, subtree: true, characterData: true });
+emoSwap(document.body);
+
+/* ---------- 커뮤니티 ---------- */
+const CATS = [['all', '전체'], ['hot', '인기'], ['free', '자유'], ['worry', '고민'], ['tip', '꿀팁'], ['love', '연애'], ['army', '군생활'], ['leave', '휴가·외박'], ['gomsin', '곰신'], ['ask', '질문']];
+const catName = k => (CATS.find(x => x[0] === k) || [0, '자유'])[1];
+let cmCat = 'all', cmCur = null, cAnon = true, wAnon = true, wCat = 'free', cmBusy = false;
+const timeAgo = iso => { const d = (Date.now() - new Date(iso)) / 1000; if (d < 60) return '방금 전'; if (d < 3600) return Math.floor(d / 60) + '분 전'; if (d < 86400) return Math.floor(d / 3600) + '시간 전'; if (d < 86400 * 7) return Math.floor(d / 86400) + '일 전'; const t = new Date(iso); return `${t.getMonth() + 1}/${t.getDate()}`; };
+const cmErr = e => /community_|schema cache|does not exist|function/i.test((e && e.message) || '') ? 'schema_community.sql 을 Supabase SQL Editor 에서 먼저 실행해주세요.' : '잠시 후 다시 시도해주세요.';
+function renderCmCats() { q('cm-cats').innerHTML = CATS.map(c => `<button class="cm-chip ${cmCat === c[0] ? 'on' : ''}" onclick="cmCat='${c[0]}';loadCommunity()">${c[0] === 'hot' ? ico('flame') + ' ' : ''}${c[1]}</button>`).join(''); }
+async function loadCommunity() {
+  if (!sb || !me) return; renderCmCats();
+  const el = q('cm-list'); el.innerHTML = '<div class="py-12 text-center text-[13px] text-[#8B95A1]">불러오는 중…</div>';
+  const { data, error } = await sb.rpc('community_list', { c: cmCat, lim: 50 });
+  if (error) { el.innerHTML = `<div class="py-12 px-6 text-center text-[13px] text-[#8B95A1]">${esc(cmErr(error))}</div>`; return; }
+  if (!data || !data.length) { el.innerHTML = `<div class="py-14 text-center text-[13px] text-[#8B95A1]">${cmCat === 'hot' ? '아직 인기글이 없어요.<br>좋아요 3개·댓글 2개 이상이면 올라가요.' : '첫 글을 남겨보세요!'}</div>`; return; }
+  el.innerHTML = data.map(p => `<button class="cm-row" onclick="openPost(${p.id})"><div class="flex items-center gap-2 mb-1">${p.hot ? '<span class="text-[10px] font-extrabold text-[#E5484D] bg-[#FFF0F0] px-1.5 py-0.5 rounded">HOT</span>' : ''}<span class="text-[11px] font-bold text-[var(--mil-green)]">${esc(catName(p.cat))}</span></div><div class="text-[15px] font-bold leading-snug">${esc(p.title)}</div><div class="text-[13px] text-[#8B95A1] mt-1 truncate">${esc(p.preview)}</div><div class="text-[11px] text-[#8B95A1] mt-2">${esc(p.author)}${p.unit ? ' · ' + esc(p.unit) : ''} · ${timeAgo(p.created_at)}</div><div class="flex gap-4 text-[12px] text-[#8B95A1] mt-1.5"><span class="${p.liked ? 'text-[#F2606F]' : ''}">${ico('heart', p.liked ? 'style="fill:currentColor"' : '')} ${p.likes}</span><span>${ico('msg')} ${p.comments}</span><span>${ico('eye')} ${p.views}</span></div></button>`).join('');
+}
+function togCAnon() { cAnon = !cAnon; paintCAnon(); }
+function paintCAnon() { const b = q('cm-anon-btn'); b.innerText = cAnon ? '익명' : '닉네임'; b.style.cssText = cAnon ? 'background:var(--mil-green);color:#fff;border-color:var(--mil-green)' : 'background:#fff;color:#4E5968;border-color:#E5E8EB'; }
+async function openPost(id, keep) {
+  cmCur = id; if (!keep) { openM('modal-post'); q('post-body').innerHTML = '<div class="py-16 text-center text-[13px] text-[#8B95A1]">불러오는 중…</div>'; q('cm-in').value = ''; paintCAnon(); }
+  const { data: p, error } = await sb.rpc('community_get', { pid: id });
+  if (error || !p) { q('post-body').innerHTML = `<div class="py-16 text-center text-[13px] text-[#8B95A1]">${error ? esc(cmErr(error)) : '삭제된 글이에요.'}</div>`; return; }
+  q('post-cat').innerText = catName(p.cat);
+  q('post-body').innerHTML = `<div class="px-5 pt-5 pb-4 border-b border-[#F2F3F5]"><div class="text-[18px] font-extrabold leading-snug">${esc(p.title)}</div><div class="flex items-center justify-between mt-2"><div class="text-[12px] text-[#8B95A1]">${esc(p.author)}${p.unit ? ' · ' + esc(p.unit) : ''} · ${timeAgo(p.created_at)}</div>${p.mine ? `<button onclick="delPost(${p.id})" class="text-[12px] font-bold text-[#E5484D]">${ico('trash')} 삭제</button>` : ''}</div><div class="text-[15px] leading-relaxed mt-4 whitespace-pre-wrap break-words">${esc(p.body)}</div>
+   <div class="flex items-center gap-5 mt-5 text-[13px] text-[#8B95A1]"><button onclick="likePost(${p.id})" class="flex items-center gap-1.5 px-3.5 py-2 rounded-full border ${p.liked ? 'border-[#F2606F] text-[#F2606F] bg-[#FFF0F2]' : 'border-[#E5E8EB]'} font-bold">${ico('heart', p.liked ? 'style="fill:currentColor"' : '')} 좋아요 ${p.likes}</button><span>${ico('msg')} ${p.comments.length}</span><span>${ico('eye')} ${p.views}</span></div></div>
+   <div class="px-5 py-3 text-[13px] font-bold">댓글 ${p.comments.length}</div>
+   ${p.comments.length ? p.comments.map(c => `<div class="px-5 py-3 border-t border-[#F7F8F9]"><div class="flex items-center justify-between"><div class="text-[12px] font-bold">${esc(c.author)} <span class="font-normal text-[#8B95A1]">· ${timeAgo(c.created_at)}</span></div>${c.mine ? `<button onclick="delComment(${c.id})" class="text-[11px] text-[#8B95A1]">삭제</button>` : ''}</div><div class="text-[14px] mt-1 whitespace-pre-wrap break-words">${esc(c.body)}</div></div>`).join('') : '<div class="px-5 py-8 text-center text-[13px] text-[#8B95A1]">첫 댓글을 남겨보세요</div>'}<div class="h-6"></div>`;
+}
+async function likePost(id) { const { error } = await sb.rpc('community_like', { pid: id }); if (error) return showAlert('알림', esc(cmErr(error))); openPost(id, true); loadCommunity(); }
+async function sendComment() { const v = q('cm-in').value.trim(); if (!v || !cmCur) return; const { error } = await sb.rpc('community_comment', { pid: cmCur, b: v, a: cAnon }); if (error) return showAlert('알림', esc(cmErr(error))); q('cm-in').value = ''; await openPost(cmCur, true); loadCommunity(); const b = q('post-body'); b.scrollTop = b.scrollHeight; }
+async function delPost(id) { if (!confirm('이 글을 삭제할까요?')) return; await sb.rpc('community_delete', { kind: 'post', rid: id }); closeModal('modal-post'); loadCommunity(); }
+async function delComment(id) { if (!confirm('이 댓글을 삭제할까요?')) return; await sb.rpc('community_delete', { kind: 'comment', rid: id }); openPost(cmCur, true); loadCommunity(); }
+function openWrite() { q('w-title').value = ''; q('w-body').value = ''; wCat = CATS.some(c => c[0] === cmCat) && !['all', 'hot'].includes(cmCat) ? cmCat : 'free'; wAnon = true; paintWrite(); openM('modal-write'); }
+function setWAnon(v) { wAnon = v; paintWrite(); }
+function paintWrite() {
+  q('w-cats').innerHTML = CATS.filter(c => !['all', 'hot'].includes(c[0])).map(c => `<button class="cm-chip ${wCat === c[0] ? 'on' : ''}" onclick="wCat='${c[0]}';paintWrite()">${c[1]}</button>`).join('');
+  [1, 0].forEach(k => { const on = (k === 1) === wAnon; q('w-anon-' + k).style.cssText = on ? 'background:var(--mil-green);color:#fff;border-color:var(--mil-green)' : 'background:#fff;color:#4E5968;border-color:#E5E8EB'; });
+  q('w-anon-hint').innerText = wAnon ? '이름 없이 "익명"으로 표시돼요.' : `"${(me && me.nickname) || (me && me.gender === 'M' ? '군인' : '곰신')}" 닉네임으로 표시돼요.`;
+}
+async function submitPost() {
+  if (cmBusy) return; const t = q('w-title').value.trim(), b = q('w-body').value.trim();
+  if (!t || !b) return showAlert('알림', '제목과 내용을 입력해주세요.');
+  cmBusy = true; const { error } = await sb.rpc('community_post', { c: wCat, t, b, a: wAnon }); cmBusy = false;
+  if (error) return showAlert('알림', esc(cmErr(error)));
+  closeModal('modal-write'); cmCat = 'all'; loadCommunity();
 }
 /* ---------- 스플래시 ---------- */
 const splashT0 = Date.now();
