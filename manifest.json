@@ -1,1 +1,37 @@
-{"name":"감자돌이 & 곰신 올인원","short_name":"감자돌이","start_url":"./","scope":"./","display":"standalone","orientation":"portrait","background_color":"#F7F8F9","theme_color":"#6B7B5C","icons":[{"src":"icon-192.png","sizes":"192x192","type":"image/png"},{"src":"icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}
+{
+  "id": "zzamtiger-app",
+  "name": "짬타이거",
+  "short_name": "짬타이거",
+  "description": "군인과 곰신을 위한 군생활 앱",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F7F8F9",
+  "theme_color": "#6B7B5C",
+  "categories": [
+    "lifestyle",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

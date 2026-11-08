@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>감자돌이 & 곰신 올인원</title>
+<title>짬타이거</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#6B7B5C">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="감자돌이">
+<meta name="apple-mobile-web-app-title" content="짬타이거">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
 <script src="https://cdn.tailwindcss.com"></script>
@@ -28,6 +28,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg-main)
 @keyframes flash{0%{opacity:0}20%{opacity:1;background:#fff}100%{opacity:0}}
 .flash-overlay{position:fixed;inset:0;z-index:9999;pointer-events:none;animation:flash 1.5s ease-out forwards}
 @keyframes hb{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}.animate-heartbeat{animation:hb 1.4s infinite}
+@keyframes splashin{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}@keyframes splashbar{0%{transform:translateX(-100%)}100%{transform:translateX(220%)}}@keyframes cf{0%{transform:translateY(-30px) rotate(0);opacity:1}100%{transform:translateY(300px) rotate(540deg);opacity:0}}
 svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .pb-safe{padding-bottom:max(12px,env(safe-area-inset-bottom))}
 .inp{width:100%;background:#F5F6F8;border-radius:12px;padding:14px 16px;font-size:14px;outline:none}.inp:focus{box-shadow:0 0 0 2px var(--mil-green)}
@@ -37,9 +38,14 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 <body class="min-h-screen flex justify-center items-start sm:p-4 select-none antialiased bg-gray-100">
 
 <!-- 로그인 -->
-<div id="auth-modal" class="fixed inset-0 z-[100] bg-[var(--bg-main)] flex items-center justify-center p-6 transition-opacity">
+<div id="splash" class="fixed inset-0 z-[200] bg-white flex flex-col items-center justify-center transition-opacity duration-500">
+  <img src="logo.png" alt="" class="w-[132px] h-[132px] rounded-[34px] border border-[#E5E8EB] object-cover" style="animation:splashin .7s ease-out both">
+  <div class="text-[30px] font-black tracking-tight mt-5" style="animation:splashin .7s .12s ease-out both">짬타이거</div>
+  <div class="w-[120px] h-[3px] rounded-full bg-[#F2F3F5] overflow-hidden mt-9"><div class="h-full w-1/2 rounded-full" style="background:#191F28;animation:splashbar 1.1s ease-in-out infinite"></div></div>
+ </div>
+ <div id="auth-modal" class="fixed inset-0 z-[100] bg-[var(--bg-main)] flex items-center justify-center p-6 transition-opacity">
  <div class="w-full max-w-sm bg-white rounded-[32px] p-8 shadow-2xl border border-[#F2F3F5] flex flex-col items-center">
-  <span class="text-5xl mb-4">🥔❤️👧</span>
+  <img src="logo.png" alt="짬타이거" class="w-24 h-24 rounded-[26px] border border-[#E5E8EB] mb-3 object-cover bg-white"><div class="text-[24px] font-black tracking-tight mb-4">짬타이거</div>
   <h2 class="text-[22px] font-extrabold mb-1" id="auth-title">로그인</h2>
   <p class="text-[13px] text-[#8B95A1] mb-6 text-center" id="auth-subtitle">계정을 연결하고 연인과 데이터를 동기화하세요.</p>
   <div class="w-full space-y-3 mb-5">
@@ -80,10 +86,11 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 
 <div class="w-full max-w-md bg-[var(--bg-main)] min-h-screen sm:min-h-[900px] sm:rounded-[40px] sm:shadow-2xl flex flex-col relative overflow-hidden sm:border-[6px] sm:border-gray-200">
  <header class="sticky top-0 bg-[var(--bg-main)]/90 backdrop-blur-md px-6 pb-4 flex items-center justify-between z-40" style="padding-top:max(16px,env(safe-area-inset-top))">
-  <div class="flex items-center gap-2"><span class="text-2xl">🥔</span><div><h1 class="text-[19px] font-extrabold tracking-tight">감자돌이</h1><p class="text-[12px] text-[#8B95A1] font-semibold">스마트 군생활 올인원</p></div></div>
+  <div class="flex items-center gap-2.5"><img src="logo.png" alt="" class="w-9 h-9 rounded-[10px] bg-white border border-[#E5E8EB] object-cover"><h1 class="text-[21px] font-black tracking-tight">짬타이거</h1></div>
   <div class="flex items-center gap-2">
    <button id="btn-cart" onclick="openCart()" class="hidden relative w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center active:scale-95"><span class="text-lg">🛒</span><span id="cart-dot" class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full animate-pulse"></span></button>
-   <button onclick="openSettings()" class="w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center text-[#4E5968] active:scale-95 text-lg">⚙️</button>
+   <button id="btn-friends" onclick="openFriends()" class="relative w-10 h-10 flex items-center justify-center text-[#191F28] active:scale-95"><svg class="w-[26px] h-[26px] sf-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span id="friend-dot" class="hidden absolute top-1 right-0.5 w-2.5 h-2.5 bg-red-500 border-2 border-[#F7F8F9] rounded-full"></span></button>
+   <button onclick="openSettings()" class="w-10 h-10 flex items-center justify-center text-[#191F28] active:scale-95"><svg class="w-[26px] h-[26px] sf-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
   </div>
  </header>
 
@@ -231,6 +238,26 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
     <div id="set-p-account" class="hidden px-5 pt-2"><div class="bg-[#F5F6F8] rounded-xl p-4 mb-5"><div class="text-[11px] text-[#8B95A1]">로그인 계정</div><div id="set-acc-email" class="text-[14px] font-bold break-all"></div></div><button onclick="logout()" class="w-full border border-[#E5E8EB] text-[#E5484D] py-3.5 rounded-xl font-bold text-[14px]">로그아웃</button></div>
    </div></div></div>
 
+ <div id="modal-pop" class="fixed inset-0 z-[120] bg-black/50 backdrop-blur-sm hidden items-center justify-center p-5">
+  <div class="bg-white w-full max-w-[340px] rounded-[30px] overflow-hidden text-center relative">
+   <div id="pop-cf" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+   <div id="pop-name" class="pt-6 text-[14px] font-bold text-[#8B95A1]"></div>
+   <div id="pop-title" class="px-6 mt-1 text-[26px] font-black leading-tight tracking-tight"></div>
+   <div id="pop-sub" class="px-6 mt-2 text-[13px] text-[#8B95A1]"></div>
+   <div class="relative mt-2 h-[230px] flex items-center justify-center"><img src="tiger_cheer.png" alt="" class="h-[215px] object-contain relative z-10"><div id="pop-badge" class="absolute z-20 bottom-1 px-5 py-1.5 rounded-full text-[18px] font-black text-white" style="background:var(--mil-green)"></div></div>
+   <div class="px-5 pb-5 pt-2 space-y-2"><button id="pop-share" onclick="popShare()" class="hidden w-full py-3.5 rounded-xl text-white font-bold text-[14px]" style="background:var(--mil-green)">지인에게 공유하기</button><button onclick="popClose()" class="w-full py-3.5 rounded-xl bg-[#F5F6F8] text-[#191F28] font-bold text-[14px]">확인</button></div>
+  </div></div>
+ <div id="modal-friends" class="fixed inset-0 z-50 bg-[var(--bg-main)] hidden flex-col">
+  <div class="max-w-md mx-auto w-full h-full flex flex-col" style="padding-top:env(safe-area-inset-top)">
+   <div class="flex items-center justify-between px-4 py-3 bg-white"><button onclick="closeModal('modal-friends')" class="w-10 h-10 rounded-full bg-[#F5F6F8] text-xl font-bold">‹</button><div class="font-bold text-[17px]">친구</div><button onclick="refreshFriends()" class="w-10 h-10 text-[18px]">🔄</button></div>
+   <div class="flex-1 overflow-y-auto no-scrollbar px-5 py-4 space-y-4 pb-12">
+    <div class="toss-card !p-5"><div class="flex items-center justify-between"><div><div class="text-[12px] text-[#8B95A1] font-semibold">내 친구 코드</div><div id="fr-code" class="text-[24px] font-black tracking-[.25em] select-text mt-0.5">-</div></div><button onclick="copyFriendCode()" class="text-[12px] font-bold bg-[#F5F6F8] rounded-full px-3.5 py-2">복사</button></div>
+     <div class="flex gap-2 mt-4"><input id="fr-input" maxlength="6" placeholder="친구 코드 6자리" class="flex-1 bg-white border border-[#E5E8EB] rounded-xl px-3 py-3 text-[14px] outline-none uppercase"><button onclick="addFriend()" class="bg-[#191F28] text-white px-5 rounded-xl font-bold text-[13px]">친구 추가</button></div>
+     <p class="text-[11px] text-[#8B95A1] mt-2">상대가 수락하면 친구가 돼요. 친구에게는 이름·사진·복무 진행 정보만 보여요.</p></div>
+    <div id="fr-req"></div>
+    <div id="fr-chips-wrap" class="hidden"><div class="text-[13px] font-extrabold mb-2">내 친구</div><div id="fr-chips" class="flex gap-3 overflow-x-auto no-scrollbar pb-1"></div></div>
+    <div id="fr-detail"></div>
+   </div></div></div>
  <div id="modal-crop" class="fixed inset-0 z-[70] bg-black/90 hidden flex-col items-center justify-center p-4">
   <div class="text-white font-bold text-[16px] mb-1">사진 자르기</div><div class="text-white/60 text-[12px] mb-4">드래그로 위치를, 슬라이더나 두 손가락으로 크기를 맞춰요</div>
   <div class="relative rounded-[28%] overflow-hidden bg-black" style="width:280px;height:280px;touch-action:none"><canvas id="crop-cv" width="280" height="280" style="touch-action:none"></canvas></div>
@@ -283,7 +310,7 @@ const sb = configured ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) :
 const q = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const openM = id => { q(id).classList.remove('hidden'); q(id).classList.add('flex'); };
-function closeModal(id) { q(id).classList.add('hidden'); q(id).classList.remove('flex'); if (id === 'modal-settings' && typeof me !== 'undefined' && me) applyTheme((S_() || {}).branch || 'army'); }
+function closeModal(id) { q(id).classList.add('hidden'); q(id).classList.remove('flex'); if (id === 'modal-friends' && typeof stopFriendTimers === 'function') stopFriendTimers(); if (id === 'modal-settings' && typeof me !== 'undefined' && me) applyTheme((S_() || {}).branch || 'army'); }
 const showAlert = (t, m) => { q('alert-title').innerText = t; q('alert-message').innerHTML = m; openM('modal-alert'); };
 const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const pd = s => new Date(s + 'T00:00:00');
@@ -343,6 +370,7 @@ async function loadAll(first) {
   wishes = (w.data || []).map(x => x.item_id); pWishes = (pw.data || []).map(x => x.item_id); vacs = v.data || [];
   { const sid = me.gender === 'M' ? me.id : me.partner_id; menus = {}; if (sid) { const { data: mm } = await sb.from('menus').select('*').eq('created_by', sid); (mm || []).forEach(x => menus[x.menu_date] = x); } }
   if (first) { sav = Object.assign({ banks: [], amts: {}, opts: {} }, me.savings || {}); }
+  await loadFriends();
   await loadQ();
 }
 let qMode = 'couple';
@@ -520,7 +548,7 @@ function render(full) {
   if (S && S.enlist_date) {
     rank = fillSoldier(S, now); const ri = { r: rank };
     q('bf-img-container').innerHTML = S.avatar ? `<img src="${S.avatar}" class="w-full h-full object-cover">` : bfImg(S.bf_theme, ri.r);
-    const lk = 'lastRank_' + S.id, last = localStorage.getItem(lk); if (last && last !== ri.r) cutscene(ri.r); localStorage.setItem(lk, ri.r);
+    const lk = 'lastRank_' + S.id, last = localStorage.getItem(lk); if (last && last !== ri.r) promoPop(S, ri.r, last); localStorage.setItem(lk, ri.r);
     if (full || !salT) startSal(S);
   } else { clearInterval(salT); clearInterval(rainT); salT = null; }
   if (G) {
@@ -532,7 +560,7 @@ function render(full) {
     const inp = q('one-line-msg'); inp.readOnly = G.id !== me.id; inp.placeholder = G.id === me.id ? '상태 메시지 입력' : '상태 메시지 없음'; if (document.activeElement !== inp) inp.value = G.status_msg || '';
   }
   const c = q('profile-container'), bf = q('soldier-card'), gf = q('gf-profile-card');
-  layoutPager(S, G); if (G) fillLove(S, G);
+  layoutPager(S, G); if (G) fillLove(S, G); updateFriendDot(); if (S && S.enlist_date && !popChecked) { popChecked = true; checkDday(S); }
   // 장바구니 아이콘 (군인 홈)
   const showCart = me.gender === 'M' && partner && partner.px_sent_at && pWishes.length > 0;
   q('btn-cart').classList.toggle('hidden', !showCart);
@@ -542,7 +570,6 @@ function render(full) {
   qInit = true;
 }
 function cutscene(r) { const o = document.createElement('div'); o.className = 'flash-overlay'; document.body.appendChild(o); setTimeout(() => { showAlert('진급 ✨', `[${r}] 모습으로 성장했습니다!`); o.remove(); }, 500); }
-function evoPreview() { const S = S_(); if (!S) return; const o = document.createElement('div'); o.className = 'flash-overlay'; document.body.appendChild(o); setTimeout(() => { showAlert('진화 ✨', `현재 [${rankOf(S, new Date()).r}] 모습이에요!`); o.remove(); }, 500); }
 
 /* ---------- 탭/UI ---------- */
 const TABS = [['home', '홈', '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>'], ['savings', '적금', '<rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>'], ['goodman', 'PX굿맨', '<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>'], ['qna', 'Q&A', '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>'], ['benefits', '혜택', '<path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><line x1="12" y1="22" x2="12" y2="7"/>']];
@@ -631,6 +658,97 @@ async function removeAvatar() {
   const { error } = await sb.from('profiles').update({ avatar: null }).eq('id', me.id); if (error) return showAlert('오류', esc(error.message));
   await loadAll(false); render(true); q('set-avatar').innerHTML = myAvatarHTML(); q('set-ava2').innerHTML = myAvatarHTML();
 }
+/* ---------- 축하/응원 팝업 (진급 · 전역 D-day) ---------- */
+let popQ = [], popBusy = false, popReady = false, popCur = null, popChecked = false;
+function popPush(o) { popQ.push(o); if (popReady && !popBusy) popNext(); }
+function popNext() {
+  const o = popQ.shift(); if (!o) { popBusy = false; return; } popBusy = true; popCur = o;
+  q('pop-name').innerText = o.name || ''; q('pop-title').innerText = o.title; q('pop-sub').innerText = o.sub || ''; q('pop-badge').innerText = o.badge || ''; q('pop-badge').classList.toggle('hidden', !o.badge);
+  q('pop-share').classList.toggle('hidden', !o.share);
+  const cf = q('pop-cf'); cf.innerHTML = ''; const cols = ['#F28C9F', '#F2BA49', '#6BC4A6', '#7FA8E8', '#B79CE8', '#F2878F'];
+  for (let i = 0; i < 26; i++) { const d = document.createElement('i'); d.style.cssText = `position:absolute;top:0;left:${Math.random() * 100}%;width:${6 + Math.random() * 6}px;height:${10 + Math.random() * 8}px;background:${cols[i % cols.length]};border-radius:2px;opacity:0;animation:cf ${2.2 + Math.random() * 1.8}s ${Math.random() * 1.2}s ease-in infinite`; cf.appendChild(d); }
+  openM('modal-pop');
+}
+function popClose() { closeModal('modal-pop'); setTimeout(popNext, 250); }
+async function popShare() { const t = popCur && popCur.share; if (!t) return; const url = location.origin + location.pathname; try { if (navigator.share) await navigator.share({ title: '짬타이거', text: t, url }); else { await navigator.clipboard.writeText(t + ' ' + url); showAlert('복사 완료', '공유 문구를 복사했어요.'); } } catch (e) { } }
+const joSa = r => '일병상병병장이병'.includes(r) ? r + '으로' : r + '로';
+function promoPop(S, rank, prev) {
+  const nm = (S.nickname || '군인') + '님';
+  if (rank === '전역') popPush({ name: nm, title: '전역을 축하해요! 🎉', sub: '그동안 정말 고생 많았어요', badge: '전역' });
+  else popPush({ name: nm, title: `${joSa(rank)} 진급했어요!`, sub: (prev ? prev + ' → ' : '') + rank + ' · 앞으로도 화이팅!', badge: rank });
+}
+function checkDday(S) {
+  const I = milInfo(S), T0 = new Date(); T0.setHours(0, 0, 0, 0), N = Math.round((I.dis - T0) / 864e5);
+  if (N <= 0 || !(N % 100 === 0 || [50, 30, 10, 7].includes(N))) return;
+  const k = `dpop:${S.id}:${N}`; if (localStorage.getItem(k)) return; localStorage.setItem(k, '1');
+  popPush({ name: (S.nickname || '군인') + '님', title: `전역까지 ${N}일 남았어요!`, sub: N >= 100 ? '여기까지 오느라 고생 많았어요' : '조금만 더 힘내요, 거의 다 왔어요', badge: `D-${N}`, share: `전역까지 D-${N}! 짬타이거` });
+}
+function evoPreview() {
+  const S = S_(); if (!S || !S.enlist_date) return; const h = hoInfo(S, new Date()), rk = rankOf(S, new Date()).r, T0 = new Date(); T0.setHours(0, 0, 0, 0); const dd = Math.max(0, Math.ceil((h.end - T0) / 864e5));
+  popPush({ name: (S.nickname || '군인') + '님', title: rk === '전역' ? '전역을 축하해요! 🎉' : `${rk} ${h.n}호봉이에요!`, sub: rk === '전역' ? '' : `${h.next} ${h.rank === '병장' ? '' : '진급'}까지 D-${dd}`.replace('전역 까지', '전역까지'), badge: rk });
+}
+/* ---------- 스플래시 ---------- */
+const splashT0 = Date.now();
+function hideSplash() {
+  const el = document.getElementById('splash'); if (!el || el.dataset.gone) return; el.dataset.gone = '1';
+  setTimeout(() => { el.style.opacity = '0'; setTimeout(() => { el.remove(); popReady = true; if (popQ.length && !popBusy) popNext(); }, 520); }, Math.max(0, 1300 - (Date.now() - splashT0)));
+}
+setTimeout(hideSplash, 9000);
+/* ---------- 친구 ---------- */
+let friends = [], frSel = null, frT = null, frH = null;
+async function loadFriends() { try { const { data, error } = await sb.rpc('friend_overview'); friends = error ? [] : (data || []); } catch (e) { friends = []; } updateFriendDot(); }
+function updateFriendDot() { const d = document.getElementById('friend-dot'); if (d) d.classList.toggle('hidden', !friends.some(x => x.direction === 'in')); }
+function frAvatar(P) {
+  if (P.avatar) return `<img src="${P.avatar}" class="w-full h-full object-cover">`;
+  if (P.gender === 'M') return bfImg(P.bf_theme, P.enlist_date ? rankOf(P, new Date()).r : '이병');
+  return `<img src="${P.gf_theme === 'cat' ? 'gf_cat.png' : 'gf_bear.png'}" class="w-full h-full object-cover">`;
+}
+function frTheme(b) { const p = PAL[b] || PAL.army; return `--mil-green:${p.g};--mil-green-light:${p.l};--mil-dark:${p.d};--mil-soft:${p.s};--mil-border:${p.b}`; }
+function frCard(P) {
+  const nm = esc(P.nickname || '이름 없음');
+  if (!(P.gender === 'M' && P.enlist_date && P.discharge_date)) return `<div class="toss-card"><div class="flex items-center gap-4"><div class="w-[76px] h-[76px] rounded-[22px] bg-[var(--pink-light)] overflow-hidden flex items-center justify-center flex-shrink-0">${frAvatar(P)}</div><div class="min-w-0"><div class="text-[12px] font-bold text-[var(--pink-main)]">${P.gender === 'F' ? '곰신' : '친구'}</div><div class="text-[25px] font-extrabold leading-tight truncate">${nm}</div></div></div><p class="text-[12px] text-[#8B95A1] mt-4">표시할 복무 정보가 없어요.</p></div>`;
+  const now = new Date(), I = milInfo(P), h = hoInfo(P, now), rk = rankOf(P, now).r, T0 = new Date(now.getFullYear(), now.getMonth(), now.getDate()), dd = d => Math.max(0, Math.ceil((d - T0) / 864e5)), fm = d => `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+  const td = Math.round((I.dis - I.e) / 864e5) + 1, sd = Math.min(td, Math.max(0, Math.round((T0 - I.e) / 864e5) + 1)); let wk = 0; for (let d = new Date(T0); d <= I.dis; d.setDate(d.getDate() + 1)) if (d.getDay() !== 0 && d.getDay() !== 6) wk++;
+  const hoL = h.nxIsPromo ? (h.rank === '병장' ? '마지막 호봉' : `${h.next} 1호봉`) : `${h.n + 1}호봉 승급`, hoD = h.nxIsPromo && h.rank === '병장' ? '' : `D-${dd(h.nx)}`, prL = h.rank === '병장' ? '전역' : `${h.next} 진급`;
+  const cell = (v, l) => `<div><div class="text-[20px] font-black tabular-nums">${v}</div><div class="text-[11px] text-[#8B95A1]">${l}</div></div>`;
+  return `<div style="${frTheme(P.branch)}"><div class="toss-card"><div class="flex items-center gap-4"><div class="w-[76px] h-[76px] rounded-[22px] bg-[var(--mil-soft)] flex items-center justify-center overflow-hidden flex-shrink-0 border border-[var(--mil-border)]">${frAvatar(P)}</div><div class="flex-1 min-w-0"><div class="text-[12px] text-[var(--mil-green)] font-bold mb-0.5">대한민국 ${I.b.k}</div><div class="flex items-center gap-1.5 text-[13px] font-bold text-[var(--mil-green)]">${rankMark(rk)}<span>${rk}</span><span>${rk === '전역' ? '' : h.n + '호봉'}</span></div><div class="text-[25px] font-extrabold leading-tight tracking-tight break-all">${nm}</div><div class="text-[11px] text-[#8B95A1] mt-0.5">입대 <b class="text-[#4E5968]">${fm(I.e)}</b> · 전역 <b class="text-[#4E5968]">${fm(I.dis)}</b></div></div></div>
+   <div class="mt-4 rounded-2xl p-4 text-white" style="background:var(--mil-dark)"><div class="flex justify-between text-[12px] font-bold mb-1.5"><span>전역</span><span>${sd >= td ? '전역!' : 'D-' + (td - sd)}</span></div><div class="relative h-9 rounded-lg overflow-hidden bg-white/10"><div id="fv-bar" class="absolute inset-y-0 left-0" style="background:var(--mil-green);width:0"></div><div id="fv-pct" class="relative px-3 h-full flex items-center text-[15px] font-black tabular-nums">0%</div></div>
+    <div class="grid grid-cols-2 gap-3 mt-4"><div><div class="flex justify-between text-[11px] font-bold"><span>${hoL}</span><span>${hoD}</span></div><div class="relative h-6 rounded-md bg-white/10 overflow-hidden mt-1"><div id="fv-ho-bar" class="absolute inset-y-0 left-0 bg-white/25" style="width:0"></div><div id="fv-ho-pct" class="relative px-2 h-full flex items-center text-[11px] tabular-nums">0%</div></div></div>
+    <div><div class="flex justify-between text-[11px] font-bold"><span>${prL}</span><span>D-${dd(h.end)}</span></div><div class="relative h-6 rounded-md bg-white/10 overflow-hidden mt-1"><div id="fv-pr-bar" class="absolute inset-y-0 left-0 bg-white/25" style="width:0"></div><div id="fv-pr-pct" class="relative px-2 h-full flex items-center text-[11px] tabular-nums">0%</div></div></div></div></div>
+   <div class="grid grid-cols-3 gap-y-5 mt-5 text-center">${cell(td, '전체 복무일')}${cell(sd, '현재 복무일')}${cell(Math.max(0, td - sd), '남은 복무일')}${cell(dd(h.end), '계급 진급일')}${cell(wk, '남은 일과일')}${cell(I.b.k, '군종')}</div></div></div>`;
+}
+function frTick() {
+  const P = friends.find(x => x.uid === frSel && x.direction === 'friend'); if (!P || !q('fv-pct') || !P.enlist_date) return;
+  const n = Date.now(), I = milInfo(P), C = x => Math.min(100, Math.max(0, x)), all = C((n - I.e.getTime()) / (I.dis.getTime() + 864e5 - I.e.getTime()) * 100);
+  if (!frH || frH.uid !== P.uid || n >= frH.nx || n >= frH.end) { frH = hoInfo(P, new Date(n)); frH.uid = P.uid; }
+  const ho = C((n - frH.hs) / (frH.nx - frH.hs) * 100), pr = C((n - frH.start) / (frH.end - frH.start) * 100);
+  q('fv-pct').innerText = all.toFixed(8) + '%'; q('fv-bar').style.width = all + '%'; q('fv-ho-pct').innerText = ho.toFixed(5) + '%'; q('fv-ho-bar').style.width = ho + '%'; q('fv-pr-pct').innerText = pr.toFixed(5) + '%'; q('fv-pr-bar').style.width = pr + '%';
+}
+function renderFriends() {
+  q('fr-code').innerText = me.friend_code || '-';
+  const inc = friends.filter(x => x.direction === 'in'), out = friends.filter(x => x.direction === 'out'), fl = friends.filter(x => x.direction === 'friend');
+  const mini = (P, btns) => `<div class="flex items-center gap-3 py-2"><div class="w-11 h-11 rounded-2xl overflow-hidden bg-[#F5F6F8] flex-shrink-0 flex items-center justify-center">${frAvatar(P)}</div><div class="flex-1 min-w-0"><div class="text-[14px] font-bold truncate">${esc(P.nickname || '이름 없음')}</div><div class="text-[11px] text-[#8B95A1]">${P.gender === 'F' ? '곰신' : P.gender === 'M' ? '군인' : ''}</div></div>${btns}</div>`;
+  q('fr-req').innerHTML = (inc.length || out.length) ? `<div class="toss-card !p-5">${inc.length ? `<div class="text-[13px] font-extrabold mb-1">받은 친구 요청 ${inc.length}</div>` + inc.map(P => mini(P, `<button onclick="respondFriend('${P.fid}',true)" class="text-[12px] font-bold bg-[#191F28] text-white rounded-full px-3.5 py-1.5">수락</button><button onclick="respondFriend('${P.fid}',false)" class="text-[12px] font-bold bg-[#F5F6F8] rounded-full px-3.5 py-1.5 ml-1">거절</button>`)).join('') : ''}${out.length ? `<div class="text-[13px] font-extrabold ${inc.length ? 'mt-3' : ''} mb-1">보낸 요청</div>` + out.map(P => mini(P, `<span class="text-[11px] text-[#8B95A1] mr-1">대기중</span><button onclick="removeFriend('${P.fid}',true)" class="text-[12px] font-bold bg-[#F5F6F8] rounded-full px-3 py-1.5">취소</button>`)).join('') : ''}</div>` : '';
+  q('fr-chips-wrap').classList.toggle('hidden', !fl.length);
+  if (!fl.find(x => x.uid === frSel)) frSel = fl[0] ? fl[0].uid : null;
+  q('fr-chips').innerHTML = fl.map(P => `<button onclick="frPick('${P.uid}')" class="flex-shrink-0 text-center" style="width:68px"><div class="w-[60px] h-[60px] mx-auto rounded-[20px] overflow-hidden bg-[#F5F6F8] flex items-center justify-center border-2 ${P.uid === frSel ? 'border-[var(--mil-green)]' : 'border-transparent'}">${frAvatar(P)}</div><div class="text-[11px] font-bold mt-1 truncate ${P.uid === frSel ? '' : 'text-[#8B95A1]'}">${esc(P.nickname || '이름 없음')}</div></button>`).join('');
+  const cur = fl.find(x => x.uid === frSel);
+  q('fr-detail').innerHTML = cur ? frCard(cur) + `<button onclick="removeFriend('${cur.fid}')" class="w-full mt-3 text-[12px] text-[#8B95A1] underline">이 친구 삭제</button>` : (fl.length || inc.length || out.length ? '' : '<div class="text-center text-[13px] text-[#8B95A1] py-10">아직 친구가 없어요.<br>친구 코드를 입력해서 추가해보세요!</div>');
+  frH = null; frTick();
+}
+function frPick(u) { frSel = u; renderFriends(); }
+async function refreshFriends() { await loadFriends(); renderFriends(); }
+function openFriends() { renderFriends(); openM('modal-friends'); clearInterval(frT); frT = setInterval(frTick, 100); loadFriends().then(renderFriends); }
+function stopFriendTimers() { clearInterval(frT); frT = null; }
+async function copyFriendCode() { try { await navigator.clipboard.writeText(me.friend_code || ''); showAlert('복사 완료', '친구 코드를 복사했어요.'); } catch (e) { showAlert('내 친구 코드', esc(me.friend_code || '-')); } }
+async function addFriend() {
+  const c = q('fr-input').value.trim(); if (c.length < 6) return showAlert('알림', '6자리 친구 코드를 입력해주세요.');
+  const { data, error } = await sb.rpc('request_friend', { c }); if (error) return showAlert('오류', esc(error.message) + '<br><br>schema_friends.sql 을 실행했는지 확인하세요.');
+  const msg = { OK: '친구 요청을 보냈어요! 상대가 수락하면 친구가 돼요.', ACCEPTED: '친구가 됐어요! 🎉', NOT_FOUND: '존재하지 않는 코드예요.', SELF: '내 코드는 입력할 수 없어요.', ALREADY: '이미 친구이거나 요청이 진행 중이에요.' }[data] || data;
+  q('fr-input').value = ''; await loadFriends(); renderFriends(); showAlert('친구 추가', msg);
+}
+async function respondFriend(fid, ok) { const { error } = await sb.rpc('respond_friend', { fid, ok }); if (error) return showAlert('오류', esc(error.message)); await loadFriends(); renderFriends(); }
+async function removeFriend(fid, silent) { if (!silent && !confirm('이 친구를 삭제할까요?')) return; const { error } = await sb.rpc('remove_friend', { fid }); if (error) return showAlert('오류', esc(error.message)); await loadFriends(); renderFriends(); }
 async function saveUnit() {
   const name = q('set-unit-name').value.trim(), addr = q('set-unit-addr').value.trim(), p = picks.unit && picks.unit.label === addr ? picks.unit : null;
   if (!name) return showAlert('알림', '부대명을 입력해주세요.');
@@ -1003,8 +1121,9 @@ async function renderBenefits() {
 authToggleHTML();
 q('profile-container').addEventListener('scroll', pagerDots, { passive: true });
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js').catch(() => {});
+if (!configured) hideSplash();
 if (configured) {
-  sb.auth.getSession().then(({ data }) => { if (data.session) { session = data.session; boot(); } });
+  sb.auth.getSession().then(({ data }) => { if (data.session) { session = data.session; boot().finally(hideSplash); } else hideSplash(); }).catch(hideSplash);
   sb.auth.onAuthStateChange((ev, s) => { if (ev === 'SIGNED_IN' && s && !booted) { session = s; boot(); } if (ev === 'SIGNED_OUT') location.reload(); });
 }
 </script>
