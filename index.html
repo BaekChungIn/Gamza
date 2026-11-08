@@ -53,6 +53,11 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 @keyframes billSway{0%,100%{transform:translateY(0) rotate(var(--r0))}50%{transform:translateY(-5px) rotate(var(--r1))}}
 .bill.pb.top{animation:billSway var(--d,3s) ease-in-out infinite}
 .pk{text-shadow:0 1px 8px rgba(190,60,100,.18)}.pk .pbar{background:rgba(255,255,255,.4)}.pk #gf-esc-bar,.pk #gf-esc-bar2{background:rgba(255,255,255,.75)!important}.pk [class~="bg-white/10"]{background:rgba(255,255,255,.38)!important}.pk [class~="bg-white/25"]{background:rgba(255,255,255,.72)!important}.pk [id$="-pct"],.pk [id$="-pct2"]{color:#8E2F4D;text-shadow:none}
+@keyframes bankGlow{0%,100%{filter:drop-shadow(0 0 12px rgba(255,205,100,.35))}50%{filter:drop-shadow(0 0 26px rgba(255,225,130,.8))}}
+@keyframes tw{0%,100%{opacity:0;transform:scale(.2) rotate(0)}50%{opacity:1;transform:scale(1) rotate(45deg)}}
+.spk{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:radial-gradient(circle,#fff 0,rgba(255,238,160,.9) 28%,rgba(255,220,120,0) 70%);animation:tw var(--d,2s) ease-in-out infinite var(--dl,0s)}
+.spk::before,.spk::after{content:'';position:absolute;left:50%;top:50%;background:linear-gradient(90deg,rgba(255,255,255,0),#fff,rgba(255,255,255,0))}
+.spk::before{width:24px;height:1.5px;margin:-.75px 0 0 -12px}.spk::after{width:1.5px;height:24px;margin:-12px 0 0 -.75px;background:linear-gradient(180deg,rgba(255,255,255,0),#fff,rgba(255,255,255,0))}
 </style>
 </head>
 <body class="min-h-screen flex justify-center items-start sm:p-4 select-none antialiased bg-gray-100">
@@ -296,26 +301,27 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
     <div><div id="gst-vac" class="text-[22px] font-black tabular-nums">-</div><div class="text-[11px] text-[#8B95A1]">다음 휴가일</div></div>
    </div>
   </div></div>
- <div id="modal-sal" class="fixed inset-0 z-[60] hidden flex-col text-white overflow-hidden" style="background:radial-gradient(120% 80% at 50% 40%,#2A3A2E 0%,var(--mil-dark) 55%,#12170F 100%)" onclick="salShake()">
+ <div id="modal-sal" class="fixed inset-0 z-[60] hidden flex-col text-white overflow-hidden" style="touch-action:none;background:radial-gradient(120% 80% at 50% 45%,#2E402F 0%,var(--mil-dark) 55%,#12170F 100%)">
   <div id="sal-rain" class="absolute inset-0 pointer-events-none z-[15] overflow-hidden"></div>
-  <div class="flex items-center gap-3 px-4 pb-1 relative z-30" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="event.stopPropagation();closeModal('modal-sal')" class="w-10 h-10 rounded-full bg-white/10 font-bold text-[18px]">‹</button><div class="font-bold text-[16px] flex-1">실시간 복무 급여 통장</div><button id="sal-snd" onclick="salToggleSnd(event)" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"></button></div>
-  <div class="px-6 pt-1 text-center relative z-30"><div id="sal-owner" class="text-[14px] font-bold opacity-90">군인의 군 통장</div><div class="flex items-baseline justify-center gap-1 mt-0.5"><span id="sal-big" class="text-[34px] font-extrabold tabular-nums">0</span><span class="text-[18px] font-bold opacity-80">원</span></div><div id="sal-pct" class="text-[12px] opacity-70 mt-0.5"></div><div class="text-[11px] opacity-60 mt-1">화면을 터치하면 돈이 쏟아져요</div></div>
+  <div class="flex items-center gap-3 px-4 pb-1 relative z-30" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeModal('modal-sal')" class="w-10 h-10 rounded-full bg-white/10 font-bold text-[18px]">‹</button><div class="font-bold text-[16px] flex-1">실시간 복무 급여 통장</div><button id="sal-snd" onclick="salToggleSnd(event)" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"></button></div>
+  <div class="px-6 pt-1 text-center relative z-30"><div id="sal-owner" class="text-[14px] font-bold opacity-90">군인의 군 통장</div><div class="flex items-baseline justify-center gap-1 mt-0.5"><span id="sal-big" class="text-[34px] font-extrabold tabular-nums">0</span><span class="text-[18px] font-bold opacity-80">원</span></div><div id="sal-pct" class="text-[12px] opacity-70 mt-0.5"></div><div class="text-[11px] opacity-60 mt-1">터치하면 돈이 빨려들어가요 · 드래그하면 돈이 휘어져요</div></div>
   <div id="sal-stage" class="relative flex-1 mt-1">
-   <div id="bank" class="absolute z-10" style="filter:drop-shadow(0 0 10px rgba(255,205,100,.25))">
-    <div id="bank-glass" class="absolute overflow-hidden" style="left:6%;top:19.5%;width:88%;height:73.2%;border-radius:50%;background:radial-gradient(ellipse at 35% 28%,rgba(255,236,170,.30),rgba(255,205,100,.12) 60%,rgba(255,190,70,.22))">
-     <div id="bank-fill" class="absolute left-0 right-0 bottom-0" style="height:0;background:linear-gradient(180deg,rgba(110,190,130,.10),rgba(70,150,100,.38))"></div>
+   <div id="bank" class="absolute z-10" style="animation:bankGlow 2.8s ease-in-out infinite">
+    <div class="absolute rounded-full pointer-events-none" style="inset:-14%;background:radial-gradient(circle,rgba(255,214,110,.42) 0%,rgba(255,200,90,.16) 48%,rgba(255,200,90,0) 70%)"></div>
+    <div id="bank-glass" class="absolute overflow-hidden" style="left:4%;top:6%;width:92%;height:92%;border-radius:50%;background:radial-gradient(circle at 34% 26%,rgba(255,244,190,.5),rgba(255,214,110,.2) 55%,rgba(255,190,70,.34))">
+     <div id="bank-fill" class="absolute left-0 right-0 bottom-0" style="height:0;background:linear-gradient(180deg,rgba(255,225,130,.10),rgba(120,170,100,.34))"></div>
      <div id="bank-bills" class="absolute inset-0"></div>
+     <div id="bank-spk" class="absolute inset-0 pointer-events-none" style="z-index:9998"></div>
+     <div class="absolute inset-0 pointer-events-none" style="z-index:9997;background:radial-gradient(circle at 50% 70%,rgba(255,225,130,.28),rgba(255,225,130,0) 60%);mix-blend-mode:screen"></div>
     </div>
-    <svg viewBox="0 0 100 82" class="absolute inset-0 w-full h-full pointer-events-none" style="overflow:visible" fill="none" stroke="#F0CB72" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-     <rect x="22" y="66" width="9" height="12" rx="3" fill="rgba(255,215,120,.16)"/><rect x="36" y="69" width="9" height="11" rx="3" fill="rgba(255,215,120,.16)"/><rect x="56" y="69" width="9" height="11" rx="3" fill="rgba(255,215,120,.16)"/><rect x="70" y="66" width="9" height="12" rx="3" fill="rgba(255,215,120,.16)"/>
-     <path d="M7 42 q-8 -2 -5 -10 q3 5 8 3"/>
-     <path d="M27 22 L31 7 L45 17 Z" fill="rgba(255,215,120,.2)"/><path d="M57 16 L69 7 L73 24 Z" fill="rgba(255,215,120,.2)"/>
-     <ellipse cx="50" cy="46" rx="44" ry="30"/>
-     <rect x="88" y="37" width="11" height="17" rx="5.5" fill="rgba(255,215,120,.16)"/><circle cx="93.5" cy="43" r="1.2" fill="#F0CB72"/><circle cx="93.5" cy="49" r="1.2" fill="#F0CB72"/>
-     <circle cx="76" cy="33" r="2.2" fill="#F0CB72"/>
-     <path d="M30 17.5 C24 34 24 58 32 74" opacity=".55" stroke-dasharray="1.5 2.5"/><path d="M70 17.5 C76 34 76 58 68 74" opacity=".55" stroke-dasharray="1.5 2.5"/>
-     <path d="M16 40 Q20 27 36 22" stroke="#fff" opacity=".55" stroke-width="1.6"/>
-     <rect x="38" y="14.5" width="24" height="4" rx="2" fill="#2E2110"/>
+    <svg viewBox="0 0 100 100" class="absolute inset-0 w-full h-full pointer-events-none" style="overflow:visible" fill="none" stroke="#F6D77E" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+     <path d="M22 17 L11 -20 M29 11 L24 -22 M78 17 L89 -20 M71 11 L76 -22" stroke="#FBEBB8" stroke-width=".8" opacity=".75"/>
+     <circle cx="50" cy="52" r="46"/><circle cx="50" cy="52" r="44.4" opacity=".35"/>
+     <circle cx="19" cy="23" r="3" fill="rgba(255,255,255,.75)" stroke="none"/><circle cx="81" cy="23" r="3" fill="rgba(255,255,255,.75)" stroke="none"/>
+     <ellipse cx="50" cy="12" rx="18" ry="9" fill="rgba(255,215,120,.3)"/>
+     <rect x="38" y="9.8" width="24" height="3.8" rx="1.9" fill="#2E2110" stroke="none"/>
+     <ellipse cx="44" cy="16.3" rx="2" ry="1.4" fill="#2E2110" stroke="none"/><ellipse cx="56" cy="16.3" rx="2" ry="1.4" fill="#2E2110" stroke="none"/>
+     <path d="M13 50 A38 38 0 0 1 35 18" stroke="#fff" opacity=".6" stroke-width="2"/><path d="M87 62 A38 38 0 0 1 70 85" stroke="#fff" opacity=".35" stroke-width="1.6"/>
     </svg>
    </div>
    <div class="absolute left-0 right-0 bottom-2 text-center text-[12px] opacity-80 z-10">가득 차면 전역 시 최대 <b id="sal-max-label"></b></div>
@@ -913,7 +919,7 @@ function openGd() {
   q('gd-hero').innerHTML = G.avatar ? `<img src="${G.avatar}" class="w-full h-full object-cover">` : `<img src="${G.gf_theme === 'cat' ? 'gf_cat.png' : 'gf_bear.png'}" class="w-full h-full object-cover">`;
   q('gd-rank').innerHTML = `${gi[0]} 곰신 ${gi[1]}`; q('gd-name').innerText = G.nickname || (G.gf_theme === 'cat' ? '꽃냥이' : '곰신 베어'); q('gd-love').innerHTML = q('gf-love-days').innerHTML; openM('modal-gd');
 }
-let salOpen = false, salRainT = null, salR = 0, salVis = -1, salLW = '', salAC = null, salMuted = false, salSndAt = 0, salGlowAt = 0, salB = null, salEls = [];
+let salOpen = false, salRainT = null, salRaf = 0, salLast = 0, salR = 0, salVis = -1, salLW = '', salAC = null, salMuted = false, salSndAt = 0, salGlowAt = 0, salB = null, salEls = [], salP = [], salBoost = 0, salGeo = null, salBound = false, salPtr = { d: false, x: 0, y: 0, vx: 0, vy: 0, t: 0 };
 try { salMuted = localStorage.getItem('salMute') === '1'; } catch (e) { }
 const salFmt = n => Math.floor(n).toLocaleString('ko-KR');
 function billURI(kind) {
@@ -926,27 +932,28 @@ function salIcon() { q('sal-snd').innerHTML = salMuted ? '<svg width="20" height
 function salToggleSnd(ev) { ev.stopPropagation(); salMuted = !salMuted; try { localStorage.setItem('salMute', salMuted ? '1' : '0'); } catch (e) { } salIcon(); salAudio(); if (!salMuted) salSnd(true); }
 function salAudio() { try { if (!salAC) { const A = window.AudioContext || window.webkitAudioContext; if (A) salAC = new A(); } if (salAC && salAC.state === 'suspended') salAC.resume(); } catch (e) { } }
 function salSnd(force) {
-  if (salMuted || !salAC) return; const now = Date.now(); if (!force && now - salSndAt < 70) return; salSndAt = now;
+  if (!salOpen || salMuted || !salAC) return; const now = Date.now(); if (!force && now - salSndAt < 70) return; salSndAt = now;
   try {
     const c = salAC, t = c.currentTime, len = Math.floor(c.sampleRate * .06), buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
     for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
     const ns = c.createBufferSource(), hp = c.createBiquadFilter(), g1 = c.createGain(); ns.buffer = buf; hp.type = 'highpass'; hp.frequency.value = 2500; g1.gain.value = .1; ns.connect(hp); hp.connect(g1); g1.connect(c.destination); ns.start(t);
-    const f = [1568, 1760, 1976, 2349][Math.floor(Math.random() * 4)], o = c.createOscillator(), g = c.createGain(); o.type = 'sine'; o.frequency.value = f;
-    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.06, t + .01); g.gain.exponentialRampToValueAtTime(.0001, t + .5); o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + .55);
+    [0, 1].forEach(k => { const f = [1568, 1760, 1976, 2349, 2637][Math.floor(Math.random() * 5)] * (k ? 1.5 : 1), o = c.createOscillator(), g = c.createGain(); o.type = 'sine'; o.frequency.value = f; const v = k ? .025 : .06;
+      g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v, t + .01); g.gain.exponentialRampToValueAtTime(.0001, t + .6); o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + .65); });
   } catch (e) { }
 }
 function salLayout() {
   const st = q('sal-stage'), sw = st.clientWidth, sh = st.clientHeight; if (!sw || !sh) return false; const key = sw + 'x' + sh; if (key === salLW) return true; salLW = key;
-  const Wb = Math.min(sw * .94, (sh - 34) * .98 / .82), Hb = Wb * .82, bk = q('bank');
-  bk.style.width = Wb + 'px'; bk.style.height = Hb + 'px'; bk.style.left = (sw - Wb) / 2 + 'px'; bk.style.top = Math.max(0, (sh - 34 - Hb) / 2) + 'px';
-  if (!salB) { const N = 170; salB = []; for (let i = 0; i < N; i++) salB.push({ x: 10 + Math.random() * 80, y: (i + 1) / N * .97, r: Math.random() * 90 - 45, gold: Math.random() < .3, d: 2.4 + Math.random() * 2, r1: Math.random() * 30 - 15 }); }
-  const box = q('bank-bills'), w = Wb * .17, h = w * .4595; box.innerHTML = ''; salEls = salB.map(o => { const b = document.createElement('div'); b.className = 'bill pb ' + (o.gold ? 'y' : 'g'); b.style.cssText = `width:${w}px;height:${h}px;left:${o.x}%;bottom:${o.y * 100}%;margin:0 0 ${-h / 2}px ${-w / 2}px;transform:rotate(${o.r}deg);display:none;z-index:${Math.round(o.y * 100)}`; b.style.setProperty('--r0', o.r + 'deg'); b.style.setProperty('--r1', (o.r + o.r1) + 'deg'); b.style.setProperty('--d', o.d + 's'); box.appendChild(b); return b; });
+  const Wb = Math.min(sw * .98, (sh - 30) * .96), bk = q('bank');
+  bk.style.width = Wb + 'px'; bk.style.height = Wb + 'px'; bk.style.left = (sw - Wb) / 2 + 'px'; bk.style.top = Math.max(0, (sh - 30 - Wb) / 2 + 10) + 'px';
+  if (!salB) { const N = 230; salB = []; for (let i = 0; i < N; i++) { const y = (i + 1) / N * .97, hw = Math.sqrt(Math.max(0, 1 - Math.pow(2 * y - 1, 2))) / 2; salB.push({ x: 50 + (Math.random() * 2 - 1) * hw * 100 * .88, y, r: Math.random() * 90 - 45, gold: Math.random() < .3, d: 2.4 + Math.random() * 2, r1: Math.random() * 30 - 15 }); } }
+  const box = q('bank-bills'), w = Wb * .15, h = w * .4595; box.innerHTML = ''; salEls = salB.map(o => { const b = document.createElement('div'); b.className = 'bill pb ' + (o.gold ? 'y' : 'g'); b.style.cssText = `width:${w}px;height:${h}px;left:${o.x}%;bottom:${o.y * 100}%;margin:0 0 ${-h / 2}px ${-w / 2}px;transform:rotate(${o.r}deg);display:none;z-index:${Math.round(o.y * 100)}`; b.style.setProperty('--r0', o.r + 'deg'); b.style.setProperty('--r1', (o.r + o.r1) + 'deg'); b.style.setProperty('--d', o.d + 's'); box.appendChild(b); return b; });
+  const sp = q('bank-spk'); if (!sp.firstChild) for (let i = 0; i < 22; i++) { const e = document.createElement('div'), a = Math.random() * 6.28, rr = Math.sqrt(Math.random()) * 44; e.className = 'spk'; e.style.left = (50 + Math.cos(a) * rr) + '%'; e.style.top = (50 + Math.sin(a) * rr) + '%'; e.style.setProperty('--d', (1.4 + Math.random() * 2) + 's'); e.style.setProperty('--dl', (-Math.random() * 3) + 's'); sp.appendChild(e); }
   salVis = -1; return true;
 }
 function salApply() {
   const r = salR, cnt = salB ? salB.filter(o => o.y <= r).length : 0; q('bank-fill').style.height = (r * 100) + '%';
   if (cnt === salVis) return; salVis = cnt;
-  salEls.forEach((b, i) => { b.style.display = i < cnt ? 'block' : 'none'; b.classList.toggle('top', i < cnt && i >= cnt - 14); });
+  salEls.forEach((b, i) => { b.style.display = i < cnt ? 'block' : 'none'; b.classList.toggle('top', i < cnt && i >= cnt - 16); });
 }
 function salDetail(S, n) {
   if (!salOpen) return; const ok = salLayout(), mx = salMax(S), cur = n < pd(S.enlist_date) ? 0 : totalPay(S, n, q('check-matching').checked); salR = mx ? Math.min(1, cur / mx) : 0;
@@ -955,46 +962,75 @@ function salDetail(S, n) {
   q('sal-pct').innerText = `최대의 ${(salR * 100).toFixed(4)}% · ${q('check-matching').checked ? '매칭금 포함' : '매칭금 제외'}`;
   q('sal-max-label').innerText = `${salFmt(mx)}원`; if (ok) salApply();
 }
-function salGlow(slotFrac) {
-  const g = q('bank-glass'), bk = q('bank'); if (!g || !salOpen) return; const now = Date.now(); if (now - salGlowAt < 90) return; salGlowAt = now;
-  const e = document.createElement('div'), s = g.clientWidth * .34; e.style.cssText = `position:absolute;width:${s}px;height:${s}px;left:${50 + (Math.random() * 16 - 8)}%;bottom:${salR * 100}%;margin:0 0 ${-s / 2}px ${-s / 2}px;border-radius:50%;background:radial-gradient(circle,rgba(255,250,210,.95),rgba(255,215,120,.55) 40%,rgba(255,200,90,0) 70%);pointer-events:none;z-index:999`;
-  g.appendChild(e); e.animate([{ opacity: .95, transform: 'scale(.3)' }, { opacity: .6, transform: 'scale(1.2)', offset: .4 }, { opacity: 0, transform: 'scale(1.8)' }], { duration: 650, easing: 'ease-out' }).onfinish = () => e.remove();
-  bk.animate([{ filter: 'drop-shadow(0 0 10px rgba(255,205,100,.25))' }, { filter: 'drop-shadow(0 0 22px rgba(255,220,130,.95))', offset: .3 }, { filter: 'drop-shadow(0 0 10px rgba(255,205,100,.25))' }], { duration: 550, easing: 'ease-out' });
+function salGeoUpd() {
+  const m = q('modal-sal'), b = q('bank'), g = q('bank-glass'); if (!m || !b || !g) return false; const mr = m.getBoundingClientRect(), bk = b.getBoundingClientRect(), gl = g.getBoundingClientRect(); if (!bk.width) return false;
+  salGeo = { vw: mr.width, vh: mr.height, slotX: bk.left + bk.width / 2 - mr.left, slotY: bk.top + bk.height * .125 - mr.top, gcx: gl.left + gl.width / 2 - mr.left, gcy: gl.top + gl.height / 2 - mr.top, gr: gl.width / 2, gbot: gl.bottom - mr.top, gh: gl.height, bw: bk.width }; return true;
+}
+function salGlow(xm) {
+  const g = q('bank-glass'), bk = q('bank'); if (!g || !salOpen || !salGeo) return; const now = Date.now(); if (now - salGlowAt < 80) return; salGlowAt = now;
+  const e = document.createElement('div'), s = g.clientWidth * .42, lx = xm - (salGeo.gcx - salGeo.gr);
+  e.style.cssText = `position:absolute;width:${s}px;height:${s}px;left:${lx}px;bottom:${salR * 100}%;margin:0 0 ${-s / 2}px ${-s / 2}px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,230,1),rgba(255,226,130,.7) 38%,rgba(255,200,90,0) 70%);pointer-events:none;z-index:9999`;
+  g.appendChild(e); e.animate([{ opacity: 1, transform: 'scale(.3)' }, { opacity: .75, transform: 'scale(1.2)', offset: .35 }, { opacity: 0, transform: 'scale(2)' }], { duration: 750, easing: 'ease-out' }).onfinish = () => e.remove();
+  for (let i = 0; i < 6; i++) { const p = document.createElement('div'); p.className = 'spk'; p.style.cssText = `left:${lx}px;bottom:${salR * 100}%;z-index:9999;animation:none;opacity:1`; g.appendChild(p); const a = Math.random() * 6.28, d = 20 + Math.random() * 36; p.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d - 14}px) scale(.2)`, opacity: 0 }], { duration: 600 + Math.random() * 300, easing: 'ease-out' }).onfinish = () => p.remove(); }
+  bk.animate([{ filter: 'drop-shadow(0 0 12px rgba(255,205,100,.35))' }, { filter: 'drop-shadow(0 0 34px rgba(255,235,150,1))', offset: .3 }, { filter: 'drop-shadow(0 0 12px rgba(255,205,100,.35))' }], { duration: 650, easing: 'ease-out' });
 }
 function salShake() {
-  salAudio(); const tops = salEls.filter(b => b.classList.contains('top'));
-  tops.forEach((b, i) => { const r0 = parseFloat(b.style.getPropertyValue('--r0')) || 0, up = 18 + Math.random() * 34, tw = (Math.random() * 60 - 30), rx = 50 + Math.random() * 40; b.animate([{ transform: `translateY(0) rotate(${r0}deg)` }, { transform: `translateY(${-up}px) rotateX(${rx}deg) rotate(${r0 + tw}deg)`, offset: .38 }, { transform: `translateY(${-up * .35}px) rotateX(${-rx * .5}deg) rotate(${r0 - tw * .4}deg)`, offset: .7 }, { transform: `translateY(0) rotate(${r0}deg)` }], { duration: 950 + Math.random() * 300, delay: i * 14, easing: 'ease-out' }); });
-  for (let i = 0; i < 14; i++) setTimeout(() => salSpawn(i % 3 !== 0), Math.random() * 900);
+  if (!salOpen) return; const cnt = salVis > 0 ? salVis : 0, tops = salEls.slice(Math.max(0, cnt - 36), cnt), R = Math.random, TP = Math.PI * 2;
+  tops.forEach((b, i) => {
+    const r0 = parseFloat(b.style.getPropertyValue('--r0')) || 0, H = 50 + R() * 120, A = 14 + R() * 26, f = 1.6 + R() * 1.4, p0 = R() * TP, dur = 1900 + R() * 900, N = 26, kf = [], T = .34;
+    for (let k = 0; k <= N; k++) { const t = k / N; let y; if (t < T) { const a = t / T; y = -H * (1 - Math.pow(1 - a, 2)); } else { const a = (t - T) / (1 - T); y = -H * (1 - a * a * (3 - 2 * a) * .85 - a * .15); } const fade = k === N ? 0 : Math.sin(Math.PI * Math.min(1, t * 1.05)), ph = TP * f * t + p0;
+      kf.push({ offset: t, transform: k === N ? `translate(0,0) rotate(${r0}deg)` : `translate(${(A * Math.sin(ph) * fade).toFixed(1)}px,${y.toFixed(1)}px) perspective(500px) rotateY(${(70 * Math.sin(ph * .8 + 1) * fade).toFixed(1)}deg) rotateZ(${(r0 + 38 * Math.sin(ph + 1.3) * fade).toFixed(1)}deg)` }); }
+    b.animate(kf, { duration: dur, delay: i * 14, easing: 'linear' });
+  });
+  for (let i = 0; i < 6; i++) setTimeout(() => salSpawn(true), Math.random() * 500);
 }
 function salSpawn(inBank) {
-  const m = q('modal-sal'), c = q('sal-rain'); if (!m || !c || !salOpen || c.childElementCount > 48) return;
-  const mr = m.getBoundingClientRect(), vw = mr.width, vh = mr.height, gold = Math.random() > .7, N = inBank ? 34 : 46, kf = [], R = Math.random, TP = Math.PI * 2;
-  const b = document.createElement('div'); b.className = 'bill ' + (gold ? 'y' : 'g'); b.style.left = '0'; b.style.top = '0';
-  if (inBank) {
-    const bk = q('bank').getBoundingClientRect(), gl = q('bank-glass').getBoundingClientRect(), w = Math.max(46, Math.min(70, bk.width * .17)), slotX = bk.left + bk.width / 2 - mr.left, slotY = bk.top + bk.height * .2 - mr.top;
-    let surf = gl.bottom - mr.top - salR * gl.height - w * .2; if (surf < slotY + 14) surf = slotY + 14;
-    const x0 = slotX + (R() * 2 - 1) * vw * .5, total = surf + 60, sT = (slotY + 60) / total, A = 36 + R() * 44, f = 1.8 + R() * 1.4, p0 = R() * TP, B = 26 + R() * 28, F = 55 + R() * 25;
-    b.style.width = w + 'px'; b.style.height = w * .4595 + 'px';
-    for (let k = 0; k <= N; k++) {
-      const t = k / N, y = -60 + total * t, u = Math.min(1, t / sT), damp = 1 - u, ph = TP * f * u + p0, x = slotX + (x0 - slotX) * Math.pow(1 - u, 1.6) + A * Math.sin(ph) * damp, sc = t > sT ? 1 - .45 * ((t - sT) / (1 - sT)) : 1;
-      kf.push({ offset: t, opacity: t > .93 ? .75 : 1, transform: `translate(${(x - w / 2).toFixed(1)}px,${y.toFixed(1)}px) scale(${sc.toFixed(3)}) perspective(520px) rotateY(${(F * Math.sin(ph * .8 + 1) * damp).toFixed(1)}deg) rotateZ(${(B * Math.sin(ph + 1.3) * damp).toFixed(1)}deg)` });
+  const c = q('sal-rain'); if (!c || !salOpen || !salGeo || salP.length > 44) return; const g = salGeo, R = Math.random, TP = Math.PI * 2, gold = R() > .7;
+  const b = document.createElement('div'); b.className = 'bill ' + (gold ? 'y' : 'g'); b.style.left = '0'; b.style.top = '0'; b.style.willChange = 'transform';
+  const P = { el: b, in: inBank, st: 0, w: 0, ph: R() * TP, wv: 0, wo: 0, y: -70, x: 0 };
+  if (inBank) { P.w = Math.max(46, Math.min(72, g.bw * .17)); P.x0 = g.slotX + (R() * 2 - 1) * g.vw * .5; P.A = 30 + R() * 44; P.om = 3.2 + R() * 2; P.vy = 78 + R() * 36; P.B = 26 + R() * 28; P.F = 55 + R() * 25; P.y = -60; }
+  else { P.w = 58 + R() * 44; P.x0 = -50 + R() * (g.vw + 100); P.dr = (R() - .5) * 160; P.A = 60 + R() * 80; P.om = 2.2 + R() * 2.2; P.vy = (g.vh + 140) / (8 + R() * 4.5); P.B = 35 + R() * 35; P.F = 60 + R() * 25; }
+  b.style.width = P.w + 'px'; b.style.height = P.w * .4595 + 'px'; b.style.opacity = '0'; c.appendChild(b); salP.push(P);
+}
+function salStep(ts) {
+  if (!salOpen) { salRaf = 0; return; } salRaf = requestAnimationFrame(salStep); const dt = Math.min(.05, (ts - (salLast || ts)) / 1000); salLast = ts; if (!salGeoUpd()) return;
+  const g = salGeo, pt = salPtr; salBoost += ((pt.d ? 1.4 : 0) - salBoost) * Math.min(1, dt * 5); const sm = 1 + salBoost;
+  if (pt.d && performance.now() - pt.t > 90) { pt.vx *= Math.exp(-10 * dt); pt.vy *= Math.exp(-10 * dt); }
+  for (let i = salP.length - 1; i >= 0; i--) {
+    const b = salP[i]; let x, y, sc = 1, rz = 0, ry = 0, done = false;
+    if (b.st === 0) {
+      if (pt.d) { const dx = b.x - pt.x, dy = b.y - pt.y, d = Math.hypot(dx, dy); if (d < 150) { const f = 1 - d / 150; b.wv += pt.vx * f * dt * 4 + (dx / (d + 1)) * 150 * f * dt * (Math.abs(pt.vx) > 40 ? 1 : .35); } }
+      b.wv *= Math.exp(-1.6 * dt); b.wo = Math.max(-280, Math.min(280, b.wo + b.wv * dt)); b.ph += b.om * dt * sm;
+      if (b.in) {
+        const u = Math.max(0, Math.min(1, (b.y + 60) / (g.slotY + 60))); b.y += b.vy * (1 + 1.4 * u * u) * sm * dt;
+        x = g.slotX + (b.x0 - g.slotX) * Math.pow(1 - u, 1.6) + b.A * Math.sin(b.ph) * (1 - u) + b.wo * (1 - u); const k = 1 - u * .85; rz = b.B * Math.sin(b.ph + 1.3) * k; ry = b.F * Math.sin(b.ph * .8 + 1) * k; y = b.y;
+        if (b.y >= g.slotY) { b.st = 1; b.ph = Math.random() * 6.28; b.y = g.slotY; b.cx = g.slotX; }
+      } else {
+        b.y += b.vy * sm * dt; const t = (b.y + 70) / (g.vh + 140); x = b.x0 + b.dr * t + b.A * Math.sin(b.ph) + b.wo; y = b.y; rz = b.B * Math.sin(b.ph + 1.3); ry = b.F * Math.sin(b.ph * .8 + 1); if (b.y > g.vh + 90) done = true;
+      }
+    } else {
+      b.ph += b.om * .75 * dt * sm; b.y += 82 * sm * dt * (1 + .35 * Math.sin(b.ph * 1.7)); sc = .72;
+      const dy = b.y - g.gcy, half = Math.max(0, Math.sqrt(Math.max(0, g.gr * g.gr - dy * dy)) - b.w * .38); x = Math.max(g.gcx - half, Math.min(g.gcx + half, b.cx + g.gr * .26 * Math.sin(b.ph))); y = b.y; rz = 42 * Math.sin(b.ph + 1); ry = 65 * Math.sin(b.ph * .8 + 1);
+      const surf = g.gbot - salR * g.gh - b.w * .12; if (b.y >= Math.max(surf, g.slotY + 20)) { salGlow(x); salSnd(); done = true; }
     }
-    c.appendChild(b); b.animate(kf, { duration: 5500 + R() * 2600, easing: 'linear', fill: 'forwards' }).onfinish = () => { b.remove(); salGlow(); salSnd(); };
-  } else {
-    const w = 58 + R() * 44, x0 = -50 + R() * (vw + 100), dr = (R() - .5) * 160, A = 60 + R() * 80, f = 2 + R() * 2.4, p0 = R() * TP, B = 35 + R() * 35, F = 60 + R() * 25, H = vh + 140;
-    b.style.width = w + 'px'; b.style.height = w * .4595 + 'px';
-    for (let k = 0; k <= N; k++) { const t = k / N, ph = TP * f * t + p0, x = x0 + dr * t + A * Math.sin(ph), y = -70 + H * t; kf.push({ offset: t, transform: `translate(${(x - w / 2).toFixed(1)}px,${y.toFixed(1)}px) perspective(520px) rotateY(${(F * Math.sin(ph * .8 + 1)).toFixed(1)}deg) rotateZ(${(B * Math.sin(ph + 1.3)).toFixed(1)}deg)` }); }
-    c.appendChild(b); b.animate(kf, { duration: 8000 + R() * 4500, easing: 'linear', fill: 'forwards' }).onfinish = () => b.remove();
+    b.x = x; if (done) { b.el.remove(); salP.splice(i, 1); continue; }
+    b.el.style.opacity = '1'; b.el.style.transform = `translate(${(x - b.w / 2).toFixed(1)}px,${y.toFixed(1)}px) scale(${sc}) perspective(520px) rotateY(${ry.toFixed(1)}deg) rotateZ(${rz.toFixed(1)}deg)`;
   }
+}
+function salBind() {
+  if (salBound) return; salBound = true; const m = q('modal-sal'), pos = e => { const r = m.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+  m.addEventListener('pointerdown', e => { if (e.target.closest('button')) return; const [x, y] = pos(e); Object.assign(salPtr, { d: true, x, y, vx: 0, vy: 0, t: performance.now() }); salAudio(); salShake(); });
+  m.addEventListener('pointermove', e => { if (!salPtr.d) return; const [x, y] = pos(e), t = performance.now(), dt = Math.max(8, t - salPtr.t) / 1000; salPtr.vx = salPtr.vx * .5 + (x - salPtr.x) / dt * .5; salPtr.vy = salPtr.vy * .5 + (y - salPtr.y) / dt * .5; salPtr.x = x; salPtr.y = y; salPtr.t = t; });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => m.addEventListener(ev, () => { salPtr.d = false; }));
 }
 function openSal() {
   const S = S_(); if (!S || !S.enlist_date) return; const st = document.documentElement.style; st.setProperty('--bill-g', billURI('g')); st.setProperty('--bill-y', billURI('y'));
-  salOpen = true; salLW = ''; salVis = -1; openM('modal-sal'); salAudio(); salIcon(); salDetail(S, Date.now()); setTimeout(() => salDetail(S, Date.now()), 150);
-  for (let i = 0; i < 10; i++) setTimeout(() => salSpawn(i % 2 === 0), 250 + R_(i) * 1800);
-  clearInterval(salRainT); salRainT = setInterval(() => { salSpawn(true); if (Math.random() < .9) salSpawn(false); }, 650);
+  salOpen = true; salLW = ''; salVis = -1; salP = []; salBoost = 0; salPtr.d = false; openM('modal-sal'); salBind(); salAudio(); salIcon(); salDetail(S, Date.now()); setTimeout(() => salDetail(S, Date.now()), 150);
+  salLast = 0; cancelAnimationFrame(salRaf); salRaf = requestAnimationFrame(salStep);
+  for (let i = 0; i < 9; i++) setTimeout(() => salSpawn(i % 2 === 0), 200 + i * 230);
+  clearInterval(salRainT); salRainT = setInterval(() => { salSpawn(true); if (Math.random() < .9) salSpawn(false); }, 600);
 }
-function R_(i) { return (i * 0.37) % 1; }
-function salClose() { salOpen = false; clearInterval(salRainT); const c = q('sal-rain'); if (c) c.innerHTML = ''; }
+function salClose() { salOpen = false; salP = []; salPtr.d = false; clearInterval(salRainT); cancelAnimationFrame(salRaf); salRaf = 0; const c = q('sal-rain'); if (c) c.innerHTML = ''; try { if (salAC) salAC.suspend(); } catch (e) { } }
 addEventListener('resize', () => { salLW = ''; });
 
 /* ---------- 나의 나라사랑카드 ---------- */
