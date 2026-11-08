@@ -58,6 +58,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 .spk{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:radial-gradient(circle,#fff 0,rgba(255,238,160,.9) 28%,rgba(255,220,120,0) 70%);animation:tw var(--d,2s) ease-in-out infinite var(--dl,0s)}
 .spk::before,.spk::after{content:'';position:absolute;left:50%;top:50%;background:linear-gradient(90deg,rgba(255,255,255,0),#fff,rgba(255,255,255,0))}
 .spk::before{width:24px;height:1.5px;margin:-.75px 0 0 -12px}.spk::after{width:1.5px;height:24px;margin:-12px 0 0 -.75px;background:linear-gradient(180deg,rgba(255,255,255,0),#fff,rgba(255,255,255,0))}
+#soldier-card .pcard,#gf-profile-card .pcard,#salary-card{cursor:pointer;-webkit-tap-highlight-color:transparent}
 </style>
 </head>
 <body class="min-h-screen flex justify-center items-start sm:p-4 select-none antialiased bg-gray-100">
@@ -279,7 +280,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
     <div><div id="st-work" class="text-[22px] font-black tabular-nums">0</div><div class="text-[11px] text-[#8B95A1]">남은 일과일</div></div>
     <div><div id="st-vac" class="text-[22px] font-black tabular-nums">-</div><div class="text-[11px] text-[#8B95A1]">다음 휴가일</div></div>
    </div></div>
-  </div></div>
+  <button onclick="closeModal('modal-sd')" class="w-full h-12 rounded-2xl bg-white border border-[#E5E8EB] text-[15px] font-bold text-[#4E5968] active:scale-[.98] transition">나가기</button></div></div>
  <div id="modal-gd" class="fixed inset-0 z-[60] hidden flex-col" style="background:var(--bg-main)">
   <div class="flex items-center gap-3 px-4 pb-3" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeModal('modal-gd')" class="w-10 h-10 rounded-full bg-white border border-[#E5E8EB] font-bold text-[18px]">‹</button><div class="font-bold text-[16px]">기다림 현황</div></div>
   <div class="flex-1 overflow-y-auto no-scrollbar px-5 pb-10 space-y-4">
@@ -300,7 +301,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
     <div><div id="gst-an" class="text-[22px] font-black tabular-nums">-</div><div id="gst-an-label" class="text-[11px] text-[#8B95A1]">다음 기념일</div></div>
     <div><div id="gst-vac" class="text-[22px] font-black tabular-nums">-</div><div class="text-[11px] text-[#8B95A1]">다음 휴가일</div></div>
    </div>
-  </div></div>
+  <button onclick="closeModal('modal-gd')" class="w-full h-12 rounded-2xl bg-white border border-[#E5E8EB] text-[15px] font-bold text-[#4E5968] active:scale-[.98] transition">나가기</button></div></div>
  <div id="modal-sal" class="fixed inset-0 z-[60] hidden flex-col text-white overflow-hidden" style="touch-action:none;background:radial-gradient(120% 80% at 50% 45%,#2E402F 0%,var(--mil-dark) 55%,#12170F 100%)">
   <div id="sal-rain" class="absolute inset-0 pointer-events-none z-[15] overflow-hidden"></div>
   <div class="flex items-center gap-3 px-4 pb-1 relative z-30" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeModal('modal-sal')" class="w-10 h-10 rounded-full bg-white/10 font-bold text-[18px]">‹</button><div class="font-bold text-[16px] flex-1">실시간 복무 급여 통장</div><button id="sal-snd" onclick="salToggleSnd(event)" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"></button></div>
@@ -417,7 +418,7 @@ const sb = configured ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) :
 const q = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const openM = id => { q(id).classList.remove('hidden'); q(id).classList.add('flex'); };
-function closeModal(id) { q(id).classList.add('hidden'); q(id).classList.remove('flex'); if (id === 'modal-sal' && typeof salClose === 'function') salClose(); if (id === 'modal-friends' && typeof stopFriendTimers === 'function') stopFriendTimers(); if (id === 'modal-settings' && typeof me !== 'undefined' && me) applyTheme((S_() || {}).branch || 'army'); }
+function closeModal(id) { if ((id === 'modal-sd' || id === 'modal-gd' || id === 'modal-sal') && typeof xpClose === 'function' && xpClose(id)) return; if (typeof xpEl !== 'undefined' && xpEl && (id === 'modal-sd' || id === 'modal-gd' || id === 'modal-sal')) { xpEl.style.visibility = ''; } q(id).classList.add('hidden'); q(id).classList.remove('flex'); if (id === 'modal-sal' && typeof salClose === 'function') salClose(); if (id === 'modal-friends' && typeof stopFriendTimers === 'function') stopFriendTimers(); if (id === 'modal-settings' && typeof me !== 'undefined' && me) applyTheme((S_() || {}).branch || 'army'); }
 const showAlert = (t, m) => { q('alert-title').innerText = t; q('alert-message').innerHTML = m; openM('modal-alert'); };
 const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const pd = s => new Date(s + 'T00:00:00');
@@ -912,13 +913,45 @@ async function submitPost() {
 function openSd() {
   const S = S_(); if (!S || !S.enlist_date) return; const rk = rankOf(S, new Date()).r, h = hoInfo(S, new Date());
   q('sd-hero').innerHTML = S.avatar ? `<img src="${S.avatar}" class="w-[170px] h-[170px] rounded-full object-cover">` : (S.bf_theme === 'gamja' ? bfImg('gamja', rk) : `<img src="${rankFile(rk)}" alt="" class="h-[90%] object-contain">`);
-  q('sd-rank').innerText = rk === '전역' ? '전역' : `${rk} ${h.n}호봉`; q('sd-name').innerText = S.nickname || '군인'; openM('modal-sd');
+  q('sd-rank').innerText = rk === '전역' ? '전역' : `${rk} ${h.n}호봉`; q('sd-name').innerText = S.nickname || '군인'; xpRun('modal-sd', q('soldier-card').querySelector('.pcard'));
 }
 function openGd() {
   const G = G_(); if (!G) return; const S = S_(), rk = S && S.enlist_date ? rankOf(S, new Date()).r : '훈련병', gi = gfRank(rk);
   q('gd-hero').innerHTML = G.avatar ? `<img src="${G.avatar}" class="w-full h-full object-cover">` : `<img src="${G.gf_theme === 'cat' ? 'gf_cat.png' : 'gf_bear.png'}" class="w-full h-full object-cover">`;
-  q('gd-rank').innerHTML = `${gi[0]} 곰신 ${gi[1]}`; q('gd-name').innerText = G.nickname || (G.gf_theme === 'cat' ? '꽃냥이' : '곰신 베어'); q('gd-love').innerHTML = q('gf-love-days').innerHTML; openM('modal-gd');
+  q('gd-rank').innerHTML = `${gi[0]} 곰신 ${gi[1]}`; q('gd-name').innerText = G.nickname || (G.gf_theme === 'cat' ? '꽃냥이' : '곰신 베어'); q('gd-love').innerHTML = q('gf-love-days').innerHTML; xpRun('modal-gd', q('gf-profile-card').querySelector('.pcard'));
 }
+/* ---------- 카드 → 전체화면 확장 애니메이션 (토스 느낌) ---------- */
+let xpEl = null, xpBusy = false, xpBypass = false; const XP_EASE = 'cubic-bezier(.22,.9,.24,1)';
+function xpOv(card, W, H) {
+  const r = card.getBoundingClientRect(), cs = getComputedStyle(card), o = document.createElement('div');
+  o.style.cssText = `position:fixed;z-index:75;pointer-events:none;overflow:hidden;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;border-radius:${cs.borderRadius};background:${cs.backgroundImage !== 'none' ? cs.backgroundImage : cs.backgroundColor};box-shadow:0 12px 40px rgba(0,0,0,.2)`;
+  const c = card.cloneNode(true); c.querySelectorAll('[id]').forEach(e => e.removeAttribute('id')); c.removeAttribute('id'); c.style.cssText = `position:absolute;left:0;top:0;width:${r.width}px;height:${r.height}px;margin:0;background:none;transition:none`; o.appendChild(c); document.body.appendChild(o);
+  return { o, c, r, rad: cs.borderRadius, full: { left: '0px', top: '0px', width: W + 'px', height: H + 'px', borderRadius: '0px' }, from: { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px', borderRadius: cs.borderRadius } };
+}
+function xpRun(id, card, noOpen) {
+  if (!noOpen) openM(id); const m = q(id); xpEl = card; if (!card || !m.animate || !card.getBoundingClientRect().width) return;
+  const W = innerWidth, H = innerHeight, v = xpOv(card, W, H); card.style.visibility = 'hidden';
+  v.o.animate([v.from, v.full], { duration: 500, easing: XP_EASE, fill: 'forwards' }); v.c.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 220, fill: 'forwards' });
+  m.animate([{ opacity: 0 }, { opacity: 0, offset: .55 }, { opacity: 1 }], { duration: 640, easing: 'linear' });
+  v.o.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 260, delay: 400, fill: 'forwards' }).finished.then(() => v.o.remove()).catch(() => v.o.remove());
+  [...m.children].forEach((c, i) => c.animate([{ opacity: 0, transform: 'translateY(30px)' }, { opacity: 1, transform: 'none' }], { duration: 480, delay: 330 + i * 50, easing: XP_EASE, fill: 'backwards' }));
+}
+function xpClose(id) {
+  if (xpBypass) return false; if (xpBusy) return true; const card = xpEl, m = q(id); if (!card || !card.isConnected || !m.animate || !card.getBoundingClientRect().width) return false; xpBusy = true;
+  const W = innerWidth, H = innerHeight, v = xpOv(card, W, H), end = () => { card.style.visibility = ''; v.o.remove(); xpBusy = false; xpEl = null; };
+  Object.assign(v.o.style, v.full); v.c.style.opacity = '0'; v.o.style.opacity = '0';
+  v.o.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 180, fill: 'forwards' }).finished.then(() => {
+    xpBypass = true; try { closeModal(id); } finally { xpBypass = false; }
+    const rr = card.getBoundingClientRect(); v.c.style.width = rr.width + 'px'; v.c.style.height = rr.height + 'px';
+    v.c.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 260, delay: 160, fill: 'forwards' });
+    return v.o.animate([v.full, { left: rr.left + 'px', top: rr.top + 'px', width: rr.width + 'px', height: rr.height + 'px', borderRadius: v.rad }], { duration: 440, easing: XP_EASE, fill: 'forwards' }).finished;
+  }).then(() => { card.style.visibility = ''; return v.o.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 120, fill: 'forwards' }).finished; }).then(end).catch(() => { end(); });
+  return true;
+}
+document.addEventListener('click', e => {
+  const t = e.target, card = t.closest && t.closest('#soldier-card .pcard, #gf-profile-card .pcard'); if (!card || t.closest('.rounded-full, button, input, textarea, a, [onclick]')) return;
+  if (card.parentElement.id === 'soldier-card') openSd(); else openGd();
+});
 let salOpen = false, salRainT = null, salRaf = 0, salLast = 0, salR = 0, salVis = -1, salLW = '', salAC = null, salMuted = false, salSndAt = 0, salGlowAt = 0, salB = null, salEls = [], salP = [], salBoost = 0, salGeo = null, salBound = false, salPtr = { d: false, x: 0, y: 0, vx: 0, vy: 0, t: 0 };
 try { salMuted = localStorage.getItem('salMute') === '1'; } catch (e) { }
 const salFmt = n => Math.floor(n).toLocaleString('ko-KR');
@@ -1025,7 +1058,7 @@ function salBind() {
 }
 function openSal() {
   const S = S_(); if (!S || !S.enlist_date) return; const st = document.documentElement.style; st.setProperty('--bill-g', billURI('g')); st.setProperty('--bill-y', billURI('y'));
-  salOpen = true; salLW = ''; salVis = -1; salP = []; salBoost = 0; salPtr.d = false; openM('modal-sal'); salBind(); salAudio(); salIcon(); salDetail(S, Date.now()); setTimeout(() => salDetail(S, Date.now()), 150);
+  salOpen = true; salLW = ''; salVis = -1; salP = []; salBoost = 0; salPtr.d = false; openM('modal-sal'); salBind(); xpRun('modal-sal', q('salary-card'), true); salAudio(); salIcon(); salDetail(S, Date.now()); setTimeout(() => salDetail(S, Date.now()), 150);
   salLast = 0; cancelAnimationFrame(salRaf); salRaf = requestAnimationFrame(salStep);
   for (let i = 0; i < 9; i++) setTimeout(() => salSpawn(i % 2 === 0), 200 + i * 230);
   clearInterval(salRainT); salRainT = setInterval(() => { salSpawn(true); if (Math.random() < .9) salSpawn(false); }, 600);
