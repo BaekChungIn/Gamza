@@ -49,7 +49,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 .cm-chip.on{background:#191F28;color:#fff;border-color:#191F28}
 .cm-row{padding:16px 18px;border-bottom:1px solid #F2F3F5;display:block;width:100%;text-align:left}
 .cm-row:active{background:#F5F6F8}
-.bill{position:absolute;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.3);background-size:100% 100%;background-repeat:no-repeat}.bill.g{background-image:var(--bill-g)}.bill.y{background-image:var(--bill-y)}
+.bill{position:absolute;border-radius:4px;background-size:100% 100%;background-repeat:no-repeat}.bill.g{background-image:var(--bill-g)}.bill.y{background-image:var(--bill-y)}
 @keyframes billSway{0%,100%{transform:translateY(0) rotate(var(--r0))}50%{transform:translateY(-5px) rotate(var(--r1))}}
 .bill.pb.top{animation:billSway var(--d,3s) ease-in-out infinite}
 .pk{text-shadow:0 1px 8px rgba(190,60,100,.18)}.pk .pbar{background:rgba(255,255,255,.4)}.pk #gf-esc-bar,.pk #gf-esc-bar2{background:rgba(255,255,255,.75)!important}.pk [class~="bg-white/10"]{background:rgba(255,255,255,.38)!important}.pk [class~="bg-white/25"]{background:rgba(255,255,255,.72)!important}.pk [id$="-pct"],.pk [id$="-pct2"]{color:#8E2F4D;text-shadow:none}
@@ -310,11 +310,11 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
   <div id="sal-stage" class="relative flex-1 mt-1">
    <div id="bank" class="absolute z-10">
     <div id="bank-halo" class="absolute rounded-full pointer-events-none" style="inset:-14%;animation:haloPulse 2.8s ease-in-out infinite;background:radial-gradient(circle,rgba(255,214,110,.5) 0%,rgba(255,200,90,.16) 48%,rgba(255,200,90,0) 70%)"></div>
-    <div id="bank-glass" class="absolute overflow-hidden" style="left:4%;top:6%;width:92%;height:92%;border-radius:50%;background:radial-gradient(circle at 34% 26%,rgba(255,244,190,.5),rgba(255,214,110,.2) 55%,rgba(255,190,70,.34))">
-     <div id="bank-fill" class="absolute left-0 right-0 bottom-0" style="height:0;background:linear-gradient(180deg,rgba(255,225,130,.10),rgba(120,170,100,.34))"></div>
+    <div id="bank-glass" class="absolute" style="left:4%;top:6%;width:92%;height:92%;border-radius:50%;background:radial-gradient(circle at 34% 26%,rgba(255,244,190,.5),rgba(255,214,110,.2) 55%,rgba(255,190,70,.34))">
+     <div class="absolute inset-0 overflow-hidden" style="border-radius:50%"><div id="bank-fill" class="absolute left-0 right-0 bottom-0" style="height:0;background:linear-gradient(180deg,rgba(255,225,130,.10),rgba(120,170,100,.34))"></div></div>
      <div id="bank-bills" class="absolute inset-0"></div>
      <div id="bank-spk" class="absolute inset-0 pointer-events-none" style="z-index:9998"></div>
-     <div class="absolute inset-0 pointer-events-none" style="z-index:9997;background:radial-gradient(circle at 50% 70%,rgba(255,225,130,.28),rgba(255,225,130,0) 60%);mix-blend-mode:screen"></div>
+     
     </div>
     <svg viewBox="0 0 100 100" class="absolute inset-0 w-full h-full pointer-events-none" style="overflow:visible" fill="none" stroke="#F6D77E" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
      <path d="M22 17 L11 -20 M29 11 L24 -22 M78 17 L89 -20 M71 11 L76 -22" stroke="#FBEBB8" stroke-width=".8" opacity=".75"/>
@@ -622,7 +622,7 @@ let salT, rainT;
 function startSal(S) {
   clearInterval(salT); clearInterval(rainT);
   q('salary-branch-desc').innerText = `2026 기준 (${BR[S.branch].m}개월 복무)`;
-  salT = setInterval(() => { if (xpAnim) return; const n = Date.now(); tickPct(S, n); if (n < pd(S.enlist_date)) { q('live-total-salary').innerText = '0.00'; salDetail(S, n); return; } q('live-total-salary').innerText = totalPay(S, n, q('check-matching').checked).toLocaleString('ko-KR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); salDetail(S, n); }, 50);
+  salT = setInterval(() => { if (xpAnim) return; const n = Date.now(); if (salOpen) { salDetail(S, n); return; } tickPct(S, n); if (n < pd(S.enlist_date)) { q('live-total-salary').innerText = '0.00'; salDetail(S, n); return; } q('live-total-salary').innerText = totalPay(S, n, q('check-matching').checked).toLocaleString('ko-KR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); salDetail(S, n); }, 50);
   rainT = setInterval(() => { if (xpAnim || salOpen || xpEl) return; rainBurst(1); }, 900); // 터치 안 해도 일정 속도로 낙하
 }
 function rainBurst(n) {
@@ -986,13 +986,13 @@ function salLayout() {
   const st = q('sal-stage'), sw = st.clientWidth, sh = st.clientHeight; if (!sw || !sh) return false; const key = sw + 'x' + sh; if (key === salLW) return true; salLW = key;
   const Wb = Math.min(sw * .98, (sh - 30) * .96), bk = q('bank');
   bk.style.width = Wb + 'px'; bk.style.height = Wb + 'px'; bk.style.left = (sw - Wb) / 2 + 'px'; bk.style.top = Math.max(0, (sh - 30 - Wb) / 2 + 10) + 'px';
-  if (!salB) { const N = 230; salB = []; for (let i = 0; i < N; i++) { const y = (i + 1) / N * .97, hw = Math.sqrt(Math.max(0, 1 - Math.pow(2 * y - 1, 2))) / 2; salB.push({ x: 50 + (Math.random() * 2 - 1) * hw * 100 * .88, y, r: Math.random() * 90 - 45, gold: Math.random() < .3, d: 2.4 + Math.random() * 2, r1: Math.random() * 30 - 15 }); } }
+  if (!salB) { const N = 150; salB = []; for (let i = 0; i < N; i++) { const y = (i + 1) / N * .97, hw = Math.sqrt(Math.max(0, 1 - Math.pow(2 * y - 1, 2))) / 2; salB.push({ x: 50 + (Math.random() * 2 - 1) * hw * 100 * .88, y, r: Math.random() * 90 - 45, gold: Math.random() < .3, d: 2.4 + Math.random() * 2, r1: Math.random() * 30 - 15 }); } }
   const box = q('bank-bills'), w = Wb * .15, h = w * .4595; box.innerHTML = ''; salEls = salB.map(o => { const b = document.createElement('div'); b.className = 'bill pb ' + (o.gold ? 'y' : 'g'); b.style.cssText = `width:${w}px;height:${h}px;left:${o.x}%;bottom:${o.y * 100}%;margin:0 0 ${-h / 2}px ${-w / 2}px;transform:rotate(${o.r}deg);display:none;z-index:${Math.round(o.y * 100)}`; b.style.setProperty('--r0', o.r + 'deg'); b.style.setProperty('--r1', (o.r + o.r1) + 'deg'); b.style.setProperty('--d', o.d + 's'); box.appendChild(b); return b; });
-  const sp = q('bank-spk'); if (!sp.firstChild) for (let i = 0; i < 22; i++) { const e = document.createElement('div'), a = Math.random() * 6.28, rr = Math.sqrt(Math.random()) * 44; e.className = 'spk'; e.style.left = (50 + Math.cos(a) * rr) + '%'; e.style.top = (50 + Math.sin(a) * rr) + '%'; e.style.setProperty('--d', (1.4 + Math.random() * 2) + 's'); e.style.setProperty('--dl', (-Math.random() * 3) + 's'); sp.appendChild(e); }
-  salVis = -1; return true;
+  const sp = q('bank-spk'); if (!sp.firstChild) for (let i = 0; i < 12; i++) { const e = document.createElement('div'), a = Math.random() * 6.28, rr = Math.sqrt(Math.random()) * 44; e.className = 'spk'; e.style.left = (50 + Math.cos(a) * rr) + '%'; e.style.top = (50 + Math.sin(a) * rr) + '%'; e.style.setProperty('--d', (1.4 + Math.random() * 2) + 's'); e.style.setProperty('--dl', (-Math.random() * 3) + 's'); sp.appendChild(e); }
+  salVis = -1; salFH = -1; return true;
 }
 function salApply() {
-  const r = salR, cnt = salB ? salB.filter(o => o.y <= r).length : 0; q('bank-fill').style.height = (r * 100) + '%';
+  const r = salR, cnt = salB ? salB.filter(o => o.y <= r).length : 0; { const hp = Math.round(r * 1e4) / 100; if (hp !== salFH) { salFH = hp; q('bank-fill').style.height = hp + '%'; } }
   if (cnt === salVis) return; salVis = cnt;
   salEls.forEach((b, i) => { b.style.display = i < cnt ? 'block' : 'none'; b.classList.toggle('top', i < cnt && i >= cnt - 16); });
 }
@@ -1000,10 +1000,10 @@ function salDetail(S, n) {
   if (!salOpen) return; const ok = salLayout(), mx = salMax(S), cur = n < pd(S.enlist_date) ? 0 : totalPay(S, n, q('check-matching').checked); salR = mx ? Math.min(1, cur / mx) : 0;
   q('sal-owner').innerText = `${S.nickname || '군인'}의 군 통장`;
   q('sal-big').innerText = cur.toLocaleString('ko-KR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  q('sal-pct').innerText = `최대의 ${(salR * 100).toFixed(4)}% · ${q('check-matching').checked ? '매칭금 포함' : '매칭금 제외'}`;
+  if ((salTC++ % 4) === 0) q('sal-pct').innerText = `최대의 ${(salR * 100).toFixed(4)}% · ${q('check-matching').checked ? '매칭금 포함' : '매칭금 제외'}`;
   q('sal-max-label').innerText = `${salFmt(mx)}원`; if (ok) salApply();
 }
-let salGeoK = null;
+let salGeoK = null, salFH = -1, salTC = 0, salPng = false;
 function salGeoUpd() {
   if (salGeo && salLW && salGeoK === salLW) return true; const m = q('modal-sal'), b = q('bank'), g = q('bank-glass'); if (!m || !b || !g) return false; const mr = m.getBoundingClientRect(), bk = b.getBoundingClientRect(), gl = g.getBoundingClientRect(); if (!bk.width) return false;
   salGeo = { vw: mr.width, vh: mr.height, slotX: bk.left + bk.width / 2 - mr.left, slotY: bk.top + bk.height * .125 - mr.top, gcx: gl.left + gl.width / 2 - mr.left, gcy: gl.top + gl.height / 2 - mr.top, gr: gl.width / 2, gbot: gl.bottom - mr.top, gh: gl.height, bw: bk.width }; salGeoK = salLW; return true;
@@ -1017,17 +1017,17 @@ function salGlow(xm) {
   const hl = q('bank-halo'); if (hl) hl.animate([{ opacity: .8, transform: 'scale(1)' }, { opacity: 1, transform: 'scale(1.2)', offset: .3 }, { opacity: .8, transform: 'scale(1)' }], { duration: 650, easing: 'ease-out' });
 }
 function salShake() {
-  if (!salOpen) return; const cnt = salVis > 0 ? salVis : 0, tops = salEls.slice(Math.max(0, cnt - 36), cnt), R = Math.random, TP = Math.PI * 2;
+  if (!salOpen) return; const cnt = salVis > 0 ? salVis : 0, tops = salEls.slice(Math.max(0, cnt - 22), cnt), R = Math.random, TP = Math.PI * 2;
   tops.forEach((b, i) => {
-    const r0 = parseFloat(b.style.getPropertyValue('--r0')) || 0, H = 50 + R() * 120, A = 14 + R() * 26, f = 1.6 + R() * 1.4, p0 = R() * TP, dur = 1900 + R() * 900, N = 26, kf = [], T = .34;
+    const r0 = parseFloat(b.style.getPropertyValue('--r0')) || 0, H = 50 + R() * 120, A = 14 + R() * 26, f = 1.6 + R() * 1.4, p0 = R() * TP, dur = 1900 + R() * 900, N = 16, kf = [], T = .34;
     for (let k = 0; k <= N; k++) { const t = k / N; let y; if (t < T) { const a = t / T; y = -H * (1 - Math.pow(1 - a, 2)); } else { const a = (t - T) / (1 - T); y = -H * (1 - a * a * (3 - 2 * a) * .85 - a * .15); } const fade = k === N ? 0 : Math.sin(Math.PI * Math.min(1, t * 1.05)), ph = TP * f * t + p0;
       kf.push({ offset: t, transform: k === N ? `translate(0,0) rotate(${r0}deg)` : `translate(${(A * Math.sin(ph) * fade).toFixed(1)}px,${y.toFixed(1)}px) perspective(500px) rotateY(${(70 * Math.sin(ph * .8 + 1) * fade).toFixed(1)}deg) rotateZ(${(r0 + 38 * Math.sin(ph + 1.3) * fade).toFixed(1)}deg)` }); }
     b.animate(kf, { duration: dur, delay: i * 14, easing: 'linear' });
   });
-  for (let i = 0; i < 6; i++) setTimeout(() => salSpawn(true), Math.random() * 500);
+  for (let i = 0; i < 4; i++) setTimeout(() => salSpawn(true), Math.random() * 500);
 }
 function salSpawn(inBank) {
-  const c = q('sal-rain'); if (!c || !salOpen || !salGeo || salP.length > 44) return; const g = salGeo, R = Math.random, TP = Math.PI * 2, gold = R() > .7;
+  const c = q('sal-rain'); if (!c || !salOpen || !salGeo || salP.length > 26) return; const g = salGeo, R = Math.random, TP = Math.PI * 2, gold = R() > .7;
   const b = document.createElement('div'); b.className = 'bill ' + (gold ? 'y' : 'g'); b.style.left = '0'; b.style.top = '0'; b.style.willChange = 'transform';
   const P = { el: b, in: inBank, st: 0, w: 0, ph: R() * TP, wv: 0, wo: 0, y: -70, x: 0 };
   if (inBank) { P.w = Math.max(46, Math.min(72, g.bw * .17)); P.x0 = g.slotX + (R() * 2 - 1) * g.vw * .5; P.A = 30 + R() * 44; P.om = 3.2 + R() * 2; P.vy = 78 + R() * 36; P.B = 26 + R() * 28; P.F = 55 + R() * 25; P.y = -60; }
@@ -1056,7 +1056,7 @@ function salStep(ts) {
       const surf = g.gbot - salR * g.gh - b.w * .12; if (b.y >= Math.max(surf, g.slotY + 20)) { salGlow(x); salSnd(); done = true; }
     }
     b.x = x; if (done) { b.el.remove(); salP.splice(i, 1); continue; }
-    b.el.style.opacity = '1'; b.el.style.transform = `translate(${(x - b.w / 2).toFixed(1)}px,${y.toFixed(1)}px) scale(${sc}) perspective(520px) rotateY(${ry.toFixed(1)}deg) rotateZ(${rz.toFixed(1)}deg)`;
+    if (!b.shown) { b.shown = 1; b.el.style.opacity = '1'; } b.el.style.transform = `translate(${(x - b.w / 2).toFixed(1)}px,${y.toFixed(1)}px) scale(${sc}) perspective(520px) rotateY(${ry.toFixed(1)}deg) rotateZ(${rz.toFixed(1)}deg)`;
   }
 }
 function salBind() {
@@ -1065,12 +1065,16 @@ function salBind() {
   m.addEventListener('pointermove', e => { if (!salPtr.d) return; const [x, y] = pos(e), t = performance.now(), dt = Math.max(8, t - salPtr.t) / 1000; salPtr.vx = salPtr.vx * .5 + (x - salPtr.x) / dt * .5; salPtr.vy = salPtr.vy * .5 + (y - salPtr.y) / dt * .5; salPtr.x = x; salPtr.y = y; salPtr.t = t; });
   ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => m.addEventListener(ev, () => { salPtr.d = false; }));
 }
+function salBillPng() {
+  if (salPng) return; salPng = true;
+  ['g', 'y'].forEach(k => { const u = billURI(k), src = u.slice(5, -2), im = new Image(); im.onload = () => { try { const c = document.createElement('canvas'); c.width = 296; c.height = 136; c.getContext('2d').drawImage(im, 0, 0, 296, 136); document.documentElement.style.setProperty('--bill-' + k, 'url(' + c.toDataURL('image/png') + ')'); } catch (e) { } }; im.src = src; });
+}
 function openSal() {
-  const S = S_(); if (!S || !S.enlist_date) return; const st = document.documentElement.style; st.setProperty('--bill-g', billURI('g')); st.setProperty('--bill-y', billURI('y'));
-  salOpen = true; salLW = ''; salVis = -1; salP = []; salBoost = 0; salPtr.d = false; openM('modal-sal'); salBind(); xpRun('modal-sal', q('salary-card'), true); salAudio(); salIcon(); salDetail(S, Date.now()); setTimeout(() => salDetail(S, Date.now()), 150);
-  salLast = 0; cancelAnimationFrame(salRaf); salRaf = requestAnimationFrame(salStep);
-  for (let i = 0; i < 9; i++) setTimeout(() => salSpawn(i % 2 === 0), 200 + i * 230);
-  clearInterval(salRainT); salRainT = setInterval(() => { salSpawn(true); if (Math.random() < .9) salSpawn(false); }, 600);
+  const S = S_(); if (!S || !S.enlist_date) return; const st = document.documentElement.style; st.setProperty('--bill-g', billURI('g')); st.setProperty('--bill-y', billURI('y')); salBillPng();
+  salOpen = true; salLW = ''; salVis = -1; salP = []; salBoost = 0; salPtr.d = false; openM('modal-sal'); salBind(); salAudio(); salIcon(); salDetail(S, Date.now());
+  xpRun('modal-sal', q('salary-card'), true); setTimeout(() => salDetail(S, Date.now()), 150);
+  salLast = 0; cancelAnimationFrame(salRaf);
+  setTimeout(() => { if (!salOpen) return; salRaf = requestAnimationFrame(salStep); for (let i = 0; i < 7; i++) setTimeout(() => salSpawn(i % 2 === 0), i * 260); clearInterval(salRainT); salRainT = setInterval(() => { salSpawn(true); if (Math.random() < .55) salSpawn(false); }, 620); }, 520);
 }
 function salQuiet() { clearInterval(salRainT); try { if (salAC) salAC.suspend(); } catch (e) { } }
 function salClose() { salOpen = false; salP = []; salPtr.d = false; clearInterval(salRainT); cancelAnimationFrame(salRaf); salRaf = 0; const c = q('sal-rain'); if (c) c.innerHTML = ''; try { if (salAC) salAC.suspend(); } catch (e) { } }
