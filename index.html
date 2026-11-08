@@ -59,6 +59,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 .spk::before,.spk::after{content:'';position:absolute;left:50%;top:50%;background:linear-gradient(90deg,rgba(255,255,255,0),#fff,rgba(255,255,255,0))}
 .spk::before{width:24px;height:1.5px;margin:-.75px 0 0 -12px}.spk::after{width:1.5px;height:24px;margin:-12px 0 0 -.75px;background:linear-gradient(180deg,rgba(255,255,255,0),#fff,rgba(255,255,255,0))}
 #soldier-card .pcard,#gf-profile-card .pcard,#salary-card{cursor:pointer;-webkit-tap-highlight-color:transparent}
+@keyframes haloPulse{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
 </style>
 </head>
 <body class="min-h-screen flex justify-center items-start sm:p-4 select-none antialiased bg-gray-100">
@@ -307,8 +308,8 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
   <div class="flex items-center gap-3 px-4 pb-1 relative z-30" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeModal('modal-sal')" class="w-10 h-10 rounded-full bg-white/10 font-bold text-[18px]">‹</button><div class="font-bold text-[16px] flex-1">실시간 복무 급여 통장</div><button id="sal-snd" onclick="salToggleSnd(event)" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"></button></div>
   <div class="px-6 pt-1 text-center relative z-30"><div id="sal-owner" class="text-[14px] font-bold opacity-90">군인의 군 통장</div><div class="flex items-baseline justify-center gap-1 mt-0.5"><span id="sal-big" class="text-[34px] font-extrabold tabular-nums">0</span><span class="text-[18px] font-bold opacity-80">원</span></div><div id="sal-pct" class="text-[12px] opacity-70 mt-0.5"></div><div class="text-[11px] opacity-60 mt-1">터치하면 돈이 빨려들어가요 · 드래그하면 돈이 휘어져요</div></div>
   <div id="sal-stage" class="relative flex-1 mt-1">
-   <div id="bank" class="absolute z-10" style="animation:bankGlow 2.8s ease-in-out infinite">
-    <div class="absolute rounded-full pointer-events-none" style="inset:-14%;background:radial-gradient(circle,rgba(255,214,110,.42) 0%,rgba(255,200,90,.16) 48%,rgba(255,200,90,0) 70%)"></div>
+   <div id="bank" class="absolute z-10">
+    <div id="bank-halo" class="absolute rounded-full pointer-events-none" style="inset:-14%;animation:haloPulse 2.8s ease-in-out infinite;background:radial-gradient(circle,rgba(255,214,110,.5) 0%,rgba(255,200,90,.16) 48%,rgba(255,200,90,0) 70%)"></div>
     <div id="bank-glass" class="absolute overflow-hidden" style="left:4%;top:6%;width:92%;height:92%;border-radius:50%;background:radial-gradient(circle at 34% 26%,rgba(255,244,190,.5),rgba(255,214,110,.2) 55%,rgba(255,190,70,.34))">
      <div id="bank-fill" class="absolute left-0 right-0 bottom-0" style="height:0;background:linear-gradient(180deg,rgba(255,225,130,.10),rgba(120,170,100,.34))"></div>
      <div id="bank-bills" class="absolute inset-0"></div>
@@ -418,7 +419,7 @@ const sb = configured ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) :
 const q = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const openM = id => { q(id).classList.remove('hidden'); q(id).classList.add('flex'); };
-function closeModal(id) { if ((id === 'modal-sd' || id === 'modal-gd' || id === 'modal-sal') && typeof xpClose === 'function' && xpClose(id)) return; if (typeof xpEl !== 'undefined' && xpEl && (id === 'modal-sd' || id === 'modal-gd' || id === 'modal-sal')) { xpEl.style.visibility = ''; } q(id).classList.add('hidden'); q(id).classList.remove('flex'); if (id === 'modal-sal' && typeof salClose === 'function') salClose(); if (id === 'modal-friends' && typeof stopFriendTimers === 'function') stopFriendTimers(); if (id === 'modal-settings' && typeof me !== 'undefined' && me) applyTheme((S_() || {}).branch || 'army'); }
+function closeModal(id) { if ((id === 'modal-sd' || id === 'modal-gd' || id === 'modal-sal') && typeof xpClose === 'function' && xpClose(id)) return; if (typeof xpEl !== 'undefined' && xpEl && (id === 'modal-sd' || id === 'modal-gd' || id === 'modal-sal')) { xpEl.style.visibility = ''; xpTCRestore(); } q(id).classList.add('hidden'); q(id).classList.remove('flex'); if (id === 'modal-sal' && typeof salClose === 'function') salClose(); if (id === 'modal-friends' && typeof stopFriendTimers === 'function') stopFriendTimers(); if (id === 'modal-settings' && typeof me !== 'undefined' && me) applyTheme((S_() || {}).branch || 'army'); }
 const showAlert = (t, m) => { q('alert-title').innerText = t; q('alert-message').innerHTML = m; openM('modal-alert'); };
 const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const pd = s => new Date(s + 'T00:00:00');
@@ -921,31 +922,40 @@ function openGd() {
   q('gd-rank').innerHTML = `${gi[0]} 곰신 ${gi[1]}`; q('gd-name').innerText = G.nickname || (G.gf_theme === 'cat' ? '꽃냥이' : '곰신 베어'); q('gd-love').innerHTML = q('gf-love-days').innerHTML; xpRun('modal-gd', q('gf-profile-card').querySelector('.pcard'));
 }
 /* ---------- 카드 → 전체화면 확장 애니메이션 (토스 느낌) ---------- */
-let xpEl = null, xpBusy = false, xpBypass = false; const XP_EASE = 'cubic-bezier(.22,.9,.24,1)';
-function xpOv(card, W, H) {
+let xpEl = null, xpBusy = false, xpBypass = false, xpPrevTC = null; const XP_EASE = 'cubic-bezier(.22,.9,.24,1)', XP_TC = { 'modal-sd': '#F7F8F9', 'modal-gd': '#F7F8F9', 'modal-sal': '#1C241A' };
+function xpTC(id) { const m = document.querySelector('meta[name="theme-color"]'); if (!m) return; if (xpPrevTC === null) xpPrevTC = m.getAttribute('content'); m.setAttribute('content', XP_TC[id] || xpPrevTC); }
+function xpTCRestore() { const m = document.querySelector('meta[name="theme-color"]'); if (m && xpPrevTC !== null) m.setAttribute('content', xpPrevTC); xpPrevTC = null; }
+function xpClip(card) { const r = card.getBoundingClientRect(), W = innerWidth, H = innerHeight, rad = parseFloat(getComputedStyle(card).borderTopLeftRadius) || 26; return `inset(${Math.max(0, r.top)}px ${Math.max(0, W - r.right)}px ${Math.max(0, H - r.bottom)}px ${Math.max(0, r.left)}px round ${rad}px)`; }
+const XP_FULL = 'inset(0px 0px 0px 0px round 0px)';
+function xpOv(card) {
   const r = card.getBoundingClientRect(), cs = getComputedStyle(card), o = document.createElement('div');
-  o.style.cssText = `position:fixed;z-index:75;pointer-events:none;overflow:hidden;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;border-radius:${cs.borderRadius};background:${cs.backgroundImage !== 'none' ? cs.backgroundImage : cs.backgroundColor};box-shadow:0 12px 40px rgba(0,0,0,.2)`;
-  const c = card.cloneNode(true); c.querySelectorAll('[id]').forEach(e => e.removeAttribute('id')); c.removeAttribute('id'); c.style.cssText = `position:absolute;left:0;top:0;width:${r.width}px;height:${r.height}px;margin:0;background:none;transition:none`; o.appendChild(c); document.body.appendChild(o);
-  return { o, c, r, rad: cs.borderRadius, full: { left: '0px', top: '0px', width: W + 'px', height: H + 'px', borderRadius: '0px' }, from: { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px', borderRadius: cs.borderRadius } };
+  o.style.cssText = `position:fixed;left:0;top:0;right:0;bottom:0;z-index:75;pointer-events:none;overflow:hidden;will-change:clip-path,opacity;background:${cs.backgroundImage !== 'none' ? cs.backgroundImage : cs.backgroundColor}`;
+  const c = card.cloneNode(true); c.querySelectorAll('[id]').forEach(e => e.removeAttribute('id')); c.removeAttribute('id'); c.style.cssText = `position:absolute;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;margin:0;background:none;transition:none`; o.appendChild(c); document.body.appendChild(o);
+  return { o, c };
 }
 function xpRun(id, card, noOpen) {
   if (!noOpen) openM(id); const m = q(id); xpEl = card; if (!card || !m.animate || !card.getBoundingClientRect().width) return;
-  const W = innerWidth, H = innerHeight, v = xpOv(card, W, H); card.style.visibility = 'hidden';
-  v.o.animate([v.from, v.full], { duration: 500, easing: XP_EASE, fill: 'forwards' }); v.c.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 220, fill: 'forwards' });
-  m.animate([{ opacity: 0 }, { opacity: 0, offset: .55 }, { opacity: 1 }], { duration: 640, easing: 'linear' });
-  v.o.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 260, delay: 400, fill: 'forwards' }).finished.then(() => v.o.remove()).catch(() => v.o.remove());
-  [...m.children].forEach((c, i) => c.animate([{ opacity: 0, transform: 'translateY(30px)' }, { opacity: 1, transform: 'none' }], { duration: 480, delay: 330 + i * 50, easing: XP_EASE, fill: 'backwards' }));
+  const v = xpOv(card), from = xpClip(card), D = 480; card.style.visibility = 'hidden'; m.style.willChange = 'clip-path,opacity';
+  v.o.animate([{ clipPath: from }, { clipPath: XP_FULL }], { duration: D, easing: XP_EASE, fill: 'forwards' });
+  m.animate([{ clipPath: from }, { clipPath: XP_FULL }], { duration: D, easing: XP_EASE });
+  m.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 260, delay: 90, easing: 'ease-out', fill: 'backwards' });
+  v.c.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 170, fill: 'forwards' });
+  v.o.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, delay: 170, easing: 'ease-out', fill: 'forwards' }).finished.then(() => { v.o.remove(); m.style.willChange = ''; }).catch(() => v.o.remove());
+  [...m.children].forEach((c, i) => c.animate([{ opacity: 0, transform: 'translateY(26px)' }, { opacity: 1, transform: 'none' }], { duration: 440, delay: 110 + i * 40, easing: XP_EASE, fill: 'backwards' }));
+  setTimeout(() => xpTC(id), 160);
 }
 function xpClose(id) {
   if (xpBypass) return false; if (xpBusy) return true; const card = xpEl, m = q(id); if (!card || !card.isConnected || !m.animate || !card.getBoundingClientRect().width) return false; xpBusy = true;
-  const W = innerWidth, H = innerHeight, v = xpOv(card, W, H), end = () => { card.style.visibility = ''; v.o.remove(); xpBusy = false; xpEl = null; };
-  Object.assign(v.o.style, v.full); v.c.style.opacity = '0'; v.o.style.opacity = '0';
-  v.o.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 180, fill: 'forwards' }).finished.then(() => {
-    xpBypass = true; try { closeModal(id); } finally { xpBypass = false; }
-    const rr = card.getBoundingClientRect(); v.c.style.width = rr.width + 'px'; v.c.style.height = rr.height + 'px';
-    v.c.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 260, delay: 160, fill: 'forwards' });
-    return v.o.animate([v.full, { left: rr.left + 'px', top: rr.top + 'px', width: rr.width + 'px', height: rr.height + 'px', borderRadius: v.rad }], { duration: 440, easing: XP_EASE, fill: 'forwards' }).finished;
-  }).then(() => { card.style.visibility = ''; return v.o.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 120, fill: 'forwards' }).finished; }).then(end).catch(() => { end(); });
+  if (id === 'modal-sal' && typeof salQuiet === 'function') salQuiet();
+  const v = xpOv(card), to = xpClip(card), D = 430; m.style.willChange = 'clip-path,opacity'; v.c.style.opacity = '0';
+  const end = () => { m.getAnimations().forEach(a => a.cancel()); m.style.willChange = ''; card.style.visibility = ''; v.o.remove(); xpBusy = false; xpEl = null; xpTCRestore(); };
+  v.o.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 170, fill: 'forwards' });
+  v.o.animate([{ clipPath: XP_FULL }, { clipPath: to }], { duration: D, easing: XP_EASE, fill: 'forwards' });
+  v.c.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 230, delay: 160, fill: 'forwards' });
+  m.animate([{ clipPath: XP_FULL }, { clipPath: to }], { duration: D, easing: XP_EASE, fill: 'forwards' });
+  m.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, delay: 150, fill: 'forwards' });
+  setTimeout(xpTCRestore, 120);
+  setTimeout(() => { xpBypass = true; try { closeModal(id); } finally { xpBypass = false; } end(); }, D + 20);
   return true;
 }
 document.addEventListener('click', e => {
@@ -1005,7 +1015,7 @@ function salGlow(xm) {
   e.style.cssText = `position:absolute;width:${s}px;height:${s}px;left:${lx}px;bottom:${salR * 100}%;margin:0 0 ${-s / 2}px ${-s / 2}px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,230,1),rgba(255,226,130,.7) 38%,rgba(255,200,90,0) 70%);pointer-events:none;z-index:9999`;
   g.appendChild(e); e.animate([{ opacity: 1, transform: 'scale(.3)' }, { opacity: .75, transform: 'scale(1.2)', offset: .35 }, { opacity: 0, transform: 'scale(2)' }], { duration: 750, easing: 'ease-out' }).onfinish = () => e.remove();
   for (let i = 0; i < 6; i++) { const p = document.createElement('div'); p.className = 'spk'; p.style.cssText = `left:${lx}px;bottom:${salR * 100}%;z-index:9999;animation:none;opacity:1`; g.appendChild(p); const a = Math.random() * 6.28, d = 20 + Math.random() * 36; p.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d - 14}px) scale(.2)`, opacity: 0 }], { duration: 600 + Math.random() * 300, easing: 'ease-out' }).onfinish = () => p.remove(); }
-  bk.animate([{ filter: 'drop-shadow(0 0 12px rgba(255,205,100,.35))' }, { filter: 'drop-shadow(0 0 34px rgba(255,235,150,1))', offset: .3 }, { filter: 'drop-shadow(0 0 12px rgba(255,205,100,.35))' }], { duration: 650, easing: 'ease-out' });
+  const hl = q('bank-halo'); if (hl) hl.animate([{ opacity: .8, transform: 'scale(1)' }, { opacity: 1, transform: 'scale(1.2)', offset: .3 }, { opacity: .8, transform: 'scale(1)' }], { duration: 650, easing: 'ease-out' });
 }
 function salShake() {
   if (!salOpen) return; const cnt = salVis > 0 ? salVis : 0, tops = salEls.slice(Math.max(0, cnt - 36), cnt), R = Math.random, TP = Math.PI * 2;
@@ -1063,6 +1073,7 @@ function openSal() {
   for (let i = 0; i < 9; i++) setTimeout(() => salSpawn(i % 2 === 0), 200 + i * 230);
   clearInterval(salRainT); salRainT = setInterval(() => { salSpawn(true); if (Math.random() < .9) salSpawn(false); }, 600);
 }
+function salQuiet() { clearInterval(salRainT); try { if (salAC) salAC.suspend(); } catch (e) { } }
 function salClose() { salOpen = false; salP = []; salPtr.d = false; clearInterval(salRainT); cancelAnimationFrame(salRaf); salRaf = 0; const c = q('sal-rain'); if (c) c.innerHTML = ''; try { if (salAC) salAC.suspend(); } catch (e) { } }
 addEventListener('resize', () => { salLW = ''; });
 
