@@ -49,7 +49,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 .cm-chip.on{background:#191F28;color:#fff;border-color:#191F28}
 .cm-row{padding:16px 18px;border-bottom:1px solid #F2F3F5;display:block;width:100%;text-align:left}
 .cm-row:active{background:#F5F6F8}
-.bill{position:absolute;border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.3);background-size:100% 100%;background-repeat:no-repeat}.bill.g{background-image:var(--bill-g)}.bill.y{background-image:var(--bill-y)}
+.bill{position:absolute;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.3);background-size:100% 100%;background-repeat:no-repeat}.bill.g{background-image:var(--bill-g)}.bill.y{background-image:var(--bill-y)}
 @keyframes billSway{0%,100%{transform:translateY(0) rotate(var(--r0))}50%{transform:translateY(-5px) rotate(var(--r1))}}
 .bill.pb.top{animation:billSway var(--d,3s) ease-in-out infinite}
 .pk{text-shadow:0 1px 8px rgba(190,60,100,.18)}.pk .pbar{background:rgba(255,255,255,.4)}.pk #gf-esc-bar,.pk #gf-esc-bar2{background:rgba(255,255,255,.75)!important}.pk [class~="bg-white/10"]{background:rgba(255,255,255,.38)!important}.pk [class~="bg-white/25"]{background:rgba(255,255,255,.72)!important}.pk [id$="-pct"],.pk [id$="-pct2"]{color:#8E2F4D;text-shadow:none}
@@ -622,8 +622,8 @@ let salT, rainT;
 function startSal(S) {
   clearInterval(salT); clearInterval(rainT);
   q('salary-branch-desc').innerText = `2026 기준 (${BR[S.branch].m}개월 복무)`;
-  salT = setInterval(() => { const n = Date.now(); tickPct(S, n); if (n < pd(S.enlist_date)) { q('live-total-salary').innerText = '0.00'; salDetail(S, n); return; } q('live-total-salary').innerText = totalPay(S, n, q('check-matching').checked).toLocaleString('ko-KR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); salDetail(S, n); }, 50);
-  rainT = setInterval(() => rainBurst(1), 900); // 터치 안 해도 일정 속도로 낙하
+  salT = setInterval(() => { if (xpAnim) return; const n = Date.now(); tickPct(S, n); if (n < pd(S.enlist_date)) { q('live-total-salary').innerText = '0.00'; salDetail(S, n); return; } q('live-total-salary').innerText = totalPay(S, n, q('check-matching').checked).toLocaleString('ko-KR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); salDetail(S, n); }, 50);
+  rainT = setInterval(() => { if (xpAnim || salOpen || xpEl) return; rainBurst(1); }, 900); // 터치 안 해도 일정 속도로 낙하
 }
 function rainBurst(n) {
   const c = q('money-rain-container'); if (!c) return;
@@ -861,7 +861,7 @@ function emoSwap(root) {
     if (n.parentNode) n.parentNode.replaceChild(frag, n);
   });
 }
-new MutationObserver(ms => { ms.forEach(m => { if (m.type === 'childList') m.addedNodes.forEach(n => { if (n.nodeType === 1 || n.nodeType === 3) emoSwap(n); }); else emoSwap(m.target); }); }).observe(document.body, { childList: true, subtree: true, characterData: true });
+new MutationObserver(ms => { ms.forEach(m => { if (m.type === 'childList') m.addedNodes.forEach(n => { if (n.nodeType === 1 || n.nodeType === 3) { EMO_RE.lastIndex = 0; if (EMO_RE.test(n.textContent || '')) emoSwap(n); } }); else { EMO_RE.lastIndex = 0; if (EMO_RE.test(m.target.nodeValue || '')) emoSwap(m.target); } }); }).observe(document.body, { childList: true, subtree: true, characterData: true });
 emoSwap(document.body);
 
 /* ---------- 커뮤니티 ---------- */
@@ -922,7 +922,7 @@ function openGd() {
   q('gd-rank').innerHTML = `${gi[0]} 곰신 ${gi[1]}`; q('gd-name').innerText = G.nickname || (G.gf_theme === 'cat' ? '꽃냥이' : '곰신 베어'); q('gd-love').innerHTML = q('gf-love-days').innerHTML; xpRun('modal-gd', q('gf-profile-card').querySelector('.pcard'));
 }
 /* ---------- 카드 → 전체화면 확장 애니메이션 (토스 느낌) ---------- */
-let xpEl = null, xpBusy = false, xpBypass = false, xpPrevTC = null; const XP_EASE = 'cubic-bezier(.22,.9,.24,1)', XP_TC = { 'modal-sd': '#F7F8F9', 'modal-gd': '#F7F8F9', 'modal-sal': '#1C241A' };
+let xpAnim = false, xpEl = null, xpBusy = false, xpBypass = false, xpPrevTC = null; const XP_EASE = 'cubic-bezier(.22,.9,.24,1)', XP_TC = { 'modal-sd': '#F7F8F9', 'modal-gd': '#F7F8F9', 'modal-sal': '#1C241A' };
 function xpTC(id) { const m = document.querySelector('meta[name="theme-color"]'); if (!m) return; if (xpPrevTC === null) xpPrevTC = m.getAttribute('content'); m.setAttribute('content', XP_TC[id] || xpPrevTC); }
 function xpTCRestore() { const m = document.querySelector('meta[name="theme-color"]'); if (m && xpPrevTC !== null) m.setAttribute('content', xpPrevTC); xpPrevTC = null; }
 function xpClip(card) { const r = card.getBoundingClientRect(), W = innerWidth, H = innerHeight, rad = parseFloat(getComputedStyle(card).borderTopLeftRadius) || 26; return `inset(${Math.max(0, r.top)}px ${Math.max(0, W - r.right)}px ${Math.max(0, H - r.bottom)}px ${Math.max(0, r.left)}px round ${rad}px)`; }
@@ -935,25 +935,23 @@ function xpOv(card) {
 }
 function xpRun(id, card, noOpen) {
   if (!noOpen) openM(id); const m = q(id); xpEl = card; if (!card || !m.animate || !card.getBoundingClientRect().width) return;
-  const v = xpOv(card), from = xpClip(card), D = 480; card.style.visibility = 'hidden'; m.style.willChange = 'clip-path,opacity';
+  const v = xpOv(card), from = xpClip(card), D = 440; xpAnim = true; setTimeout(() => { xpAnim = false; }, 700); card.style.visibility = 'hidden'; m.style.willChange = 'opacity';
   v.o.animate([{ clipPath: from }, { clipPath: XP_FULL }], { duration: D, easing: XP_EASE, fill: 'forwards' });
-  m.animate([{ clipPath: from }, { clipPath: XP_FULL }], { duration: D, easing: XP_EASE });
-  m.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 260, delay: 90, easing: 'ease-out', fill: 'backwards' });
+  m.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 240, delay: 190, easing: 'ease-out', fill: 'backwards' });
   v.c.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 170, fill: 'forwards' });
-  v.o.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, delay: 170, easing: 'ease-out', fill: 'forwards' }).finished.then(() => { v.o.remove(); m.style.willChange = ''; }).catch(() => v.o.remove());
-  [...m.children].forEach((c, i) => c.animate([{ opacity: 0, transform: 'translateY(26px)' }, { opacity: 1, transform: 'none' }], { duration: 440, delay: 110 + i * 40, easing: XP_EASE, fill: 'backwards' }));
+  v.o.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 260, delay: 200, easing: 'ease-out', fill: 'forwards' }).finished.then(() => { v.o.remove(); m.style.willChange = ''; }).catch(() => v.o.remove());
+  [...m.children].forEach((c, i) => c.animate([{ opacity: 0, transform: 'translateY(26px)' }, { opacity: 1, transform: 'none' }], { duration: 420, delay: 200 + i * 35, easing: XP_EASE, fill: 'backwards' }));
   setTimeout(() => xpTC(id), 160);
 }
 function xpClose(id) {
   if (xpBypass) return false; if (xpBusy) return true; const card = xpEl, m = q(id); if (!card || !card.isConnected || !m.animate || !card.getBoundingClientRect().width) return false; xpBusy = true;
   if (id === 'modal-sal' && typeof salQuiet === 'function') salQuiet();
-  const v = xpOv(card), to = xpClip(card), D = 430; m.style.willChange = 'clip-path,opacity'; v.c.style.opacity = '0';
+  const v = xpOv(card), to = xpClip(card), D = 420; xpAnim = true; setTimeout(() => { xpAnim = false; }, D + 120); m.style.willChange = 'opacity'; v.c.style.opacity = '0';
   const end = () => { m.getAnimations().forEach(a => a.cancel()); m.style.willChange = ''; card.style.visibility = ''; v.o.remove(); xpBusy = false; xpEl = null; xpTCRestore(); };
   v.o.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 170, fill: 'forwards' });
   v.o.animate([{ clipPath: XP_FULL }, { clipPath: to }], { duration: D, easing: XP_EASE, fill: 'forwards' });
   v.c.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 230, delay: 160, fill: 'forwards' });
-  m.animate([{ clipPath: XP_FULL }, { clipPath: to }], { duration: D, easing: XP_EASE, fill: 'forwards' });
-  m.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, delay: 150, fill: 'forwards' });
+  m.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 120, delay: 150, fill: 'forwards' });
   setTimeout(xpTCRestore, 120);
   setTimeout(() => { xpBypass = true; try { closeModal(id); } finally { xpBypass = false; } end(); }, D + 20);
   return true;
@@ -1005,9 +1003,10 @@ function salDetail(S, n) {
   q('sal-pct').innerText = `최대의 ${(salR * 100).toFixed(4)}% · ${q('check-matching').checked ? '매칭금 포함' : '매칭금 제외'}`;
   q('sal-max-label').innerText = `${salFmt(mx)}원`; if (ok) salApply();
 }
+let salGeoK = null;
 function salGeoUpd() {
-  const m = q('modal-sal'), b = q('bank'), g = q('bank-glass'); if (!m || !b || !g) return false; const mr = m.getBoundingClientRect(), bk = b.getBoundingClientRect(), gl = g.getBoundingClientRect(); if (!bk.width) return false;
-  salGeo = { vw: mr.width, vh: mr.height, slotX: bk.left + bk.width / 2 - mr.left, slotY: bk.top + bk.height * .125 - mr.top, gcx: gl.left + gl.width / 2 - mr.left, gcy: gl.top + gl.height / 2 - mr.top, gr: gl.width / 2, gbot: gl.bottom - mr.top, gh: gl.height, bw: bk.width }; return true;
+  if (salGeo && salLW && salGeoK === salLW) return true; const m = q('modal-sal'), b = q('bank'), g = q('bank-glass'); if (!m || !b || !g) return false; const mr = m.getBoundingClientRect(), bk = b.getBoundingClientRect(), gl = g.getBoundingClientRect(); if (!bk.width) return false;
+  salGeo = { vw: mr.width, vh: mr.height, slotX: bk.left + bk.width / 2 - mr.left, slotY: bk.top + bk.height * .125 - mr.top, gcx: gl.left + gl.width / 2 - mr.left, gcy: gl.top + gl.height / 2 - mr.top, gr: gl.width / 2, gbot: gl.bottom - mr.top, gh: gl.height, bw: bk.width }; salGeoK = salLW; return true;
 }
 function salGlow(xm) {
   const g = q('bank-glass'), bk = q('bank'); if (!g || !salOpen || !salGeo) return; const now = Date.now(); if (now - salGlowAt < 80) return; salGlowAt = now;
