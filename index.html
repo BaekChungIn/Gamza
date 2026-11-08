@@ -48,11 +48,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 <body class="min-h-screen flex justify-center items-start sm:p-4 select-none antialiased bg-gray-100">
 
 <!-- 로그인 -->
-<div id="splash" class="fixed inset-0 z-[200] bg-white flex flex-col items-center justify-center transition-opacity duration-500">
-  <img src="logo.png" alt="" class="w-[132px] h-[132px] rounded-[34px] border border-[#E5E8EB] object-cover" style="animation:splashin .7s ease-out both">
-  <div class="text-[30px] font-black tracking-tight mt-5" style="animation:splashin .7s .12s ease-out both">짬타이거</div>
-  <div class="w-[120px] h-[3px] rounded-full bg-[#F2F3F5] overflow-hidden mt-9"><div class="h-full w-1/2 rounded-full" style="background:#191F28;animation:splashbar 1.1s ease-in-out infinite"></div></div>
- </div>
+<div id="splash" class="fixed inset-0 z-[200] transition-opacity duration-500" style="background:#E1E1E1 url(splash.jpg) center/cover no-repeat"></div>
  <div id="auth-modal" class="fixed inset-0 z-[100] bg-[var(--bg-main)] flex items-center justify-center p-6 transition-opacity">
  <div class="w-full max-w-sm bg-white rounded-[32px] p-8 shadow-2xl border border-[#F2F3F5] flex flex-col items-center">
   <img src="logo.png" alt="짬타이거" class="w-24 h-24 rounded-[26px] border border-[#E5E8EB] mb-3 object-cover bg-white"><div class="text-[24px] font-black tracking-tight mb-4">짬타이거</div>
@@ -181,6 +177,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
     <div id="saving-split-warning" class="text-[11px] font-bold text-[#D94867] bg-[#FFF0F3] p-3 rounded-lg text-center mb-5 hidden">⚡ 한도 초과! 총 55만원 또는 1개 은행 30만원을 초과했어요.</div>
     <div class="bg-[var(--mil-dark)] rounded-2xl p-5 text-white"><div class="text-[12px] text-[var(--mil-t2)] mb-1">만기 시 총 예상 수령액</div><div class="text-[28px] font-black mb-2"><span id="saving-total-result">0</span>원</div>
      <div class="flex gap-3 text-[11px] text-[var(--mil-t1)]"><span>원금 <span id="saving-prin">0</span></span><span>이자 <span id="saving-int">0</span></span></div><div class="text-[11px] text-[var(--mil-t0)] mt-1 font-bold">정부 매칭지원금: <span id="saving-match">0</span></div></div>
+    <button id="sav-save" onclick="saveSavNow()" class="w-full mt-4 py-4 rounded-2xl font-bold text-[15px] text-white" style="background:#191F28">저장하기</button><div id="sav-msg" class="text-center text-[11px] mt-2 text-[#8B95A1] min-h-[16px]"></div>
     <p class="text-[10px] text-[#8B95A1] mt-3">※ 우대금리 조건·한도는 은행/시기별로 바뀔 수 있어요. 가입 전 해당 은행 공지를 꼭 확인하세요.</p>
    </div>
   </section>
@@ -218,7 +215,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
   </section>
  </main>
 
- <nav class="bg-white/95 backdrop-blur-md px-3 pt-3 pb-safe flex justify-between items-center z-40 border-t border-[#F2F3F5] shrink-0 absolute bottom-0 left-0 right-0" id="bottom-nav"></nav>
+ <nav class="bg-white/95 backdrop-blur-md px-1 pt-2.5 pb-safe grid grid-cols-6 items-center z-40 border-t border-[#F2F3F5] shrink-0 absolute bottom-0 left-0 right-0" id="bottom-nav"></nav>
 
  <!-- 설정 -->
  <div id="modal-settings" class="fixed inset-0 z-50 bg-white hidden flex-col">
@@ -297,6 +294,19 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
    <div id="sal-rain" class="absolute inset-0 pointer-events-none z-10 overflow-hidden"></div>
    <div id="sal-pile" class="absolute left-0 right-0 bottom-0 z-[5] pile-fill" style="height:0"></div>
   </div></div>
+
+ <div id="modal-cardpick" class="fixed inset-0 z-[65] hidden flex-col" style="background:var(--bg-main)">
+  <div class="flex items-center gap-3 px-4 pb-3" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeModal('modal-cardpick')" class="w-10 h-10 rounded-full bg-white border border-[#E5E8EB] font-bold text-[18px]">‹</button><div class="font-bold text-[16px]">나라사랑카드 설정</div></div>
+  <div class="px-5 text-[12px] text-[#8B95A1] mb-3">가지고 있는 카드를 선택하세요. 여러 개 선택할 수 있어요.</div>
+  <div id="cp-list" class="flex-1 overflow-y-auto no-scrollbar px-5 space-y-3 pb-4"></div>
+  <div class="px-5 pt-2" style="padding-bottom:max(18px,env(safe-area-inset-bottom))"><button onclick="saveCards()" class="w-full py-4 rounded-2xl text-white font-bold text-[15px]" style="background:#191F28">선택 완료</button></div>
+ </div>
+ <div id="modal-card" class="fixed inset-0 z-[70] hidden flex-col overflow-hidden">
+  <div id="cd-bg" class="absolute inset-0" style="background:#191F28;opacity:0"></div>
+  <button id="cd-close" onclick="closeCard()" class="absolute z-30 left-4 w-10 h-10 rounded-full font-bold text-[18px] text-white" style="top:max(14px,env(safe-area-inset-top));background:rgba(255,255,255,.16);opacity:0">‹</button>
+  <img id="cd-img" alt="" class="fixed z-20" style="border-radius:14px;box-shadow:0 20px 44px rgba(0,0,0,.38);left:0;top:0;width:10px;height:10px">
+  <div id="cd-panel" class="absolute left-0 right-0 bottom-0 z-10 bg-white overflow-y-auto no-scrollbar px-6 pt-6" style="border-radius:28px 28px 0 0;opacity:0;padding-bottom:max(28px,env(safe-area-inset-bottom))"></div>
+ </div>
  <div id="modal-post" class="fixed inset-0 z-[60] bg-white hidden flex-col">
   <div class="flex items-center gap-3 px-4 pb-3 border-b border-[#F2F3F5]" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeModal('modal-post')" class="w-10 h-10 rounded-full bg-[#F5F6F8] font-bold text-[18px]">‹</button><div class="font-bold text-[16px]" id="post-cat">게시글</div></div>
   <div id="post-body" class="flex-1 overflow-y-auto no-scrollbar"></div>
@@ -435,7 +445,7 @@ async function loadAll(first) {
   ]);
   wishes = (w.data || []).map(x => x.item_id); pWishes = (pw.data || []).map(x => x.item_id); vacs = v.data || [];
   { const sid = me.gender === 'M' ? me.id : me.partner_id; menus = {}; if (sid) { const { data: mm } = await sb.from('menus').select('*').eq('created_by', sid); (mm || []).forEach(x => menus[x.menu_date] = x); } }
-  if (first) { sav = Object.assign({ banks: [], amts: {}, opts: {} }, me.savings || {}); }
+  if (first) { let ls = null; try { ls = JSON.parse(localStorage.getItem('sav:' + me.id)); } catch (e) { } sav = Object.assign({ banks: [], amts: {}, opts: {} }, (me.savings && me.savings.banks && me.savings.banks.length) ? me.savings : (ls || me.savings || {})); }
   await loadFriends();
   await loadQ();
 }
@@ -640,12 +650,12 @@ function cutscene(r) { const o = document.createElement('div'); o.className = 'f
 /* ---------- 탭/UI ---------- */
 const TABS = [['home', '홈', '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>'], ['savings', '적금', '<rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>'], ['goodman', 'PX굿맨', '<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>'], ['qna', 'Q&A', '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>'], ['community', '커뮤니티', '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'], ['benefits', '혜택', '<path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><line x1="12" y1="22" x2="12" y2="7"/>']];
 function initUI() {
-  q('bottom-nav').innerHTML = TABS.map(t => `<button onclick="switchTab('${t[0]}')" id="nav-btn-${t[0]}" class="flex flex-col items-center gap-1 min-w-[44px]"><svg class="w-6 h-6 sf-icon" viewBox="0 0 24 24">${t[2]}</svg><span class="text-[10px] font-bold">${t[1]}</span></button>`).join('');
+  q('bottom-nav').innerHTML = TABS.map(t => `<button onclick="switchTab('${t[0]}')" id="nav-btn-${t[0]}" class="flex flex-col items-center gap-1"><svg class="w-6 h-6 sf-icon" viewBox="0 0 24 24">${t[2]}</svg><span class="text-[10px] font-bold">${t[1]}</span></button>`).join('');
   q('set-branches').innerHTML = Object.keys(BR).map(k => `<button onclick="setBr('${k}')" id="sb-${k}" class="py-2 rounded-lg border-2 font-bold text-[11px]">${BR[k].k}</button>`).join('');
   switchTab('home');
 }
 function switchTab(t) {
-  curTab = t; TABS.forEach(([id]) => { q('tab-' + id).classList.toggle('hidden', id !== t); q('nav-btn-' + id).className = 'flex flex-col items-center gap-1 transition-all ' + (id === t ? 'text-[var(--mil-green)] scale-105' : 'text-[#B0B8C1]'); });
+  curTab = t; TABS.forEach(([id]) => { q('tab-' + id).classList.toggle('hidden', id !== t); q('nav-btn-' + id).className = 'flex flex-col items-center gap-1 transition-all ' + (id === t ? 'text-[var(--mil-green)]' : 'text-[#B0B8C1]'); });
   if (t === 'savings') renderSav(); if (t === 'goodman') renderPX(); if (t === 'qna') renderQ(true); if (t === 'benefits') renderBenefits(); if (t === 'community') loadCommunity();
 }
 
@@ -792,6 +802,8 @@ const ICONS = {
  smile:'<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>',
  logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',
  flame:'<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
+ info:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
+ chev:'<polyline points="9 18 15 12 9 6"/>',
  drop:'<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>',
  car:'<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M9 17h6"/>',
  ticket:'<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><path d="M13 5v2M13 17v2M13 11v2"/>',
@@ -803,7 +815,7 @@ const ICONS = {
  trash:'<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>'
 };
 const ico = (n, ex = '') => `<svg class="ic" viewBox="0 0 24 24" ${ex}>${ICONS[n] || ''}</svg>`;
-const EMO = { '💕':'heart','❤':'heart','💑':'users','💌':'mail','✉':'mail','🛒':'bag','🌙':'moon','✨':'sparkle','🎉':'sparkle','🔒':'lock','🪖':'shield','🛡':'shield','🌱':'sprout','🌿':'leaf','🌷':'flower','🌸':'flower','💐':'award','🏖':'umbrella','📍':'pin','📌':'pin','🚶':'walk','☀':'sun','✏':'pencil','🚆':'train','🚇':'train','🍚':'utensils','⚡':'zap','🌅':'sunrise','👤':'user','🥔':'user','🐯':'user','🐻':'user','🐈‍⬛':'user','🐈':'user','🚌':'bus','💰':'wallet','💬':'msg','💳':'card','🏠':'home','📓':'book','📚':'book','📷':'camera','✅':'checkc','🔄':'refresh','📥':'download','🎭':'smile','🚪':'logout','🔥':'flame','💧':'drop','🫧':'drop','🚗':'car','🚕':'car','🎢':'ticket','📱':'phone','🪪':'idcard','🎁':'gift','📅':'cal' };
+const EMO = { '💕':'heart','❤':'heart','💑':'users','💌':'mail','✉':'mail','🛒':'bag','🌙':'moon','✨':'sparkle','🎉':'sparkle','🔒':'lock','🪖':'shield','🛡':'shield','🌱':'sprout','🌿':'leaf','🌷':'flower','🌸':'flower','💐':'award','🏖':'umbrella','📍':'pin','📌':'pin','🚶':'walk','☀':'sun','✏':'pencil','🚆':'train','🚇':'train','🍚':'utensils','⚡':'zap','🌅':'sunrise','👤':'user','🥔':'user','🐯':'user','🐻':'user','🐈‍⬛':'user','🐈':'user','🚌':'bus','💰':'wallet','💬':'msg','💳':'card','🏠':'home','📓':'book','📚':'book','📷':'camera','✅':'checkc','🔄':'refresh','📥':'download','🎭':'smile','🚪':'logout','🔥':'flame','💧':'drop','🫧':'drop','🚗':'car','🚕':'car','🎢':'ticket','📱':'phone','🪪':'idcard','🎁':'gift','📅':'cal','ℹ':'info','▶':'chev','⚠':'info' };
 const EMO_RE = new RegExp('(' + Object.keys(EMO).sort((a, b) => b.length - a.length).map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\uFE0F?', 'g');
 function emoSwap(root) {
   if (!root) return; if (root.nodeType === 3) root = root.parentNode; if (!root || !root.nodeType) return;
@@ -898,6 +910,61 @@ function salRain(n) {
 }
 function openSal() { const S = S_(); if (!S || !S.enlist_date) return; salOpen = true; openM('modal-sal'); q('sal-pile').dataset.h = 0; salDetail(S, Date.now()); setTimeout(() => salRain(18), 250); clearInterval(salRainT); salRainT = setInterval(() => salRain(2), 500); }
 function salClose() { salOpen = false; clearInterval(salRainT); const c = q('sal-rain'); if (c) c.innerHTML = ''; }
+
+/* ---------- 나의 나라사랑카드 ---------- */
+const NSC = [
+ { id: 'hana', n: '하나 나라사랑카드', img: 'card_hana.png', tag: '3기 · 하나은행', items: [['PX', '10만원 미만 30% 할인(월 5천원 한도) · 10만원 이상 20% 할인(월 10만원, 일 2만원 한도)'], ['대중교통', '20% 할인'], ['편의점', 'CU 행사품목 10% 할인 (국군의 날·현충일 30%)'], ['커피', '스타벅스 20% 할인'], ['영화', '팝콘 스몰세트 무료 (군 급여 이체 필요)'], ['온라인쇼핑', '10% 캐시백 · 쿠팡/네이버플러스 스토어 20%'], ['실적 조건', 'PX·온라인쇼핑·편의점 등 Easy 서비스는 실적 조건 없음 · Basic 서비스는 전월실적 구간별 월 5천~5만원 한도']] },
+ { id: 'shinhan', n: '신한 나라사랑카드', img: 'card_shinhan.png', tag: '3기 · 신한은행', items: [['PX', '20% 캐시백 (월 최대 10만원, 건당 3만원 이상 결제 제외)'], ['대중교통', '20% 캐시백 (광역교통 10%)'], ['편의점', '20% 캐시백'], ['커피', '5% 캐시백'], ['영화', 'CGV 6천원 제공'], ['통신', '이동통신요금 5% 캐시백'], ['온라인쇼핑', '무신사·29CM 10% 캐시백'], ['해외결제', '1% 캐시백 (전월실적 없이)'], ['실적 조건', '생활 서비스 캐시백 한도가 전월실적 구간별 월 5천~5만원']] },
+ { id: 'ibk', n: 'IBK 나라사랑카드', img: 'card_ibk.png', tag: '3기 · IBK기업은행', items: [['PX', '기본+특별 할인 합쳐 최대 50% (전월실적 불필요)'], ['대중교통', '20% 할인'], ['편의점', '10% 할인'], ['카페', '10% 할인'], ['영화', 'CGV 최대 3천원 할인'], ['통신', '이동통신 5% 할인'], ['쇼핑·배달', '10% 할인'], ['사랑서비스', '아웃백 20%, 교보문고·어학시험 2천원 할인 등'], ['현역병 패키지', '군 급여 수령만으로 이용 가능 (네이버플러스 멤버십·아웃백·통합 쿠폰 등, 세부 조건은 은행 공지 확인)']] },
+ { id: 'kb', n: 'KB국민 나라사랑카드', img: 'card_kb.png', tag: '기존 발급자 · KB국민카드', items: [['군 생활권', '군마트 PX, GS25, 해군마트 등 GS리테일 계열 할인'], ['교통·통신', '대중교통, 이동통신요금 할인'], ['생활·여가', 'CGV 영화, 스타벅스, 에버랜드·롯데월드 등 할인'], ['외식', '아웃백, VIPS 할인'], ['보험', 'KB손해보험 단체보험 성격의 무료 가입 항목 (군 시설 내외 사고, 대중교통 상해 등)'], ['안내', '2026년 3기 신규 발급은 신한·하나·IBK기업은행이에요. 정확한 할인율·실적 조건은 KB국민카드 공지를 확인하세요.']] }
+];
+const myCards = () => (sav && Array.isArray(sav.cards) ? sav.cards : []).filter(id => NSC.some(c => c.id === id));
+function cardSection() {
+  const ids = myCards();
+  return `<div class="toss-card"><div class="flex justify-between items-center"><h2 class="text-[18px] font-extrabold">나의 나라사랑카드</h2><button onclick="openCardPick()" class="text-[12px] font-bold bg-[#F5F6F8] px-3 py-1.5 rounded-full">${ids.length ? '변경' : '설정하기'}</button></div>
+  ${ids.length ? `<div class="flex gap-3 overflow-x-auto no-scrollbar mt-2 -mx-6 px-6 py-4" style="scroll-snap-type:x mandatory">${ids.map((id, i) => { const c = NSC.find(x => x.id === id); return `<div class="shrink-0" style="width:${ids.length > 1 ? '78%' : '100%'};scroll-snap-align:center"><img id="nsc-img-${i}" src="${c.img}" alt="${esc(c.n)}" onclick="openCard(${i})" class="w-full block active:scale-[.98] transition" style="border-radius:14px;box-shadow:0 10px 26px rgba(0,0,0,.18)"></div>`; }).join('')}</div><p class="text-[11px] text-[#8B95A1] text-center mt-3">혜택을 보고 싶으면 카드를 터치하세요</p>`
+   : `<button onclick="openCardPick()" class="w-full mt-4 rounded-2xl border-2 border-dashed border-[#D5D9DE] py-9 text-[13px] font-bold text-[#8B95A1]">${ico('card')} 나라사랑카드를 설정해보세요</button>`}</div>`;
+}
+let cpSel = [];
+function openCardPick() { cpSel = myCards().slice(); paintCardPick(); openM('modal-cardpick'); }
+function paintCardPick() {
+  q('cp-list').innerHTML = NSC.map(c => { const on = cpSel.includes(c.id); return `<button onclick="cpTog('${c.id}')" class="w-full flex items-center gap-3 p-3 rounded-2xl bg-white text-left ${on ? 'border-2 border-[var(--mil-green)]' : 'border border-[#E5E8EB]'}"><img src="${c.img}" alt="" class="w-[96px] shrink-0" style="border-radius:8px"><div class="flex-1 min-w-0"><div class="text-[14px] font-bold">${esc(c.n)}</div><div class="text-[11px] text-[#8B95A1] mt-0.5">${esc(c.tag)}</div></div><span class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${on ? 'text-white' : 'border-2 border-[#D5D9DE]'}" style="${on ? 'background:var(--mil-green)' : ''}">${on ? ico('checkc') : ''}</span></button>`; }).join('');
+}
+function cpTog(id) { cpSel = cpSel.includes(id) ? cpSel.filter(x => x !== id) : cpSel.concat(id); paintCardPick(); }
+async function saveCards() {
+  const payload = Object.assign({}, sav, { cards: cpSel.slice() });
+  const { error } = await sb.from('profiles').update({ savings: Object.assign({}, me.savings || {}, { cards: cpSel.slice() }) }).eq('id', me.id);
+  if (error) return showAlert('저장 실패', '잠시 후 다시 시도해주세요.');
+  sav.cards = cpSel.slice(); me.savings = Object.assign({}, me.savings || {}, { cards: cpSel.slice() }); try { localStorage.setItem('sav:' + me.id, JSON.stringify(Object.assign({}, sav))); } catch (e) { }
+  closeModal('modal-cardpick'); renderBenefits();
+}
+let cdCur = null, cdBusy = false;
+const cdEase = 'cubic-bezier(.2,.8,.2,1)';
+async function openCard(i) {
+  if (cdBusy) return; cdBusy = true; const c = NSC.find(x => x.id === myCards()[i]), el = q('nsc-img-' + i); if (!c || !el) { cdBusy = false; return; }
+  const r = el.getBoundingClientRect(), vw = innerWidth, vh = innerHeight, ratio = r.height / r.width; cdCur = { el, i };
+  const img = q('cd-img'); img.src = c.img; const box = (w, top) => ({ left: (vw - w) / 2 + 'px', top: top + 'px', width: w + 'px', height: w * ratio + 'px' });
+  const from = { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' };
+  const wc = Math.min(vw - 48, 360), center = box(wc, (vh - wc * ratio) / 2), wf = Math.min(vw - 110, 280), safe = 64, top = box(wf, safe), panelTop = safe + wf * ratio + 24;
+  Object.assign(img.style, from); el.style.visibility = 'hidden';
+  q('cd-panel').style.top = panelTop + 'px'; q('cd-panel').style.opacity = 0; q('cd-panel').innerHTML = `<div class="text-[20px] font-extrabold">${esc(c.n)}</div><div class="text-[12px] text-[#8B95A1] mt-0.5 mb-4">${esc(c.tag)} · 2026.01 기준 · 세부 조건은 카드사 공지를 꼭 확인하세요</div>${c.items.map((it, k) => `<div class="cd-row py-3.5 border-t border-[#F2F3F5]" style="opacity:0"><div class="text-[13px] font-extrabold text-[var(--mil-green)]">${esc(it[0])}</div><div class="text-[14px] text-[#191F28] mt-0.5 leading-relaxed">${esc(it[1])}</div></div>`).join('')}`;
+  openM('modal-card');
+  q('cd-bg').animate([{ opacity: 0 }, { opacity: 1 }], { duration: 260, fill: 'forwards' });
+  await img.animate([from, center], { duration: 460, easing: cdEase, fill: 'forwards' }).finished;
+  await sleep(420);
+  q('cd-close').animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: 'forwards' });
+  q('cd-panel').animate([{ opacity: 0, transform: 'translateY(70px)' }, { opacity: 1, transform: 'none' }], { duration: 560, easing: cdEase, fill: 'forwards' });
+  document.querySelectorAll('.cd-row').forEach((row, k) => row.animate([{ opacity: 0, transform: 'translateY(16px)' }, { opacity: 1, transform: 'none' }], { duration: 420, delay: 180 + k * 60, easing: cdEase, fill: 'forwards' }));
+  await img.animate([center, top], { duration: 560, easing: cdEase, fill: 'forwards' }).finished; cdBusy = false;
+}
+async function closeCard() {
+  if (cdBusy || !cdCur) return; cdBusy = true; const img = q('cd-img'), el = cdCur.el, r = el.getBoundingClientRect();
+  const cur = { left: img.style.left, top: img.style.top, width: img.style.width, height: img.style.height }, cs = getComputedStyle(img), now = { left: cs.left, top: cs.top, width: cs.width, height: cs.height };
+  q('cd-panel').animate([{ opacity: 1 }, { opacity: 0, transform: 'translateY(50px)' }], { duration: 240, fill: 'forwards' }); q('cd-close').animate([{ opacity: 1 }, { opacity: 0 }], { duration: 160, fill: 'forwards' });
+  await img.animate([now, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' }], { duration: 420, easing: cdEase, fill: 'forwards' }).finished;
+  q('cd-bg').animate([{ opacity: 1 }, { opacity: 0 }], { duration: 160, fill: 'forwards' }); el.style.visibility = 'visible'; closeModal('modal-card');
+  img.getAnimations().forEach(a => a.cancel()); q('cd-bg').getAnimations().forEach(a => a.cancel()); q('cd-panel').getAnimations().forEach(a => a.cancel()); q('cd-close').getAnimations().forEach(a => a.cancel()); cdCur = null; cdBusy = false;
+}
 /* ---------- 스플래시 ---------- */
 const splashT0 = Date.now();
 function hideSplash() {
@@ -1119,7 +1186,16 @@ const bD = [
  { id: 'wo', n: '우리', b: 5.0, max: 6.0, o: [{ n: '자동이체', r: .4, d: '우리은행 자동이체(적금 납입 등) 설정' }, { n: '기타', r: .6, d: '은행 공지의 기타 우대조건 충족' }] },
  { id: 'im', n: 'iM뱅크', b: 5.0, max: 5.5, o: [{ n: '카드', r: .3, d: 'iM뱅크 카드 실적/발급' }, { n: '청약', r: .2, d: 'iM 주택청약 보유/가입' }] }];
 let savT;
-function saveSav() { clearTimeout(savT); savT = setTimeout(() => sb.from('profiles').update({ savings: sav }).eq('id', me.id), 600); }
+let savDirty = false;
+function paintSavBtn() { const b = q('sav-save'); if (!b) return; b.innerText = savDirty ? '저장하기' : '저장 완료'; b.style.cssText = savDirty ? 'background:#191F28;color:#fff' : 'background:#F0F3ED;color:var(--mil-green)'; }
+function markSav() { savDirty = true; q('sav-msg').innerText = '변경사항이 있어요. 저장하기를 눌러주세요.'; paintSavBtn(); }
+async function saveSavNow() {
+  calcSav(); const payload = Object.assign({}, sav); const b = q('sav-save'); b.innerText = '저장 중…';
+  const { error } = await sb.from('profiles').update({ savings: payload }).eq('id', me.id);
+  if (error) { paintSavBtn(); return showAlert('저장 실패', '잠시 후 다시 시도해주세요.<br><span class="text-[11px] text-[#8B95A1]">' + esc(error.message) + '</span>'); }
+  me.savings = payload; try { localStorage.setItem('sav:' + me.id, JSON.stringify(payload)); } catch (e) { }
+  savDirty = false; q('sav-msg').innerText = '저장됐어요. 다음에 열어도 그대로 보여요.'; paintSavBtn();
+}
 function renderSav() {
   const bG = q('bank-selector-grid'); if (!bG.innerHTML) bG.innerHTML = bD.map(b => `<button id="btn-bank-${b.id}" onclick="toggleBank('${b.id}')" class="py-2.5 rounded-lg border text-[12px] font-bold transition">${b.n}</button>`).join('');
   bD.forEach(b => q('btn-bank-' + b.id).className = 'py-2.5 rounded-lg text-[12px] font-bold transition ' + (sav.banks.includes(b.id) ? 'border-2 border-[var(--mil-green)] bg-[var(--mil-green-light)] text-[var(--mil-green)]' : 'border border-[#E5E8EB] bg-white text-[#4E5968]'));
@@ -1128,12 +1204,12 @@ function renderSav() {
   c.innerHTML = sav.banks.map(id => { const b = bD.find(x => x.id === id), amt = sav.amts[id] ?? Math.floor(550000 / sav.banks.length), on = sav.opts[id] || [];
     return `<div class="bg-white rounded-xl p-4 border border-[var(--mil-green)] shadow-sm"><div class="flex justify-between items-center mb-3"><div class="text-[14px] font-bold">${b.n} <span class="text-[11px] text-[#8B95A1]">기본 ${b.b}% · 최대 ${b.max}%</span></div><div class="flex items-center gap-1"><input type="number" id="amt-${id}" value="${amt}" step="10000" min="0" class="w-24 bg-[#F5F6F8] border border-[#E5E8EB] rounded-lg px-2 py-1.5 text-right text-[13px] font-bold outline-none" oninput="calcSav(true)"><span class="text-[12px] font-bold">원</span></div></div>
     <div class="space-y-1.5 bg-[#F5F6F8] p-3 rounded-lg">${b.o.map((o, i) => `<label class="flex items-start gap-2 cursor-pointer"><input type="checkbox" class="w-4 h-4 mt-0.5 accent-[var(--mil-green)] opt-${id}" data-i="${i}" data-r="${o.r}" ${on.includes(i) ? 'checked' : ''} onchange="calcSav(true)"><span class="text-[11px]"><b>${o.n}</b> <b class="text-[var(--mil-green)]">+${o.r}%</b><br><span class="text-[#8B95A1]">📌 ${o.d}</span></span></label>`).join('')}</div></div>`; }).join('');
-  calcSav();
+  calcSav(); paintSavBtn();
 }
 function toggleBank(id) {
   if (sav.banks.includes(id)) { sav.banks = sav.banks.filter(x => x !== id); delete sav.amts[id]; delete sav.opts[id]; }
   else { if (sav.banks.length >= 4) return showAlert('한도 초과', '최대 4개 은행만 선택 가능합니다.'); sav.banks.push(id); }
-  saveSav(); renderSav();
+  markSav(); renderSav();
 }
 function calcSav(persist) {
   const months = BR[(S_() || me).branch || 'army'].m; let tP = 0, tI = 0, tot = 0, warn = false;
@@ -1143,7 +1219,7 @@ function calcSav(persist) {
     tot += amt; if (amt > 300000) warn = true; tP += prin; tI += Math.floor(prin * rate / 100 * (months + 1) / 24); });
   if (tot > 550000) warn = true; q('saving-split-warning').classList.toggle('hidden', !warn);
   q('saving-total-result').innerText = (tP * 2 + tI).toLocaleString(); q('saving-prin').innerText = tP.toLocaleString(); q('saving-int').innerText = tI.toLocaleString(); q('saving-match').innerText = tP.toLocaleString();
-  if (persist) saveSav();
+  if (persist) markSav();
 }
 
 /* ---------- 경로 (이동수단 비교) ---------- */
@@ -1321,7 +1397,7 @@ async function renderBenefits() {
   if (!EVT) await loadEvents();
   const evs = EVT.events.map(e => ({ e, i: evInfo(e) })).filter(x => showEnded || x.i.k !== 'ended').sort((a, b) => ({ live: 0, soon: 1, ended: 2 })[a.i.k] - ({ live: 0, soon: 1, ended: 2 })[b.i.k] || (a.e.end || '9').localeCompare(b.e.end || '9'));
   const col = { live: 'bg-[var(--mil-green)] text-white', soon: 'bg-[#F2BA49] text-[#191F28]', ended: 'bg-[#B0B8C1] text-white' };
-  q('tab-benefits').innerHTML = `<div class="toss-card"><div class="flex justify-between items-center mb-1"><h2 class="text-[18px] font-extrabold">🎁 지금 진행 중인 이벤트</h2><button onclick="showEnded=!showEnded;renderBenefits()" class="text-[11px] font-bold bg-[#F5F6F8] px-3 py-1.5 rounded-full">${showEnded ? '종료 숨기기' : '종료 보기'}</button></div>
+  q('tab-benefits').innerHTML = cardSection() + `<div class="toss-card"><div class="flex justify-between items-center mb-1"><h2 class="text-[18px] font-extrabold">🎁 지금 진행 중인 이벤트</h2><button onclick="showEnded=!showEnded;renderBenefits()" class="text-[11px] font-bold bg-[#F5F6F8] px-3 py-1.5 rounded-full">${showEnded ? '종료 숨기기' : '종료 보기'}</button></div>
    <p class="text-[11px] text-[#8B95A1] mb-4">마지막 업데이트 ${esc(EVT.updated || '-')} · ${esc(EVT.note || '')}</p><div class="space-y-3">${evs.length ? evs.map(({ e, i }) => `<div class="bg-[#F5F6F8] rounded-2xl p-4 border border-[#E5E8EB] ${i.k === 'ended' ? 'opacity-60' : ''}"><div class="flex justify-between items-start gap-2 mb-1"><div class="text-[14px] font-extrabold leading-snug">${esc(e.title)}</div><span class="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${col[i.k]}">${i.label}</span></div>
    <div class="text-[11px] text-[#8B95A1] mb-2">${esc(e.org)}</div><div class="text-[12px] font-bold mb-1">${esc(e.benefit)}</div><div class="text-[11px] text-[#4E5968] space-y-0.5"><div>📅 ${e.start ? esc(e.start) : '상시'} ~ ${e.end ? esc(e.end) : '미정'} ${i.d ? `<b class="text-[var(--pink-main)]">(${i.d})</b>` : ''}</div><div>👤 ${esc(e.target)}</div>${e.note ? `<div>ℹ️ ${esc(e.note)}</div>` : ''}</div>
    <a target="_blank" rel="noopener" href="${esc(e.url)}" class="inline-block mt-2 text-[11px] font-bold text-[var(--mil-green)]">출처 보기 ▶</a></div>`).join('') : '<div class="text-center text-[12px] text-[#8B95A1] py-4">진행 중인 이벤트가 없어요.</div>'}</div></div>
