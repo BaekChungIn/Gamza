@@ -112,6 +112,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
   <div class="flex items-center gap-2.5"><img src="logo.png" alt="" class="w-9 h-9 rounded-[10px] bg-white border border-[#E5E8EB] object-cover"><h1 class="text-[21px] font-black tracking-tight">짬타이거</h1></div>
   <div class="flex items-center gap-2">
    <button id="btn-cart" onclick="openCart()" class="hidden relative w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center active:scale-95"><span class="text-lg">🛒</span><span id="cart-dot" class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full animate-pulse"></span></button>
+   <button id="btn-letters" onclick="openLetters()" class="relative w-10 h-10 flex items-center justify-center text-[#191F28] active:scale-95"><svg class="w-[26px] h-[26px] sf-icon" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2.5"/><path d="m22 7-10 6.5L2 7"/></svg><span id="letter-dot" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold items-center justify-center border-2 border-[#F7F8F9]" style="display:none"></span></button>
    <button id="btn-friends" onclick="openFriends()" class="relative w-10 h-10 flex items-center justify-center text-[#191F28] active:scale-95"><svg class="w-[26px] h-[26px] sf-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span id="friend-dot" class="hidden absolute top-1 right-0.5 w-2.5 h-2.5 bg-red-500 border-2 border-[#F7F8F9] rounded-full"></span></button>
    <button onclick="openSettings()" class="w-10 h-10 flex items-center justify-center text-[#191F28] active:scale-95"><svg class="w-[26px] h-[26px] sf-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
   </div>
@@ -356,17 +357,41 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
    <input id="w-title" maxlength="80" placeholder="제목" class="inp !font-bold">
    <textarea id="w-body" maxlength="3000" rows="10" placeholder="솔직한 이야기를 나눠보세요" class="inp !leading-relaxed" style="resize:none"></textarea>
   </div></div>
- <div id="modal-friends" class="fixed inset-0 z-50 bg-[var(--bg-main)] hidden flex-col">
+ <div id="modal-friends" class="fixed inset-0 z-50 bg-[var(--bg-main)] hidden flex-col" style="background:var(--bg-main)">
   <div class="max-w-md mx-auto w-full h-full flex flex-col" style="padding-top:env(safe-area-inset-top)">
    <div class="flex items-center justify-between px-4 py-3 bg-white"><button onclick="closeModal('modal-friends')" class="w-10 h-10 rounded-full bg-[#F5F6F8] text-xl font-bold">‹</button><div class="font-bold text-[17px]">친구</div><button onclick="refreshFriends()" class="w-10 h-10 text-[18px]">🔄</button></div>
-   <div class="flex-1 overflow-y-auto no-scrollbar px-5 py-4 space-y-4 pb-12">
-    <div class="toss-card !p-5"><div class="flex items-center justify-between"><div><div class="text-[12px] text-[#8B95A1] font-semibold">내 친구 코드</div><div id="fr-code" class="text-[24px] font-black tracking-[.25em] select-text mt-0.5">-</div></div><button onclick="copyFriendCode()" class="text-[12px] font-bold bg-[#F5F6F8] rounded-full px-3.5 py-2">복사</button></div>
-     <div class="flex gap-2 mt-4"><input id="fr-input" maxlength="6" placeholder="친구 코드 6자리" class="flex-1 bg-white border border-[#E5E8EB] rounded-xl px-3 py-3 text-[14px] outline-none uppercase"><button onclick="addFriend()" class="bg-[#191F28] text-white px-5 rounded-xl font-bold text-[13px]">친구 추가</button></div>
-     <p class="text-[11px] text-[#8B95A1] mt-2">상대가 수락하면 친구가 돼요. 친구에게는 이름·사진·복무 진행 정보만 보여요.</p></div>
-    <div id="fr-req"></div>
-    <div id="fr-chips-wrap" class="hidden"><div class="text-[13px] font-extrabold mb-2">내 친구</div><div id="fr-chips" class="flex gap-3 overflow-x-auto no-scrollbar pb-1"></div></div>
-    <div id="fr-detail"></div>
+   <div class="px-5 pb-3 pt-1 bg-white"><div class="flex p-1 rounded-2xl bg-[#F2F4F6]">
+    <button id="fr-tab-list" onclick="frTab('list')" class="flex-1 py-2 rounded-xl text-[13px] font-bold relative">친구 목록<span id="fr-tab-dot" class="hidden absolute top-1.5 right-3 w-2 h-2 bg-red-500 rounded-full"></span></button>
+    <button id="fr-tab-code" onclick="frTab('code')" class="flex-1 py-2 rounded-xl text-[13px] font-bold">내 친구 코드</button>
+    <button id="fr-tab-add" onclick="frTab('add')" class="flex-1 py-2 rounded-xl text-[13px] font-bold">친구 추가</button></div></div>
+   <div class="flex-1 overflow-y-auto no-scrollbar px-5 py-4 pb-12">
+    <div id="frp-list" class="space-y-4"><div id="fr-req"></div><div id="fr-cards" class="space-y-4"></div><div id="fr-empty" class="hidden text-center text-[13px] text-[#8B95A1] py-12">아직 친구가 없어요.<br>‘친구 추가’에서 코드를 입력해보세요!</div></div>
+    <div id="frp-code" class="hidden"><div class="toss-card !p-6 text-center"><div class="text-[12px] text-[#8B95A1] font-semibold">내 친구 코드</div><div id="fr-code" class="text-[34px] font-black tracking-[.25em] select-text mt-2">-</div><button onclick="copyFriendCode()" class="mt-4 text-[13px] font-bold bg-[#191F28] text-white rounded-full px-6 py-2.5">코드 복사</button><p class="text-[11px] text-[#8B95A1] mt-4">이 코드를 친구에게 알려주세요. 상대가 입력하면 친구 요청이 가요.</p></div></div>
+    <div id="frp-add" class="hidden"><div class="toss-card !p-6"><div class="text-[15px] font-extrabold">친구 코드로 추가</div><div class="flex gap-2 mt-4"><input id="fr-input" maxlength="6" placeholder="친구 코드 6자리" class="flex-1 min-w-0 bg-white border border-[#E5E8EB] rounded-xl px-3 py-3 text-[14px] outline-none uppercase"><button onclick="addFriend()" class="bg-[#191F28] text-white px-5 rounded-xl font-bold text-[13px] whitespace-nowrap">친구 추가</button></div><p class="text-[11px] text-[#8B95A1] mt-3">상대가 수락하면 친구가 돼요. 친구에게는 이름·사진·복무 진행 정보·캘린더가 보여요.</p></div></div>
    </div></div></div>
+ <div id="modal-fd" class="fixed inset-0 z-[60] hidden flex-col" style="background:var(--bg-main)">
+  <div class="flex items-center gap-3 px-4 pb-3" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeModal('modal-fd')" class="w-10 h-10 rounded-full bg-white border border-[#E5E8EB] font-bold text-[18px]">‹</button><div class="font-bold text-[16px]">친구 프로필</div></div>
+  <div id="fd-body" class="flex-1 overflow-y-auto no-scrollbar px-5 pb-10"></div></div>
+ <div id="modal-fcal" class="fixed inset-0 z-[62] hidden flex-col" style="background:var(--bg-main)">
+  <div class="flex items-center gap-3 px-4 pb-3" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeModal('modal-fcal')" class="w-10 h-10 rounded-full bg-white border border-[#E5E8EB] font-bold text-[18px]">‹</button><div id="fcal-title" class="font-bold text-[16px]">캘린더</div></div>
+  <div class="flex-1 overflow-y-auto no-scrollbar px-5 pb-10 space-y-4">
+   <div class="toss-card"><div class="flex items-center justify-between mb-3"><button onclick="fcalGo(-1)" class="w-9 h-9 rounded-full bg-[#F5F6F8] font-bold">‹</button><div id="fcal-month" class="font-extrabold text-[16px]"></div><button onclick="fcalGo(1)" class="w-9 h-9 rounded-full bg-[#F5F6F8] font-bold">›</button></div>
+    <div class="grid grid-cols-7 text-center text-[11px] font-bold text-[#8B95A1] mb-1"><div class="text-[#E5484D]">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="text-[#3B82F6]">토</div></div>
+    <div id="fcal-grid" class="grid grid-cols-7 text-center"></div></div>
+   <div id="fcal-list" class="space-y-2"></div>
+   <button onclick="closeModal('modal-fcal')" class="w-full h-12 rounded-2xl bg-white border border-[#E5E8EB] text-[15px] font-bold text-[#4E5968]">나가기</button></div></div>
+ <div id="modal-letters" class="fixed inset-0 z-[60] hidden flex-col" style="background:var(--bg-main)">
+  <div class="flex items-center gap-3 px-4 pb-3" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeModal('modal-letters')" class="w-10 h-10 rounded-full bg-white border border-[#E5E8EB] font-bold text-[18px]">‹</button><div class="font-bold text-[16px] flex-1">편지함</div><button onclick="openWrite()" class="px-4 h-10 rounded-full bg-[#191F28] text-white text-[13px] font-bold">편지 쓰기</button></div>
+  <div class="px-5 pb-3"><div class="flex p-1 rounded-2xl bg-[#E9ECEF]"><button id="lt-in" onclick="lTabSet('in')" class="flex-1 py-2 rounded-xl text-[13px] font-bold relative">받은 편지</button><button id="lt-out" onclick="lTabSet('out')" class="flex-1 py-2 rounded-xl text-[13px] font-bold">보낸 편지</button></div></div>
+  <div id="l-list" class="flex-1 overflow-y-auto no-scrollbar px-5 pb-10 space-y-2.5"></div></div>
+ <div id="modal-lview" class="fixed inset-0 z-[63] hidden flex-col" style="background:#FBF6EA">
+  <div class="flex items-center gap-3 px-4 pb-3" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeModal('modal-lview')" class="w-10 h-10 rounded-full bg-white/80 border border-[#EADFC8] font-bold text-[18px]">‹</button><div id="lv-head" class="font-bold text-[16px] flex-1">편지</div><button onclick="lDelete()" class="text-[12px] text-[#9A8E78] underline px-2">삭제</button></div>
+  <div class="flex-1 overflow-y-auto no-scrollbar px-5 pb-10"><div class="rounded-[22px] p-6 min-h-[360px]" style="background:#FFFDF7;border:1px solid #EFE4CC;box-shadow:0 8px 24px rgba(150,120,60,.10)"><div id="lv-meta" class="text-[12px] text-[#9A8E78]"></div><div id="lv-title" class="text-[19px] font-extrabold mt-2 break-words"></div><div id="lv-body" class="text-[15px] leading-[1.85] mt-4 break-words" style="white-space:pre-wrap;color:#3B3426"></div></div>
+   <button id="lv-reply" onclick="lReply()" class="w-full h-12 mt-4 rounded-2xl bg-[#191F28] text-white text-[14px] font-bold">답장하기</button></div></div>
+ <div id="modal-lwrite" class="fixed inset-0 z-[64] hidden flex-col" style="background:#FBF6EA">
+  <div class="flex items-center gap-3 px-4 pb-3" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeModal('modal-lwrite')" class="w-10 h-10 rounded-full bg-white/80 border border-[#EADFC8] font-bold text-[18px]">‹</button><div class="font-bold text-[16px] flex-1">편지 쓰기</div><button onclick="sendLetter()" class="px-5 h-10 rounded-full bg-[#191F28] text-white text-[13px] font-bold">보내기</button></div>
+  <div class="flex-1 overflow-y-auto no-scrollbar px-5 pb-10"><div class="text-[12px] font-bold text-[#9A8E78] mb-2">받는 사람</div><div id="lw-chips" class="flex gap-3 overflow-x-auto no-scrollbar pb-2"></div>
+   <div class="rounded-[22px] p-5 mt-3" style="background:#FFFDF7;border:1px solid #EFE4CC"><input id="lw-title" maxlength="40" placeholder="제목 (선택)" class="w-full bg-transparent outline-none text-[17px] font-bold pb-3" style="border-bottom:1px dashed #E5D9BD"><textarea id="lw-body" maxlength="2000" placeholder="마음을 담아 편지를 써보세요" oninput="q('lw-cnt').innerText=this.value.length+' / 2000'" class="w-full bg-transparent outline-none text-[15px] leading-[1.8] mt-3 resize-none" style="height:300px"></textarea><div id="lw-cnt" class="text-right text-[11px] text-[#B5AA92]">0 / 2000</div></div></div></div>
  <div id="modal-crop" class="fixed inset-0 z-[70] bg-black/90 hidden flex-col items-center justify-center p-4">
   <div class="text-white font-bold text-[16px] mb-1">사진 자르기</div><div class="text-white/60 text-[12px] mb-4">드래그로 위치를, 슬라이더나 두 손가락으로 크기를 맞춰요</div>
   <div class="relative rounded-[28%] overflow-hidden bg-black" style="width:280px;height:280px;touch-action:none"><canvas id="crop-cv" width="280" height="280" style="touch-action:none"></canvas></div>
@@ -419,7 +444,7 @@ const sb = configured ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) :
 const q = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const openM = id => { q(id).classList.remove('hidden'); q(id).classList.add('flex'); };
-function closeModal(id) { if ((id === 'modal-sd' || id === 'modal-gd' || id === 'modal-sal') && typeof xpClose === 'function' && xpClose(id)) return; if (typeof xpEl !== 'undefined' && xpEl && (id === 'modal-sd' || id === 'modal-gd' || id === 'modal-sal')) { xpEl.style.visibility = ''; xpTCRestore(); } q(id).classList.add('hidden'); q(id).classList.remove('flex'); if (id === 'modal-sal' && typeof salClose === 'function') salClose(); if (id === 'modal-friends' && typeof stopFriendTimers === 'function') stopFriendTimers(); if (id === 'modal-settings' && typeof me !== 'undefined' && me) applyTheme((S_() || {}).branch || 'army'); }
+function closeModal(id) { if ((id === 'modal-sd' || id === 'modal-gd' || id === 'modal-sal' || id === 'modal-fd') && typeof xpClose === 'function' && xpClose(id)) return; if (typeof xpEl !== 'undefined' && xpEl && (id === 'modal-sd' || id === 'modal-gd' || id === 'modal-sal' || id === 'modal-fd')) { xpEl.style.visibility = ''; xpTCRestore(); } q(id).classList.add('hidden'); q(id).classList.remove('flex'); if (id === 'modal-sal' && typeof salClose === 'function') salClose(); if (id === 'modal-friends' && typeof stopFriendTimers === 'function') stopFriendTimers(); if (id === 'modal-settings' && typeof me !== 'undefined' && me) applyTheme((S_() || {}).branch || 'army'); }
 const showAlert = (t, m) => { q('alert-title').innerText = t; q('alert-message').innerHTML = m; openM('modal-alert'); };
 const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const pd = s => new Date(s + 'T00:00:00');
@@ -479,7 +504,7 @@ async function loadAll(first) {
   wishes = (w.data || []).map(x => x.item_id); pWishes = (pw.data || []).map(x => x.item_id); vacs = v.data || [];
   { const sid = me.gender === 'M' ? me.id : me.partner_id; menus = {}; if (sid) { const { data: mm } = await sb.from('menus').select('*').eq('created_by', sid); (mm || []).forEach(x => menus[x.menu_date] = x); } }
   if (first) { let ls = null; try { ls = JSON.parse(localStorage.getItem('sav:' + me.id)); } catch (e) { } sav = Object.assign({ banks: [], amts: {}, opts: {} }, (me.savings && me.savings.banks && me.savings.banks.length) ? me.savings : (ls || me.savings || {})); }
-  await loadFriends();
+  await loadFriends(); loadLetters();
   await loadQ();
 }
 let qMode = 'couple';
@@ -922,7 +947,7 @@ function openGd() {
   q('gd-rank').innerHTML = `${gi[0]} 곰신 ${gi[1]}`; q('gd-name').innerText = G.nickname || (G.gf_theme === 'cat' ? '꽃냥이' : '곰신 베어'); q('gd-love').innerHTML = q('gf-love-days').innerHTML; xpRun('modal-gd', q('gf-profile-card').querySelector('.pcard'));
 }
 /* ---------- 카드 → 전체화면 확장 애니메이션 (토스 느낌) ---------- */
-let xpAnim = false, xpEl = null, xpBusy = false, xpBypass = false, xpPrevTC = null; const XP_EASE = 'cubic-bezier(.22,.9,.24,1)', XP_TC = { 'modal-sd': '#F7F8F9', 'modal-gd': '#F7F8F9', 'modal-sal': '#1C241A' };
+let xpAnim = false, xpEl = null, xpBusy = false, xpBypass = false, xpPrevTC = null; const XP_EASE = 'cubic-bezier(.22,.9,.24,1)', XP_TC = { 'modal-sd': '#F7F8F9', 'modal-gd': '#F7F8F9', 'modal-sal': '#1C241A', 'modal-fd': '#F7F8F9' };
 function xpTC(id) { const m = document.querySelector('meta[name="theme-color"]'); if (!m) return; if (xpPrevTC === null) xpPrevTC = m.getAttribute('content'); m.setAttribute('content', XP_TC[id] || xpPrevTC); }
 function xpTCRestore() { const m = document.querySelector('meta[name="theme-color"]'); if (m && xpPrevTC !== null) m.setAttribute('content', xpPrevTC); xpPrevTC = null; }
 function xpClip(card) { const r = card.getBoundingClientRect(), W = innerWidth, H = innerHeight, rad = parseFloat(getComputedStyle(card).borderTopLeftRadius) || 26; return `inset(${Math.max(0, r.top)}px ${Math.max(0, W - r.right)}px ${Math.max(0, H - r.bottom)}px ${Math.max(0, r.left)}px round ${rad}px)`; }
@@ -1207,9 +1232,38 @@ function frCard(P) {
     <div><div class="flex justify-between text-[11px] font-bold"><span>${prL}</span><span>D-${dd(h.end)}</span></div><div class="relative h-6 rounded-md bg-white/10 overflow-hidden mt-1"><div id="fv-pr-bar" class="absolute inset-y-0 left-0 bg-white/25" style="width:0"></div><div id="fv-pr-pct" class="relative px-2 h-full flex items-center text-[11px] tabular-nums">0%</div></div></div></div></div>
    <div class="grid grid-cols-3 gap-y-5 mt-5 text-center">${cell(td, '전체 복무일')}${cell(sd, '현재 복무일')}${cell(Math.max(0, td - sd), '남은 복무일')}${cell(dd(h.end), '계급 진급일')}${cell(wk, '남은 일과일')}${cell(I.b.k, '군종')}</div></div></div>`;
 }
+/* ---------- 친구 UI (탭 · 프로필 카드 · 전체화면 · 캘린더 · 편지) ---------- */
+let frTabCur = 'list', frCache = {};
+function frTab(t) { frTabCur = t; ['list', 'code', 'add'].forEach(k => { q('frp-' + k).classList.toggle('hidden', k !== t); q('fr-tab-' + k).className = 'flex-1 py-2 rounded-xl text-[13px] font-bold relative ' + (k === t ? 'bg-white shadow-sm text-[#191F28]' : 'text-[#8B95A1]'); }); }
+function frPal(b) { const p = PAL[b] || PAL.army; return `--mil-green:${p.g};--mil-green-light:${p.l};--mil-dark:${p.d};--mil-dark2:${p.d2};--mil-soft:${p.s};--mil-border:${p.b}`; }
+const FR_PINK = 'linear-gradient(155deg,#F9BBCD 0%,#F4A0B9 55%,#EE8AA9 100%)';
+function frMini(P) {
+  const nm = esc(P.nickname || '이름 없음'), soldier = P.gender === 'M' && P.enlist_date && P.discharge_date;
+  if (!soldier) return `<div class="pcard pk" onclick="openFd('${P.uid}',this)" style="height:auto;cursor:pointer;background:${P.gender === 'F' ? FR_PINK : 'linear-gradient(155deg,#5B6475,#3E4656)'}"><div class="flex items-center gap-3.5"><div class="w-[64px] h-[64px] rounded-full overflow-hidden flex items-center justify-center flex-shrink-0" style="background:rgba(255,255,255,.4);box-shadow:0 0 0 2px rgba(255,255,255,.7)">${frAvatar(P)}</div><div class="min-w-0"><div class="text-[11px] font-semibold opacity-80">${P.gender === 'F' ? '곰신' : '친구'}</div><div class="text-[23px] font-extrabold leading-tight truncate">${nm}</div></div></div><div class="text-center text-[12px] font-bold opacity-80 mt-3">자세히 보기 ›</div></div>`;
+  const now = new Date(), I = milInfo(P), h = hoInfo(P, now), rk = rankOf(P, now).r;
+  return `<div style="${frPal(P.branch)}"><div class="pcard" onclick="openFd('${P.uid}',this)" style="height:auto;cursor:pointer;background:linear-gradient(155deg,var(--mil-dark) 0%,var(--mil-dark2) 100%)"><div class="flex items-center gap-3.5"><div class="w-[64px] h-[64px] rounded-full overflow-hidden flex items-center justify-center flex-shrink-0" style="background:#E1E1E1;box-shadow:0 0 0 2px rgba(255,255,255,.25)">${frAvatar(P)}</div><div class="min-w-0 flex-1"><div class="text-[11px] font-semibold opacity-75">대한민국 ${I.b.k}</div><div class="flex items-center gap-1.5 text-[12px] font-bold">${rankMark(rk)}<span>${rk} ${rk === '전역' ? '' : h.n + '호봉'}</span></div><div class="text-[23px] font-extrabold leading-tight truncate">${nm}</div></div></div>
+  <div class="pbar mt-3" style="height:38px"><div class="absolute inset-y-0 left-0" style="background:var(--mil-green);width:0"></div><div data-fp="${P.uid}" class="relative px-3.5 h-full flex items-center text-[15px] font-black tabular-nums">0%</div></div><div class="text-center text-[12px] font-bold opacity-80 mt-2.5">자세히 보기 ›</div></div></div>`;
+}
+function fdHtml(P) {
+  const nm = esc(P.nickname || '이름 없음'), soldier = P.gender === 'M' && P.enlist_date && P.discharge_date;
+  const acts = `<div class="grid grid-cols-2 gap-3"><button onclick="openFcal()" class="h-12 rounded-2xl bg-white border border-[#E5E8EB] text-[14px] font-bold">캘린더 보기</button><button onclick="openWrite('${P.uid}')" class="h-12 rounded-2xl bg-[#191F28] text-white text-[14px] font-bold">편지 쓰기</button></div><button onclick="removeFriend('${P.fid}')" class="w-full text-[12px] text-[#8B95A1] underline py-2">이 친구 삭제</button><button onclick="closeModal('modal-fd')" class="w-full h-12 rounded-2xl bg-white border border-[#E5E8EB] text-[15px] font-bold text-[#4E5968]">나가기</button>`;
+  if (!soldier) return `<div class="space-y-4"><div class="rounded-[28px] p-6 text-white pk" style="background:${P.gender === 'F' ? FR_PINK : 'linear-gradient(155deg,#5B6475,#3E4656)'}"><div class="flex flex-col items-center"><div class="h-[160px] w-[160px] rounded-full overflow-hidden flex items-center justify-center" style="background:rgba(255,255,255,.4);box-shadow:0 0 0 3px rgba(255,255,255,.7)">${frAvatar(P)}</div><div class="mt-3 text-[13px] font-semibold opacity-90">${P.gender === 'F' ? '곰신' : '친구'}</div><div class="text-[26px] font-extrabold">${nm}</div></div></div>${acts}</div>`;
+  const now = new Date(), I = milInfo(P), h = hoInfo(P, now), rk = rankOf(P, now).r, T0 = new Date(now.getFullYear(), now.getMonth(), now.getDate()), dd = d => Math.max(0, Math.ceil((d - T0) / 864e5)), fm = d => `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+  const td = Math.round((I.dis - I.e) / 864e5) + 1, sd = Math.min(td, Math.max(0, Math.round((T0 - I.e) / 864e5) + 1)); let wk = 0; for (let d = new Date(T0); d <= I.dis; d.setDate(d.getDate() + 1)) if (d.getDay() !== 0 && d.getDay() !== 6) wk++;
+  const hoL = h.nxIsPromo ? (h.rank === '병장' ? '마지막 호봉' : `${h.next} 1호봉`) : `${h.n + 1}호봉 승급`, hoD = h.nxIsPromo && h.rank === '병장' ? '' : `D-${dd(h.nx)}`, prL = h.rank === '병장' ? '전역' : `${h.next} 진급`;
+  const cell = (v, l) => `<div><div class="text-[22px] font-black tabular-nums">${v}</div><div class="text-[11px] text-[#8B95A1]">${l}</div></div>`;
+  return `<div class="space-y-4" style="${frPal(P.branch)}"><div class="rounded-[28px] p-5 text-white" style="background:linear-gradient(155deg,var(--mil-dark) 0%,var(--mil-dark2) 100%)"><div class="flex flex-col items-center"><div class="h-[170px] w-[170px] rounded-full overflow-hidden flex items-center justify-center" style="background:#E1E1E1">${frAvatar(P)}</div><div class="mt-2 flex items-center gap-1.5 text-[14px] font-bold">${rankMark(rk)}<span>${rk} ${rk === '전역' ? '' : h.n + '호봉'}</span></div><div class="text-[26px] font-extrabold">${nm}</div><div class="text-[11px] opacity-70 mt-0.5">대한민국 ${I.b.k} · 입대 ${fm(I.e)} · 전역 ${fm(I.dis)}</div></div>
+   <div class="flex justify-between text-[12px] font-bold mt-4 mb-1.5"><span>전역</span><span>${sd >= td ? '전역!' : 'D-' + (td - sd)}</span></div><div class="pbar"><div id="fv-bar" class="absolute inset-y-0 left-0" style="background:var(--mil-green);width:0"></div><div id="fv-pct" class="relative px-3.5 h-full flex items-center text-[17px] font-black tabular-nums">0%</div></div>
+   <div class="grid grid-cols-2 gap-3 mt-4"><div><div class="flex justify-between text-[11px] font-bold"><span>${hoL}</span><span>${hoD}</span></div><div class="relative h-6 rounded-md bg-white/10 overflow-hidden mt-1"><div id="fv-ho-bar" class="absolute inset-y-0 left-0 bg-white/25" style="width:0"></div><div id="fv-ho-pct" class="relative px-2 h-full flex items-center text-[11px] tabular-nums">0%</div></div></div>
+   <div><div class="flex justify-between text-[11px] font-bold"><span>${prL}</span><span>D-${dd(h.end)}</span></div><div class="relative h-6 rounded-md bg-white/10 overflow-hidden mt-1"><div id="fv-pr-bar" class="absolute inset-y-0 left-0 bg-white/25" style="width:0"></div><div id="fv-pr-pct" class="relative px-2 h-full flex items-center text-[11px] tabular-nums">0%</div></div></div></div></div>
+   <div class="toss-card grid grid-cols-3 gap-y-6 text-center">${cell(td, '전체 복무일')}${cell(sd, '현재 복무일')}${cell(Math.max(0, td - sd), '남은 복무일')}${cell(dd(h.end), '계급 진급일')}${cell(wk, '남은 일과일')}${cell(I.b.k, '군종')}</div>${acts}</div>`;
+}
+function openFd(u, el) { const P = friends.find(x => x.uid === u); if (!P) return; frSel = u; frH = null; q('fd-body').innerHTML = fdHtml(P); q('fd-body').scrollTop = 0; xpRun('modal-fd', el); frTick(); }
 function frTick() {
+  if (typeof xpAnim !== 'undefined' && xpAnim) return; const n = Date.now();
+  document.querySelectorAll('[data-fp]').forEach(el => { const c = frCache[el.dataset.fp]; if (!c) return; const v = Math.min(100, Math.max(0, (n - c.s) / (c.e - c.s) * 100)); el.innerText = v.toFixed(6) + '%'; el.previousElementSibling.style.width = v + '%'; });
   const P = friends.find(x => x.uid === frSel && x.direction === 'friend'); if (!P || !q('fv-pct') || !P.enlist_date) return;
-  const n = Date.now(), I = milInfo(P), C = x => Math.min(100, Math.max(0, x)), all = C((n - I.e.getTime()) / (I.dis.getTime() + 864e5 - I.e.getTime()) * 100);
+  const I = milInfo(P), C = x => Math.min(100, Math.max(0, x)), all = C((n - I.e.getTime()) / (I.dis.getTime() + 864e5 - I.e.getTime()) * 100);
   if (!frH || frH.uid !== P.uid || n >= frH.nx || n >= frH.end) { frH = hoInfo(P, new Date(n)); frH.uid = P.uid; }
   const ho = C((n - frH.hs) / (frH.nx - frH.hs) * 100), pr = C((n - frH.start) / (frH.end - frH.start) * 100);
   q('fv-pct').innerText = all.toFixed(8) + '%'; q('fv-bar').style.width = all + '%'; q('fv-ho-pct').innerText = ho.toFixed(5) + '%'; q('fv-ho-bar').style.width = ho + '%'; q('fv-pr-pct').innerText = pr.toFixed(5) + '%'; q('fv-pr-bar').style.width = pr + '%';
@@ -1219,16 +1273,73 @@ function renderFriends() {
   const inc = friends.filter(x => x.direction === 'in'), out = friends.filter(x => x.direction === 'out'), fl = friends.filter(x => x.direction === 'friend');
   const mini = (P, btns) => `<div class="flex items-center gap-3 py-2"><div class="w-11 h-11 rounded-2xl overflow-hidden bg-[#F5F6F8] flex-shrink-0 flex items-center justify-center">${frAvatar(P)}</div><div class="flex-1 min-w-0"><div class="text-[14px] font-bold truncate">${esc(P.nickname || '이름 없음')}</div><div class="text-[11px] text-[#8B95A1]">${P.gender === 'F' ? '곰신' : P.gender === 'M' ? '군인' : ''}</div></div>${btns}</div>`;
   q('fr-req').innerHTML = (inc.length || out.length) ? `<div class="toss-card !p-5">${inc.length ? `<div class="text-[13px] font-extrabold mb-1">받은 친구 요청 ${inc.length}</div>` + inc.map(P => mini(P, `<button onclick="respondFriend('${P.fid}',true)" class="text-[12px] font-bold bg-[#191F28] text-white rounded-full px-3.5 py-1.5">수락</button><button onclick="respondFriend('${P.fid}',false)" class="text-[12px] font-bold bg-[#F5F6F8] rounded-full px-3.5 py-1.5 ml-1">거절</button>`)).join('') : ''}${out.length ? `<div class="text-[13px] font-extrabold ${inc.length ? 'mt-3' : ''} mb-1">보낸 요청</div>` + out.map(P => mini(P, `<span class="text-[11px] text-[#8B95A1] mr-1">대기중</span><button onclick="removeFriend('${P.fid}',true)" class="text-[12px] font-bold bg-[#F5F6F8] rounded-full px-3 py-1.5">취소</button>`)).join('') : ''}</div>` : '';
-  q('fr-chips-wrap').classList.toggle('hidden', !fl.length);
-  if (!fl.find(x => x.uid === frSel)) frSel = fl[0] ? fl[0].uid : null;
-  q('fr-chips').innerHTML = fl.map(P => `<button onclick="frPick('${P.uid}')" class="flex-shrink-0 text-center" style="width:68px"><div class="w-[60px] h-[60px] mx-auto rounded-full overflow-hidden bg-[#F5F6F8] flex items-center justify-center border-2 ${P.uid === frSel ? 'border-[var(--mil-green)]' : 'border-transparent'}">${frAvatar(P)}</div><div class="text-[11px] font-bold mt-1 truncate ${P.uid === frSel ? '' : 'text-[#8B95A1]'}">${esc(P.nickname || '이름 없음')}</div></button>`).join('');
-  const cur = fl.find(x => x.uid === frSel);
-  q('fr-detail').innerHTML = cur ? frCard(cur) + `<button onclick="removeFriend('${cur.fid}')" class="w-full mt-3 text-[12px] text-[#8B95A1] underline">이 친구 삭제</button>` : (fl.length || inc.length || out.length ? '' : '<div class="text-center text-[13px] text-[#8B95A1] py-10">아직 친구가 없어요.<br>친구 코드를 입력해서 추가해보세요!</div>');
-  frH = null; frTick();
+  frCache = {}; fl.forEach(P => { if (P.gender === 'M' && P.enlist_date && P.discharge_date) { const I = milInfo(P); frCache[P.uid] = { s: I.e.getTime(), e: I.dis.getTime() + 864e5 }; } });
+  q('fr-cards').innerHTML = fl.map(frMini).join(''); q('fr-empty').classList.toggle('hidden', !!(fl.length || inc.length || out.length));
+  q('fr-tab-dot').classList.toggle('hidden', !inc.length); frTab(frTabCur); frH = null; frTick();
+}
+/* 친구 캘린더 */
+let fcal = { uid: null, items: [], y: 2026, m: 0, err: '' };
+async function openFcal() {
+  const P = friends.find(x => x.uid === frSel); if (!P) return; const d = new Date(); fcal = { uid: P.uid, items: [], y: d.getFullYear(), m: d.getMonth(), err: '' };
+  q('fcal-title').innerText = `${P.nickname || '친구'}님의 캘린더`; renderFcal(); openM('modal-fcal');
+  try { const { data, error } = await sb.rpc('friend_calendar', { fuid: P.uid }); if (error) fcal.err = error.message; else fcal.items = data || []; } catch (e) { fcal.err = String(e); } renderFcal();
+}
+function fcalGo(n) { fcal.m += n; if (fcal.m < 0) { fcal.m = 11; fcal.y--; } if (fcal.m > 11) { fcal.m = 0; fcal.y++; } renderFcal(); }
+function renderFcal() {
+  q('fcal-month').innerText = `${fcal.y}년 ${fcal.m + 1}월`; const first = new Date(fcal.y, fcal.m, 1), days = new Date(fcal.y, fcal.m + 1, 0).getDate(), today = ymd(new Date()); let h = '';
+  for (let i = 0; i < first.getDay(); i++) h += '<div></div>';
+  for (let d = 1; d <= days; d++) { const x = ymd(new Date(fcal.y, fcal.m, d)), cv = fcal.items.find(v => x >= v.start_date && x <= v.end_date), K = cv ? VK[vkind(cv)] : null, dow = (first.getDay() + d - 1) % 7;
+    h += `<div class="h-10 flex items-center justify-center"><span class="w-9 h-9 rounded-full flex items-center justify-center text-[14px] font-semibold ${K ? 'text-white' : ''} ${!K && x === today ? 'border border-[#B0B8C1]' : ''} ${!K && dow === 0 ? 'text-[#E5484D]' : ''} ${!K && dow === 6 ? 'text-[#3B82F6]' : ''}" ${K ? 'style="background:' + K.c + '"' : ''}>${d}</span></div>`; }
+  q('fcal-grid').innerHTML = h;
+  const t0 = new Date(); t0.setHours(0, 0, 0, 0), L = q('fcal-list');
+  if (fcal.err) { L.innerHTML = `<div class="text-center text-[12px] text-[#8B95A1] py-3">캘린더를 불러오지 못했어요.<br>schema_social.sql 을 실행했는지 확인하세요.</div>`; return; }
+  if (!fcal.items.length) { L.innerHTML = '<div class="text-center text-[12px] text-[#8B95A1] py-3">등록된 일정이 없어요.</div>'; return; }
+  const list = fcal.items.map(v => { const s = pd(v.start_date), e = pd(v.end_date), d = Math.round((s - t0) / 864e5); return { v, nights: Math.round((e - s) / 864e5), ended: t0 > e, dd: d > 0 ? `D-${d}` : (t0 <= e ? (d === 0 ? 'D-Day' : '진행중') : '종료') }; }).sort((a, b) => (a.ended - b.ended) || a.v.start_date.localeCompare(b.v.start_date));
+  L.innerHTML = list.map(({ v, nights, ended, dd }) => { const k = vkind(v), K = VK[k], when = k === 'out' ? `${v.start_date}${v.start_time || v.end_time ? ' · ' + (v.start_time || '') + ' ~ ' + (v.end_time || '') : ''}` : `${v.start_date} ~ ${v.end_date} (${nights}박 ${nights + 1}일)`;
+    return `<div class="bg-white p-3.5 rounded-xl flex justify-between items-center gap-2 border border-[#E5E8EB] ${ended ? 'opacity-50' : ''}"><div class="flex flex-col min-w-0"><div class="flex items-center gap-1.5"><span class="text-[10px] font-extrabold text-white px-1.5 py-0.5 rounded-full whitespace-nowrap" style="background:${K.c}">${K.n}</span><span class="text-[14px] font-bold truncate">${esc(v.title)}</span></div><span class="text-[12px] text-[#8B95A1] mt-0.5">${esc(when)}</span></div><span class="text-[16px] font-black" style="color:${K.c}">${dd}</span></div>`; }).join('');
+}
+/* 편지 */
+let letters = [], lTab = 'in', lTo = null, lCur = null;
+const fmDT = iso => { const d = new Date(iso); return `${d.getMonth() + 1}월 ${d.getDate()}일 ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
+async function loadLetters() {
+  if (!window._lT) { window._lT = setInterval(() => { if (typeof me !== 'undefined' && me && !document.hidden) loadLetters(); }, 30000); document.addEventListener('visibilitychange', () => { if (!document.hidden && me) loadLetters(); }); }
+  try { const { data, error } = await sb.rpc('letter_list'); letters = error ? [] : (data || []); } catch (e) { letters = []; } updateLetterDot();
+  if (!q('modal-letters').classList.contains('hidden')) renderLetters();
+}
+function updateLetterDot() { const n = letters.filter(l => !l.mine && !l.read_at).length, d = q('letter-dot'); if (d) { d.style.display = n ? 'flex' : 'none'; d.innerText = n > 9 ? '9+' : n; } }
+function openLetters() { renderLetters(); openM('modal-letters'); loadLetters(); }
+function lTabSet(t) { lTab = t; renderLetters(); }
+function lPerson(l) { const u = l.mine ? l.recipient : l.sender; return friends.find(x => x.uid === u) || { uid: u, nickname: '친구', gender: '' }; }
+function renderLetters() {
+  const nin = letters.filter(l => !l.mine && !l.read_at).length;
+  q('lt-in').innerHTML = '받은 편지' + (nin ? `<span class="ml-1 text-[11px] text-white bg-red-500 rounded-full px-1.5 py-0.5">${nin}</span>` : '');
+  q('lt-in').className = 'flex-1 py-2 rounded-xl text-[13px] font-bold ' + (lTab === 'in' ? 'bg-white shadow-sm text-[#191F28]' : 'text-[#8B95A1]'); q('lt-out').className = 'flex-1 py-2 rounded-xl text-[13px] font-bold ' + (lTab === 'out' ? 'bg-white shadow-sm text-[#191F28]' : 'text-[#8B95A1]');
+  const list = letters.filter(l => lTab === 'out' ? l.mine : !l.mine);
+  q('l-list').innerHTML = list.length ? list.map(l => { const P = lPerson(l), un = !l.mine && !l.read_at, first = (l.title || l.body).replace(/\s+/g, ' ');
+    return `<button onclick="openLetter(${l.id})" class="w-full text-left flex items-center gap-3 p-3.5 rounded-2xl ${un ? 'bg-white border-2 border-[var(--mil-green)]' : 'bg-white border border-[#E5E8EB]'}"><div class="w-11 h-11 rounded-full overflow-hidden bg-[#F5F6F8] flex-shrink-0 flex items-center justify-center">${frAvatar(P)}</div><div class="flex-1 min-w-0"><div class="flex items-center gap-1.5"><span class="text-[14px] font-bold truncate">${l.mine ? '받는 사람 · ' : ''}${esc(P.nickname || '친구')}</span>${un ? '<span class="w-2 h-2 rounded-full bg-red-500"></span>' : ''}</div><div class="text-[13px] text-[#4E5968] truncate mt-0.5 ${un ? 'font-bold' : ''}">${esc(first)}</div></div><div class="text-[11px] text-[#8B95A1] flex-shrink-0">${fmDT(l.created_at)}</div></button>`; }).join('')
+    : `<div class="text-center text-[13px] text-[#8B95A1] py-16">${lTab === 'in' ? '받은 편지가 없어요.' : '보낸 편지가 없어요.'}<br>친구에게 먼저 편지를 써보세요!</div>`;
+}
+async function openLetter(id) {
+  const l = letters.find(x => x.id === id); if (!l) return; lCur = l; const P = lPerson(l);
+  q('lv-head').innerText = l.mine ? '보낸 편지' : '받은 편지'; q('lv-meta').innerText = `${l.mine ? 'To' : 'From'}. ${P.nickname || '친구'} · ${fmDT(l.created_at)}`; q('lv-title').innerText = l.title || ''; q('lv-title').style.display = l.title ? '' : 'none'; q('lv-body').innerText = l.body; q('lv-reply').style.display = l.mine ? 'none' : '';
+  openM('modal-lview');
+  if (!l.mine && !l.read_at) { l.read_at = new Date().toISOString(); updateLetterDot(); renderLetters(); try { await sb.rpc('letter_read', { lid: id }); } catch (e) { } }
+}
+function lReply() { if (!lCur) return; closeModal('modal-lview'); openWrite(lCur.mine ? lCur.recipient : lCur.sender); }
+async function lDelete() { if (!lCur || !confirm('이 편지를 삭제할까요?')) return; const id = lCur.id; closeModal('modal-lview'); letters = letters.filter(x => x.id !== id); updateLetterDot(); renderLetters(); try { await sb.rpc('letter_delete', { lid: id }); } catch (e) { } }
+function openWrite(u) {
+  const fl = friends.filter(x => x.direction === 'friend'); if (!fl.length) return showAlert('알림', '편지는 친구에게만 보낼 수 있어요.<br>먼저 친구를 추가해보세요!');
+  lTo = u && fl.find(x => x.uid === u) ? u : (fl[0] && (lTo && fl.find(x => x.uid === lTo) ? lTo : fl[0].uid)); q('lw-title').value = ''; q('lw-body').value = ''; q('lw-cnt').innerText = '0 / 2000'; paintLw(); openM('modal-lwrite');
+}
+function paintLw() { const fl = friends.filter(x => x.direction === 'friend'); q('lw-chips').innerHTML = fl.map(P => `<button onclick="lTo='${P.uid}';paintLw()" class="flex-shrink-0 text-center" style="width:64px"><div class="w-[54px] h-[54px] mx-auto rounded-full overflow-hidden bg-[#F5F6F8] flex items-center justify-center border-2 ${P.uid === lTo ? 'border-[var(--mil-green)]' : 'border-transparent'}">${frAvatar(P)}</div><div class="text-[11px] font-bold mt-1 truncate ${P.uid === lTo ? '' : 'text-[#8B95A1]'}">${esc(P.nickname || '친구')}</div></button>`).join(''); }
+async function sendLetter() {
+  const b = q('lw-body').value.trim(), t = q('lw-title').value.trim(); if (!lTo) return showAlert('알림', '받는 사람을 선택해주세요.'); if (!b) return showAlert('알림', '편지 내용을 입력해주세요.');
+  const { error } = await sb.rpc('send_letter', { to_uid: lTo, t, b }); if (error) return showAlert('오류', esc(error.message) + '<br><br>schema_social.sql 을 실행했는지 확인하세요.');
+  closeModal('modal-lwrite'); lTab = 'out'; await loadLetters(); if (!q('modal-letters').classList.contains('hidden')) renderLetters(); showAlert('편지를 보냈어요', '친구의 편지 아이콘에 알림이 떠요.');
 }
 function frPick(u) { frSel = u; renderFriends(); }
 async function refreshFriends() { await loadFriends(); renderFriends(); }
-function openFriends() { renderFriends(); openM('modal-friends'); clearInterval(frT); frT = setInterval(frTick, 100); loadFriends().then(renderFriends); }
+function openFriends() { frTabCur = 'list'; renderFriends(); openM('modal-friends'); clearInterval(frT); frT = setInterval(frTick, 100); loadFriends().then(renderFriends); }
 function stopFriendTimers() { clearInterval(frT); frT = null; }
 async function copyFriendCode() { try { await navigator.clipboard.writeText(me.friend_code || ''); showAlert('복사 완료', '친구 코드를 복사했어요.'); } catch (e) { showAlert('내 친구 코드', esc(me.friend_code || '-')); } }
 async function addFriend() {
