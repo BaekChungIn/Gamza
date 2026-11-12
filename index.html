@@ -60,17 +60,67 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 .spk::before{width:24px;height:1.5px;margin:-.75px 0 0 -12px}.spk::after{width:1.5px;height:24px;margin:-12px 0 0 -.75px;background:linear-gradient(180deg,rgba(255,255,255,0),#fff,rgba(255,255,255,0))}
 #soldier-card .pcard,#gf-profile-card .pcard,#salary-card{cursor:pointer;-webkit-tap-highlight-color:transparent}
 @keyframes haloPulse{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
+.in-s{flex:0 0 100%;scroll-snap-align:center;display:flex;align-items:center;justify-content:center;min-width:0}
+.in-v{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:0 20px;width:100%}
+.in-card{border-radius:24px;padding:18px;box-shadow:0 10px 30px rgba(25,31,40,.10);border:1px solid rgba(0,0,0,.04)}
+.in-chip{font-size:12px;font-weight:700;background:#fff;border:1px solid #E5E8EB;border-radius:99px;padding:6px 12px}
+.in-t{text-align:center}.in-k{font-size:15px;color:#6B7684;font-weight:500}.in-h{font-size:30px;font-weight:900;letter-spacing:-.03em;margin:4px 0 10px;color:#191F28}.in-d{font-size:13.5px;line-height:1.65;color:#8B95A1}
 </style>
 </head>
 <body class="min-h-screen flex justify-center items-start sm:p-4 select-none antialiased bg-gray-100">
 
 <!-- 로그인 -->
 <div id="splash" class="fixed inset-0 z-[200] transition-opacity duration-500" style="background:#E1E1E1 url(splash.jpg) center/cover no-repeat"></div>
- <div id="auth-modal" class="fixed inset-0 z-[100] bg-[var(--bg-main)] flex items-center justify-center p-6 transition-opacity">
- <div class="w-full max-w-sm bg-white rounded-[32px] p-8 shadow-2xl border border-[#F2F3F5] flex flex-col items-center">
-  <img src="logo.png" alt="짬타이거" class="w-24 h-24 rounded-[26px] border border-[#E5E8EB] mb-3 object-cover bg-white"><div class="text-[24px] font-black tracking-tight mb-4">짬타이거</div>
-  <h2 class="text-[22px] font-extrabold mb-1" id="auth-title">로그인</h2>
-  <p class="text-[13px] text-[#8B95A1] mb-6 text-center" id="auth-subtitle">계정을 연결하고 연인과 데이터를 동기화하세요.</p>
+ <div id="intro" class="fixed inset-0 z-[150] flex-col" style="display:none;background:var(--bg-main);padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)">
+ <div class="flex justify-end px-5 pt-3"><button onclick="introClose()" class="text-[13px] font-bold text-[#8B95A1] px-3 py-2">건너뛰기</button></div>
+ <div id="intro-pager" class="flex-1 flex overflow-x-auto no-scrollbar" style="scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;min-height:0">
+  <section class="in-s"><div class="in-v">
+   <div class="in-card" style="background:linear-gradient(155deg,#3A4530,#2B3524);color:#fff;width:268px"><div style="display:flex;align-items:center;gap:12px"><div style="width:62px;height:62px;border-radius:50%;background:#E1E1E1;overflow:hidden;box-shadow:0 0 0 2px rgba(255,255,255,.25)"><img src="tiger_ilb.png" style="width:100%;height:100%;object-fit:contain"></div><div><div style="font-size:11px;opacity:.7">대한민국 육군</div><div style="font-size:13px;font-weight:700">일병 1호봉</div><div style="font-size:22px;font-weight:800;line-height:1.1">충인</div></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;margin:14px 0 6px;opacity:.85"><span>전역</span><span>D-451</span></div><div style="height:36px;border-radius:12px;background:rgba(255,255,255,.14);position:relative;overflow:hidden"><div style="position:absolute;inset:0 auto 0 0;width:38%;background:#6B7B5C"></div><div style="position:relative;padding:0 12px;height:100%;display:flex;align-items:center;font-weight:900;font-size:15px">17.80473066%</div></div>
+    <div style="display:flex;gap:8px;margin-top:10px"><div style="flex:1;height:22px;border-radius:8px;background:rgba(255,255,255,.12);font-size:10px;display:flex;align-items:center;padding:0 8px">25.82%</div><div style="flex:1;height:22px;border-radius:8px;background:rgba(255,255,255,.12);font-size:10px;display:flex;align-items:center;padding:0 8px">4.28%</div></div></div>
+   <div class="in-t"><div class="in-k">내 군생활을 한눈에</div><div class="in-h">전역일 계산기</div><div class="in-d">계급·호봉·진급까지 소수점 8자리로<br>실시간 진행률을 보여줘요</div></div></div></section>
+  <section class="in-s"><div class="in-v">
+   <div class="in-card" style="background:linear-gradient(160deg,#2B3524,#1C241A);color:#fff;width:268px;text-align:center"><div style="font-size:12px;opacity:.75">충인의 군 통장</div><div style="font-size:30px;font-weight:900;margin:2px 0 8px">4,216,886.<span style="opacity:.7">27</span><span style="font-size:15px"> 원</span></div>
+    <div style="width:150px;height:150px;margin:0 auto;border-radius:50%;border:3px solid #F6D77E;background:radial-gradient(circle at 34% 26%,rgba(255,244,190,.55),rgba(255,214,110,.2) 55%,rgba(255,190,70,.34));position:relative;overflow:hidden;box-shadow:0 0 28px rgba(255,214,110,.5)"><div style="position:absolute;left:10%;right:10%;bottom:0;height:34%;background:repeating-linear-gradient(8deg,#9CCB9A 0 10px,#F3C66B 10px 20px);border-radius:50% 50% 0 0;opacity:.9"></div><i style="position:absolute;left:26%;top:22%;width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 8px #fff"></i><i style="position:absolute;left:68%;top:46%;width:6px;height:6px;border-radius:50%;background:#fff;box-shadow:0 0 8px #fff"></i></div></div>
+   <div class="in-t"><div class="in-k">월급이 쌓이는 걸 실시간으로</div><div class="in-h">복무 급여 통장</div><div class="in-d">돈이 저금통에 떨어지는 걸 보며<br>전역 때 모일 금액을 확인해요</div></div></div></section>
+  <section class="in-s"><div class="in-v">
+   <div class="in-card" style="background:#fff;width:268px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b style="font-size:15px">2026년 11월</b><span style="font-size:11px;background:#F2F4F6;border-radius:99px;padding:4px 10px;font-weight:700">+ 등록</span></div>
+    <div id="intro-cal" style="display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:12px;font-weight:600;row-gap:4px"></div>
+    <div style="margin-top:10px;background:#F5F6F8;border:1px solid #E5E8EB;border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center"><div><span style="font-size:10px;font-weight:800;color:#fff;background:#7C6BC9;border-radius:99px;padding:2px 7px">외박</span> <b style="font-size:13px">첫외박</b></div><b style="color:#7C6BC9">D-6</b></div></div>
+   <div class="in-t"><div class="in-k">휴가·외박·외출, 한곳에서</div><div class="in-h">캘린더</div><div class="in-d">일정을 등록하면 D-day로 챙겨주고<br>친구와 연인도 함께 볼 수 있어요</div></div></div></section>
+  <section class="in-s"><div class="in-v">
+   <div class="in-card" style="background:#fff;width:268px"><img src="card_ibk.png" style="width:100%;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,.18)"><div style="margin-top:12px;font-size:14px;font-weight:800">장병내일준비적금 <span style="font-size:11px;background:#191F28;color:#fff;border-radius:8px;padding:3px 8px;float:right">매칭 100%</span></div><div style="margin-top:8px;font-size:12px;color:#4E5968;background:#F5F6F8;border-radius:12px;padding:10px 12px;line-height:1.6">만기 시 예상 수령액<br><b style="font-size:19px;color:#191F28">20,378,550원</b></div></div>
+   <div class="in-t"><div class="in-k">적금과 나라사랑카드 혜택까지</div><div class="in-h">적금 · 혜택</div><div class="in-d">은행별 우대금리를 계산하고<br>내 나라사랑카드 혜택을 모아봐요</div></div></div></section>
+  <section class="in-s"><div class="in-v">
+   <div style="width:268px"><div style="display:flex;gap:6px;margin-bottom:10px"><span class="in-chip" style="background:#191F28;color:#fff">전체</span><span class="in-chip">인기</span><span class="in-chip">고민</span><span class="in-chip">꿀팁</span></div>
+    <div class="in-card" style="background:#fff;margin-bottom:10px;padding:14px 16px"><div style="font-size:11px;font-weight:800;color:#6B7B5C">고민</div><div style="font-size:15px;font-weight:800;margin:2px 0">첫 휴가 때 뭐 하면 좋을까요?</div><div style="font-size:12px;color:#8B95A1">익명 · 방금 전</div><div style="font-size:12px;color:#8B95A1;margin-top:6px">♡ 12 &nbsp; 💬 5 &nbsp; 👁 87</div></div>
+    <div class="in-card" style="background:#fff;padding:14px 16px"><div style="font-size:11px;font-weight:800;color:#6B7B5C">꿀팁</div><div style="font-size:15px;font-weight:800;margin:2px 0">PX 대량 구매 할인 정리</div><div style="font-size:12px;color:#8B95A1">익명 · 1시간 전</div></div></div>
+   <div class="in-t"><div class="in-k">익명으로 편하게 이야기해요</div><div class="in-h">커뮤니티</div><div class="in-d">고민·꿀팁·연애 이야기를 나누고<br>좋아요와 댓글로 소통해요</div></div></div></section>
+  <section class="in-s"><div class="in-v">
+   <div style="width:268px;position:relative;height:250px"><div class="in-card" style="position:absolute;left:0;top:0;width:200px;background:linear-gradient(155deg,#F9BBCD,#EE8AA9);color:#fff;padding:16px"><div style="display:flex;align-items:center;gap:10px"><div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.45);overflow:hidden"><img src="gf_bear.png" style="width:100%;height:100%;object-fit:cover"></div><div><div style="font-size:11px;opacity:.9">곰신</div><div style="font-size:20px;font-weight:800">지수</div></div></div><div style="margin-top:10px;font-size:12px;font-weight:700">함께한 지 <b style="font-size:18px">D+412</b></div></div>
+    <div class="in-card" style="position:absolute;right:0;bottom:0;width:210px;background:#FFFDF7;border:1px solid #EFE4CC;padding:14px 16px"><div style="font-size:11px;color:#9A8E78">From. 충인 · 11월 8일</div><div style="font-size:14px;font-weight:800;margin:4px 0">보고싶다 💌</div><div style="font-size:12px;color:#3B3426;line-height:1.7">오늘은 훈련이 끝나고<br>네 생각이 제일 많이 났어.</div></div></div>
+   <div class="in-t"><div class="in-k">멀리 있어도 가까이</div><div class="in-h">연인 · 친구 · 편지</div><div class="in-d">연인과 연동해 서로의 일정과 진행률을 보고<br>편지도 주고받을 수 있어요</div></div></div></section>
+ </div>
+ <div class="px-6 pb-6 pt-3"><div id="intro-dots" class="flex justify-center gap-2 mb-5"></div><button id="intro-btn" onclick="introNext()" class="w-full h-14 rounded-2xl text-white text-[16px] font-bold active:scale-[.98] transition" style="background:#191F28">다음</button></div>
+</div>
+<script>try { if (!localStorage.getItem('zt_intro')) document.getElementById('intro').style.display = 'flex'; } catch (e) { }</script>
+
+ <div id="auth-modal" class="fixed inset-0 z-[100] flex flex-col transition-opacity" style="background:var(--bg-main);padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)">
+ <div id="auth-home" class="flex-1 flex flex-col px-6 min-h-0">
+  <div class="flex-1 flex flex-col items-center justify-center text-center">
+   <img src="logo.png" alt="짬타이거" class="w-[104px] h-[104px] rounded-[28px] border border-[#E5E8EB] object-cover" style="background:#E1E1E1">
+   <div class="mt-7 text-[16px] text-[#6B7684] font-medium">나의 군생활 파트너</div>
+   <div class="text-[40px] font-black tracking-tight leading-tight" style="color:var(--mil-green)">짬타이거</div>
+  </div>
+  <div class="pb-6">
+   <button onclick="googleAuth()" class="w-full h-14 rounded-2xl flex items-center justify-center gap-2.5 bg-white border border-[#E5E8EB] font-bold text-[15px] active:scale-[.98] transition"><svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>Google로 계속하기</button>
+   <button onclick="authView('email')" class="w-full h-12 mt-2 text-[14px] font-semibold text-[#4E5968]">이메일로 계속하기</button>
+  </div>
+ </div>
+ <div id="auth-email-view" class="hidden flex-1 flex-col px-6 min-h-0 overflow-y-auto no-scrollbar">
+  <div class="pt-3"><button onclick="authView('home')" class="w-10 h-10 -ml-2 flex items-center justify-center text-[26px] text-[#191F28]">‹</button></div>
+  <div class="mt-6"><h2 class="text-[28px] font-black tracking-tight" id="auth-title">로그인</h2>
+  <p class="text-[14px] text-[#8B95A1] mt-2 mb-8" id="auth-subtitle">계정을 연결하고 연인과 데이터를 동기화하세요.</p></div>
   <div class="w-full space-y-3 mb-5">
    <input type="email" id="auth-email" placeholder="이메일 주소" class="inp" autocomplete="email">
    <input type="password" id="auth-password" placeholder="비밀번호 (6자리 이상)" class="inp" autocomplete="current-password">
@@ -82,11 +132,8 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
     </div>
    </div>
   </div>
-  <button id="btn-auth-submit" onclick="submitAuth()" class="w-full bg-[#191F28] text-white py-3.5 rounded-xl font-bold text-[14px] active:scale-95 transition mb-4">이메일로 로그인</button>
-  <div class="text-[12px] text-[#4E5968] mb-5" id="auth-toggle-text"></div>
-  <div class="w-full flex items-center gap-3 mb-5"><div class="h-px bg-[#E5E8EB] flex-1"></div><span class="text-[11px] text-[#8B95A1]">또는</span><div class="h-px bg-[#E5E8EB] flex-1"></div></div>
-  <button onclick="googleAuth()" class="w-full flex items-center justify-center gap-2 bg-[#F5F6F8] py-3.5 rounded-xl font-bold text-[14px] active:scale-95 transition border border-[#E5E8EB]">
-   <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>Google 계정으로 시작</button>
+  <button id="btn-auth-submit" onclick="submitAuth()" class="w-full h-14 bg-[#191F28] text-white rounded-2xl font-bold text-[15px] active:scale-[.98] transition mb-4">이메일로 로그인</button>
+  <div class="text-[13px] text-[#4E5968] text-center pb-8" id="auth-toggle-text"></div>
  </div>
 </div>
 
@@ -465,6 +512,7 @@ let me = null, partner = null, session = null, wishes = [], pWishes = [], vacs =
 let signup = false, signupGender = null, obG = null, obBranch = 'army', setBranchV = 'army', sav = { banks: [], amts: {}, opts: {} }, pxSel = [];
 
 /* ---------- 인증 ---------- */
+function authView(v) { q('auth-home').style.display = v === 'home' ? '' : 'none'; const e = q('auth-email-view'); e.style.display = v === 'email' ? 'flex' : 'none'; if (v === 'email') setTimeout(() => { try { q('auth-email').focus(); } catch (x) { } }, 60); }
 function authToggleHTML() { q('auth-toggle-text').innerHTML = signup ? '이미 계정이 있나요? <span class="text-[var(--mil-green)] font-bold cursor-pointer" onclick="toggleAuthMode()">로그인</span>' : '계정이 없나요? <span class="text-[var(--mil-green)] font-bold cursor-pointer" onclick="toggleAuthMode()">새 계정 만들기</span>'; }
 function toggleAuthMode() { signup = !signup; q('auth-title').innerText = signup ? '회원가입' : '로그인'; q('auth-subtitle').innerText = signup ? '성별을 선택하고 비밀번호를 재확인해주세요.' : '계정을 연결하고 연인과 데이터를 동기화하세요.'; q('auth-signup-fields').classList.toggle('hidden', !signup); q('btn-auth-submit').innerText = signup ? '계정 생성하기' : '이메일로 로그인'; authToggleHTML(); }
 function setGender(g) { signupGender = g; q('btn-gender-M').className = 'flex-1 py-3 rounded-xl border-2 font-bold text-[13px] ' + (g === 'M' ? 'border-[var(--mil-green)] bg-[var(--mil-green-light)] text-[var(--mil-green)]' : 'border-[#E5E8EB] bg-[#F5F6F8] text-[#8B95A1]'); q('btn-gender-F').className = 'flex-1 py-3 rounded-xl border-2 font-bold text-[13px] ' + (g === 'F' ? 'border-[var(--pink-main)] bg-[var(--pink-light)] text-[var(--pink-main)]' : 'border-[#E5E8EB] bg-[#F5F6F8] text-[#8B95A1]'); }
@@ -1209,6 +1257,16 @@ function hideSplash() {
   setTimeout(() => { el.style.opacity = '0'; setTimeout(() => { el.remove(); popReady = true; if (popQ.length && !popBusy) popNext(); }, 520); }, Math.max(0, 1300 - (Date.now() - splashT0)));
 }
 setTimeout(hideSplash, 9000);
+/* ---------- 첫 실행 소개 화면 ---------- */
+function introClose(silent) { const el = document.getElementById('intro'); if (!el || el.style.display === 'none') return; try { localStorage.setItem('zt_intro', '1'); } catch (e) { } if (silent) { el.style.display = 'none'; return; } el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 260, fill: 'forwards' }).finished.then(() => { el.style.display = 'none'; }).catch(() => { el.style.display = 'none'; }); }
+(function () {
+  const pg = document.getElementById('intro-pager'), dots = document.getElementById('intro-dots'), btn = document.getElementById('intro-btn'); if (!pg) return; const n = pg.children.length; let cur = 0;
+  dots.innerHTML = Array.from({ length: n }, (_, i) => `<i style="width:${i ? 8 : 22}px;height:8px;border-radius:99px;background:${i ? '#D5DAE0' : '#191F28'};transition:all .25s"></i>`).join('');
+  const paint = () => { [...dots.children].forEach((d, i) => { d.style.width = i === cur ? '22px' : '8px'; d.style.background = i === cur ? '#191F28' : '#D5DAE0'; }); btn.innerText = cur === n - 1 ? '시작하기' : '다음'; };
+  pg.addEventListener('scroll', () => { const i = Math.round(pg.scrollLeft / pg.clientWidth); if (i !== cur) { cur = i; paint(); } }, { passive: true });
+  window.introNext = () => { if (cur >= n - 1) return introClose(); pg.scrollTo({ left: (cur + 1) * pg.clientWidth, behavior: 'smooth' }); };
+  const g = document.getElementById('intro-cal'); if (g) { let h = ''; '일월화수목금토'.split('').forEach((d, i) => h += `<div style="color:${i === 0 ? '#E5484D' : i === 6 ? '#3B82F6' : '#8B95A1'};font-size:10px">${d}</div>`); for (let i = 0; i < 7; i++) h += '<div></div>'.repeat(i === 0 ? 0 : 0); for (let d = 1; d <= 30; d++) { const on = d === 14 || d === 15, dow = (d - 1) % 7; h += `<div style="height:30px;display:flex;align-items:center;justify-content:center"><span style="width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;${on ? 'background:#7C6BC9;color:#fff' : 'color:' + (dow === 0 ? '#E5484D' : dow === 6 ? '#3B82F6' : '#191F28')}">${d}</span></div>`; } g.innerHTML = h; }
+})();
 /* ---------- 친구 ---------- */
 let friends = [], frSel = null, frT = null, frH = null;
 async function loadFriends() { try { const { data, error } = await sb.rpc('friend_overview'); friends = error ? [] : (data || []); } catch (e) { friends = []; } updateFriendDot(); }
@@ -1734,8 +1792,8 @@ q('profile-container').addEventListener('scroll', pagerDots, { passive: true });
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js').catch(() => {});
 if (!configured) hideSplash();
 if (configured) {
-  sb.auth.getSession().then(({ data }) => { if (data.session) { session = data.session; boot().finally(hideSplash); } else hideSplash(); }).catch(hideSplash);
-  sb.auth.onAuthStateChange((ev, s) => { if (ev === 'SIGNED_IN' && s && !booted) { session = s; boot(); } if (ev === 'SIGNED_OUT') location.reload(); });
+  sb.auth.getSession().then(({ data }) => { if (data.session) { session = data.session; introClose(true); boot().finally(hideSplash); } else hideSplash(); }).catch(hideSplash);
+  sb.auth.onAuthStateChange((ev, s) => { if (ev === 'SIGNED_IN' && s && !booted) { session = s; introClose(true); boot(); } if (ev === 'SIGNED_OUT') location.reload(); });
 }
 </script>
 </body>
