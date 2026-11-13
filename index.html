@@ -281,9 +281,9 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
     <div class="grid grid-cols-4 gap-2 mb-5" id="bank-selector-grid"></div>
     <div id="selected-banks-container" class="space-y-4 mb-5"></div>
     <div id="saving-split-warning" class="text-[11px] font-bold text-[#D94867] bg-[#FFF0F3] p-3 rounded-lg text-center mb-5 hidden">⚡ 한도 초과! 총 55만원 또는 1개 은행 30만원을 초과했어요.</div>
-    <div class="bg-[var(--mil-dark)] rounded-2xl p-5 text-white"><div class="text-[12px] text-[var(--mil-t2)] mb-1">만기 시 총 예상 수령액</div><div class="text-[28px] font-black mb-2"><span id="saving-total-result">0</span>원</div>
+    <div onclick="swOpen(true,2)" class="bg-[var(--mil-dark)] rounded-2xl p-5 text-white cursor-pointer active:scale-[.98] transition-transform"><div class="flex justify-between items-center mb-1"><div class="text-[12px] text-[var(--mil-t2)]">만기 시 총 예상 수령액</div><div class="text-[10px] font-bold bg-white/15 rounded-full px-2 py-0.5">터치시 통장이 열립니다</div></div><div class="text-[28px] font-black mb-2"><span id="saving-total-result">0</span>원</div>
      <div class="flex gap-3 text-[11px] text-[var(--mil-t1)]"><span>원금 <span id="saving-prin">0</span></span><span>이자 <span id="saving-int">0</span></span></div><div class="text-[11px] text-[var(--mil-t0)] mt-1 font-bold">정부 매칭지원금: <span id="saving-match">0</span></div></div>
-    <button onclick="swOpen(true)" class="w-full mt-4 py-3.5 rounded-2xl font-bold text-[14px] bg-[#F2F4F6] text-[#191F28]">🧮 다시 계산하기</button>
+    <div class="flex gap-2 mt-4"><button onclick="swOpen(true)" class="flex-1 py-3.5 rounded-2xl font-bold text-[14px] bg-[#F2F4F6] text-[#191F28]">다시 계산하기</button><button id="sav-reset" onclick="savReset()" class="flex-1 py-3.5 rounded-2xl font-bold text-[14px] bg-[#FFF0F3] text-[#D94867]">초기화</button></div>
     <button id="sav-save" onclick="saveSavNow()" class="w-full mt-4 py-4 rounded-2xl font-bold text-[15px] text-white" style="background:#191F28">저장하기</button><div id="sav-msg" class="text-center text-[11px] mt-2 text-[#8B95A1] min-h-[16px]"></div>
     <p class="text-[10px] text-[#8B95A1] mt-3">※ 우대금리 조건·한도는 은행/시기별로 바뀔 수 있어요. 가입 전 해당 은행 공지를 꼭 확인하세요.</p>
    </div>
@@ -1657,11 +1657,11 @@ function swCalc(s) {
   s.banks.forEach(id => { const b = bD.find(x => x.id === id), amt = s.amts[id] ?? swDef(s.banks.length), add = (s.opts[id] || []).reduce((a, i) => a + b.o[i].r, 0), rate = Math.min(b.max, b.b + add), prin = amt * months; tot += amt; if (amt > 300000) warn = true; tP += prin; tI += Math.floor(prin * rate / 100 * (months + 1) / 24); });
   if (tot > 550000) warn = true; return { tP, tI, tot, warn, months, total: tP * 2 + tI };
 }
-function swOpen(again) {
+function swOpen(again, st) {
   sw = { banks: again ? sav.banks.slice() : [], amts: again ? Object.assign({}, sav.amts) : {}, opts: {} };
   if (again) Object.keys(sav.opts || {}).forEach(k => sw.opts[k] = (sav.opts[k] || []).slice());
   swStep = 0; const m = q('modal-sw'), r = q('sw-root'); r.innerHTML = ''; m.classList.remove('hidden'); m.classList.add('flex');
-  swShow(0, 'up');
+  sw.view = st === 2; swShow(st || 0, 'up');
   m.animate([{ opacity: 0, transform: 'translateY(40px)' }, { opacity: 1, transform: 'none' }], { duration: 320, easing: 'cubic-bezier(.2,.8,.2,1)' });
 }
 function swClose() { closeModal('modal-sw'); }
@@ -1696,7 +1696,7 @@ function swShow(n, dir) {
      <div class="cv"><div class="f"><svg viewBox="0 0 170 240" width="170" height="240" preserveAspectRatio="none"><rect width="170" height="240" fill="#8A8660"/><path d="M0 30C30 10 60 40 80 20S120 0 170 30V80C130 60 110 100 70 80S20 100 0 70Z" fill="#4B5A3A"/><path d="M110 90c25-20 50-10 60 10v70c-30 10-50-20-60-40Z" fill="#6B5A3E"/><path d="M0 130c25-15 50 5 60 30s-20 50-60 40Z" fill="#BDB08A"/><path d="M60 170c30-20 70-10 110 10v60H70c-30 0-30-40-10-70Z" fill="#4B5A3A"/><path d="M90 40c20-10 40 0 45 20s-30 25-45 0Z" fill="#6F7F55"/><path d="M20 200c20-10 40 10 30 40H0V210Z" fill="#6B5A3E"/><rect x="0" y="62" width="170" height="10" fill="#4F5A33" opacity=".7" transform="rotate(-4 85 67)"/><g fill="#2F3A22" transform="translate(85 125)"><polygon points="0,-20 5,-6 20,-6 8,3 12,18 0,9 -12,18 -8,3 -20,-6 -5,-6"/><path d="M-24 -6L-60 -2 M24 -6L60 -2" stroke="#2F3A22" stroke-width="5" stroke-linecap="round"/></g><text x="85" y="205" text-anchor="middle" font-family="Pretendard,sans-serif" font-weight="900" font-size="19" fill="#F6EFD9">국군적금통장</text><rect width="170" height="240" fill="url(#sg)"/><defs><linearGradient id="sg" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".28"/><stop offset=".08" stop-color="#000" stop-opacity="0"/></linearGradient></defs></svg></div>
       <div class="b" style="padding:18px 14px"><div style="font-size:10px;color:#8B95A1;font-weight:700">내 적금 계획</div><div style="margin-top:10px;font-size:11px;color:#191F28;line-height:2;font-weight:800">${sw.banks.map(id => bD.find(x => x.id === id).n).join(' · ')}<br><span style="color:#4E5968;font-weight:700">월 ${R.tot.toLocaleString()}원</span><br><span style="color:#4E5968;font-weight:700">${R.months}개월 납입</span></div></div></div></div></div>
      <div id="sw-info" class="swrise text-center mt-8 px-6"><div class="text-[13px] font-bold text-[#4E5968]">이 계획대로 ${R.months}개월 납입하면</div><div class="text-[22px] font-black mt-1">${R.total.toLocaleString()}원을 받아요 🎉</div><div class="text-[10px] text-[#8B95A1] mt-2">원금 + 이자 + 정부 매칭지원금 합계 · 예상치예요</div></div></div>
-    <div id="sw-end" class="swcta swrise"><button onclick="swFinish()">이 계획으로 적금 등록하기</button><button onclick="swBack()" style="background:#F2F4F6;color:#4E5968;margin-top:8px">조건 다시 고르기</button></div>`;
+    <div id="sw-end" class="swcta swrise"><button onclick="${sw.view ? 'swClose()' : 'swFinish()'}">${sw.view ? '확인' : '이 계획으로 적금 등록하기'}</button><button onclick="swBack()" style="background:#F2F4F6;color:#4E5968;margin-top:8px">조건 다시 고르기</button></div>`;
   }
   r.appendChild(p);
   const D = 300, ease = 'cubic-bezier(.2,.8,.2,1)', fromX = dir === 'back' ? '-28px' : dir === 'up' ? '0px' : '28px';
@@ -1714,6 +1714,17 @@ function swPlay() {
     for (let i = 0; i < 7; i++) { const s = document.createElement('div'); s.className = 'swsp'; s.textContent = '✨'; s.style.left = (190 + Math.random() * 130) + 'px'; s.style.top = (10 + Math.random() * 120) + 'px'; s.style.animationDelay = (i * .12) + 's'; w.appendChild(s); setTimeout(() => s.remove(), 2000); }
   }, 1700);
   setTimeout(() => { q('sw-info').classList.add('in'); q('sw-end').classList.add('in'); }, 3000);
+}
+
+let savRT;
+async function savReset() {
+  const b = q('sav-reset');
+  if (!b.dataset.armed) { b.dataset.armed = '1'; b.innerText = '한 번 더 누르면 삭제돼요'; clearTimeout(savRT); savRT = setTimeout(() => { delete b.dataset.armed; b.innerText = '초기화'; }, 3000); return; }
+  clearTimeout(savRT); sav.banks = []; sav.amts = {}; sav.opts = {}; savDirty = false;
+  const payload = Object.assign({}, sav); try { localStorage.setItem('sav:' + me.id, JSON.stringify(payload)); } catch (e) { }
+  const { error } = await sb.from('profiles').update({ savings: Object.assign({}, me.savings || {}, payload) }).eq('id', me.id);
+  if (error) showAlert('초기화 실패', esc(error.message)); else me.savings = Object.assign({}, me.savings || {}, payload);
+  delete b.dataset.armed; b.innerText = '초기화'; renderSav();
 }
 async function swFinish() {
   sav.banks = sw.banks.slice(); sav.amts = Object.assign({}, sw.amts); sav.opts = {}; sw.banks.forEach(id => sav.opts[id] = (sw.opts[id] || []).slice());
