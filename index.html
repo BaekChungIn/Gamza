@@ -91,6 +91,12 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 .swrise{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}.swrise.in{opacity:1;transform:none}
 @keyframes swspark{0%{opacity:0;transform:scale(.2) rotate(0)}40%{opacity:1}100%{opacity:0;transform:scale(1.2) rotate(90deg)}}
 .swsp{position:absolute;font-size:16px;opacity:0;animation:swspark 1.2s ease-out forwards;pointer-events:none}
+.sav-det{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows .5s cubic-bezier(.2,.8,.2,1),opacity .3s ease}
+.sav-det>div{overflow:hidden;min-height:0}
+.sav-det.open{grid-template-rows:1fr;opacity:1}
+.sav-det .bkcard{opacity:0;transform:translateY(-16px);transition:opacity .4s ease,transform .5s cubic-bezier(.2,.8,.2,1)}
+.sav-det.open .bkcard{opacity:1;transform:none}
+.sav-det.open .bkcard:nth-child(2){transition-delay:.07s}.sav-det.open .bkcard:nth-child(3){transition-delay:.14s}.sav-det.open .bkcard:nth-child(4){transition-delay:.21s}
 </style>
 </head>
 <body class="min-h-screen flex justify-center items-start sm:p-4 select-none antialiased bg-gray-100">
@@ -277,14 +283,17 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
    <div id="sav-main" class="toss-card">
     <h2 class="text-[18px] font-extrabold mb-1 flex justify-between">장병내일준비적금 <span class="bg-[#191F28] text-white text-[10px] px-2 py-1 rounded-md">매칭 100%</span></h2>
     <p class="text-[12px] text-[#4E5968] mb-4">월 최대 55만 원 · 은행 최대 4개 · 선택 내용은 자동 저장돼요.</p>
-    <h3 class="text-[14px] font-bold mb-3">1. 가입 은행 선택</h3>
-    <div class="grid grid-cols-4 gap-2 mb-5" id="bank-selector-grid"></div>
-    <div id="selected-banks-container" class="space-y-4 mb-5"></div>
-    <div id="saving-split-warning" class="text-[11px] font-bold text-[#D94867] bg-[#FFF0F3] p-3 rounded-lg text-center mb-5 hidden">⚡ 한도 초과! 총 55만원 또는 1개 은행 30만원을 초과했어요.</div>
+    <h3 class="text-[14px] font-bold mb-3">1. 나의 가입 은행</h3>
+    <div class="grid grid-cols-4 gap-2 mb-6" id="bank-selector-grid"></div>
+    <h3 class="text-[14px] font-bold mb-3">2. 상세 조건</h3>
+    <button type="button" id="sav-det-btn" onclick="savDet()" class="w-full flex items-center justify-between rounded-2xl bg-[#F5F6F8] border border-[#E5E8EB] px-4 py-3.5 mb-3 active:scale-[.99] transition-transform"><span class="text-[13px] font-bold text-[#191F28]">우대조건 <span id="sav-det-sum" class="text-[var(--mil-green)]">0개</span> 선택됨</span><span class="flex items-center gap-1 text-[12px] font-bold text-[#4E5968]"><span id="sav-det-txt">펼치기</span><svg id="sav-det-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="transition:transform .45s cubic-bezier(.2,.8,.2,1)"><polyline points="6 9 12 15 18 9"/></svg></span></button>
+    <div id="sav-det" class="sav-det"><div><div id="selected-banks-container" class="space-y-3 pb-3"></div></div></div>
+    <div id="saving-split-warning" class="text-[11px] font-bold text-[#D94867] bg-[#FFF0F3] p-3 rounded-lg text-center mb-3 hidden">⚡ 한도 초과! 총 55만원 또는 1개 은행 30만원을 초과했어요.</div>
+    <h3 class="text-[14px] font-bold mb-3 mt-3">3. 만기 시 총 예상 수령액</h3>
     <div onclick="swOpen(true,2)" class="bg-[var(--mil-dark)] rounded-2xl p-5 text-white cursor-pointer active:scale-[.98] transition-transform"><div class="flex justify-between items-center mb-1"><div class="text-[12px] text-[var(--mil-t2)]">만기 시 총 예상 수령액</div><div class="text-[10px] font-bold bg-white/15 rounded-full px-2 py-0.5">터치시 통장이 열립니다</div></div><div class="text-[28px] font-black mb-2"><span id="saving-total-result">0</span>원</div>
      <div class="flex gap-3 text-[11px] text-[var(--mil-t1)]"><span>원금 <span id="saving-prin">0</span></span><span>이자 <span id="saving-int">0</span></span></div><div class="text-[11px] text-[var(--mil-t0)] mt-1 font-bold">정부 매칭지원금: <span id="saving-match">0</span></div></div>
-    <div class="flex gap-2 mt-4"><button onclick="swOpen(true)" class="flex-1 py-3.5 rounded-2xl font-bold text-[14px] bg-[#F2F4F6] text-[#191F28]">다시 계산하기</button><button id="sav-reset" onclick="savReset()" class="flex-1 py-3.5 rounded-2xl font-bold text-[14px] bg-[#FFF0F3] text-[#D94867]">초기화</button></div>
-    <button id="sav-save" onclick="saveSavNow()" class="w-full mt-4 py-4 rounded-2xl font-bold text-[15px] text-white" style="background:#191F28">저장하기</button><div id="sav-msg" class="text-center text-[11px] mt-2 text-[#8B95A1] min-h-[16px]"></div>
+    <div class="grid grid-cols-2 gap-2 mt-5"><button onclick="swOpen(true)" class="py-4 rounded-2xl font-bold text-[14px] bg-[#F2F4F6] text-[#191F28]">다시 계산하기</button><button id="sav-reset" onclick="savReset()" class="py-4 rounded-2xl font-bold text-[14px] bg-[#FFF0F3] text-[#D94867]">초기화</button></div>
+    <button id="sav-save" onclick="saveSavNow()" class="w-full mt-2 py-4 rounded-2xl font-bold text-[15px] text-white" style="background:#191F28">저장하기</button><div id="sav-msg" class="text-center text-[11px] mt-2 text-[#8B95A1] min-h-[16px]"></div>
     <p class="text-[10px] text-[#8B95A1] mt-3">※ 우대금리 조건·한도는 은행/시기별로 바뀔 수 있어요. 가입 전 해당 은행 공지를 꼭 확인하세요.</p>
    </div>
   </section>
@@ -1628,7 +1637,7 @@ function renderSav() {
   const c = q('selected-banks-container');
   if (!sav.banks.length) { c.innerHTML = '<div class="text-center text-[12px] text-[#8B95A1] py-4 bg-[#F5F6F8] rounded-xl">가입할 은행을 위 버튼으로 선택해주세요.</div>'; calcSav(); return; }
   c.innerHTML = sav.banks.map(id => { const b = bD.find(x => x.id === id), amt = sav.amts[id] ?? Math.floor(550000 / sav.banks.length), on = sav.opts[id] || [];
-    return `<div class="bg-white rounded-xl p-4 border border-[var(--mil-green)] shadow-sm"><div class="flex justify-between items-center mb-3"><div class="text-[14px] font-bold">${b.n} <span class="text-[11px] text-[#8B95A1]">기본 ${b.b}% · 최대 ${b.max}%</span></div><div class="flex items-center gap-1"><input type="number" id="amt-${id}" value="${amt}" step="10000" min="0" class="w-24 bg-[#F5F6F8] border border-[#E5E8EB] rounded-lg px-2 py-1.5 text-right text-[13px] font-bold outline-none" oninput="calcSav(true)"><span class="text-[12px] font-bold">원</span></div></div>
+    return `<div class="bkcard bg-white rounded-xl p-4 border border-[var(--mil-green)] shadow-sm"><div class="flex justify-between items-center mb-3"><div class="text-[14px] font-bold">${b.n} <span class="text-[11px] text-[#8B95A1]">기본 ${b.b}% · 최대 ${b.max}%</span></div><div class="flex items-center gap-1"><input type="number" id="amt-${id}" value="${amt}" step="10000" min="0" class="w-24 bg-[#F5F6F8] border border-[#E5E8EB] rounded-lg px-2 py-1.5 text-right text-[13px] font-bold outline-none" oninput="calcSav(true)"><span class="text-[12px] font-bold">원</span></div></div>
     <div class="space-y-1.5 bg-[#F5F6F8] p-3 rounded-lg">${b.o.map((o, i) => `<label class="flex items-start gap-2 cursor-pointer"><input type="checkbox" class="w-4 h-4 mt-0.5 accent-[var(--mil-green)] opt-${id}" data-i="${i}" data-r="${o.r}" ${on.includes(i) ? 'checked' : ''} onchange="calcSav(true)"><span class="text-[11px]"><b>${o.n}</b> <b class="text-[var(--mil-green)]">+${o.r}%</b><br><span class="text-[#8B95A1]">📌 ${o.d}</span></span></label>`).join('')}</div></div>`; }).join('');
   calcSav(); paintSavBtn();
 }
@@ -1637,6 +1646,9 @@ function toggleBank(id) {
   else { if (sav.banks.length >= 4) return showAlert('한도 초과', '최대 4개 은행만 선택 가능합니다.'); sav.banks.push(id); }
   markSav(); renderSav();
 }
+
+function savDet() { const d = q('sav-det'), o = d.classList.toggle('open'); q('sav-det-txt').innerText = o ? '접기' : '펼치기'; q('sav-det-chev').style.transform = o ? 'rotate(180deg)' : ''; }
+function savSum() { const e = q('sav-det-sum'); if (e) e.innerText = sav.banks.reduce((n, id) => n + ((sav.opts[id] || []).length), 0) + '개'; }
 function calcSav(persist) {
   const months = BR[(S_() || me).branch || 'army'].m; let tP = 0, tI = 0, tot = 0, warn = false;
   sav.banks.forEach(id => { const b = bD.find(x => x.id === id), el = q('amt-' + id); const amt = el ? Math.max(0, parseInt(el.value || 0)) : (sav.amts[id] || 0);
@@ -1645,7 +1657,7 @@ function calcSav(persist) {
     tot += amt; if (amt > 300000) warn = true; tP += prin; tI += Math.floor(prin * rate / 100 * (months + 1) / 24); });
   if (tot > 550000) warn = true; q('saving-split-warning').classList.toggle('hidden', !warn);
   q('saving-total-result').innerText = (tP * 2 + tI).toLocaleString(); q('saving-prin').innerText = tP.toLocaleString(); q('saving-int').innerText = tI.toLocaleString(); q('saving-match').innerText = tP.toLocaleString();
-  if (persist) markSav();
+  savSum(); if (persist) markSav();
 }
 
 
