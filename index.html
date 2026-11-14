@@ -257,9 +257,9 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
     <div class="relative z-20 flex items-end justify-between gap-2"><div><div class="text-[12px] text-[var(--mil-t2)] mb-1">현재까지 축적된 군 복무 총 자산</div><div class="flex items-baseline gap-1"><span id="live-total-salary" class="text-[32px] font-extrabold tabular-nums">0.00</span><span class="text-[18px] font-bold text-[var(--mil-t1)]">원</span></div></div><button onclick="event.stopPropagation();openSal()" class="shrink-0 text-[12px] font-bold bg-white/10 border border-white/15 px-3 py-1.5 rounded-full">자세히 보기 ›</button></div>
    </div>
 
-   <div class="toss-card hidden" id="vacation-card">
-    <div class="flex justify-between items-center mb-4"><h3 class="text-[16px] font-bold">📅 캘린더</h3><button onclick="openVac()" class="bg-[#F5F6F8] px-3 py-1.5 rounded-full text-[12px] font-bold">+ 등록</button></div>
-    <div id="vacation-list" class="space-y-3"></div>
+   <div class="toss-card hidden cursor-pointer active:scale-[.99] transition-transform" id="vacation-card" onclick="openCalF()">
+    <div class="flex justify-between items-center mb-3"><h3 class="text-[16px] font-bold">📅 캘린더</h3><div class="flex items-center gap-2"><span class="text-[11px] font-bold text-[#8B95A1]">전체 보기 ›</span><button onclick="event.stopPropagation();openVac()" class="bg-[#F5F6F8] px-3 py-1.5 rounded-full text-[12px] font-bold">+ 등록</button></div></div>
+    <div id="vacation-list"></div>
    </div>
 
    <div class="toss-card">
@@ -511,7 +511,18 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
    <div class="flex gap-2"><button onclick="closeModal('modal-vac')" class="flex-1 py-3 rounded-xl bg-[#F5F6F8] font-bold text-[14px]">취소</button><button onclick="saveVac()" class="flex-1 py-3 rounded-xl bg-[#191F28] text-white font-bold text-[14px]">저장</button></div>
   </div></div>
 
- <div id="modal-menu" class="fixed inset-0 z-50 bg-[var(--bg-main)] hidden flex-col">
+ <div id="modal-mycal" class="fixed inset-0 z-[60] hidden flex-col" style="background:var(--bg-main)">
+  <div class="flex items-center gap-3 px-4 pb-3" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeCalF()" class="w-10 h-10 rounded-full bg-white border border-[#E5E8EB] font-bold text-[18px]">‹</button><div class="flex-1 text-[18px] font-extrabold">캘린더</div><button onclick="openVac()" class="bg-[#191F28] text-white px-4 py-2 rounded-full text-[12px] font-bold">+ 등록</button></div>
+  <div class="flex-1 overflow-y-auto no-scrollbar px-4 space-y-3" style="padding-bottom:max(24px,env(safe-area-inset-bottom))">
+   <div class="toss-card"><div class="flex items-center justify-between mb-2"><button onclick="cfNav(-1)" class="w-9 h-9 rounded-full bg-[#F5F6F8] font-bold">‹</button><div id="cf-title" class="font-bold text-[15px]"></div><button onclick="cfNav(1)" class="w-9 h-9 rounded-full bg-[#F5F6F8] font-bold">›</button></div>
+    <div class="grid grid-cols-7 text-center text-[11px] font-bold text-[#8B95A1] mb-1"><div class="text-[#E5484D]">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="text-[#3B82F6]">토</div></div>
+    <div id="cf-grid" class="grid grid-cols-7 text-center gap-y-1"></div>
+    <div id="cf-day" class="text-[12px] text-[#4E5968] text-center mt-3 min-h-[18px]"></div>
+    <div class="flex justify-center gap-3 mt-2 text-[10px] font-bold text-[#8B95A1]"><span><i class="inline-block w-2 h-2 rounded-full mr-1" style="background:#6B7B5C"></i>휴가</span><span><i class="inline-block w-2 h-2 rounded-full mr-1" style="background:#7C6BC9"></i>외박</span><span><i class="inline-block w-2 h-2 rounded-full mr-1" style="background:#E0A030"></i>외출</span></div></div>
+   <div id="cf-stats"></div>
+   <div class="toss-card"><div class="text-[15px] font-extrabold mb-3">등록한 일정</div><div id="vac-full-list" class="space-y-3"></div></div>
+  </div></div>
+  <div id="modal-menu" class="fixed inset-0 z-50 bg-[var(--bg-main)] hidden flex-col">
   <div class="max-w-md mx-auto w-full h-full flex flex-col" style="padding-top:env(safe-area-inset-top)">
    <div class="flex items-center justify-between px-4 py-3 bg-white"><button onclick="closeModal('modal-menu')" class="w-10 h-10 rounded-full bg-[#F5F6F8] text-xl font-bold">‹</button><div class="font-bold text-[17px]">🍚 식단표</div><button id="menu-edit-btn" onclick="menuEditToggle()" class="text-[13px] font-bold text-[var(--mil-green)] w-10">편집</button></div>
    <div class="flex-1 overflow-y-auto no-scrollbar px-5 py-4 space-y-3">
@@ -1492,7 +1503,7 @@ async function saveStatusMsg() { await sb.from('profiles').update({ status_msg: 
 /* ---------- 휴가/일정 ---------- */
 const VK = { vacation: { n: '휴가', e: '🏖', c: '#6B7B5C', d: '휴가 🏖' }, stay: { n: '외박', e: '🌙', c: '#7C6BC9', d: '외박 🌙' }, out: { n: '외출', e: '🚶', c: '#E0A030', d: '외출 🚶' } };
 const vkind = v => VK[v.kind] ? v.kind : 'vacation';
-let vS = null, vE = null, vKind = 'vacation', calY = 2026, calM = 0;
+let vS = null, vE = null, vKind = 'vacation', calY = 2026, calM = 0, cfY = 2026, cfM = 0, cfSel = '';
 function setVacKind(k) {
   vKind = k; if (k === 'out') vE = null;
   Object.keys(VK).forEach(x => q('vk-' + x).className = 'flex-1 py-2.5 rounded-xl text-[13px] font-bold ' + (x === k ? 'text-white' : 'bg-[#F5F6F8] text-[#4E5968]')), q('vk-' + k).style.background = VK[k].c;
@@ -1526,17 +1537,51 @@ async function saveVac() {
   closeModal('modal-vac'); await loadAll(false); render(false);
 }
 async function delVac(id) { if (!confirm('이 일정을 삭제할까요?')) return; await sb.from('vacations').delete().eq('id', id); await loadAll(false); render(false); }
+const cfDates = v => { const o = []; for (let d = pd(v.start_date), e = pd(v.end_date); d <= e; d.setDate(d.getDate() + 1)) o.push(ymd(d)); return o; };
+const vDay = k => k === 'out' ? '외출' : VK[k].n;
+function vacStats() {
+  const sid = (S_() || me).id, T = ymd(new Date()), used = { vacation: new Set(), stay: new Set(), out: new Set() }, left = { vacation: new Set(), stay: new Set(), out: new Set() }, nxt = {};
+  vacs.filter(v => !v.created_by || v.created_by === sid).forEach(v => { const k = vkind(v); cfDates(v).forEach(x => { if (x <= T) used[k].add(x); else left[k].add(x); });
+    if (v.end_date >= T) { const c = nxt[k]; if (!c || v.start_date < c.start_date) nxt[k] = v; } });
+  return { used, left, nxt, T };
+}
+function openCalF() { const t = new Date(); cfY = t.getFullYear(); cfM = t.getMonth(); cfSel = ymd(t); renderCalF(); const m = q('modal-mycal'); openM('modal-mycal'); m.animate([{ opacity: 0, transform: 'translateY(36px)' }, { opacity: 1, transform: 'none' }], { duration: 320, easing: 'cubic-bezier(.2,.8,.2,1)' }); }
+function closeCalF() { const m = q('modal-mycal'), a = m.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(36px)' }], { duration: 220, easing: 'ease-in' }); a.onfinish = () => closeModal('modal-mycal'); }
+function cfNav(d) { cfM += d; if (cfM < 0) { cfM = 11; cfY--; } if (cfM > 11) { cfM = 0; cfY++; } renderCalF(); }
+function cfPick(x) { cfSel = x; renderCalF(); }
+function renderCalF() {
+  if (!me) return; q('cf-title').innerText = `${cfY}년 ${cfM + 1}월`;
+  const first = new Date(cfY, cfM, 1), days = new Date(cfY, cfM + 1, 0).getDate(), T = ymd(new Date()); let h = '';
+  for (let i = 0; i < first.getDay(); i++) h += '<div></div>';
+  for (let d = 1; d <= days; d++) {
+    const x = ymd(new Date(cfY, cfM, d)), ev = vacs.filter(v => x >= v.start_date && x <= v.end_date), ks = [...new Set(ev.map(vkind))], dow = (first.getDay() + d - 1) % 7, c = ks.length ? VK[ks[0]].c : '', sel = x === cfSel;
+    h += `<button onclick="cfPick('${x}')" class="h-11 flex flex-col items-center justify-center"><span class="w-9 h-9 rounded-full flex flex-col items-center justify-center text-[14px] font-semibold ${x === T ? 'border-2 border-[#191F28]' : ''} ${sel && x !== T ? 'border border-[#B0B8C1]' : ''} ${!ks.length && dow === 0 ? 'text-[#E5484D]' : ''} ${!ks.length && dow === 6 ? 'text-[#3B82F6]' : ''}" style="${ks.length ? 'background:' + c + ';color:#fff' : ''}">${d}</span></button>`;
+  }
+  q('cf-grid').innerHTML = h;
+  const ev = vacs.filter(v => cfSel >= v.start_date && cfSel <= v.end_date);
+  q('cf-day').innerHTML = `<b>${cfSel.slice(5).replace('-', '월 ')}일</b> · ` + (ev.length ? ev.map(v => `<span style="color:${VK[vkind(v)].c};font-weight:800">${esc(v.title)}</span>`).join(', ') : '일정 없음');
+  const { used, left, nxt, T: T2 } = vacStats(), row = o => Object.keys(VK).map(k => `<div class="flex-1 rounded-2xl p-3 text-center" style="background:${VK[k].c}14"><div class="text-[11px] font-bold" style="color:${VK[k].c}">${VK[k].n}</div><div class="text-[20px] font-black mt-0.5">${o[k].size}<span class="text-[12px] font-bold">일</span></div></div>`).join('');
+  const dd = v => { if (!v) return ['없음', '#B0B8C1']; const n = Math.round((pd(v.start_date) - pd(T2)) / 864e5); return n > 0 ? ['D-' + n, null] : n === 0 ? ['D-Day', null] : ['진행중', null]; };
+  q('cf-stats').innerHTML = `<div class="toss-card"><div class="text-[13px] font-extrabold mb-2">지금까지 사용한 일수</div><div class="flex gap-2">${row(used)}</div><div class="text-[13px] font-extrabold mt-4 mb-2">등록해둔 남은 일수</div><div class="flex gap-2">${row(left)}</div></div>
+  <div class="toss-card"><div class="text-[13px] font-extrabold mb-2">다음 일정 D-Day</div><div class="space-y-2">${Object.keys(VK).map(k => { const v = nxt[k], [t, col] = dd(v); return `<div class="flex items-center justify-between rounded-2xl bg-[#F5F6F8] px-4 py-3"><div><div class="text-[12px] font-bold" style="color:${VK[k].c}">다음 ${VK[k].n}</div><div class="text-[11px] text-[#8B95A1] mt-0.5">${v ? esc(v.start_date) + (k === 'out' ? '' : ' ~ ' + esc(v.end_date)) : '등록된 일정이 없어요'}</div></div><div class="text-[20px] font-black" style="color:${col || VK[k].c}">${t}</div></div>`; }).join('')}</div></div>`;
+}
 function renderVac() {
   const L = q('vacation-list'), today = new Date(); today.setHours(0, 0, 0, 0);
-  if (!vacs.length) { L.innerHTML = '<div class="text-center text-[12px] text-[#8B95A1] py-3">캘린더가 비어 있어요. 휴가·외박·외출을 추가해보세요!</div>'; return; }
+  const dn = ['일', '월', '화', '수', '목', '금', '토'];
+  L.innerHTML = '<div class="grid grid-cols-7 gap-1">' + [...Array(7)].map((_, i) => { const d = new Date(today); d.setDate(d.getDate() + i); const x = ymd(d), ev = vacs.filter(v => x >= v.start_date && x <= v.end_date), ks = [...new Set(ev.map(vkind))], c = ks.length ? VK[ks[0]].c : '';
+    return `<div class="flex flex-col items-center py-2 rounded-2xl ${i === 0 ? 'bg-[#191F28] text-white' : 'bg-[#F5F6F8]'}"><div class="text-[10px] font-bold ${i === 0 ? 'opacity-70' : d.getDay() === 0 ? 'text-[#E5484D]' : d.getDay() === 6 ? 'text-[#3B82F6]' : 'text-[#8B95A1]'}">${i === 0 ? '오늘' : dn[d.getDay()]}</div><div class="text-[16px] font-black mt-0.5">${d.getDate()}</div><div class="h-2 mt-1 flex gap-0.5">${ks.map(k => `<i class="w-1.5 h-1.5 rounded-full" style="background:${i === 0 ? '#fff' : VK[k].c}"></i>`).join('')}</div></div>`; }).join('') + '</div>';
   const info = v => { const s = pd(v.start_date), e = pd(v.end_date), d = Math.round((s - today) / 864e5); return { s, e, nights: Math.round((e - s) / 864e5), ended: today > e, dd: d > 0 ? `D-${d}` : (today <= e ? (d === 0 ? 'D-Day' : '진행중') : '종료') }; };
-  const list = vacs.map(v => ({ v, i: info(v) })).sort((a, b) => (a.i.ended - b.i.ended) || a.v.start_date.localeCompare(b.v.start_date)), cnt = { vacation: 0, stay: 0, out: 0 };
-  list.forEach(x => { if (!x.i.ended) cnt[vkind(x.v)]++; });
-  L.innerHTML = `<div class="text-[11px] font-bold text-[#8B95A1]">예정·진행 중 ${Object.keys(VK).map(k => `${VK[k].n} ${cnt[k]}`).join(' · ')}</div>` + list.map(({ v, i }) => {
-    const k = vkind(v), K = VK[k], mine = v.created_by === me.id;
-    const when = k === 'out' ? `${v.start_date}${v.start_time || v.end_time ? ' · ' + (v.start_time || '') + ' ~ ' + (v.end_time || '') : ''}` : `${v.start_date} ~ ${v.end_date} (${i.nights}박 ${i.nights + 1}일)`;
-    return `<div class="bg-[#F5F6F8] p-3.5 rounded-xl flex justify-between items-center gap-2 border border-[#E5E8EB] ${i.ended ? 'opacity-50' : ''}"><div class="flex flex-col min-w-0"><div class="flex items-center gap-1.5"><span class="text-[10px] font-extrabold text-white px-1.5 py-0.5 rounded-full whitespace-nowrap" style="background:${K.c}">${K.n}</span><span class="text-[14px] font-bold truncate">${esc(v.title)}</span>${mine ? '' : '<span class="text-[10px] text-[var(--pink-main)] whitespace-nowrap">상대</span>'}</div><span class="text-[12px] text-[#8B95A1] mt-0.5">${esc(when)}</span></div><div class="flex items-center gap-2 flex-shrink-0"><span class="text-[16px] font-black" style="color:${K.c}">${i.dd}</span><button onclick="delVac('${v.id}')" class="text-[#B0B8C1] text-[14px]">✕</button></div></div>`;
-  }).join('');
+  const up = vacs.map(v => ({ v, i: info(v) })).filter(x => !x.i.ended).sort((a, b) => a.v.start_date.localeCompare(b.v.start_date))[0];
+  L.innerHTML += `<div class="text-[12px] font-bold text-[#4E5968] mt-3">${up ? `다음 일정 · <span style="color:${VK[vkind(up.v)].c}">${esc(up.v.title)} ${up.i.dd}</span>` : '등록된 일정이 없어요. 눌러서 캘린더를 열어보세요'}</div>`;
+  const F = q('vac-full-list'); if (F) {
+    if (!vacs.length) F.innerHTML = '<div class="text-center text-[12px] text-[#8B95A1] py-3">캘린더가 비어 있어요. 휴가·외박·외출을 추가해보세요!</div>';
+    else { const list = vacs.map(v => ({ v, i: info(v) })).sort((a, b) => (a.i.ended - b.i.ended) || a.v.start_date.localeCompare(b.v.start_date));
+      F.innerHTML = list.map(({ v, i }) => {
+        const k = vkind(v), K = VK[k], mine = v.created_by === me.id;
+        const when = k === 'out' ? `${v.start_date}${v.start_time || v.end_time ? ' · ' + (v.start_time || '') + ' ~ ' + (v.end_time || '') : ''}` : `${v.start_date} ~ ${v.end_date} (${i.nights}박 ${i.nights + 1}일)`;
+        return `<div class="bg-[#F5F6F8] p-3.5 rounded-xl flex justify-between items-center gap-2 border border-[#E5E8EB] ${i.ended ? 'opacity-50' : ''}"><div class="flex flex-col min-w-0"><div class="flex items-center gap-1.5"><span class="text-[10px] font-extrabold text-white px-1.5 py-0.5 rounded-full whitespace-nowrap" style="background:${K.c}">${K.n}</span><span class="text-[14px] font-bold truncate">${esc(v.title)}</span>${mine ? '' : '<span class="text-[10px] text-[var(--pink-main)] whitespace-nowrap">상대</span>'}</div><span class="text-[12px] text-[#8B95A1] mt-0.5">${esc(when)}</span></div><div class="flex items-center gap-2 flex-shrink-0"><span class="text-[16px] font-black" style="color:${K.c}">${i.dd}</span><button onclick="delVac('${v.id}')" class="text-[#B0B8C1] text-[14px]">✕</button></div></div>`; }).join(''); }
+  }
+  if (!q('modal-mycal').classList.contains('hidden')) renderCalF();
 }
 
 /* ---------- Q&A ---------- */
