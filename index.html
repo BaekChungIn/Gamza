@@ -313,6 +313,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
    <div id="qna-modes" class="flex gap-2 hidden"><button id="qm-couple" onclick="qSetMode('couple')" class="flex-1 py-2.5 rounded-xl text-[13px] font-bold">💕 커플 질문</button><button id="qm-diary" onclick="qSetMode('diary')" class="flex-1 py-2.5 rounded-xl text-[13px] font-bold">📓 군생활 일기 🔒</button></div>
    <div class="toss-card bg-gradient-to-br from-[var(--mil-soft)] to-[#FFF0F3] text-center py-8">
     <div class="flex items-center justify-between px-2 mb-2"><button onclick="qDay(-1)" class="w-8 h-8 rounded-full bg-white/70 font-bold">◀</button><div class="text-[12px] font-bold text-[var(--mil-softtext)]" id="qna-day-badge"></div><button onclick="qDay(1)" class="w-8 h-8 rounded-full bg-white/70 font-bold">▶</button></div>
+    <div id="qna-meta" class="flex flex-wrap justify-center gap-1.5 mb-3 px-4"></div>
     <h2 class="text-[17px] font-extrabold leading-snug px-4" id="qna-question-text"></h2>
    </div>
    <div class="toss-card space-y-5" id="qna-body">
@@ -547,6 +548,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
  <div id="modal-alert" class="fixed inset-0 z-[110] bg-[#191F28]/60 backdrop-blur-sm hidden items-center justify-center p-4"><div class="bg-white w-full max-w-[320px] rounded-[24px] p-6 text-center shadow-2xl"><h3 id="alert-title" class="font-bold text-[17px] mb-3">알림</h3><div id="alert-message" class="text-[13px] text-[#4E5968] mb-6 whitespace-pre-line text-left leading-relaxed max-h-[60vh] overflow-y-auto no-scrollbar"></div><button onclick="closeModal('modal-alert')" class="w-full py-3.5 bg-[#191F28] text-white rounded-xl font-bold text-[14px]">확인</button></div></div>
 </div>
 
+<script src="questions.js"></script>
 <script>
 /* ================= 설정: Supabase 프로젝트 값 입력 ================= */
 const SUPABASE_URL = 'https://fziblqwqtyhntmmvzhgv.supabase.co';
@@ -1601,6 +1603,11 @@ const QF = ["{s}, 떠올리면 가장 먼저 생각나는 장면은?", "{s} 중 
 const QC = ["우리의 첫 만남", "첫 데이트", "처음 손잡은 날", "함께 먹은 음식", "같이 간 여행", "함께 본 영화", "서로의 별명", "처음 싸운 날", "화해한 순간", "서로의 습관", "함께 들은 노래", "휴가 때의 데이트", "면회와 통화", "편지와 메시지", "기념일", "나의 장점", "너의 장점", "함께 찍은 사진", "우리의 약속", "함께 웃은 순간", "보고 싶은 순간", "서로에게 고마운 일", "우리 동네 데이트", "같이 해보고 싶은 것", "전역 후 첫날", "우리의 미래 집", "함께 키우고 싶은 것", "우리의 10년 뒤"];
 const QD = ["오늘 하루", "오늘의 식사", "오늘의 훈련·근무", "함께 근무하는 사람들", "생활관 분위기", "오늘 들은 말", "오늘 가장 힘들었던 일", "오늘 웃었던 일", "가족", "친구", "미래의 목표", "전역 후 계획", "읽고 싶은 책", "운동", "건강", "수면", "오늘 배운 점", "나의 성격", "내가 변한 점", "고마운 사람", "후회되는 일", "자랑하고 싶은 일", "보고 싶은 사람", "먹고 싶은 음식", "가고 싶은 곳", "나 자신에게 하고 싶은 말", "군생활의 의미", "오늘의 감정"];
 const qText = (day, couple) => { const i = day - 1; return QF[i % 24].replace('{s}', (couple ? QC : QD)[Math.floor(i / 24) % 28]); };
+function qRow(day, couple) {
+  const Z = window.ZQ, b = (S_() || me).branch || 'army', L = Z && Z[couple ? 'c' : 'd'] && Z[couple ? 'c' : 'd'][b];
+  if (!L || !L.length) return { q: qText(day, couple), cat: '', sp: '', per: '' };
+  const r = L[Math.min(day, L.length) - 1]; return { q: Z.T[r[0]], cat: Z.T[r[1]], sp: r[2] < 0 ? '' : Z.T[r[2]], per: Z.T[r[3]] };
+}
 function qInfo() {
   qNorm(); const S = S_(), coupleMode = qMode === 'couple';
   if (!S) return { none: true };
@@ -1615,7 +1622,8 @@ function renderQ(setInput) {
   q('qna-day-badge').innerText = `Day ${qDayN} / ${I.td} · ${I.coupleMode ? '커플 질문' : '군생활 일기 🔒'}`;
   q('qna-modes').classList.toggle('hidden', me.gender !== 'M'); const linked = !!(me.partner_id && partner);
   [['couple', 'qm-couple'], ['diary', 'qm-diary']].forEach(([k, id]) => q(id).className = 'flex-1 py-2.5 rounded-xl text-[13px] font-bold ' + (qMode === k ? 'bg-[#191F28] text-white' : 'bg-white border border-[#E5E8EB] text-[#4E5968]') + (k === 'couple' && !linked ? ' opacity-50' : ''));
-  q('qna-question-text').innerText = '“' + qText(qDayN, I.coupleMode) + '”';
+  const R = qRow(qDayN, I.coupleMode); q('qna-question-text').innerText = '“' + R.q + '”';
+  q('qna-meta').innerHTML = (R.sp ? `<span class="text-[11px] font-extrabold px-2.5 py-1 rounded-full" style="background:#FFF3C4;color:#8A6A00">⭐ ${esc(R.sp)}</span>` : '') + [R.per, R.sp && R.cat === '특별한 날' ? '' : R.cat].filter(Boolean).map(x => `<span class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/80 text-[var(--mil-softtext)]">${esc(x)}</span>`).join('');
   q('qna-my-label').innerText = I.coupleMode ? '나의 답변' : '오늘의 기록 (나만 볼 수 있어요 🔒)';
   q('qna-partner-box').classList.toggle('hidden', !I.coupleMode);
   if (setInput || document.activeElement !== q('qna-ans')) q('qna-ans').value = qAns[me.id] || '';
