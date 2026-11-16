@@ -330,7 +330,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
    <div class="flex items-center justify-between mb-3"><h2 class="text-[22px] font-extrabold">커뮤니티</h2><button onclick="loadCommunity()" class="w-10 h-10 rounded-full bg-white border border-[#E5E8EB] flex items-center justify-center text-[#4E5968] text-[18px]">🔄</button></div>
    <div id="cm-cats" class="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5 pb-3"></div>
    <div id="cm-list" class="bg-white rounded-3xl overflow-hidden border border-[#F2F3F5]"></div>
-   <button onclick="openWrite()" class="fixed right-5 w-14 h-14 rounded-full text-white shadow-lg flex items-center justify-center text-[22px] z-30" style="background:var(--mil-green);bottom:92px">✏️</button>
+   <button onclick="openWriteC()" class="fixed right-5 w-14 h-14 rounded-full text-white shadow-lg flex items-center justify-center text-[22px] z-30" style="background:var(--mil-green);bottom:92px">✏️</button>
   </section>
  </main>
 
@@ -654,7 +654,7 @@ async function boot() {
   await loadAll(true);
   if (!me) return;
   if (!me.onboarded) return showOnboarding();
-  initUI(); render(true); subscribe();
+  initUI(); render(true); subscribe(); flushPend(); deepLink();
 }
 
 /* ---------- 온보딩 ---------- */
@@ -1051,7 +1051,7 @@ async function likePost(id) { const { error } = await sb.rpc('community_like', {
 async function sendComment() { const v = q('cm-in').value.trim(); if (!v || !cmCur) return; const { error } = await sb.rpc('community_comment', { pid: cmCur, b: v, a: cAnon }); if (error) return showAlert('알림', esc(cmErr(error))); q('cm-in').value = ''; await openPost(cmCur, true); loadCommunity(); const b = q('post-body'); b.scrollTop = b.scrollHeight; }
 async function delPost(id) { if (!confirm('이 글을 삭제할까요?')) return; await sb.rpc('community_delete', { kind: 'post', rid: id }); closeModal('modal-post'); loadCommunity(); }
 async function delComment(id) { if (!confirm('이 댓글을 삭제할까요?')) return; await sb.rpc('community_delete', { kind: 'comment', rid: id }); openPost(cmCur, true); loadCommunity(); }
-function openWrite() { q('w-title').value = ''; q('w-body').value = ''; wCat = CATS.some(c => c[0] === cmCat) && !['all', 'hot'].includes(cmCat) ? cmCat : 'free'; wAnon = true; paintWrite(); openM('modal-write'); }
+function openWriteC() { q('w-title').value = ''; q('w-body').value = ''; wCat = CATS.some(c => c[0] === cmCat) && !['all', 'hot'].includes(cmCat) ? cmCat : 'free'; wAnon = true; paintWrite(); openM('modal-write'); }
 function setWAnon(v) { wAnon = v; paintWrite(); }
 function paintWrite() {
   q('w-cats').innerHTML = CATS.filter(c => !['all', 'hot'].includes(c[0])).map(c => `<button class="cm-chip ${wCat === c[0] ? 'on' : ''}" onclick="wCat='${c[0]}';paintWrite()">${c[1]}</button>`).join('');
@@ -1677,9 +1677,30 @@ function renderQ(setInput) {
   if (I.coupleMode) { const pa = qAns[me.partner_id], mine = qAns[me.id];
     q('qna-partner').innerHTML = !mine ? '<div class="text-center text-[#8B95A1] text-[12px]"><div class="text-2xl mb-1">🔒</div>먼저 내 답변을 저장해주세요</div>' : (pa ? esc(pa) : '<div class="text-center text-[#8B95A1] text-[12px]"><div class="text-2xl mb-1">⏳</div>상대방의 답변 대기중</div>'); }
 }
+/* 오프라인 저장 대기열 + 백그라운드 동기화 */
+const pendGet = () => { try { return JSON.parse(localStorage.getItem('zt_pend') || '[]'); } catch (e) { return []; } };
+function pendAdd(r) { const l = pendGet().filter(x => !(x.user_id === r.user_id && x.day === r.day)); l.push(r); try { localStorage.setItem('zt_pend', JSON.stringify(l)); } catch (e) { } if ('serviceWorker' in navigator) navigator.serviceWorker.ready.then(g => g.sync && g.sync.register('zt-sync')).catch(() => { }); }
+let flushing = false;
+async function flushPend() {
+  if (flushing || !me || !navigator.onLine) return; let l = pendGet().filter(x => x.user_id === me.id); if (!l.length) return; flushing = true;
+  try { const { error } = await sb.from('qna_answers').upsert(l); if (!error) { localStorage.setItem('zt_pend', JSON.stringify(pendGet().filter(x => x.user_id !== me.id))); if (curTab === 'qna') { await loadQ(); renderQ(false); } } } catch (e) { }
+  flushing = false;
+}
+window.addEventListener('online', flushPend);
+if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', e => { if (e.data && e.data.type === 'zt-sync') flushPend(); });
+/* 바로가기 / 공유 받기 */
+function deepLink() {
+  const u = new URLSearchParams(location.search), t = u.get('tab'), sh = [u.get('share_title'), u.get('share_text'), u.get('share_url')].filter(Boolean).join('\n');
+  if (sh) { switchTab('community'); openWriteC(); q('w-body').value = sh.slice(0, 2000); }
+  else if (t && TABS.some(x => x[0] === t)) switchTab(t);
+  if (t || sh) history.replaceState(null, '', location.pathname);
+}
 async function submitQ() {
   const v = q('qna-ans').value.trim(); if (!v) return showAlert('알림', '내용을 작성해주세요.');
-  const { error } = await sb.from('qna_answers').upsert({ user_id: me.id, day: qKey(), answer: v, updated_at: new Date().toISOString() }); if (error) return showAlert('오류', esc(error.message));
+  const row = { user_id: me.id, day: qKey(), answer: v, updated_at: new Date().toISOString() };
+  let error = null; try { ({ error } = await sb.from('qna_answers').upsert(row)); } catch (e) { error = e; }
+  if (error && (!navigator.onLine || /fetch|network/i.test(String(error.message || error)))) { pendAdd(row); return showAlert('저장 대기', '인터넷이 연결되면 자동으로 저장돼요.'); }
+  if (error) return showAlert('오류', esc(error.message));
   await loadQ(); renderQ(false); showAlert('저장 완료', qInfo().coupleMode ? '답변이 저장됐어요! 상대방도 답하면 서로의 답이 공개돼요 💕' : '오늘의 기록이 저장됐어요. 나만 볼 수 있어요 🔒');
 }
 
