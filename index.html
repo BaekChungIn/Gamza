@@ -1615,10 +1615,42 @@ const QF = ["{s}, 떠올리면 가장 먼저 생각나는 장면은?", "{s} 중 
 const QC = ["우리의 첫 만남", "첫 데이트", "처음 손잡은 날", "함께 먹은 음식", "같이 간 여행", "함께 본 영화", "서로의 별명", "처음 싸운 날", "화해한 순간", "서로의 습관", "함께 들은 노래", "휴가 때의 데이트", "면회와 통화", "편지와 메시지", "기념일", "나의 장점", "너의 장점", "함께 찍은 사진", "우리의 약속", "함께 웃은 순간", "보고 싶은 순간", "서로에게 고마운 일", "우리 동네 데이트", "같이 해보고 싶은 것", "전역 후 첫날", "우리의 미래 집", "함께 키우고 싶은 것", "우리의 10년 뒤"];
 const QD = ["오늘 하루", "오늘의 식사", "오늘의 훈련·근무", "함께 근무하는 사람들", "생활관 분위기", "오늘 들은 말", "오늘 가장 힘들었던 일", "오늘 웃었던 일", "가족", "친구", "미래의 목표", "전역 후 계획", "읽고 싶은 책", "운동", "건강", "수면", "오늘 배운 점", "나의 성격", "내가 변한 점", "고마운 사람", "후회되는 일", "자랑하고 싶은 일", "보고 싶은 사람", "먹고 싶은 음식", "가고 싶은 곳", "나 자신에게 하고 싶은 말", "군생활의 의미", "오늘의 감정"];
 const qText = (day, couple) => { const i = day - 1; return QF[i % 24].replace('{s}', (couple ? QC : QD)[Math.floor(i / 24) % 28]); };
+/* 군생활 일기·커플 질문: 입대일 기준으로 실제 계급(진급일)을 계산해 날짜별 질문 배치 */
+const qPlanC = {};
+const Q_OTHER = /육군|해군|공군|해병|진해|진주|포항|세일러|수병|함정|비행|활주로|전투기|항공|기수|교육사령부|교육훈련단|신병교육대/;
+function qPlan(couple) {
+  const Z = window.ZQ, S = S_() || me, b = (S && S.branch) || 'army', set = Z && Z[couple ? 'c' : 'd'], L0 = set && set[b]; if (!L0 || !L0.length) return null;
+  const I = milInfo(S), e = new Date(I.e.getFullYear(), I.e.getMonth(), I.e.getDate()), td = Math.ceil((I.dis - I.e) / 864e5) + 1, key = [couple, b, +e, td].join('|'); if (qPlanC[key]) return qPlanC[key];
+  const dayOf = d => Math.round((d - e) / 864e5) + 1, mk = r => ({ q: Z.T[r[0]], cat: Z.T[r[1]], sp: r[2] < 0 ? '' : Z.T[r[2]], per: Z.T[r[3]] }), rows = L0.map(mk);
+  // 진급은 매월 1일: 1일 입대자는 2개월 뒤 1일, 2일 이후 입대자는 입대한 달을 빼고 다음 달부터 2개월 뒤 1일에 일병. 이후 6개월마다 상병·병장.
+  const ilb = new Date(e.getFullYear(), e.getMonth() + (e.getDate() === 1 ? 2 : 3), 1), sang = new Date(ilb.getFullYear(), ilb.getMonth() + 6, 1), bj = new Date(sang.getFullYear(), sang.getMonth() + 6, 1);
+  const train = rows.filter(x => x.per === '훈련병').length, ilbS = dayOf(ilb), sangS = dayOf(sang), bjS = dayOf(bj), maliS = td - 59;
+  const phase = d => couple ? '' : d <= train ? '훈련병' : d < ilbS ? '이병' : d < sangS ? '일병' : d < bjS ? '상병' : d >= maliS ? '말년 병장' : '병장';
+  const spDay = l => { let m; return l === '입대일' ? 1 : l === '수료' ? train : l === '일병 진급' ? ilbS : l === '상병 진급' ? sangS : l === '병장 진급' ? bjS : l === '전역일' ? td : (m = l.match(/^\+(\d+)일$/)) ? +m[1] : (m = l.match(/^D-(\d+)$/)) ? td - m[1] : 0; };
+  const eff = x => couple ? '' : (x.per === '일병' && x.cat === '이병') ? '이병' : x.per; // 시트에서 일병 구간에 섞여 있던 '이병' 질문은 이병 구간으로
+  const plan = new Array(td + 2).fill(null), pool = {};
+  rows.forEach(x => {
+    const dd = x.sp ? spDay(x.sp) : 0;
+    if (x.sp && dd) { let d = dd; if (d < 1 || d > td) return; while (plan[d] && d < td) d++; if (!plan[d]) plan[d] = Object.assign({}, x, { per: phase(d) || x.per }); return; }
+    (pool[eff(x)] = pool[eff(x)] || []).push(x);
+  });
+  const free = {}; for (let d = 1; d <= td; d++) if (!plan[d]) (free[phase(d)] = free[phase(d)] || []).push(d);
+  const own = new Set(rows.map(x => x.q)), others = ['army', 'navy', 'airforce', 'marine'].filter(k => k !== b && set[k]);
+  const extras = ph => { const seen = new Set(), o = []; others.forEach(k => set[k].map(mk).forEach(x => { if (x.sp || own.has(x.q) || seen.has(x.q) || eff(x) !== ph || Q_OTHER.test(x.q) || /^(육군|해군|공군|해병대) 생활$|테마$/.test(x.cat)) return; seen.add(x.q); o.push(x); })); return o; };
+  const ANCH = /일병이 되기 전까지|이병 생활 중 가장 서러웠던/;
+  Object.keys(free).forEach(ph => {
+    const F = free[ph]; let P = (pool[ph] || []).slice();
+    if (F.length > P.length) { const anc = P.filter(x => ANCH.test(x.q)), body = P.filter(x => !ANCH.test(x.q)); P = body.concat(extras(ph).filter(x => !ANCH.test(x.q))).concat(anc); }
+    if (!P.length) P = rows.filter(x => !x.sp);
+    const n = F.length, m = P.length;
+    F.forEach((d, i) => { const k = n > m ? (i < m ? i : (i - m) % m) : (n === 1 ? 0 : Math.round(i * (m - 1) / (n - 1))); plan[d] = Object.assign({}, P[k], { per: phase(d) || P[k].per }); });
+  });
+  return qPlanC[key] = plan;
+}
 function qRow(day, couple) {
-  const Z = window.ZQ, b = (S_() || me).branch || 'army', L = Z && Z[couple ? 'c' : 'd'] && Z[couple ? 'c' : 'd'][b];
-  if (!L || !L.length) return { q: qText(day, couple), cat: '', sp: '', per: '' };
-  const r = L[Math.min(day, L.length) - 1]; return { q: Z.T[r[0]], cat: Z.T[r[1]], sp: r[2] < 0 ? '' : Z.T[r[2]], per: Z.T[r[3]] };
+  let pl = null; try { pl = qPlan(couple); } catch (err) { pl = null; }
+  if (pl) { const r = pl[Math.max(1, Math.min(day, pl.length - 2))]; if (r) return { q: r.q, cat: r.cat, sp: r.sp, per: r.per }; }
+  return { q: qText(day, couple), cat: '', sp: '', per: '' };
 }
 function qInfo() {
   qNorm(); const S = S_(), coupleMode = qMode === 'couple';
