@@ -98,8 +98,124 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 .sav-det.open .bkcard{opacity:1;transform:none}
 .sav-det.open .bkcard:nth-child(2){transition-delay:.07s}.sav-det.open .bkcard:nth-child(3){transition-delay:.14s}.sav-det.open .bkcard:nth-child(4){transition-delay:.21s}
 .ios-t{position:absolute;left:64px;right:64px;text-align:center;pointer-events:none;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Apple SD Gothic Neo",Pretendard,sans-serif;font-size:17px;font-weight:600;letter-spacing:-.3px;color:#191F28}
+/* ---- 굿맨 코너 ---- */
+#tab-goodman{--gm-ink:#191F28;--gm-g:#6B7B5C}
+.gm-top{position:sticky;top:0;z-index:25;background:var(--bg-main);margin:0 -20px;padding:4px 20px 10px}
+.gm-head{display:flex;align-items:baseline;justify-content:space-between;padding:2px 2px 10px}
+.gm-title{font-size:24px;font-weight:800;letter-spacing:-.6px;color:#191F28;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Apple SD Gothic Neo",Pretendard,sans-serif}
+.gm-sub{font-size:12px;font-weight:600;color:#8B95A1}
+.gm-search{display:flex;align-items:center;gap:8px;height:46px;padding:0 14px;border-radius:14px;background:#fff;border:1px solid #E8EBEE;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.gm-search:focus-within{border-color:#191F28}
+.gm-search svg{width:19px;height:19px;fill:none;stroke:#8B95A1;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.gm-search input{flex:1;min-width:0;border:0;outline:0;background:transparent;font-size:14.5px;font-weight:500;color:#191F28;-webkit-appearance:none}
+.gm-search input::-webkit-search-cancel-button{display:none}
+.gm-clr.hidden{display:none}
+.gm-clr{width:22px;height:22px;border-radius:50%;background:#C9CED6;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.gm-clr svg{width:12px;height:12px;stroke:#fff;stroke-width:3}
+.gm-cats{display:flex;gap:7px;overflow-x:auto;margin:12px -20px 0;padding:0 20px}
+.gm-chip{flex-shrink:0;height:34px;padding:0 14px;border-radius:999px;background:#fff;border:1px solid #E8EBEE;font-size:13px;font-weight:700;color:#4E5968;transition:all .15s}
+.gm-chip.on{background:#191F28;border-color:#191F28;color:#fff}
+.gm-seg{display:flex;gap:4px;margin-top:12px;padding:4px;border-radius:14px;background:#ECEEF1}
+.gm-seg button{flex:1;height:34px;border-radius:11px;font-size:13px;font-weight:700;color:#6B7684;transition:all .18s}
+.gm-seg button.on{background:#fff;color:#191F28;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.gm-seg button i{font-style:normal;margin-left:4px;color:var(--gm-g);font-weight:800}
+.gm-count{padding:10px 4px 2px;font-size:12.5px;font-weight:700;color:#6B7684}
+.gm-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding-top:8px}
+.gm-card{background:#fff;border-radius:20px;border:1px solid #EEF0F2;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 2px 10px rgba(25,31,40,.03)}
+.gm-tile{position:relative;aspect-ratio:1/.66;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:10px}
+.gm-tile .gb{font-size:19px;font-weight:900;letter-spacing:-.6px;line-height:1.15;word-break:keep-all}
+.gm-tile .gc{margin-top:6px;font-size:10.5px;font-weight:700;opacity:.7;letter-spacing:.2px}
+.gm-pop{position:absolute;left:9px;top:9px;height:20px;padding:0 8px;border-radius:999px;background:#191F28;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center}
+.gm-heart{position:absolute;right:6px;top:6px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:rgba(25,31,40,.38)}
+.gm-heart svg{width:21px;height:21px;fill:rgba(255,255,255,.55);stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s cubic-bezier(.3,1.6,.5,1)}
+.gm-heart.on{color:#E8647C}.gm-heart.on svg{fill:#E8647C;transform:scale(1.12)}
+.gm-info{padding:11px 12px 12px;display:flex;flex-direction:column;flex:1}
+.gm-b{font-size:11px;font-weight:800;color:#8B95A1}
+.gm-n{margin-top:0;font-size:13.5px;font-weight:700;line-height:1.35;color:#191F28;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.7em;word-break:keep-all}
+.gm-add{margin-top:10px;height:36px;border-radius:11px;background:#F2F4F6;color:#333D4B;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .15s}
+.gm-add svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.gm-add.on{background:var(--mil-green);color:#fff}
+.gm-add:active{transform:scale(.97)}
+.gm-empty{grid-column:1/-1;text-align:center;padding:56px 0;color:#8B95A1;font-size:14px;font-weight:600;line-height:1.6}
+.gm-bar-wrap{position:fixed;left:0;right:0;bottom:84px;padding:0 16px;max-width:448px;margin:0 auto;z-index:30;pointer-events:none}
+.gm-bar{pointer-events:auto;display:flex;align-items:center;gap:8px;padding:8px;border-radius:22px;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid #E8EBEE;box-shadow:0 10px 30px rgba(25,31,40,.14)}
+.gm-cartbtn{height:46px;padding:0 12px 0 8px;display:flex;align-items:center;gap:8px;color:#191F28}
+.gm-cb-ic{position:relative;width:34px;height:34px;display:flex;align-items:center;justify-content:center}
+.gm-cb-ic svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.gm-cb-ic i{position:absolute;right:-3px;top:-2px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#E8647C;color:#fff;font-style:normal;font-size:10.5px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-sizing:content-box;box-sizing:border-box}
+.gm-askbtn{height:46px;padding:0 16px;border-radius:15px;background:#fff;border:1.5px solid #191F28;color:#191F28;font-size:14px;font-weight:800}
+.gm-glowbtn{flex:1;height:46px;border-radius:15px;background:linear-gradient(135deg,#F7C95C,#F2A93B);color:#191F28;font-size:14.5px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 14px rgba(242,169,59,.4)}
+.gm-glowbtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.gm-bar button:active{transform:scale(.97)}
+/* 장바구니 */
+.gmc-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #F2F4F6}
+.gmc-row:last-child{border-bottom:0}
+.gmc-dot{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;text-align:center;line-height:1.1;flex-shrink:0;overflow:hidden}
+.gmc-x{width:30px;height:30px;border-radius:50%;background:#F2F4F6;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.gmc-x svg{width:13px;height:13px;fill:none;stroke:#8B95A1;stroke-width:2.6;stroke-linecap:round}
+.gmc-rc{display:flex;align-items:center;gap:8px;height:44px;padding:0 14px 0 6px;border-radius:999px;background:#F5F6F8;border:1.5px solid transparent;font-size:13.5px;font-weight:700;color:#333D4B;transition:all .15s}
+.gmc-rc.on{background:#191F28;color:#fff}
+.gmc-rc .av{width:32px;height:32px;border-radius:50%;overflow:hidden;background:#E1E1E1;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.gmc-rc small{font-size:10.5px;font-weight:700;opacity:.6;margin-left:1px}
+/* 선물 알림 */
+#gift-banner{background:linear-gradient(135deg,#FFF6DD,#FFE9C2);border:1px solid #F4D9A2;box-shadow:0 8px 22px rgba(242,169,59,.16)}
+.gb-ico{position:relative;width:46px;height:46px;border-radius:50%;background:#fff;color:#E59B22;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 10px rgba(229,155,34,.25)}
+.gb-ico svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.gb-ico::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:2px solid rgba(242,169,59,.55);animation:gbPulse 1.8s ease-out infinite}
+@keyframes gbPulse{0%{transform:scale(.92);opacity:.9}100%{transform:scale(1.35);opacity:0}}
+.gm-gift-badge{position:absolute;top:-5px;right:-5px;z-index:3;width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#F7C95C,#F2A93B);color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 2px 8px rgba(242,169,59,.5);animation:gbBob 2.2s ease-in-out infinite}
+.gm-gift-badge svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+@keyframes gbBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+.gma-card{background:#fff;border-radius:22px;border:1px solid #EEF0F2;padding:16px}
+.gma-card.new{border-color:#F4D9A2;box-shadow:0 6px 18px rgba(242,169,59,.14)}
+.gma-it{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid #F2F4F6}
+.gma-it:first-of-type{border-top:0}
+/* 굿맨 변신 */
+#modal-glow{overflow:hidden}
+.gl-bg{position:absolute;inset:0;background:radial-gradient(circle at 50% 36%,rgba(255,226,150,.55),rgba(255,255,255,0) 62%);opacity:0;transition:opacity 1.2s}
+.gl-s1 .gl-bg{opacity:1}.gl-s2 .gl-bg{opacity:.55}
+.gl-x{position:absolute;right:14px;top:max(12px,env(safe-area-inset-top));z-index:5;width:38px;height:38px;border-radius:50%;background:rgba(25,31,40,.06);display:flex;align-items:center;justify-content:center}
+.gl-x svg{width:16px;height:16px;fill:none;stroke:#4E5968;stroke-width:2.6;stroke-linecap:round}
+.gl-stage{position:absolute;left:0;right:0;top:0;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-top:0;transition:height 1s cubic-bezier(.22,1,.36,1),padding .9s cubic-bezier(.22,1,.36,1);pointer-events:none;z-index:2}
+.gl-s2 .gl-stage{height:calc(232px + env(safe-area-inset-top));justify-content:flex-end;padding-top:env(safe-area-inset-top);padding-bottom:10px}
+.gl-face{position:relative;width:244px;height:244px;flex-shrink:0;transition:width 1s cubic-bezier(.22,1,.36,1),height 1s cubic-bezier(.22,1,.36,1);animation:glFaceIn .9s cubic-bezier(.22,1,.36,1) both}
+@keyframes glFaceIn{from{opacity:0;transform:scale(.86)}to{opacity:1;transform:none}}
+.gl-s2 .gl-face{width:104px;height:104px}
+.gl-circle{position:absolute;inset:0;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 50% 38%,#ECE6DA,#C9C1B3);box-shadow:0 10px 28px rgba(0,0,0,.1);transition:background 1.3s,box-shadow 1.3s}
+.gl-circle img{position:absolute;width:175%;max-width:none;left:-40.6%;top:0;filter:saturate(.55) brightness(.85) contrast(.92) sepia(.24);transition:filter 1.5s ease}
+.gl-s1 .gl-circle,.gl-s2 .gl-circle{background:radial-gradient(circle at 50% 38%,#FFFCEE,#FFE19A);box-shadow:0 0 0 6px rgba(255,224,150,.4),0 18px 60px rgba(242,186,73,.5)}
+.gl-s1 .gl-circle img,.gl-s2 .gl-circle img{filter:saturate(1.15) brightness(1.07) contrast(1.03)}
+.gl-spot{position:absolute;border-radius:50%;background:rgba(118,80,54,.36);filter:blur(.7px);transition:opacity 1.1s .3s}
+.gl-s1 .gl-spot,.gl-s2 .gl-spot{opacity:0}
+.gl-shine{position:absolute;top:-12%;bottom:-12%;width:38%;left:-60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.95),transparent);transform:skewX(-18deg);opacity:0}
+.gl-s1 .gl-shine{animation:glShine 1.3s cubic-bezier(.4,0,.2,1) .15s 2}
+@keyframes glShine{0%{left:-60%;opacity:1}100%{left:130%;opacity:1}}
+.gl-ring{position:absolute;inset:-3px;border-radius:50%;border:2px solid rgba(242,186,73,.75);opacity:0}
+.gl-s1 .gl-ring{animation:glRing 1.5s ease-out .2s 2}
+@keyframes glRing{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.6);opacity:0}}
+.gl-star{position:absolute;width:var(--s);height:var(--s);left:var(--x);top:var(--y);color:#F2B53D;opacity:0;pointer-events:none}
+.gl-star svg{width:100%;height:100%;display:block;fill:currentColor}
+.gl-s1 .gl-star{animation:glStar 1.5s ease-in-out var(--d) infinite}
+@keyframes glStar{0%,100%{opacity:0;transform:scale(.15) rotate(0)}50%{opacity:1;transform:scale(1) rotate(50deg)}}
+.gl-msg{margin-top:34px;text-align:center;min-height:62px;transition:margin .9s cubic-bezier(.22,1,.36,1)}
+.gl-s2 .gl-msg{margin-top:14px;min-height:0}
+.gl-msg>div{display:none;animation:glFade .6s ease both}
+.gl-s0 .gl-t0,.gl-s1 .gl-t1,.gl-s2 .gl-t2{display:block}
+.gl-msg b{display:block;font-size:24px;font-weight:800;letter-spacing:-.6px;color:#191F28;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Apple SD Gothic Neo",Pretendard,sans-serif}
+.gl-s2 .gl-msg b{font-size:21px}
+.gl-msg span{display:block;margin-top:7px;font-size:14px;font-weight:500;color:#8B95A1}
+@keyframes glFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.gl-steps{position:absolute;left:0;right:0;top:calc(242px + env(safe-area-inset-top));bottom:0;overflow-y:auto;padding:6px 18px 130px;opacity:0;pointer-events:none;z-index:1}
+.gl-s2 .gl-steps{opacity:1;pointer-events:auto}
+.gl-step{display:flex;gap:13px;padding:17px 16px;border-radius:22px;background:#fff;border:1px solid #EEF0F2;box-shadow:0 6px 20px rgba(25,31,40,.05);margin-bottom:12px;opacity:0;transform:translateY(44px)}
+.gl-s2 .gl-step{animation:glIn .85s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--i)*130ms + 450ms)}
+@keyframes glIn{from{opacity:0;transform:translateY(44px) scale(.98)}to{opacity:1;transform:none}}
+.gl-no{width:30px;height:30px;border-radius:50%;background:#191F28;color:#fff;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.gl-foot{position:absolute;left:0;right:0;bottom:0;padding:26px 18px calc(16px + env(safe-area-inset-bottom));background:linear-gradient(rgba(255,255,255,0),#fff 38%);opacity:0;pointer-events:none;transition:opacity .6s 1s;z-index:3}
+.gl-s2 .gl-foot{opacity:1;pointer-events:auto}
 </style>
 </head>
+
 <body class="min-h-screen flex justify-center items-start sm:p-4 select-none antialiased bg-gray-100">
 
 <!-- 로그인 -->
@@ -198,7 +314,6 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
  <header class="sticky top-0 bg-[var(--bg-main)]/90 backdrop-blur-md px-6 pb-4 flex items-center justify-between z-40" style="padding-top:max(16px,env(safe-area-inset-top))">
   <div class="flex items-center gap-2.5"><img src="logo.png" alt="" class="w-9 h-9 rounded-[10px] bg-white border border-[#E5E8EB] object-cover"></div>
   <div class="flex items-center gap-2">
-   <button id="btn-cart" onclick="openCart()" class="hidden relative w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center active:scale-95"><span class="text-lg">🛒</span><span id="cart-dot" class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full animate-pulse"></span></button>
    <button id="btn-letters" onclick="openLetters()" class="relative w-10 h-10 flex items-center justify-center text-[#191F28] active:scale-95"><svg class="w-[26px] h-[26px] sf-icon" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2.5"/><path d="m22 7-10 6.5L2 7"/></svg><span id="letter-dot" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold items-center justify-center border-2 border-[#F7F8F9]" style="display:none"></span></button>
    <button id="btn-friends" onclick="openFriends()" class="relative w-10 h-10 flex items-center justify-center text-[#191F28] active:scale-95"><svg class="w-[26px] h-[26px] sf-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span id="friend-dot" class="hidden absolute top-1 right-0.5 w-2.5 h-2.5 bg-red-500 border-2 border-[#F7F8F9] rounded-full"></span></button>
    <button onclick="openSettings()" class="w-10 h-10 flex items-center justify-center text-[#191F28] active:scale-95"><svg class="w-[26px] h-[26px] sf-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
@@ -208,6 +323,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
  <main class="flex-1 px-5 pb-28 overflow-y-auto no-scrollbar relative z-10">
   <!-- 홈 -->
   <section id="tab-home" class="space-y-4 pt-2">
+   <button id="gift-banner" onclick="openAsks()" class="hidden w-full text-left rounded-3xl p-4 flex items-center gap-3.5 active:scale-[.99] transition-transform"><span class="gb-ico"><svg viewBox="0 0 24 24"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></span><span class="flex-1 min-w-0"><span id="gb-t" class="block text-[15px] font-extrabold text-[#191F28] truncate">선물 조르기가 도착했어요</span><span id="gb-s" class="block text-[12px] font-semibold text-[#9A6A1B] mt-0.5"></span></span><svg viewBox="0 0 24 24" class="w-5 h-5 flex-shrink-0" style="fill:none;stroke:#C58A22;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round"><path d="m9 6 6 6-6 6"/></svg></button>
    <div id="clean-state-banner" class="toss-card text-center py-10 hidden"><span class="text-4xl">🌱</span><h2 class="text-[18px] font-extrabold my-2">연동 대기중</h2><p class="text-[13px] text-[#8B95A1]">설정에서 내 코드를 남자친구에게 알려주거나<br>상대 코드를 입력해 연동해보세요!</p></div>
    <div id="profile-container" class="flex overflow-x-auto no-scrollbar" style="scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;align-items:stretch;margin:0 -6px;padding:2px 6px 14px">
     <div id="soldier-card" class="pg hidden">
@@ -300,13 +416,22 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
   </section>
 
   <!-- 굿맨 -->
-  <section id="tab-goodman" class="space-y-4 pt-2 hidden">
-   <div class="toss-card"><div class="flex justify-between mb-2"><h2 class="text-[18px] font-extrabold">굿맨 스킨케어</h2><span class="bg-[#191F28] text-white text-[10px] px-2.5 py-1 rounded-full font-bold">PX TOP 24</span></div>
-    <p class="text-[12px] text-[#4E5968] mb-4" id="px-guide-text"></p><div class="space-y-2.5" id="px-items-container"></div></div>
-   <div class="h-24"></div>
-   <div class="fixed bottom-20 left-0 right-0 px-5 max-w-md mx-auto z-30"><div class="bg-[#191F28] rounded-2xl p-4 shadow-xl flex items-center justify-between">
-    <div class="text-white text-[13px] font-bold">선택 <span id="px-sel-cnt" class="text-[var(--mil-green-light)]">0</span>개</div>
-    <div class="flex gap-2"><button id="btn-px-send" onclick="sendPx()" class="hidden bg-[var(--mil-dark2)] text-white px-3 py-2 rounded-xl text-[12px] font-bold">💌 조르기</button><button onclick="showRoutine()" class="bg-[#F2BA49] text-[#191F28] px-4 py-2 rounded-xl text-[13px] font-extrabold">✨ 굿맨 변신</button></div></div></div>
+  <section id="tab-goodman" class="pt-0 hidden">
+   <div class="gm-top">
+    <div class="gm-head"><div class="gm-title">굿맨 스킨케어</div><div class="gm-sub">군마트 인기 제품 <span id="gm-total"></span>개</div></div>
+    <label class="gm-search"><svg viewBox="0 0 24 24" class="gm-si"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="gm-q" type="search" enterkeyhint="search" autocomplete="off" placeholder="브랜드, 제품명을 검색해보세요" oninput="gmSearch(this.value)"><button type="button" id="gm-clr" class="gm-clr hidden" onclick="gmSearch('');q('gm-q').value=''" aria-label="지우기"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></label>
+    <div id="gm-cats" class="gm-cats no-scrollbar"></div>
+    <div id="gm-seg" class="gm-seg"></div>
+   </div>
+   <div id="gm-count" class="gm-count"></div>
+   <div id="gm-list" class="gm-grid"></div>
+   <div id="gm-more" class="hidden px-1 pt-3"><button onclick="gm.lim+=60;gmGrid()" class="w-full h-12 rounded-2xl bg-white border border-[#E5E8EB] text-[13px] font-bold text-[#4E5968] active:scale-[.99]"></button></div>
+   <div class="h-36"></div>
+   <div class="gm-bar-wrap"><div class="gm-bar">
+    <button onclick="gmCartOpen()" class="gm-cartbtn" aria-label="장바구니"><span class="gm-cb-ic"><svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><i id="gm-bar-cnt">0</i></span><span class="text-[13px] font-extrabold">장바구니</span></button>
+    <button onclick="gmCartOpen(true)" class="gm-askbtn">조르기</button>
+    <button onclick="gmRoutine()" class="gm-glowbtn"><svg viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15v4M17 17h4"/></svg>굿맨 변신</button>
+   </div></div>
   </section>
 
   <!-- Q&A -->
@@ -500,6 +625,39 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
   <input type="range" id="crop-zoom" min="100" max="400" value="100" class="mt-5" style="width:280px" oninput="cropZoom(this.value)">
   <div class="flex gap-3 mt-5" style="width:280px"><button onclick="closeModal('modal-crop')" class="flex-1 py-3 rounded-xl bg-white/15 text-white font-bold text-[14px]">취소</button><button onclick="cropSave()" class="flex-1 py-3 rounded-xl bg-white text-[#191F28] font-bold text-[14px]">저장</button></div>
  </div>
+<!-- 굿맨: 장바구니 -->
+<div id="modal-gmcart" class="fixed inset-0 z-[60] hidden flex-col" style="background:var(--bg-main)">
+ <div class="relative flex items-center justify-between px-4 pb-3" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeModal('modal-gmcart')" class="w-10 h-10 rounded-full bg-white border border-[#E5E8EB] font-bold text-[18px]" aria-label="뒤로">‹</button><div class="ios-t" style="top:max(14px,env(safe-area-inset-top));line-height:40px">장바구니</div><button onclick="gmClear()" class="text-[13px] font-bold text-[#8B95A1] px-2 h-10">비우기</button></div>
+ <div class="flex-1 overflow-y-auto no-scrollbar px-4 pb-4 space-y-3">
+  <div id="gmc-list" class="bg-white rounded-3xl border border-[#EEF0F2] overflow-hidden"></div>
+  <div id="gmc-rcp-box" class="bg-white rounded-3xl border border-[#EEF0F2] p-5"><div class="text-[15px] font-extrabold">누구에게 조를까요?</div><div class="text-[12px] text-[#8B95A1] mt-1">연인이나 친구를 골라 장바구니를 보내요. 여러 명도 선택할 수 있어요.</div><div id="gmc-rcp" class="flex flex-wrap gap-2 mt-3.5"></div></div>
+ </div>
+ <div class="px-4 pt-2 flex gap-2.5" style="padding-bottom:max(16px,env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--bg-main) 30%)">
+  <button id="gmc-send" onclick="gmSend()" class="flex-1 h-[52px] rounded-2xl bg-[#191F28] text-white text-[15px] font-extrabold active:scale-[.99] disabled:opacity-50 flex items-center justify-center gap-2"><svg viewBox="0 0 24 24" class="w-[18px] h-[18px]" style="fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>선물 조르기</button>
+  <button onclick="closeModal('modal-gmcart');gmRoutine()" class="h-[52px] px-5 rounded-2xl text-[15px] font-extrabold active:scale-[.99]" style="background:#F2BA49;color:#191F28">굿맨 변신</button>
+ </div>
+</div>
+<!-- 굿맨: 선물 조르기 알림 -->
+<div id="modal-gmask" class="fixed inset-0 z-[60] hidden flex-col" style="background:var(--bg-main)">
+ <div class="relative flex items-center justify-between px-4 pb-3" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeAsks()" class="w-10 h-10 rounded-full bg-white border border-[#E5E8EB] font-bold text-[18px]" aria-label="뒤로">‹</button><div id="gma-title" class="ios-t" style="top:max(14px,env(safe-area-inset-top));line-height:40px">선물 조르기</div><div class="w-10"></div></div>
+ <div class="px-4 pb-3"><div id="gma-tabs" class="gm-seg"></div></div>
+ <div id="gma-list" class="flex-1 overflow-y-auto no-scrollbar px-4 pb-8 space-y-3"></div>
+</div>
+<!-- 굿맨 변신 -->
+<div id="modal-glow" class="fixed inset-0 z-[90] hidden flex-col gl-s0" style="background:#fff">
+ <div class="gl-bg"></div>
+ <button class="gl-x" onclick="glClose()" aria-label="닫기"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+ <div class="gl-stage">
+  <div class="gl-face">
+   <div class="gl-ring"></div>
+   <div class="gl-circle"><img src="tiger_cheer.png" alt=""><i class="gl-spot" style="left:34%;top:50%;width:5%;height:5%"></i><i class="gl-spot" style="left:54%;top:55%;width:4%;height:4%"></i><i class="gl-spot" style="left:46%;top:42%;width:3.4%;height:3.4%"></i><i class="gl-spot" style="left:40%;top:62%;width:4%;height:4%"></i><i class="gl-spot" style="left:51%;top:65%;width:3%;height:3%"></i><i class="gl-spot" style="left:60%;top:46%;width:3%;height:3%"></i><i class="gl-spot" style="left:31%;top:43%;width:3%;height:3%"></i><div class="gl-shine"></div></div>
+   <span id="gl-stars"></span>
+  </div>
+  <div class="gl-msg"><div class="gl-t0"><b>피부 상태를 확인하는 중</b><span>오늘의 피부는 조금 칙칙해 보여요</span></div><div class="gl-t1"><b>굿맨으로 변신 중</b><span>반짝반짝, 피부가 살아나고 있어요</span></div><div class="gl-t2"><b>오늘의 굿맨 루틴</b><span id="gl-sub"></span></div></div>
+ </div>
+ <div id="gl-steps" class="gl-steps no-scrollbar"></div>
+ <div class="gl-foot"><button onclick="glClose()" class="w-full h-[54px] rounded-2xl bg-[#191F28] text-white text-[16px] font-extrabold active:scale-[.99]">좋아요, 이대로 바를게요</button></div>
+</div>
  <div id="modal-vac" class="fixed inset-0 z-[70] hidden flex-col" style="background:var(--bg-main)">
   <div class="relative flex items-center justify-between px-4 pb-3" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeVac()" class="w-10 h-10 rounded-full bg-white border border-[#E5E8EB] font-bold text-[18px]" aria-label="뒤로">‹</button><div class="ios-t" style="top:max(14px,env(safe-area-inset-top));line-height:40px">일정 등록</div><div class="w-10"></div></div>
   <div class="flex-1 overflow-y-auto no-scrollbar px-4 pt-4">
@@ -561,6 +719,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 </div>
 
 <script src="questions.js"></script>
+<script src="px.js"></script>
 <script>
 /* ================= 설정: Supabase 프로젝트 값 입력 ================= */
 const SUPABASE_URL = 'https://fziblqwqtyhntmmvzhgv.supabase.co';
@@ -625,15 +784,12 @@ async function loadAll(first) {
   if (!m) return showAlert('오류', '프로필을 찾을 수 없습니다. schema.sql 이 실행되었는지 확인하세요.');
   me = m; partner = null;
   if (me.partner_id) { const { data: p } = await sb.from('profiles').select('*').eq('id', me.partner_id).maybeSingle(); partner = p; }
-  const [w, pw, v] = await Promise.all([
-    sb.from('px_wishes').select('item_id').eq('user_id', uid),
-    me.partner_id ? sb.from('px_wishes').select('item_id').eq('user_id', me.partner_id) : { data: [] },
-    sb.from('vacations').select('*').order('start_date')
-  ]);
-  wishes = (w.data || []).map(x => x.item_id); pWishes = (pw.data || []).map(x => x.item_id); vacs = v.data || [];
+  const [v] = await Promise.all([sb.from('vacations').select('*').order('start_date')]);
+  vacs = v.data || [];
   { const sid = me.gender === 'M' ? me.id : me.partner_id; menus = {}; if (sid) { const { data: mm } = await sb.from('menus').select('*').eq('created_by', sid); (mm || []).forEach(x => menus[x.menu_date] = x); } }
   if (first) { let ls = null; try { ls = JSON.parse(localStorage.getItem('sav:' + me.id)); } catch (e) { } sav = Object.assign({ banks: [], amts: {}, opts: {} }, (me.savings && me.savings.banks && me.savings.banks.length) ? me.savings : (ls || me.savings || {})); }
-  await loadFriends(); loadLetters();
+  await loadFriends(); loadLetters(); await loadAsks();
+  if (first) { await loadGm(); clearInterval(gm.poll); gm.poll = setInterval(() => { if (me && !document.hidden) loadAsks(); }, 45000); }
   await loadQ();
 }
 let qMode = 'couple';
@@ -824,10 +980,6 @@ function render(full) {
   }
   const c = q('profile-container'), bf = q('soldier-card'), gf = q('gf-profile-card');
   layoutPager(S, G); if (G) fillLove(S, G); updateFriendDot(); if (S && S.enlist_date && !popChecked) { popChecked = true; checkDday(S); }
-  // 장바구니 아이콘 (군인 홈)
-  const showCart = me.gender === 'M' && partner && partner.px_sent_at && pWishes.length > 0;
-  q('btn-cart').classList.toggle('hidden', !showCart);
-  if (showCart) q('cart-dot').classList.toggle('hidden', localStorage.getItem('pxseen') === partner.px_sent_at);
   if (S && S.unit_lat && !q('route-start').value && !picks.start) { const lb = S.unit_name || S.unit_addr || '자대'; q('route-start').value = lb; picks.start = { label: lb, name: lb, lat: S.unit_lat, lng: S.unit_lng }; }
   renderVac(); renderPX(); renderQ(!qInit || full); if (curTab === 'savings') renderSav();
   qInit = true;
@@ -1353,7 +1505,7 @@ function introClose(silent) { const el = document.getElementById('intro'); if (!
 /* ---------- 친구 ---------- */
 let friends = [], frSel = null, frT = null, frH = null;
 async function loadFriends() { try { const { data, error } = await sb.rpc('friend_overview'); friends = error ? [] : (data || []); } catch (e) { friends = []; } updateFriendDot(); }
-function updateFriendDot() { const d = document.getElementById('friend-dot'); if (d) d.classList.toggle('hidden', !friends.some(x => x.direction === 'in')); }
+function updateFriendDot() { const d = document.getElementById('friend-dot'); if (d) d.classList.toggle('hidden', !(friends.some(x => x.direction === 'in') || (typeof gm !== 'undefined' && me && gm.asks.some(a => a.recipient === me.id && !a.seen && friends.some(f => f.uid === a.sender))))); }
 function frAvatar(P) {
   if (P.avatar) return `<img src="${P.avatar}" class="w-full h-full object-cover">`;
   if (P.gender === 'M') return bfImg(P.bf_theme, P.enlist_date ? rankOf(P, new Date()).r : '이병');
@@ -1415,7 +1567,7 @@ function renderFriends() {
   const mini = (P, btns) => `<div class="flex items-center gap-3 py-2"><div class="w-11 h-11 rounded-2xl overflow-hidden bg-[#F5F6F8] flex-shrink-0 flex items-center justify-center">${frAvatar(P)}</div><div class="flex-1 min-w-0"><div class="text-[14px] font-bold truncate">${esc(P.nickname || '이름 없음')}</div><div class="text-[11px] text-[#8B95A1]">${P.gender === 'F' ? '곰신' : P.gender === 'M' ? '군인' : ''}</div></div>${btns}</div>`;
   q('fr-req').innerHTML = (inc.length || out.length) ? `<div class="toss-card !p-5">${inc.length ? `<div class="text-[13px] font-extrabold mb-1">받은 친구 요청 ${inc.length}</div>` + inc.map(P => mini(P, `<button onclick="respondFriend('${P.fid}',true)" class="text-[12px] font-bold bg-[#191F28] text-white rounded-full px-3.5 py-1.5">수락</button><button onclick="respondFriend('${P.fid}',false)" class="text-[12px] font-bold bg-[#F5F6F8] rounded-full px-3.5 py-1.5 ml-1">거절</button>`)).join('') : ''}${out.length ? `<div class="text-[13px] font-extrabold ${inc.length ? 'mt-3' : ''} mb-1">보낸 요청</div>` + out.map(P => mini(P, `<span class="text-[11px] text-[#8B95A1] mr-1">대기중</span><button onclick="removeFriend('${P.fid}',true)" class="text-[12px] font-bold bg-[#F5F6F8] rounded-full px-3 py-1.5">취소</button>`)).join('') : ''}</div>` : '';
   frCache = {}; fl.forEach(P => { if (P.gender === 'M' && P.enlist_date && P.discharge_date) { const I = milInfo(P); frCache[P.uid] = { s: I.e.getTime(), e: I.dis.getTime() + 864e5 }; } });
-  q('fr-cards').innerHTML = fl.map(frMini).join(''); q('fr-empty').classList.toggle('hidden', !!(fl.length || inc.length || out.length));
+  q('fr-cards').innerHTML = fl.map(frMini).join(''); giftBadges(); q('fr-empty').classList.toggle('hidden', !!(fl.length || inc.length || out.length));
   q('fr-tab-dot').classList.toggle('hidden', !inc.length); frTab(frTabCur); frH = null; frTick();
 }
 /* 친구 캘린더 */
@@ -1738,42 +1890,165 @@ function renderQcal() {
   let done = 0; for (let n = 1; n <= I.today; n++) if (qAll[n] && qAll[n][me.id]) done++; q('qc-prog').innerText = `답변 ${done} / ${I.today}일`;
 }
 
-/* ---------- PX 굿맨 ---------- */
-const pxI = [{ id: 1, n: 'VT 리들샷 100/300', c: '기능성/세럼', h: 1 }, { id: 2, n: 'CKD 레티노 콜라겐 크림', c: '기능성/세럼', h: 1 }, { id: 3, n: 'AHC 텐 레볼루션 아이크림', c: '기능성/세럼', h: 1 }, { id: 4, n: '본에스티스 퍼펙트 세트', c: '기능성/세럼', h: 1 }, { id: 5, n: '참존 마유 크림 에스트라', c: '크림', h: 0 }, { id: 6, n: '닥터지 로얄 블랙 스네일', c: '크림', h: 1 }, { id: 7, n: '라운드랩 독도 크림', c: '크림', h: 0 }, { id: 8, n: '피지오겔 DMT 크림', c: '크림', h: 0 }, { id: 9, n: '라운드랩 1025 독도 토너', c: '토너/패드', h: 1 }, { id: 10, n: '아누아 어성초 77 토너', c: '토너/패드', h: 1 }, { id: 11, n: '아비브 어성초 스팟 패드', c: '토너/패드', h: 0 }, { id: 12, n: '구달 청귤 비타C 패드', c: '토너/패드', h: 0 }, { id: 13, n: '아이소이 응급 진정 세럼', c: '기능성/세럼', h: 0 }, { id: 14, n: '아누아 어성초 80 앰플', c: '기능성/세럼', h: 0 }, { id: 15, n: '포맨 독도 올인원 플루이드', c: '남성/올인원', h: 0 }, { id: 16, n: '센텔리안24 마데카 옴므', c: '남성/올인원', h: 0 }, { id: 17, n: '닥터지 그린 마일드 선크림', c: '선케어', h: 1 }, { id: 18, n: '라운드랩 자작나무 선크림', c: '선케어', h: 1 }, { id: 19, n: 'AHC 내추럴 프레쉬 선스틱', c: '선케어', h: 0 }, { id: 20, n: '메이크프렘 모이스처 폼', c: '클렌징', h: 0 }, { id: 21, n: '마녀공장 클렌징 오일', c: '클렌징', h: 1 }, { id: 22, n: '카밀 핸드 앤 네일 크림', c: '기타', h: 0 }, { id: 23, n: '메디힐 에센셜 마스크팩', c: '기타', h: 0 }, { id: 24, n: '스팀베이스 아이마스크', c: '기타', h: 0 }];
-const isF = () => me.gender === 'F';
-function selIds() { return isF() ? wishes : pxSel; }
+/* ---------- 굿맨 코너 ---------- */
+const GT = { '크림': ['#F5F0E4', '#8A7440'], '세럼': ['#E8F2EE', '#4F8A74'], '토너·패드': ['#E7F0F7', '#4E7FA3'], '마스크': ['#F4EAF3', '#935E8C'], '선케어': ['#FCF1DA', '#B98122'], '클렌징': ['#E6F3F1', '#3F958A'], '트러블': ['#F9E9E5', '#B2604F'], '색조': ['#FAE7EE', '#C0587A'], '남성': ['#E8ECF4', '#46598A'], '헤어': ['#EDF0E4', '#667A42'], '바디': ['#F3ECE3', '#96703F'], '립·향수': ['#F9E6E8', '#BE4F60'] };
+const GCATS = ['전체', '크림', '세럼', '토너·패드', '마스크', '선케어', '클렌징', '트러블', '색조', '남성', '헤어', '바디', '립·향수'];
+const pxI = (window.PXI || []).map((a, i) => ({ i, b: a[0], n: a[1], c: a[2], p: a[3], k: a[0] + ' ' + a[1] }));
+const pxK = {}; pxI.forEach(x => pxK[x.k] = x);
+let gm = { q: '', cat: '전체', seg: 'all', lim: 60, wish: [], cart: [], asks: [], rcp: [], askTab: 'in', askFrom: null, saveT: null, glT: [], poll: null };
+const gmKey = () => 'gm:' + (me ? me.id : '');
+async function loadGm() {
+  let L = null; try { L = JSON.parse(localStorage.getItem(gmKey())); } catch (e) { }
+  try { const { data, error } = await sb.from('px_lists').select('*').eq('user_id', me.id).maybeSingle(); if (!error && data) L = { wish: data.wish || [], cart: data.cart || [] }; } catch (e) { }
+  L = L || {}; gm.wish = (L.wish || []).filter(k => pxK[k]); gm.cart = (L.cart || []).filter(k => pxK[k]);
+}
+function saveGm() {
+  try { localStorage.setItem(gmKey(), JSON.stringify({ wish: gm.wish, cart: gm.cart })); } catch (e) { }
+  clearTimeout(gm.saveT); gm.saveT = setTimeout(async () => { try { await sb.from('px_lists').upsert({ user_id: me.id, wish: gm.wish, cart: gm.cart, updated_at: new Date().toISOString() }); } catch (e) { } }, 700);
+}
+const CHK = '<svg viewBox="0 0 24 24"><polyline points="4 12.5 9.5 18 20 6.5"/></svg>', BAGI = '<svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>';
+const HEART = '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
+function gmList() {
+  const t = gm.q.trim().toLowerCase().replace(/\s+/g, '');
+  const L = pxI.filter(x => (gm.cat === '전체' || x.c === gm.cat) && (gm.seg === 'all' || (gm.seg === 'wish' ? gm.wish.includes(x.k) : gm.cart.includes(x.k))) && (!t || (x.k + x.c).toLowerCase().replace(/\s+/g, '').includes(t)));
+  return t || gm.seg !== 'all' || gm.cat !== '전체' ? L : L.slice().sort((a, b) => b.p - a.p);
+}
+function gmCard(x) {
+  const T = GT[x.c] || ['#F2F4F6', '#4E5968'], w = gm.wish.includes(x.k), c = gm.cart.includes(x.k);
+  return `<div class="gm-card" data-gi="${x.i}"><div class="gm-tile" style="background:${T[0]};color:${T[1]}">${x.p ? '<span class="gm-pop">인기</span>' : ''}<button class="gm-heart ${w ? 'on' : ''}" onclick="gmWish(${x.i})" aria-label="찜">${HEART}</button><div class="gb">${esc(x.b)}</div><div class="gc">${esc(x.c)}</div></div><div class="gm-info"><div class="gm-n">${esc(x.n)}</div><button class="gm-add ${c ? 'on' : ''}" onclick="gmCart(${x.i})">${c ? CHK + '담김' : BAGI + '담기'}</button></div></div>`;
+}
+function gmGrid() {
+  const L = gmList(), box = q('gm-list');
+  q('gm-count').innerText = gm.q.trim() ? `검색 결과 ${L.length}개` : (gm.seg === 'wish' ? `찜한 제품 ${L.length}개` : gm.seg === 'cart' ? `장바구니 ${L.length}개` : `${gm.cat === '전체' ? '전체' : gm.cat} ${L.length}개`);
+  box.innerHTML = L.length ? L.slice(0, gm.lim).map(gmCard).join('') : `<div class="gm-empty">${gm.q.trim() ? `‘${esc(gm.q.trim())}’에 맞는 제품이 없어요.<br>다른 검색어로 찾아보세요.` : gm.seg === 'wish' ? '찜한 제품이 없어요.<br>마음에 드는 제품의 하트를 눌러보세요.' : gm.seg === 'cart' ? '장바구니가 비어있어요.' : '제품이 없어요.'}</div>`;
+  q('gm-more').classList.toggle('hidden', L.length <= gm.lim); if (L.length > gm.lim) q('gm-more').firstElementChild.innerText = `더보기 (${L.length - gm.lim}개 남음)`;
+}
+function gmBar() { q('gm-bar-cnt').innerText = gm.cart.length; q('gm-bar-cnt').style.display = gm.cart.length ? '' : 'none'; }
+function gmSeg() { q('gm-seg').innerHTML = [['all', '전체', 0], ['wish', '찜', gm.wish.length], ['cart', '장바구니', gm.cart.length]].map(s => `<button onclick="gmSegGo('${s[0]}')" class="${gm.seg === s[0] ? 'on' : ''}">${s[1]}${s[2] ? `<i>${s[2]}</i>` : ''}</button>`).join(''); }
 function renderPX() {
-  if (!me) return; const c = q('px-items-container'), sel = selIds();
-  q('px-guide-text').innerHTML = isF() ? '남자친구가 사다 주길 바라는 제품을 담고 <b>💌 조르기</b>를 누르면 남자친구 홈에 🛒가 떠요.' : '🛒 표시는 여자친구가 담은 제품이에요. 체크 후 <b>✨ 굿맨 변신</b>으로 사용 순서·용량을 확인하세요.';
-  q('btn-px-send').classList.toggle('hidden', !isF()); q('px-sel-cnt').innerText = sel.length;
-  c.innerHTML = pxI.map(i => `<label class="bg-white rounded-xl p-3 border flex items-center justify-between cursor-pointer"><div><div class="text-[10px] font-bold ${i.h ? 'text-[var(--pink-main)]' : 'text-[#8B95A1]'} mb-1">${i.h ? '🔥 HOT ' : ''}${i.c} ${!isF() && pWishes.includes(i.id) ? '🛒' : ''}</div><div class="text-[13px] font-bold">${i.n}</div></div><input type="checkbox" ${sel.includes(i.id) ? 'checked' : ''} onchange="tPx(${i.id})" class="w-5 h-5 accent-[var(--mil-green)] rounded"></label>`).join('');
+  if (!me) return; q('gm-total').innerText = pxI.length;
+  q('gm-cats').innerHTML = GCATS.map(c => `<button onclick="gmCat('${c}')" class="gm-chip ${gm.cat === c ? 'on' : ''}">${c}</button>`).join('');
+  gmSeg(); gmGrid(); gmBar();
 }
-async function tPx(id) {
-  if (isF()) { const on = wishes.includes(id); wishes = on ? wishes.filter(x => x !== id) : [...wishes, id]; q('px-sel-cnt').innerText = wishes.length;
-    if (on) await sb.from('px_wishes').delete().eq('user_id', me.id).eq('item_id', id); else await sb.from('px_wishes').insert({ item_id: id }); }
-  else { pxSel = pxSel.includes(id) ? pxSel.filter(x => x !== id) : [...pxSel, id]; q('px-sel-cnt').innerText = pxSel.length; }
+function gmCat(c) { gm.cat = c; gm.lim = 60; renderPX(); const e = q('gm-cats').querySelector('.on'); if (e) e.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' }); }
+function gmSegGo(s) { gm.seg = s; gm.lim = 60; gmSeg(); gmGrid(); }
+function gmSearch(v) { gm.q = v; gm.lim = 60; q('gm-clr').classList.toggle('hidden', !v); gmGrid(); }
+function gmTog(arr, k) { const a = gm[arr], i = a.indexOf(k); if (i >= 0) a.splice(i, 1); else a.push(k); }
+function gmPaint(i) {
+  const x = pxI[i]; if (!x) return;
+  if (gm.seg !== 'all') { gmSeg(); gmGrid(); gmBar(); return; }
+  document.querySelectorAll(`.gm-card[data-gi="${i}"]`).forEach(card => {
+    card.querySelector('.gm-heart').classList.toggle('on', gm.wish.includes(x.k));
+    const b = card.querySelector('.gm-add'), on = gm.cart.includes(x.k); b.classList.toggle('on', on); b.innerHTML = on ? CHK + '담김' : BAGI + '담기';
+  }); gmSeg(); gmBar();
 }
-async function sendPx() {
-  if (!wishes.length) return showAlert('알림', '장바구니가 비어있어요.');
-  if (!me.partner_id) return showAlert('알림', '먼저 남자친구와 연동해주세요.');
-  const t = new Date().toISOString(); const { error } = await sb.from('profiles').update({ px_sent_at: t }).eq('id', me.id); if (error) return showAlert('오류', esc(error.message));
-  me.px_sent_at = t; showAlert('전송 완료 💌', '남자친구 홈 화면에 🛒 알림이 떴어요!');
+function gmWish(i) { gmTog('wish', pxI[i].k); saveGm(); gmPaint(i); }
+function gmCart(i) { gmTog('cart', pxI[i].k); saveGm(); gmPaint(i); if (q('modal-gmcart').classList.contains('flex')) gmCartRender(); }
+/* 장바구니 / 조르기 보내기 */
+function gmRecips() {
+  const r = []; if (me.partner_id && partner) r.push({ id: partner.id, nm: partner.nickname || (me.gender === 'M' ? '여자친구' : '남자친구'), tag: '연인', P: partner });
+  friends.filter(f => f.direction === 'friend').forEach(f => r.push({ id: f.uid, nm: f.nickname || '친구', tag: '친구', P: f })); return r;
 }
-function openCart() {
-  const L = pWishes.map(id => pxI.find(x => x.id === id)).filter(Boolean).map(x => `- ${esc(x.n)}`).join('<br>');
-  showAlert('🛒 여자친구의 장바구니', `휴가 때 꼭 사다줘! ❤️<br><br><b>${L}</b>`); localStorage.setItem('pxseen', partner.px_sent_at); q('cart-dot').classList.add('hidden');
+function gmCartOpen(focusAsk) { gmCartRender(); openM('modal-gmcart'); if (focusAsk) setTimeout(() => q('gmc-rcp-box').scrollIntoView({ behavior: 'smooth', block: 'center' }), 60); }
+function gmCartRender() {
+  const C = gm.cart.map(k => pxK[k]).filter(Boolean), R = gmRecips(); gm.rcp = gm.rcp.filter(id => R.some(r => r.id === id)); if (R.length === 1 && !gm.rcp.length) gm.rcp = [R[0].id];
+  q('gmc-list').innerHTML = C.length ? C.map(x => { const T = GT[x.c] || ['#F2F4F6', '#4E5968']; return `<div class="gmc-row"><div class="gmc-dot" style="background:${T[0]};color:${T[1]}">${esc(x.b.length > 5 ? x.b.slice(0, 4) : x.b)}</div><div class="flex-1 min-w-0"><div class="text-[11px] font-extrabold text-[#8B95A1]">${esc(x.b)} · ${esc(x.c)}</div><div class="text-[14px] font-bold leading-snug">${esc(x.n)}</div></div><button class="gmc-x" onclick="gmCart(${x.i})" aria-label="삭제"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>`; }).join('') : '<div class="gm-empty" style="padding:44px 0">장바구니가 비어있어요.<br>마음에 드는 제품을 담아보세요.</div>';
+  q('gmc-rcp').innerHTML = R.length ? R.map(r => `<button class="gmc-rc ${gm.rcp.includes(r.id) ? 'on' : ''}" onclick="gmRcp('${r.id}')"><span class="av">${frAvatar(r.P)}</span>${esc(r.nm)}<small>${r.tag}</small></button>`).join('') : '<div class="text-[13px] text-[#8B95A1] leading-relaxed">아직 연결된 사람이 없어요.<br>설정에서 연인을 연동하거나, 친구를 추가해보세요.</div>';
+  q('gmc-send').disabled = !C.length || !gm.rcp.length;
 }
-function showRoutine() {
-  const sel = selIds(); if (!sel.length) return showAlert('알림', '먼저 제품을 체크하세요!');
-  const c = sel.map(id => pxI.find(x => x.id === id)); let r = '<div class="text-left space-y-4">';
-  if (c.some(x => x.c === '클렌징')) r += '<div><b class="text-[var(--mil-green)]">🫧 0단계. 클렌징</b><br>오일/폼을 <b>500원 동전 크기</b>만큼 덜어 녹여주세요.</div>';
-  if (c.some(x => x.c === '토너/패드')) r += '<div><b class="text-[var(--mil-green)]">💧 1단계. 토너/패드</b><br>화장솜에 <b>500원 크기</b>로 적셔 닦아냅니다.</div>';
-  if (c.some(x => x.c === '기능성/세럼')) r += '<div><b class="text-[var(--mil-green)]">✨ 2단계. 세럼/앰플</b><br><b>완두콩 1~2알 크기</b>를 흡수시키세요.</div>';
-  if (c.some(x => x.c === '크림' || x.c === '남성/올인원')) r += '<div><b class="text-[var(--mil-green)]">🛡️ 3단계. 크림/올인원</b><br><b>아몬드 1알 크기</b>로 보습막을 만들어요.</div>';
-  if (c.some(x => x.c === '선케어')) r += '<div><b class="text-[var(--mil-green)]">☀️ 4단계. 선케어</b><br><b>검지 2마디 분량</b>을 발라주세요.</div>';
-  if (c.some(x => x.c === '기타')) r += '<div><b class="text-[var(--mil-green)]">🌙 기타</b><br>마스크팩·아이마스크는 세안 후 10~15분 사용해요.</div>';
-  showAlert('✨ 굿맨 맞춤 스킨케어 루틴', r + '</div>');
+function gmRcp(id) { const i = gm.rcp.indexOf(id); if (i >= 0) gm.rcp.splice(i, 1); else gm.rcp.push(id); gmCartRender(); }
+function gmClear() { if (!gm.cart.length) return; gm.cart = []; saveGm(); renderPX(); gmCartRender(); }
+async function gmSend() {
+  const C = gm.cart.map(k => pxK[k]).filter(Boolean); if (!C.length) return showAlert('알림', '장바구니에 제품을 먼저 담아주세요.');
+  const R = gmRecips().filter(r => gm.rcp.includes(r.id)); if (!R.length) return showAlert('알림', '조를 사람을 선택해주세요.');
+  const its = C.map(x => ({ b: x.b, n: x.n, c: x.c })), btn = q('gmc-send'); btn.disabled = true; let ok = [], bad = '';
+  for (const r of R) { try { const { data, error } = await sb.rpc('send_px_ask', { rcpt: r.id, its }); if (!error && data === 'OK') ok.push(r.nm); else bad = error ? error.message : String(data); } catch (e) { bad = String(e.message || e); } }
+  btn.disabled = false; gmCartRender();
+  if (ok.length) { loadAsks(); showAlert('조르기 완료', `${esc(ok.join(', '))}님에게 선물 조르기를 보냈어요.<br><span class="text-[12px] text-[#8B95A1]">상대 홈 화면 맨 위에 선물 알림이 떠요.</span>`); }
+  else showAlert('전송 실패', `${esc(bad)}<br><span class="text-[11px] text-[#8B95A1]">Supabase에서 schema_px.sql을 실행했는지 확인해주세요.</span>`);
 }
+/* 받은·보낸 조르기 */
+async function loadAsks() { try { const { data, error } = await sb.from('px_asks').select('*').order('created_at', { ascending: false }).limit(100); gm.asks = error ? [] : (data || []); } catch (e) { gm.asks = []; } renderGiftUI(); }
+const asksIn = () => gm.asks.filter(a => a.recipient === me.id), unseenIn = () => asksIn().filter(a => !a.seen);
+function whoP(uid) { if (partner && partner.id === uid) return partner; return friends.find(f => f.uid === uid && f.direction === 'friend') || null; }
+const whoName = uid => { const P = whoP(uid); return (P && P.nickname) || (partner && partner.id === uid ? (me.gender === 'M' ? '여자친구' : '남자친구') : '친구'); };
+function renderGiftUI() {
+  if (!me) return; const u = unseenIn(), b = q('gift-banner'); b.classList.toggle('hidden', !u.length);
+  if (u.length) { const names = [...new Set(u.map(a => whoName(a.sender)))], n = u.reduce((s, a) => s + (a.items || []).length, 0); q('gb-t').innerText = names.length === 1 ? `${names[0]}님이 선물을 조르고 있어요` : `${names[0]}님 외 ${names.length - 1}명이 조르고 있어요`; q('gb-s').innerText = `제품 ${n}개 · 눌러서 확인해보세요`; }
+  giftBadges(); updateFriendDot();
+}
+function giftBadges() {
+  const ids = new Set(unseenIn().map(a => a.sender)), root = q('fr-cards'); if (!root) return;
+  root.querySelectorAll('.gm-gift-badge').forEach(b => { if (!ids.has(b.dataset.u)) { const w = b.parentNode; w.parentNode.insertBefore(w.firstElementChild, w); w.remove(); } });
+  root.querySelectorAll('[onclick^="openFd("]').forEach(card => {
+    const m = /openFd\('([^']+)'/.exec(card.getAttribute('onclick') || ''); if (!m || !ids.has(m[1]) || card.querySelector('.gm-gift-badge')) return;
+    const av = card.querySelector('div[class*="w-[64px]"]'); if (!av) return; const w = document.createElement('div'); w.className = 'relative flex-shrink-0'; av.parentNode.insertBefore(w, av); w.appendChild(av);
+    const b = document.createElement('button'); b.className = 'gm-gift-badge'; b.dataset.u = m[1]; b.setAttribute('aria-label', '선물 조르기'); b.innerHTML = ico('gift'); b.onclick = e => { e.stopPropagation(); closeModal('modal-friends'); openAsks(m[1]); }; w.appendChild(b);
+  });
+}
+function openAsks(uid) { gm.askFrom = uid || null; gm.askTab = 'in'; renderAsks(); openM('modal-gmask'); }
+function askTime(s) { const d = new Date(s), m = (Date.now() - d) / 6e4; return m < 1 ? '방금 전' : m < 60 ? `${Math.floor(m)}분 전` : m < 1440 ? `${Math.floor(m / 60)}시간 전` : `${d.getMonth() + 1}월 ${d.getDate()}일`; }
+function renderAsks() {
+  const inn = gm.askTab === 'in', L = (inn ? asksIn() : gm.asks.filter(a => a.sender === me.id)).filter(a => !gm.askFrom || (inn ? a.sender : a.recipient) === gm.askFrom);
+  q('gma-title').innerText = gm.askFrom ? `${whoName(gm.askFrom)}님의 조르기` : '선물 조르기';
+  q('gma-tabs').innerHTML = [['in', '받은 조르기'], ['out', '보낸 조르기']].map(t => `<button class="${gm.askTab === t[0] ? 'on' : ''}" onclick="gm.askTab='${t[0]}';renderAsks()">${t[1]}</button>`).join('');
+  q('gma-list').innerHTML = L.length ? L.map(a => { const uid = inn ? a.sender : a.recipient, P = whoP(uid), its = a.items || [], isNew = inn && !a.seen;
+    return `<div class="gma-card ${isNew ? 'new' : ''}"><div class="flex items-center gap-3 mb-3"><div class="relative flex-shrink-0"><div class="w-11 h-11 rounded-full overflow-hidden bg-[#F5F6F8] flex items-center justify-center">${P ? frAvatar(P) : ''}</div><span class="gm-gift-badge" style="width:20px;height:20px;top:-4px;right:-5px;animation:none">${ico('gift')}</span></div><div class="flex-1 min-w-0"><div class="text-[14.5px] font-extrabold truncate">${inn ? `${esc(whoName(uid))}님이 조르고 있어요` : `${esc(whoName(uid))}님에게 보냈어요`}</div><div class="text-[11.5px] text-[#8B95A1] font-semibold">${askTime(a.created_at)} · 제품 ${its.length}개</div></div>${isNew ? '<span class="text-[10px] font-extrabold text-white rounded-full px-2 py-1" style="background:#E8647C">NEW</span>' : ''}</div>` + its.map(x => { const T = GT[x.c] || ['#F2F4F6', '#4E5968']; return `<div class="gma-it"><span class="inline-block w-2 h-2 rounded-full flex-shrink-0" style="background:${T[1]}"></span><div class="min-w-0 flex-1"><span class="text-[11.5px] font-extrabold text-[#8B95A1]">${esc(x.b || '')}</span><div class="text-[13.5px] font-bold leading-snug">${esc(x.n || '')}</div></div><span class="text-[10.5px] font-bold rounded-full px-2 py-1" style="background:${T[0]};color:${T[1]}">${esc(x.c || '')}</span></div>`; }).join('') + '</div>'; }).join('')
+    : `<div class="gm-empty">${inn ? '받은 조르기가 없어요.' : '보낸 조르기가 없어요.'}</div>`;
+}
+async function closeAsks() {
+  closeModal('modal-gmask'); const from = gm.askFrom, mine = unseenIn().filter(a => !from || a.sender === from); if (!mine.length) return;
+  mine.forEach(a => a.seen = true); renderGiftUI(); try { await sb.rpc('seen_px_asks', { from_uid: from || null }); } catch (e) { }
+}
+/* 굿맨 변신 */
+const GS = {
+  clean: [1, '클렌징', '아침 · 저녁', '500원 동전 크기', '손에 덜어 미온수로 거품을 충분히 낸 뒤 30초 정도 부드럽게 문지르고 헹궈요. 클렌징 오일·밤은 마른 손, 마른 얼굴에 먼저 녹여요.'],
+  peel: [2, '각질 케어', '주 1~2회', '콩알 1개 크기', '세안 후 물기를 닦고 얼굴에 올려 살살 굴려 걷어낸 뒤 미온수로 헹궈요. 눈가와 입가는 피해요.'],
+  toner: [3, '토너 · 패드', '아침 · 저녁', '토너 500원 동전 크기 · 패드 1장', '손바닥에 덜어 피부결 따라 3~4회 두드려 흡수시키거나, 패드는 결을 따라 한 번씩 부드럽게 닦아요.'],
+  serum: [4, '세럼 · 앰플', '아침 · 저녁', '완두콩 1~2알 크기', '얼굴 중앙에서 바깥쪽으로 펴 바르고 손바닥으로 지그시 눌러 흡수시켜요.'],
+  mask: [5, '마스크팩 · 수면팩', '주 2~3회 · 저녁', '1장 · 10~15분', '토너 다음에 올려두고 시간이 되면 떼어내요. 남은 에센스는 두드려 흡수시키고, 수면팩은 마지막 단계에 얇게 펴 발라요.'],
+  eye: [6, '아이크림', '아침 · 저녁', '쌀알 크기 (양쪽 눈가 합쳐서)', '약지로 눈 아래와 바깥쪽을 톡톡 두드려 흡수시켜요. 눈에 닿지 않게 뼈 라인을 따라 발라요.'],
+  cream: [7, '크림 · 로션', '아침 · 저녁', '아몬드 1알 크기', '이마, 양 볼, 코, 턱 다섯 곳에 나눠 찍고 결을 따라 펴 발라 보습막을 만들어요.'],
+  allin: [7, '올인원', '아침 · 저녁', '500원 동전 크기', '세안 후 이것 하나면 충분해요. 얼굴 전체에 얇게 펴 바르고 가볍게 두드려 흡수시켜요.'],
+  spot: [8, '트러블 케어', '필요할 때 · 저녁', '패치 1장 · 6~8시간', '깨끗이 세안하고 물기를 닦은 뒤 트러블 부위에 붙여요. 자기 전에 붙이면 좋아요.'],
+  sun: [9, '선케어', '아침 · 외출 30분 전', '검지·중지 두 마디 길이', '기초 마지막 단계에서 얼굴 전체에 꼼꼼히 펴 바르고 2~3시간마다 덧발라요. 선스틱은 같은 자리를 4~5번 문질러요.'],
+  color: [10, '베이스 · 색조', '외출 전', '소량씩 얇게 여러 번', '선케어 후 쿠션은 퍼프로 톡톡 두드려 쌓고, 틴트·마스카라는 마지막에 사용해요.'],
+  oil: [11, '유분 정리', '번들거릴 때', '1장', '기름종이는 문지르지 말고 T존을 지그시 눌러 유분만 흡수시켜요.'],
+  hairs: [12, '샴푸', '저녁', '500원 동전 크기', '머리를 충분히 적신 뒤 거품을 내 두피를 손끝으로 1~2분 마사지하고 깨끗이 헹궈요.'],
+  hairt: [13, '트리트먼트 · 헤어 에센스', '샴푸 후', '500원 동전 크기', '물기를 짠 머리 끝부분 위주로 바르고 잠시 둔 뒤 헹궈요. 에센스는 드라이 전후 소량만 발라요.'],
+  style: [14, '헤어 스타일링', '아침', '완두콩 1~2알 크기', '드라이로 모양을 잡은 뒤 손바닥에 얇게 펴 머리 안쪽부터 바르고 스프레이로 마무리해요.'],
+  body: [15, '바디 케어', '샤워 직후 3분 이내', '손바닥 가득 한두 번', '물기를 가볍게 닦은 뒤 팔, 다리, 몸통 순서로 결을 따라 펴 발라요.'],
+  bodywash: [15, '바디 워시 · 스크럽', '샤워할 때', '손바닥 한 번 펌핑', '거품을 낸 뒤 부드럽게 씻어내요. 스크럽은 주 1~2회만 사용해요.'],
+  hand: [16, '핸드 · 풋 케어', '틈날 때 · 자기 전', '완두콩 1알 크기', '손등과 손가락 마디마디, 발뒤꿈치까지 꼼꼼히 마사지하듯 발라요.'],
+  lip: [17, '립 케어', '수시로 · 자기 전', '얇게 1~2회', '입술 결을 따라 부드럽게 발라요. 슬리핑 마스크는 자기 전에 도톰하게 올려요.'],
+  scent: [18, '향수 · 미스트', '외출 전', '1~2번 분사', '15cm 정도 떨어져 손목, 귀 뒤, 목 옆에 뿌려요. 비비지 않고 자연스럽게 마르게 둬요.']
+};
+function gmStepKey(x) {
+  const n = x.n, c = x.c;
+  if (c === '클렌징') return /필링/.test(n) ? 'peel' : 'clean';
+  if (c === '토너·패드') return 'toner'; if (c === '세럼') return 'serum'; if (c === '마스크') return 'mask';
+  if (c === '크림') return /아이크림/.test(n) ? 'eye' : 'cream';
+  if (c === '선케어') return 'sun'; if (c === '색조') return 'color';
+  if (c === '트러블') return /패드|소프트너/.test(n) ? 'toner' : /노우즈|팩/.test(n) ? 'mask' : 'spot';
+  if (c === '남성') { if (/선스틱/.test(n)) return 'sun'; if (/립밤/.test(n)) return 'lip'; if (/퍼퓸|샤워/.test(n)) return 'scent'; if (/왁스|젤|스프레이/.test(n)) return 'style'; if (/기름종이|페이셜 페이퍼/.test(n)) return 'oil'; if (/쿠션|파운데이션|커버 스틱/.test(n)) return 'color'; return 'allin'; }
+  if (c === '헤어') return /샴푸/.test(n) ? 'hairs' : 'hairt';
+  if (c === '바디') return /핸드|풋/.test(n) ? 'hand' : /워시|스크럽/.test(n) ? 'bodywash' : 'body';
+  if (c === '립·향수') return /미스트|퍼퓸|향수/.test(n) ? 'scent' : 'lip';
+  return 'cream';
+}
+function gmRoutine() {
+  const C = gm.cart.map(k => pxK[k]).filter(Boolean); if (!C.length) return showAlert('알림', '먼저 장바구니에 제품을 담아주세요.');
+  const g = {}; C.forEach(x => { const k = gmStepKey(x); (g[k] = g[k] || []).push(x); });
+  const keys = Object.keys(g).sort((a, b) => GS[a][0] - GS[b][0]);
+  q('gl-sub').innerText = `${keys.length}단계 · 제품 ${C.length}개`;
+  q('gl-steps').innerHTML = keys.map((k, n) => { const s = GS[k]; return `<div class="gl-step" style="--i:${n}"><div class="gl-no">${n + 1}</div><div class="flex-1 min-w-0"><div class="flex items-center gap-2 flex-wrap"><div class="text-[16.5px] font-extrabold tracking-tight">${s[1]}</div><span class="text-[10.5px] font-bold rounded-full px-2 py-[3px]" style="background:#F2F4F6;color:#6B7684">${s[2]}</span></div><div class="mt-2 flex flex-wrap gap-1.5">${g[k].map(x => `<span class="text-[11.5px] font-bold rounded-lg px-2 py-1" style="background:${(GT[x.c] || ['#F2F4F6'])[0]};color:${(GT[x.c] || ['', '#4E5968'])[1]}">${esc(x.b)} ${esc(x.n.length > 16 ? x.n.slice(0, 15) + '…' : x.n)}</span>`).join('')}</div><div class="mt-3 flex items-center gap-2 rounded-xl px-3 py-2.5" style="background:#F5F8F2"><span class="text-[11px] font-extrabold" style="color:var(--mil-green)">사용량</span><span class="text-[13.5px] font-extrabold">${s[3]}</span></div><div class="mt-2.5 text-[12.5px] leading-relaxed text-[#6B7684]">${s[4]}</div></div></div>`; }).join('');
+  const st = q('gl-stars'); if (!st.firstChild) st.innerHTML = [[-8, 12, 22, 0], [88, 2, 16, .3], [98, 46, 26, .6], [86, 92, 18, .2], [2, 84, 24, .8], [-16, 50, 14, .45], [46, -12, 20, .15], [60, 100, 14, .9], [18, -8, 12, .55], [100, 22, 12, .7]].map(a => `<i class="gl-star" style="--x:${a[0]}%;--y:${a[1]}%;--s:${a[2]}px;--d:${a[3]}s"><svg viewBox="0 0 24 24"><path d="M12 0c1 7 5 11 12 12-7 1-11 5-12 12-1-7-5-11-12-12 7-1 11-5 12-12z"/></svg></i>`).join('');
+  const m = q('modal-glow'); gm.glT.forEach(clearTimeout); gm.glT = []; m.classList.remove('gl-s1', 'gl-s2'); m.classList.add('gl-s0'); q('gl-steps').scrollTop = 0;
+  const f = m.querySelector('.gl-face'); f.style.animation = 'none'; void f.offsetWidth; f.style.animation = '';
+  openM('modal-glow');
+  gm.glT.push(setTimeout(() => { m.classList.remove('gl-s0'); m.classList.add('gl-s1'); }, 1100), setTimeout(() => { m.classList.remove('gl-s1'); m.classList.add('gl-s2'); }, 3900));
+}
+function glClose() { gm.glT.forEach(clearTimeout); gm.glT = []; closeModal('modal-glow'); }
 
 /* ---------- 적금 (선택 저장 + 우대금리 방법) ---------- */
 const bD = [
