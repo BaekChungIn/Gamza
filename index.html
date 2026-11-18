@@ -122,11 +122,13 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 .gm-count{padding:10px 4px 2px;font-size:12.5px;font-weight:700;color:#6B7684}
 .gm-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding-top:8px}
 .gm-card{background:#fff;border-radius:20px;border:1px solid #EEF0F2;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 2px 10px rgba(25,31,40,.03)}
-.gm-tile{position:relative;aspect-ratio:1/.66;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:10px}
+.gm-tile{position:relative;aspect-ratio:1/.9;background:#EFEEEA;overflow:hidden}
+.gm-tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%}
+.gm-bpill{position:absolute;left:9px;bottom:9px;height:20px;padding:0 8px;border-radius:999px;background:rgba(255,255,255,.82);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#4E5968;font-size:10px;font-weight:800;display:flex;align-items:center}
 .gm-tile .gb{font-size:19px;font-weight:900;letter-spacing:-.6px;line-height:1.15;word-break:keep-all}
 .gm-tile .gc{margin-top:6px;font-size:10.5px;font-weight:700;opacity:.7;letter-spacing:.2px}
-.gm-pop{position:absolute;left:9px;top:9px;height:20px;padding:0 8px;border-radius:999px;background:#191F28;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center}
-.gm-heart{position:absolute;right:6px;top:6px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:rgba(25,31,40,.38)}
+.gm-pop{z-index:2;position:absolute;left:9px;top:9px;height:20px;padding:0 8px;border-radius:999px;background:#191F28;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center}
+.gm-heart{z-index:2;position:absolute;right:6px;top:6px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:rgba(25,31,40,.38)}
 .gm-heart svg{width:21px;height:21px;fill:rgba(255,255,255,.55);stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s cubic-bezier(.3,1.6,.5,1)}
 .gm-heart.on{color:#E8647C}.gm-heart.on svg{fill:#E8647C;transform:scale(1.12)}
 .gm-info{padding:11px 12px 12px;display:flex;flex-direction:column;flex:1}
@@ -150,7 +152,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 /* 장바구니 */
 .gmc-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #F2F4F6}
 .gmc-row:last-child{border-bottom:0}
-.gmc-dot{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;text-align:center;line-height:1.1;flex-shrink:0;overflow:hidden}
+.gmc-dot{width:48px;height:48px;border-radius:13px;background:#EFEEEA;flex-shrink:0;overflow:hidden}.gmc-dot img{width:100%;height:100%;object-fit:cover;object-position:50% 62%;display:block}
 .gmc-x{width:30px;height:30px;border-radius:50%;background:#F2F4F6;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .gmc-x svg{width:13px;height:13px;fill:none;stroke:#8B95A1;stroke-width:2.6;stroke-linecap:round}
 .gmc-rc{display:flex;align-items:center;gap:8px;height:44px;padding:0 14px 0 6px;border-radius:999px;background:#F5F6F8;border:1.5px solid transparent;font-size:13.5px;font-weight:700;color:#333D4B;transition:all .15s}
@@ -205,12 +207,29 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 .gl-s2 .gl-msg b{font-size:21px}
 .gl-msg span{display:block;margin-top:7px;font-size:14px;font-weight:500;color:#8B95A1}
 @keyframes glFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.gl-steps{position:absolute;left:0;right:0;top:calc(242px + env(safe-area-inset-top));bottom:0;overflow-y:auto;padding:6px 18px 130px;opacity:0;pointer-events:none;z-index:1}
+.gl-steps{position:absolute;left:0;right:0;top:calc(242px + env(safe-area-inset-top));bottom:0;overflow-y:auto;padding:0 18px 130px;opacity:0;pointer-events:none;z-index:1}
 .gl-s2 .gl-steps{opacity:1;pointer-events:auto}
 .gl-step{display:flex;gap:13px;padding:17px 16px;border-radius:22px;background:#fff;border:1px solid #EEF0F2;box-shadow:0 6px 20px rgba(25,31,40,.05);margin-bottom:12px;opacity:0;transform:translateY(44px)}
 .gl-s2 .gl-step{animation:glIn .85s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--i)*130ms + 450ms)}
 @keyframes glIn{from{opacity:0;transform:translateY(44px) scale(.98)}to{opacity:1;transform:none}}
 .gl-no{width:30px;height:30px;border-radius:50%;background:#191F28;color:#fff;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.gl-tabw{position:sticky;top:0;z-index:5;margin:0 -18px;padding:8px 18px 10px;background:linear-gradient(#fff 78%,rgba(255,255,255,0))}
+.gl-tabs{display:flex;gap:4px;padding:4px;border-radius:15px;background:#ECEEF1}
+.gl-tabs button{flex:1;height:38px;border-radius:12px;font-size:14px;font-weight:700;color:#6B7684;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s}
+.gl-tabs button svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.gl-tabs button.on{background:#fff;color:#191F28;box-shadow:0 1px 4px rgba(0,0,0,.09)}
+.gl-per{padding:2px 4px 14px}.gl-per b{display:block;font-size:13px;font-weight:800;color:var(--mil-green)}.gl-per span{display:block;margin-top:3px;font-size:12.5px;line-height:1.5;color:#6B7684}
+.gl-grp{margin:18px 4px 10px;font-size:12px;font-weight:800;color:#8B95A1;letter-spacing:.2px}
+.gl-tag{font-size:10.5px;font-weight:700;border-radius:999px;padding:3px 8px;background:#F2F4F6;color:#6B7684}
+.gl-sb{margin-top:12px}.gl-sb:first-of-type{margin-top:10px}
+.gl-sbn{font-size:12px;font-weight:800;color:#4E5968}
+.gl-chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;border-radius:10px;padding:3px 9px 3px 3px;background:#F6F7F9;color:#333D4B}
+.gl-chip img{width:22px;height:22px;border-radius:7px;object-fit:cover;object-position:50% 62%}
+.gl-amt{margin-top:8px;display:flex;gap:9px;align-items:flex-start;border-radius:12px;padding:9px 12px;background:#F5F8F2}
+.gl-amt em{font-style:normal;flex-shrink:0;font-size:11px;font-weight:800;line-height:1.7;color:var(--mil-green)}.gl-amt span{font-size:13px;font-weight:700;line-height:1.55;color:#191F28;word-break:keep-all}
+.gl-hint{margin-top:10px;font-size:11.5px;color:#8B95A1;font-weight:600}
+.gl-warn{margin:0 0 12px;padding:13px 15px;border-radius:16px;background:#FFF6E5}.gl-warn b{display:block;font-size:13.5px;font-weight:800;color:#8A5A00}.gl-warn span{display:block;margin-top:4px;font-size:12px;line-height:1.55;color:#8A6A2A}
+.gl-off{margin:6px 0 12px;padding:13px 15px;border-radius:16px;background:#F6F7F9}.gl-off b{display:block;font-size:12.5px;font-weight:800;color:#6B7684}.gl-off span{display:block;margin-top:4px;font-size:12px;line-height:1.55;color:#8B95A1}
 .gl-foot{position:absolute;left:0;right:0;bottom:0;padding:26px 18px calc(16px + env(safe-area-inset-bottom));background:linear-gradient(rgba(255,255,255,0),#fff 38%);opacity:0;pointer-events:none;transition:opacity .6s 1s;z-index:3}
 .gl-s2 .gl-foot{opacity:1;pointer-events:auto}
 </style>
@@ -1891,6 +1910,8 @@ function renderQcal() {
 }
 
 /* ---------- 굿맨 코너 ---------- */
+const GIMG = { '크림': 'cream', '세럼': 'serum', '토너·패드': 'toner', '마스크': 'mask', '선케어': 'sun', '클렌징': 'cleansing', '트러블': 'trouble', '색조': 'makeup', '남성': 'men', '헤어': 'hair', '바디': 'body', '립·향수': 'lip' };
+const gmImg = c => 'px_' + (GIMG[c] || 'cream') + '.jpg';
 const GT = { '크림': ['#F5F0E4', '#8A7440'], '세럼': ['#E8F2EE', '#4F8A74'], '토너·패드': ['#E7F0F7', '#4E7FA3'], '마스크': ['#F4EAF3', '#935E8C'], '선케어': ['#FCF1DA', '#B98122'], '클렌징': ['#E6F3F1', '#3F958A'], '트러블': ['#F9E9E5', '#B2604F'], '색조': ['#FAE7EE', '#C0587A'], '남성': ['#E8ECF4', '#46598A'], '헤어': ['#EDF0E4', '#667A42'], '바디': ['#F3ECE3', '#96703F'], '립·향수': ['#F9E6E8', '#BE4F60'] };
 const GCATS = ['전체', '크림', '세럼', '토너·패드', '마스크', '선케어', '클렌징', '트러블', '색조', '남성', '헤어', '바디', '립·향수'];
 const pxI = (window.PXI || []).map((a, i) => ({ i, b: a[0], n: a[1], c: a[2], p: a[3], k: a[0] + ' ' + a[1] }));
@@ -1915,7 +1936,7 @@ function gmList() {
 }
 function gmCard(x) {
   const T = GT[x.c] || ['#F2F4F6', '#4E5968'], w = gm.wish.includes(x.k), c = gm.cart.includes(x.k);
-  return `<div class="gm-card" data-gi="${x.i}"><div class="gm-tile" style="background:${T[0]};color:${T[1]}">${x.p ? '<span class="gm-pop">인기</span>' : ''}<button class="gm-heart ${w ? 'on' : ''}" onclick="gmWish(${x.i})" aria-label="찜">${HEART}</button><div class="gb">${esc(x.b)}</div><div class="gc">${esc(x.c)}</div></div><div class="gm-info"><div class="gm-n">${esc(x.n)}</div><button class="gm-add ${c ? 'on' : ''}" onclick="gmCart(${x.i})">${c ? CHK + '담김' : BAGI + '담기'}</button></div></div>`;
+  return `<div class="gm-card" data-gi="${x.i}"><div class="gm-tile"><img src="${gmImg(x.c)}" alt="${esc(x.c)}" loading="lazy" decoding="async">${x.p ? '<span class="gm-pop">인기</span>' : ''}<button class="gm-heart ${w ? 'on' : ''}" onclick="gmWish(${x.i})" aria-label="찜">${HEART}</button><span class="gm-bpill">${esc(x.c)}</span></div><div class="gm-info"><div class="gm-b">${esc(x.b)}</div><div class="gm-n">${esc(x.n)}</div><button class="gm-add ${c ? 'on' : ''}" onclick="gmCart(${x.i})">${c ? CHK + '담김' : BAGI + '담기'}</button></div></div>`;
 }
 function gmGrid() {
   const L = gmList(), box = q('gm-list');
@@ -1952,7 +1973,7 @@ function gmRecips() {
 function gmCartOpen(focusAsk) { gmCartRender(); openM('modal-gmcart'); if (focusAsk) setTimeout(() => q('gmc-rcp-box').scrollIntoView({ behavior: 'smooth', block: 'center' }), 60); }
 function gmCartRender() {
   const C = gm.cart.map(k => pxK[k]).filter(Boolean), R = gmRecips(); gm.rcp = gm.rcp.filter(id => R.some(r => r.id === id)); if (R.length === 1 && !gm.rcp.length) gm.rcp = [R[0].id];
-  q('gmc-list').innerHTML = C.length ? C.map(x => { const T = GT[x.c] || ['#F2F4F6', '#4E5968']; return `<div class="gmc-row"><div class="gmc-dot" style="background:${T[0]};color:${T[1]}">${esc(x.b.length > 5 ? x.b.slice(0, 4) : x.b)}</div><div class="flex-1 min-w-0"><div class="text-[11px] font-extrabold text-[#8B95A1]">${esc(x.b)} · ${esc(x.c)}</div><div class="text-[14px] font-bold leading-snug">${esc(x.n)}</div></div><button class="gmc-x" onclick="gmCart(${x.i})" aria-label="삭제"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>`; }).join('') : '<div class="gm-empty" style="padding:44px 0">장바구니가 비어있어요.<br>마음에 드는 제품을 담아보세요.</div>';
+  q('gmc-list').innerHTML = C.length ? C.map(x => { return `<div class="gmc-row"><div class="gmc-dot"><img src="${gmImg(x.c)}" alt=""></div><div class="flex-1 min-w-0"><div class="text-[11px] font-extrabold text-[#8B95A1]">${esc(x.b)} · ${esc(x.c)}</div><div class="text-[14px] font-bold leading-snug">${esc(x.n)}</div></div><button class="gmc-x" onclick="gmCart(${x.i})" aria-label="삭제"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>`; }).join('') : '<div class="gm-empty" style="padding:44px 0">장바구니가 비어있어요.<br>마음에 드는 제품을 담아보세요.</div>';
   q('gmc-rcp').innerHTML = R.length ? R.map(r => `<button class="gmc-rc ${gm.rcp.includes(r.id) ? 'on' : ''}" onclick="gmRcp('${r.id}')"><span class="av">${frAvatar(r.P)}</span>${esc(r.nm)}<small>${r.tag}</small></button>`).join('') : '<div class="text-[13px] text-[#8B95A1] leading-relaxed">아직 연결된 사람이 없어요.<br>설정에서 연인을 연동하거나, 친구를 추가해보세요.</div>';
   q('gmc-send').disabled = !C.length || !gm.rcp.length;
 }
@@ -1993,55 +2014,145 @@ function renderAsks() {
   q('gma-title').innerText = gm.askFrom ? `${whoName(gm.askFrom)}님의 조르기` : '선물 조르기';
   q('gma-tabs').innerHTML = [['in', '받은 조르기'], ['out', '보낸 조르기']].map(t => `<button class="${gm.askTab === t[0] ? 'on' : ''}" onclick="gm.askTab='${t[0]}';renderAsks()">${t[1]}</button>`).join('');
   q('gma-list').innerHTML = L.length ? L.map(a => { const uid = inn ? a.sender : a.recipient, P = whoP(uid), its = a.items || [], isNew = inn && !a.seen;
-    return `<div class="gma-card ${isNew ? 'new' : ''}"><div class="flex items-center gap-3 mb-3"><div class="relative flex-shrink-0"><div class="w-11 h-11 rounded-full overflow-hidden bg-[#F5F6F8] flex items-center justify-center">${P ? frAvatar(P) : ''}</div><span class="gm-gift-badge" style="width:20px;height:20px;top:-4px;right:-5px;animation:none">${ico('gift')}</span></div><div class="flex-1 min-w-0"><div class="text-[14.5px] font-extrabold truncate">${inn ? `${esc(whoName(uid))}님이 조르고 있어요` : `${esc(whoName(uid))}님에게 보냈어요`}</div><div class="text-[11.5px] text-[#8B95A1] font-semibold">${askTime(a.created_at)} · 제품 ${its.length}개</div></div>${isNew ? '<span class="text-[10px] font-extrabold text-white rounded-full px-2 py-1" style="background:#E8647C">NEW</span>' : ''}</div>` + its.map(x => { const T = GT[x.c] || ['#F2F4F6', '#4E5968']; return `<div class="gma-it"><span class="inline-block w-2 h-2 rounded-full flex-shrink-0" style="background:${T[1]}"></span><div class="min-w-0 flex-1"><span class="text-[11.5px] font-extrabold text-[#8B95A1]">${esc(x.b || '')}</span><div class="text-[13.5px] font-bold leading-snug">${esc(x.n || '')}</div></div><span class="text-[10.5px] font-bold rounded-full px-2 py-1" style="background:${T[0]};color:${T[1]}">${esc(x.c || '')}</span></div>`; }).join('') + '</div>'; }).join('')
+    return `<div class="gma-card ${isNew ? 'new' : ''}"><div class="flex items-center gap-3 mb-3"><div class="relative flex-shrink-0"><div class="w-11 h-11 rounded-full overflow-hidden bg-[#F5F6F8] flex items-center justify-center">${P ? frAvatar(P) : ''}</div><span class="gm-gift-badge" style="width:20px;height:20px;top:-4px;right:-5px;animation:none">${ico('gift')}</span></div><div class="flex-1 min-w-0"><div class="text-[14.5px] font-extrabold truncate">${inn ? `${esc(whoName(uid))}님이 조르고 있어요` : `${esc(whoName(uid))}님에게 보냈어요`}</div><div class="text-[11.5px] text-[#8B95A1] font-semibold">${askTime(a.created_at)} · 제품 ${its.length}개</div></div>${isNew ? '<span class="text-[10px] font-extrabold text-white rounded-full px-2 py-1" style="background:#E8647C">NEW</span>' : ''}</div>` + its.map(x => { const T = GT[x.c] || ['#F2F4F6', '#4E5968']; return `<div class="gma-it"><div class="gmc-dot" style="width:38px;height:38px;border-radius:11px"><img src="${gmImg(x.c)}" alt=""></div><div class="min-w-0 flex-1"><span class="text-[11.5px] font-extrabold text-[#8B95A1]">${esc(x.b || '')}</span><div class="text-[13.5px] font-bold leading-snug">${esc(x.n || '')}</div></div><span class="text-[10.5px] font-bold rounded-full px-2 py-1" style="background:${T[0]};color:${T[1]}">${esc(x.c || '')}</span></div>`; }).join('') + '</div>'; }).join('')
     : `<div class="gm-empty">${inn ? '받은 조르기가 없어요.' : '보낸 조르기가 없어요.'}</div>`;
 }
 async function closeAsks() {
   closeModal('modal-gmask'); const from = gm.askFrom, mine = unseenIn().filter(a => !from || a.sender === from); if (!mine.length) return;
   mine.forEach(a => a.seen = true); renderGiftUI(); try { await sb.rpc('seen_px_asks', { from_uid: from || null }); } catch (e) { }
 }
-/* 굿맨 변신 */
-const GS = {
-  clean: [1, '클렌징', '아침 · 저녁', '500원 동전 크기', '손에 덜어 미온수로 거품을 충분히 낸 뒤 30초 정도 부드럽게 문지르고 헹궈요. 클렌징 오일·밤은 마른 손, 마른 얼굴에 먼저 녹여요.'],
-  peel: [2, '각질 케어', '주 1~2회', '콩알 1개 크기', '세안 후 물기를 닦고 얼굴에 올려 살살 굴려 걷어낸 뒤 미온수로 헹궈요. 눈가와 입가는 피해요.'],
-  toner: [3, '토너 · 패드', '아침 · 저녁', '토너 500원 동전 크기 · 패드 1장', '손바닥에 덜어 피부결 따라 3~4회 두드려 흡수시키거나, 패드는 결을 따라 한 번씩 부드럽게 닦아요.'],
-  serum: [4, '세럼 · 앰플', '아침 · 저녁', '완두콩 1~2알 크기', '얼굴 중앙에서 바깥쪽으로 펴 바르고 손바닥으로 지그시 눌러 흡수시켜요.'],
-  mask: [5, '마스크팩 · 수면팩', '주 2~3회 · 저녁', '1장 · 10~15분', '토너 다음에 올려두고 시간이 되면 떼어내요. 남은 에센스는 두드려 흡수시키고, 수면팩은 마지막 단계에 얇게 펴 발라요.'],
-  eye: [6, '아이크림', '아침 · 저녁', '쌀알 크기 (양쪽 눈가 합쳐서)', '약지로 눈 아래와 바깥쪽을 톡톡 두드려 흡수시켜요. 눈에 닿지 않게 뼈 라인을 따라 발라요.'],
-  cream: [7, '크림 · 로션', '아침 · 저녁', '아몬드 1알 크기', '이마, 양 볼, 코, 턱 다섯 곳에 나눠 찍고 결을 따라 펴 발라 보습막을 만들어요.'],
-  allin: [7, '올인원', '아침 · 저녁', '500원 동전 크기', '세안 후 이것 하나면 충분해요. 얼굴 전체에 얇게 펴 바르고 가볍게 두드려 흡수시켜요.'],
-  spot: [8, '트러블 케어', '필요할 때 · 저녁', '패치 1장 · 6~8시간', '깨끗이 세안하고 물기를 닦은 뒤 트러블 부위에 붙여요. 자기 전에 붙이면 좋아요.'],
-  sun: [9, '선케어', '아침 · 외출 30분 전', '검지·중지 두 마디 길이', '기초 마지막 단계에서 얼굴 전체에 꼼꼼히 펴 바르고 2~3시간마다 덧발라요. 선스틱은 같은 자리를 4~5번 문질러요.'],
-  color: [10, '베이스 · 색조', '외출 전', '소량씩 얇게 여러 번', '선케어 후 쿠션은 퍼프로 톡톡 두드려 쌓고, 틴트·마스카라는 마지막에 사용해요.'],
-  oil: [11, '유분 정리', '번들거릴 때', '1장', '기름종이는 문지르지 말고 T존을 지그시 눌러 유분만 흡수시켜요.'],
-  hairs: [12, '샴푸', '저녁', '500원 동전 크기', '머리를 충분히 적신 뒤 거품을 내 두피를 손끝으로 1~2분 마사지하고 깨끗이 헹궈요.'],
-  hairt: [13, '트리트먼트 · 헤어 에센스', '샴푸 후', '500원 동전 크기', '물기를 짠 머리 끝부분 위주로 바르고 잠시 둔 뒤 헹궈요. 에센스는 드라이 전후 소량만 발라요.'],
-  style: [14, '헤어 스타일링', '아침', '완두콩 1~2알 크기', '드라이로 모양을 잡은 뒤 손바닥에 얇게 펴 머리 안쪽부터 바르고 스프레이로 마무리해요.'],
-  body: [15, '바디 케어', '샤워 직후 3분 이내', '손바닥 가득 한두 번', '물기를 가볍게 닦은 뒤 팔, 다리, 몸통 순서로 결을 따라 펴 발라요.'],
-  bodywash: [15, '바디 워시 · 스크럽', '샤워할 때', '손바닥 한 번 펌핑', '거품을 낸 뒤 부드럽게 씻어내요. 스크럽은 주 1~2회만 사용해요.'],
-  hand: [16, '핸드 · 풋 케어', '틈날 때 · 자기 전', '완두콩 1알 크기', '손등과 손가락 마디마디, 발뒤꿈치까지 꼼꼼히 마사지하듯 발라요.'],
-  lip: [17, '립 케어', '수시로 · 자기 전', '얇게 1~2회', '입술 결을 따라 부드럽게 발라요. 슬리핑 마스크는 자기 전에 도톰하게 올려요.'],
-  scent: [18, '향수 · 미스트', '외출 전', '1~2번 분사', '15cm 정도 떨어져 손목, 귀 뒤, 목 옆에 뿌려요. 비비지 않고 자연스럽게 마르게 둬요.']
+/* 굿맨 변신 · 아침/점심/저녁 루틴 */
+const PER = { am: ['아침', '기상 직후 ~ 외출 전', '가볍고 흡수가 빠른 제형 위주로, 크림 양은 저녁보다 20~30% 줄여요. 레티놀·리들샷·각질 제거제는 저녁으로 미뤄요.'], noon: ['점심', '낮 · 근무/훈련 중 수시', '유분·땀 정리 → 수분 보충 → 자외선 덧바름 → 수정 순서로 해야 모공이 막히지 않아요.'], pm: ['저녁', '귀가 후 ~ 취침 전', '딥 클렌징 후 고기능성·재생 케어를 집중하고, 샤워까지 마무리해요.'] };
+const GST = {
+  a1: ['가벼운 세안', '아침'], a2: ['맨얼굴 0단계', '필요할 때', 'm'], a3: ['토너 · 미스트 · 패드', ''], a4: ['수분 · 항산화 세럼', ''], a5: ['로션 · 수분크림', '', 'm'], a6: ['선케어', '필수'], a7: ['메이크업 · 남성 커버', '', 'm'], a8: ['헤어 · 향수 마무리', '', 'm'],
+  n1: ['유분 · 땀 제거', ''], n2: ['수분 보충 · 열감 진정', '', 'm'], n3: ['자외선 덧바름', '2~3시간마다'], n4: ['수정 메이크업', '', 'm'], n5: ['입술 · 손 · 향기', '수시', 'm'],
+  p1: ['포인트 리무버', '색조 했을 때', , '딥 클렌징'], p2: ['1차 세안', '선크림·베이스 제거', , '딥 클렌징'], p3: ['2차 세안', '클렌징 폼', , '딥 클렌징'], p4: ['필링 · 피지 케어', '주 1~2회', , '딥 클렌징'],
+  p5: ['맨얼굴 0단계', '세안 직후', 'm', '집중 기초 · 나이트 케어'], p6: ['토너 · 미스트 · 패드', '', 'm', '집중 기초 · 나이트 케어'], p7: ['시트팩 · 모델링팩', '주 2~3회', , '집중 기초 · 나이트 케어'], p8: ['고기능성 · 나이트 앰플', '', , '집중 기초 · 나이트 케어'], p9: ['로션 · 크림 · 재생밤', '', 'm', '집중 기초 · 나이트 케어'], p10: ['취침 전 락킹', '맨 마지막', 'm', '집중 기초 · 나이트 케어'],
+  p11: ['셀프 다운펌', '필요 시 · 샴푸 전', , '샤워 · 헤어 · 바디'], p12: ['샴푸', '', , '샤워 · 헤어 · 바디'], p13: ['워시오프 트리트먼트', '', , '샤워 · 헤어 · 바디'], p14: ['바디워시 · 스크럽 · 풋샴푸', '', 'm', '샤워 · 헤어 · 바디'], p15: ['바디로션 · 크림', '샤워 후 3분 내', , '샤워 · 헤어 · 바디'], p16: ['드라이 전후 헤어 마무리', '', 'm', '샤워 · 헤어 · 바디']
 };
-function gmStepKey(x) {
-  const n = x.n, c = x.c;
-  if (c === '클렌징') return /필링/.test(n) ? 'peel' : 'clean';
-  if (c === '토너·패드') return 'toner'; if (c === '세럼') return 'serum'; if (c === '마스크') return 'mask';
-  if (c === '크림') return /아이크림/.test(n) ? 'eye' : 'cream';
-  if (c === '선케어') return 'sun'; if (c === '색조') return 'color';
-  if (c === '트러블') return /패드|소프트너/.test(n) ? 'toner' : /노우즈|팩/.test(n) ? 'mask' : 'spot';
-  if (c === '남성') { if (/선스틱/.test(n)) return 'sun'; if (/립밤/.test(n)) return 'lip'; if (/퍼퓸|샤워/.test(n)) return 'scent'; if (/왁스|젤|스프레이/.test(n)) return 'style'; if (/기름종이|페이셜 페이퍼/.test(n)) return 'oil'; if (/쿠션|파운데이션|커버 스틱/.test(n)) return 'color'; return 'allin'; }
-  if (c === '헤어') return /샴푸/.test(n) ? 'hairs' : 'hairt';
-  if (c === '바디') return /핸드|풋/.test(n) ? 'hand' : /워시|스크럽/.test(n) ? 'bodywash' : 'body';
-  if (c === '립·향수') return /미스트|퍼퓸|향수/.test(n) ? 'scent' : 'lip';
+const GORD = { am: ['a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8'], noon: ['n1', 'n2', 'n3', 'n4', 'n5'], pm: ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16'] };
+/* 종류: [이름, 아침[단계,양], 점심[단계,양], 저녁[단계,양]] */
+const SUBS = {
+  remover: ['포인트 리무버', , , ['p1', '화장솜에 500원 동전 크기 이상 적셔 눈·입술에 10초 얹은 뒤 닦아내요']],
+  clOil: ['클렌징 오일', , , ['p2', '2~3펌프 · 마른 얼굴에 30초 롤링 → 물 묻혀 30초 유화(하얗게 변함) → 헹굼']],
+  clBalm: ['클렌징 밤·크림', , , ['p2', '체리 1알 크기 (스패출러 1스푼)']],
+  clWater: ['클렌징 워터', , , ['p2', '화장솜 2장에 듬뿍 적셔 결 따라 닦아내요']],
+  foam: ['약산성 클렌징 폼', ['a1', '새끼손가락 반 마디~한 마디(0.5~1cm)로 거품 내어 T존 위주 30초 (건성은 물세안도 OK)'], , ['p3', '새끼손가락 한 마디(1~2cm) 크기, 풍성한 거품으로 1분 이내']],
+  foamS: ['클렌징 폼 (딥클렌징)', ['a1', '지성·피지가 많을 때만 · 새끼손가락 반~한 마디, 30초'], , ['p3', '새끼손가락 한 마디(1~2cm) 크기, 풍성한 거품으로 1분 이내']],
+  soap: ['세안 비누', ['a1', '피지가 많을 때만 · 500원 동전 크기 (거품망 권장)'], , ['p3', '500원 동전 크기 (거품망 권장)']],
+  peelGel: ['필링젤', , , ['p4', '물기 닦은 얼굴에 500원 동전 크기 롤링 후 세안']],
+  nose: ['노우즈 팩 · 소프트너', , , ['p4', '1제 패치 1장(또는 적신 화장솜) 코에 10~15분 → 면봉으로 피지 걷고 미온수 세안']],
+  patch: ['트러블 패치', ['a2', '물기 제거 직후 터졌거나 붉은 트러블에 1매 (화장 전엔 얇은 이지덤 뷰티)'], ['n2', '하얗게 부풀어 오르면 1매 교체'], ['p5', '스킨케어 전 맨얼굴에 트러블당 1매']],
+  booster: ['부스터 (리들샷)', , , ['p5', '완두콩 1~2알(1~2펌프)을 맨얼굴에 지그시 눌러 흡수 · 100은 매일, 300은 3일에 1회']],
+  mist: ['미스트 · 스프레이', ['a3', '15~20cm 띄워 3~5회 분사 후 톡톡 흡수'], ['n2', '20cm 거리에서 2~3회 분사 (분사 후 10초 뒤 휴지로 가볍게 눌러 물기 제거)'], ['p6', '15~20cm 띄워 3~5회 분사 후 톡톡 흡수']],
+  first: ['퍼스트 에센스', ['a3', '500원 동전 크기 손에 덜어 2회 레이어링'], , ['p6', '500원 동전 크기 손에 덜어 2회 레이어링']],
+  toner: ['토너', ['a3', '500원 동전 크기 1회 흡수'], , ['p6', '500원 동전 크기로 2회 레이어링 (손으로 톡톡)']],
+  pad: ['토너 패드', ['a3', '닦토 1장 · 열감 낮추기엔 양 볼에 2장 3분'], , ['p6', '닦토 1장 또는 진정 부위에 2~3장 5분']],
+  padX: ['각질 · 모공 패드', , , ['p6', '닦토 1장 · 리들샷 쓴 날엔 세게 문지르지 말고 가볍게 얹거나 생략']],
+  sheetQ: ['수딩 마스크', ['a3', '1매 · 5~10분 짧게'], , ['p7', '1매, 10~15분 부착 후 남은 에센스 흡수']],
+  sheet: ['시트 마스크', , , ['p7', '1매, 10~15분 부착 후 남은 에센스 흡수']],
+  sheetShot: ['리들샷 마스크팩', , , ['p7', '1제 리들샷 → 2제 시트 순서로 1매, 10~15분']],
+  eyeP: ['아이패치', ['a3', '눈가 1쌍 · 5~10분 (붓기 완화)'], , ['p7', '눈가 양쪽 1쌍, 15~20분']],
+  model: ['모델링 팩', , , ['p7', '앰플을 먼저 듬뿍 바른 뒤 1컵(28g)+물 7~8스푼 개어 두껍게 도포 → 15~20분 뒤 떼어내요']],
+  serDay: ['수분 · 진정 · 탄력 세럼', ['a4', '스포이드 1/2개(2~3방울) · 펌프형 1펌프(완두콩 1알)'], , ['p8', '스포이드 1/2~1개(3~4방울) · 펌프형 1~2펌프']],
+  serVit: ['비타민 · 잡티 세럼', ['a4', '스포이드 1/2개 · 펌프형 1펌프 · 아침엔 반드시 선크림과 함께'], , ['p8', '스포이드 1/2~1개 · 펌프형 1~2펌프']],
+  serRet: ['레티놀 · 각질 앰플', , , ['p8', '스포이드 1/2~1개(3~4방울) · 펌프형 1~2펌프 · 저녁 전용']],
+  serNight: ['나이트 앰플', , , ['p8', '스포이드 1/2~1개(3~4방울) · 펌프형 1~2펌프']],
+  serKit: ['원데이 키트', , , ['p8', '캡슐 1개 + 앰플 1병을 전량 섞어 도포']],
+  serMedi: ['볼륨 톡스 에센스', ['a4', '3~4펌프 펴 바른 뒤 산소 버블이 올라오면 두드려 흡수'], , ['p8', '3~4펌프 펴 바른 뒤 산소 버블이 올라오면 두드려 흡수']],
+  lotion: ['로션 · 플루이드', ['a5', '100원~500원 동전 크기 (1~2펌프)'], , ['p9', '100원~500원 동전 크기 (1~2펌프)']],
+  gel: ['수딩젤', ['a5', '아몬드 1~2알 크기'], ['n2', '야외 활동 직후 열감 있는 부위에 얇게'], ['p9', '아몬드 1~2알 크기 (진정 팩으로 쓸 땐 두껍게)']],
+  allin: ['올인원', ['a5', '100원~500원 동전 크기 (1~2펌프) · 단독 사용 시 세안 후 이것 하나면 OK'], , ['p9', '100원~500원 동전 크기 (1~2펌프) · 단독 사용 시 세안 후 이것 하나면 OK']],
+  cream: ['크림', ['a5', '아몬드 반 알~1알 · 얇게 펴 바르고 2~3분 흡수 대기'], , ['p9', '아몬드 1~1.5알 · 저녁엔 듬뿍']],
+  creamBalm: ['재생 크림 · 밤', ['a5', '진주알 1알 · 붉거나 민감한 부위에 얇게'], , ['p9', '진주알 1알 · 민감한 부위에 얇게 또는 크림 위에 덧바름']],
+  eyecr: ['아이크림', ['a5', '눈가 양쪽 쌀알 1알씩'], , ['p9', '눈가 쌀알 1~2알 (얼굴 전체는 아몬드 1알)']],
+  neck: ['넥크림', ['a5', '500원 동전 크기, 쇄골 → 턱 방향으로 쓸어올려요'], , ['p9', '500원 동전 크기, 쇄골 → 턱 방향으로 쓸어올려요']],
+  set: ['기초 세트', ['a5', '스킨 → 로션 → 크림 순서'], , ['p9', '스킨 → 로션 → 크림 순서']],
+  multi: ['멀티밤', ['a5', '팔자 · 눈가에 1회 가볍게 터치'], ['n2', '오후에 당기는 눈가 · 볼에 1회 터치'], ['p10', '눈가 · 팔자 · 목 등 건조한 부위에 1~2회 쓱']],
+  sleep: ['수면팩', , , ['p10', '아몬드 1~1.5알 · 크림 위(또는 크림 대신) 얇게 펴 바르고 취침']],
+  wrap: ['랩핑 마스크', , , ['p10', '500원 동전 크기 도포 → 20~30분 완전 건조 후 떼어내고 취침']],
+  gelM: ['하이드로겔 마스크', , , ['p10', '기초 마지막에 1매 → 최소 3시간(또는 수면 중) 투명해질 때까지']],
+  lipSl: ['립 슬리핑 마스크', , , ['p10', '스패출러로 팥알 반 알 크기를 도톰하게 얹고 취침']],
+  sun: ['선크림', ['a6', '두 손가락 한 마디 길이(500원 동전 크기, 약 1g)를 2번에 나눠 도포'], ['n3', '맨얼굴일 땐 선크림 · 500원 동전 크기를 얇게'], ],
+  sunS: ['선스틱', ['a6', '같은 부위를 3~4회 왕복'], ['n3', '메이크업 위에도 2~3시간마다 2~3회 겹쳐 도포']],
+  cushion: ['쿠션 · 팩트', ['a7', '퍼프에 1회 가볍게 찍어 얇게 레이어링 (중앙 → 바깥으로 톡톡)'], ['n4', '뭉친 부위는 미스트 적신 퍼프로 정리 후, 평소 절반 이하만 찍어 두드려요']],
+  bb: ['비비크림', ['a7', '완두콩 1알 크기']],
+  bbSun: ['톤 로션 (선크림 겸용)', ['a7', '완두콩 1알~아몬드 반 알 · 선크림 생략 가능']],
+  stick: ['커버 스틱 · 파운데이션 스틱', ['a7', '얼굴 4~5곳에 1줄씩 긋고 브러시로 블렌딩']],
+  powder: ['파우더', ['a7', 'T존 · 눈가에 소량 터치'], ['n4', '번들거리는 T존 · 앞머리에 소량 톡톡']],
+  shade: ['쉐딩', ['a7', '3가지 컬러를 브러시로 섞어 턱선 · 콧대에 1~2회 얇게']],
+  eyeM: ['아이 · 브로우', ['a7', '빈 곳만 채우고, 마스카라는 입구에서 양을 덜어 뿌리부터 1~2회']],
+  tint: ['틴트', ['a7', '입술 안쪽에 1회 찍어 바른 뒤 블렌딩'], ['n4', '입술 안쪽에 1회']],
+  tintB: ['발색 립밤', ['a7', '1~2회 가볍게 왕복 (여러 번 바르면 진해져요)'], ['n4', '1~2회 가볍게 왕복']],
+  lipB: ['립밤', ['a7', '1~2회 얇게'], ['n5', '식사 후 · 건조할 때마다 1~2회']],
+  hand: ['핸드크림', , ['n5', '손 씻은 직후 완두콩 1알 (뉴트로지나는 쌀알 2~3알)']],
+  oil: ['기름종이', , ['n1', '문지르지 말고 이마 · 코 · 턱을 꾹꾹 눌러 유분만 흡수']],
+  fpaper: ['페이셜 페이퍼', , ['n1', '1장으로 얼굴 · 목의 땀과 피지를 닦아내요']],
+  perf: ['향수', ['a8', '맥박 부위(손목 · 귀 뒤 · 목)에 1~2회, 문지르지 말고 자연 건조'], ['n5', '식사 후 1회만 가볍게 추가']],
+  bmist: ['바디미스트', ['a8', '피부에서 15cm 띄워 2~3회'], ['n5', '1회 가볍게']],
+  dress: ['드레스퍼퓸', ['a8', '피부가 아닌 의류 · 침구에 20~30cm 띄워 2~3회'], ['n5', '식사 후 냄새 제거용으로 옷에 2회']],
+  wax: ['헤어 왁스', ['a8', '팥알 1~2알을 손바닥에 투명해질 때까지 비빈 뒤 모발 끝 위주로']],
+  spray: ['헤어 스프레이', ['a8', '20cm 거리에서 2~3회 짧게 분사']],
+  nowash: ['노워시 트리트먼트', ['a8', '드라이 전 모발 끝에 3회 분사'], , ['p16', '타월 드라이 후 모발 끝에 3~5회 분사']],
+  hairE: ['헤어 에센스', ['a8', '반 ~ 1펌프, 모발 끝 위주'], , ['p16', '1~2펌프 (짧은 머리는 반 펌프), 두피 제외 모발 끝 위주']],
+  down: ['셀프 다운펌', , , ['p11', '마른 옆머리에 500원 동전 크기 1~2회 분량을 빗으로 눌러 도포 → 10~15분 방치 후 미온수로 헹굼']],
+  shampoo: ['샴푸', , , ['p12', '짧은 머리 1펌프(500원 동전 크기), 긴 머리 2펌프 · 두피 위주 1~2분 마사지 후 충분히 헹굼']],
+  treat: ['트리트먼트', , , ['p13', '아몬드 1~2알 크기 (긴 머리 호두 1알) · 모발 중간~끝에 바르고 2~3분 뒤 헹굼']],
+  treatS: ['트리트먼트 (스프레이)', , , ['p13', '용기 눈금 1회분(10mL)을 젖은 모발에 뿌려 10초 주무른 뒤 헹굼']],
+  bwash: ['바디워시', , , ['p14', '샤워볼에 1~2펌프']],
+  scrub: ['바디스크럽', , , ['p14', '주 1~2회 · 물기 있는 몸에 부위별 호두 1알, 부드럽게 롤링 후 헹굼']],
+  foot: ['풋샴푸', , , ['p14', '발당 2~3회 분사 후 발끼리 문질러 세정']],
+  blot: ['바디로션 · 크림', , , ['p15', '물기 닦은 직후 팔 · 다리 · 몸통 부위별 500원 동전 크기 (전신 4~6펌프)']]
+};
+/* 제품 → 종류 */
+function gmSub(x) {
+  const n = x.n, c = x.c, k = x.k, t = r => r.test(n);
+  switch (c) {
+    case '클렌징': return t(/리무버/) ? 'remover' : t(/클렌징 오일/) ? 'clOil' : t(/클렌징 밤|콘트롤 크림|클린 잇/) ? 'clBalm' : t(/클렌징 워터/) ? 'clWater' : t(/필링/) ? 'peelGel' : t(/캐스틸/) ? 'soap' : t(/약산성|독도 클렌저|녹두/) ? 'foam' : 'foamS';
+    case '트러블': return t(/패치/) ? 'patch' : t(/패드/) ? 'padX' : 'nose';
+    case '토너·패드': return t(/미스트/) ? 'mist' : t(/원스텝 오리지널|제로 모공/) ? 'padX' : t(/패드/) ? 'pad' : 'toner';
+    case '세럼': return t(/스프레이/) ? 'mist' : t(/개똥쑥|그린티 씨드/) ? 'first' : t(/리들샷/) ? 'booster' : t(/레티놀|제로 모공/) ? 'serRet' : t(/보라병|나이트/) ? 'serNight' : t(/원데이 키트/) ? 'serKit' : t(/펩타이드9/) ? 'serMedi' : t(/비타|잡티|블레미쉬|글루타치온C 흔적|청귤/) ? 'serVit' : 'serDay';
+    case '마스크': return t(/슬리핑|수면팩/) ? 'sleep' : t(/랩핑/) ? 'wrap' : t(/하이드로겔/) ? 'gelM' : t(/컵팩|모델링/) ? 'model' : t(/아이패치|아이겔/) ? 'eyeP' : t(/리들샷/) ? 'sheetShot' : t(/시카 데일리|쿨 수딩/) ? 'sheetQ' : 'sheet';
+    case '크림': return t(/슬리핑/) ? 'sleep' : t(/멀티밤/) ? 'multi' : t(/시칼파트|시카플라스트/) ? 'creamBalm' : t(/아이크림/) ? 'eyecr' : t(/넥크림/) ? 'neck' : t(/세트/) ? 'set' : t(/로션|플루이드/) ? 'lotion' : t(/수딩젤/) ? 'gel' : 'cream';
+    case '선케어': return t(/선스틱/) ? 'sunS' : 'sun';
+    case '색조': return t(/쿠션|팩트/) ? 'cushion' : t(/비비/) ? 'bb' : t(/파우더/) ? 'powder' : t(/쉐딩/) ? 'shade' : t(/틴트/) ? 'tint' : 'eyeM';
+    case '남성': return t(/선스틱/) ? 'sunS' : t(/립밤/) ? 'tintB' : t(/퍼퓸 샤워/) ? 'bwash' : t(/시그니처 퍼퓸/) ? 'perf' : t(/다운펌/) ? 'down' : t(/스프레이/) ? 'spray' : t(/왁스/) ? 'wax' : t(/기름종이/) ? 'oil' : t(/페이셜 페이퍼/) ? 'fpaper' : t(/블루 쿠션/) ? 'cushion' : t(/트루 톤/) ? 'bbSun' : t(/커버 스틱|파운데이션/) ? 'stick' : 'allin';
+    case '헤어': return t(/샴푸/) ? 'shampoo' : t(/어노브/) ? 'treat' : t(/모레모/) ? 'treatS' : t(/노워시/) ? 'nowash' : 'hairE';
+    case '바디': return t(/핸드크림/) ? 'hand' : t(/풋샴푸/) ? 'foot' : t(/스크럽/) ? 'scrub' : t(/바디워시/) ? 'bwash' : 'blot';
+    case '립·향수': return t(/립 슬리핑/) ? 'lipSl' : t(/바디미스트/) ? 'bmist' : t(/드레스퍼퓸/) ? 'dress' : 'lipB';
+  }
   return 'cream';
+}
+const gmPerNow = () => { const h = new Date().getHours(); return h < 11 ? 'am' : h < 17 ? 'noon' : 'pm'; };
+const GPI = { am: '<svg viewBox="0 0 24 24"><path d="M3 18h18M7 18a5 5 0 0 1 10 0M12 4v3M4.9 8.9l2.1 2.1M19.1 8.9 17 11"/></svg>', noon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>', pm: '<svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>' };
+function gmWarn(C) {
+  const hit = C.filter(x => { const s = gmSub(x); return s === 'booster' || s === 'serRet' || s === 'peelGel' || s === 'padX' || s === 'nose' || (s === 'serVit' && /비타|청귤|글루타치온/.test(x.n)); });
+  return hit.length >= 2 ? hit : null;
+}
+function gmPeriod(p) {
+  gm.per = p; const C = gm.cart.map(k => pxK[k]).filter(Boolean), steps = {}, off = [];
+  C.forEach(x => { const s = SUBS[gmSub(x)], e = s[{ am: 1, noon: 2, pm: 3 }[p]]; if (!e) { off.push(x); return; } ((steps[e[0]] = steps[e[0]] || {})[gmSub(x)] = steps[e[0]][gmSub(x)] || []).push(x); });
+  const ids = GORD[p].filter(id => steps[id]), np = C.length - off.length, P = PER[p];
+  let h = `<div class="gl-tabw"><div class="gl-tabs">${['am', 'noon', 'pm'].map(a => `<button class="${a === p ? 'on' : ''}" onclick="gmPeriod('${a}')">${GPI[a]}${PER[a][0]}</button>`).join('')}</div></div>`;
+  h += `<div class="gl-per"><b>${P[1]}</b><span>${P[2]}</span></div>`;
+  q('gl-sub').innerText = `${P[0]} ${ids.length}단계 · 제품 ${np}개`;
+  const W = p === 'pm' ? gmWarn(C) : null;
+  if (W) h += `<div class="gl-warn"><b>같은 날 겹쳐 바르지 마세요</b><span>${W.map(x => esc(x.b + ' ' + x.n)).join(', ')} 처럼 자극이 큰 기능성 제품은 한꺼번에 쓰면 피부 장벽이 무너지기 쉬워요. 요일을 나눠 번갈아 써보세요.</span></div>`;
+  let last = '', n = 0;
+  ids.forEach((id, i) => {
+    const S = GST[id], g = steps[id], keys = Object.keys(g), cnt = keys.reduce((a, k) => a + g[k].length, 0);
+    if (S[3] && S[3] !== last) { h += `<div class="gl-grp">${S[3]}</div>`; } last = S[3] || last; n++;
+    h += `<div class="gl-step" style="--i:${Math.min(i, 8)}"><div class="gl-no">${n}</div><div class="flex-1 min-w-0"><div class="flex items-center gap-2 flex-wrap"><div class="text-[16.5px] font-extrabold tracking-tight">${S[0]}</div>${S[1] ? `<span class="gl-tag">${S[1]}</span>` : ''}</div>` +
+      keys.map(k => `<div class="gl-sb"><div class="gl-sbn">${SUBS[k][0]}</div><div class="flex flex-wrap gap-1.5 mt-1.5">${g[k].map(x => { const T = GT[x.c] || ['#F2F4F6', '#4E5968']; return `<span class="gl-chip"><img src="${gmImg(x.c)}" alt="">${esc(x.b)} ${esc(x.n.length > 18 ? x.n.slice(0, 17) + '…' : x.n)}</span>`; }).join('')}</div><div class="gl-amt"><em>사용량</em><span>${SUBS[k][{ am: 1, noon: 2, pm: 3 }[p]][1]}</span></div></div>`).join('') +
+      (cnt > 1 && !S[2] ? `<div class="gl-hint">이 단계는 제품 하나만 골라 써도 충분해요</div>` : '') + `</div></div>`;
+  });
+  if (!ids.length) h += `<div class="gm-empty" style="padding:34px 0">${P[0]}에 쓸 제품이 담겨있지 않아요.<br>다른 시간대 탭을 확인해보세요.</div>`;
+  if (off.length && ids.length) h += `<div class="gl-off"><b>${P[0]}에는 쉬어가요</b><span>${off.map(x => esc(x.b + ' ' + x.n)).join(' · ')}</span></div>`;
+  const box = q('gl-steps'), top = box.scrollTop; box.innerHTML = h; box.scrollTop = 0;
 }
 function gmRoutine() {
   const C = gm.cart.map(k => pxK[k]).filter(Boolean); if (!C.length) return showAlert('알림', '먼저 장바구니에 제품을 담아주세요.');
-  const g = {}; C.forEach(x => { const k = gmStepKey(x); (g[k] = g[k] || []).push(x); });
-  const keys = Object.keys(g).sort((a, b) => GS[a][0] - GS[b][0]);
-  q('gl-sub').innerText = `${keys.length}단계 · 제품 ${C.length}개`;
-  q('gl-steps').innerHTML = keys.map((k, n) => { const s = GS[k]; return `<div class="gl-step" style="--i:${n}"><div class="gl-no">${n + 1}</div><div class="flex-1 min-w-0"><div class="flex items-center gap-2 flex-wrap"><div class="text-[16.5px] font-extrabold tracking-tight">${s[1]}</div><span class="text-[10.5px] font-bold rounded-full px-2 py-[3px]" style="background:#F2F4F6;color:#6B7684">${s[2]}</span></div><div class="mt-2 flex flex-wrap gap-1.5">${g[k].map(x => `<span class="text-[11.5px] font-bold rounded-lg px-2 py-1" style="background:${(GT[x.c] || ['#F2F4F6'])[0]};color:${(GT[x.c] || ['', '#4E5968'])[1]}">${esc(x.b)} ${esc(x.n.length > 16 ? x.n.slice(0, 15) + '…' : x.n)}</span>`).join('')}</div><div class="mt-3 flex items-center gap-2 rounded-xl px-3 py-2.5" style="background:#F5F8F2"><span class="text-[11px] font-extrabold" style="color:var(--mil-green)">사용량</span><span class="text-[13.5px] font-extrabold">${s[3]}</span></div><div class="mt-2.5 text-[12.5px] leading-relaxed text-[#6B7684]">${s[4]}</div></div></div>`; }).join('');
+  gmPeriod(gmPerNow());
   const st = q('gl-stars'); if (!st.firstChild) st.innerHTML = [[-8, 12, 22, 0], [88, 2, 16, .3], [98, 46, 26, .6], [86, 92, 18, .2], [2, 84, 24, .8], [-16, 50, 14, .45], [46, -12, 20, .15], [60, 100, 14, .9], [18, -8, 12, .55], [100, 22, 12, .7]].map(a => `<i class="gl-star" style="--x:${a[0]}%;--y:${a[1]}%;--s:${a[2]}px;--d:${a[3]}s"><svg viewBox="0 0 24 24"><path d="M12 0c1 7 5 11 12 12-7 1-11 5-12 12-1-7-5-11-12-12 7-1 11-5 12-12z"/></svg></i>`).join('');
   const m = q('modal-glow'); gm.glT.forEach(clearTimeout); gm.glT = []; m.classList.remove('gl-s1', 'gl-s2'); m.classList.add('gl-s0'); q('gl-steps').scrollTop = 0;
   const f = m.querySelector('.gl-face'); f.style.animation = 'none'; void f.offsetWidth; f.style.animation = '';
