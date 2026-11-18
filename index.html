@@ -213,6 +213,19 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 .gl-s2 .gl-step{animation:glIn .85s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--i)*130ms + 450ms)}
 @keyframes glIn{from{opacity:0;transform:translateY(44px) scale(.98)}to{opacity:1;transform:none}}
 .gl-no{width:30px;height:30px;border-radius:50%;background:#191F28;color:#fff;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ri{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.rt-hd{width:30px;height:30px;border-radius:10px;background:#fff;border:1px solid #E5E8EB;display:inline-flex;align-items:center;justify-content:center;color:#191F28}
+.rt-sort{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 0;border-radius:10px;font-size:12px;font-weight:700;background:#F5F6F8;color:#4E5968}.rt-sort.on{background:#191F28;color:#fff}.rt-sort .ri{width:15px;height:15px}
+.rt-sum{background:#fff;border-radius:12px;padding:10px 8px;text-align:center}.rt-sum i{display:block;font-style:normal;font-size:10px;color:#8B95A1}.rt-sum b{display:block;margin-top:2px;font-size:12.5px;font-weight:800;letter-spacing:-.4px;white-space:nowrap}
+.rt{position:relative;margin:14px 0 10px;padding-left:4px}
+.rt:before{content:"";position:absolute;left:12px;top:12px;bottom:12px;width:2px;background:#D9DDE3}
+.rt-n{position:relative;display:flex;align-items:center;gap:10px;padding:4px 0}.rt-n i{width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid #191F28;flex-shrink:0;position:relative;z-index:1;margin-left:0}
+.rt-n span{font-size:13px;font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rt-n em{font-style:normal;font-size:10.5px;font-weight:700;color:#8B95A1}
+.rt-n.end i{background:#191F28}
+.rt-r{position:relative;display:flex;align-items:center;gap:10px;padding:7px 0 7px 0}
+.rt-ic{width:26px;height:26px;border-radius:9px;background:#fff;border:1px solid #E5E8EB;display:flex;align-items:center;justify-content:center;color:#4E5968;position:relative;z-index:1;margin-left:-4px}.rt-ic .ri{width:16px;height:16px}
+.rt-ic.ktx{color:#2F6FD0}.rt-ic.metro{color:#3F7F5F}.rt-ic.bus{color:#C27A1A}.rt-ic.walk{color:#6B7684}
+.rt-t{flex:1;min-width:0;font-size:12.5px}.rt-t b{font-weight:800}.rt-t span{color:#4E5968;font-weight:600}.rt-c{font-size:12px;font-weight:800;color:#191F28}
 .gl-tabw{position:sticky;top:0;z-index:5;margin:0 -18px;padding:8px 18px 10px;background:linear-gradient(#fff 78%,rgba(255,255,255,0))}
 .gl-tabs{display:flex;gap:4px;padding:4px;border-radius:15px;background:#ECEEF1}
 .gl-tabs button{flex:1;height:38px;border-radius:12px;font-size:14px;font-weight:700;color:#6B7684;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s}
@@ -401,7 +414,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
    <div class="toss-card">
     <div class="flex justify-between items-center mb-4"><h3 class="text-[16px] font-bold">🏠 집으로가기</h3><button onclick="getGPS()" class="bg-[#F2F3F5] text-[#4E5968] text-[11px] font-bold px-3 py-1.5 rounded-full">📍 현위치</button></div>
     <div class="space-y-3 mb-4"><div class="relative"><input id="route-start" placeholder="출발지 (현위치 · 자대 · 장소 검색)" class="inp font-semibold" autocomplete="off" oninput="placeInput('start')"><div id="sug-start" class="hidden absolute z-30 left-0 right-0 bg-white border border-[#E5E8EB] rounded-xl shadow-lg mt-1 max-h-60 overflow-y-auto"></div></div>
-    <div class="relative"><input id="route-end" placeholder="도착지 (아파트·상가 이름이나 주소)" class="inp font-semibold" autocomplete="off" oninput="placeInput('end')"><div id="sug-end" class="hidden absolute z-30 left-0 right-0 bg-white border border-[#E5E8EB] rounded-xl shadow-lg mt-1 max-h-60 overflow-y-auto"></div></div><button onclick="calcRoute()" class="w-full bg-[#191F28] text-white py-3 rounded-xl font-bold text-[14px]">경로 탐색 ⚡</button></div>
+    <div class="relative"><input id="route-end" placeholder="도착지 (아파트·상가 이름이나 주소)" class="inp font-semibold" autocomplete="off" oninput="placeInput('end')"><div id="sug-end" class="hidden absolute z-30 left-0 right-0 bg-white border border-[#E5E8EB] rounded-xl shadow-lg mt-1 max-h-60 overflow-y-auto"></div></div><button id="route-go" onclick="calcRoute()" disabled class="w-full py-3 rounded-xl font-bold text-[14px] bg-[#E5E8EB] text-[#A0A7B1]">경로 탐색</button></div>
     <div id="route-results" class="hidden"></div>
    </div>
   </section>
@@ -429,7 +442,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
     <div onclick="swOpen(true,2)" class="bg-[var(--mil-dark)] rounded-2xl p-5 text-white cursor-pointer active:scale-[.98] transition-transform"><div class="flex justify-between items-center mb-1"><div class="text-[12px] text-[var(--mil-t2)]">만기 시 총 예상 수령액</div><div class="text-[10px] font-bold bg-white/15 rounded-full px-2 py-0.5">터치시 통장이 열립니다</div></div><div class="text-[28px] font-black mb-2"><span id="saving-total-result">0</span>원</div>
      <div class="flex gap-3 text-[11px] text-[var(--mil-t1)]"><span>원금 <span id="saving-prin">0</span></span><span>이자 <span id="saving-int">0</span></span></div><div class="text-[11px] text-[var(--mil-t0)] mt-1 font-bold">정부 매칭지원금: <span id="saving-match">0</span></div></div>
     <div class="grid grid-cols-2 gap-2 mt-5"><button onclick="swOpen(true)" class="py-4 rounded-2xl font-bold text-[14px] bg-[#F2F4F6] text-[#191F28]">다시 계산하기</button><button id="sav-reset" onclick="savReset()" class="py-4 rounded-2xl font-bold text-[14px] bg-[#FFF0F3] text-[#D94867]">초기화</button></div>
-    <button id="sav-save" onclick="saveSavNow()" class="w-full mt-2 py-4 rounded-2xl font-bold text-[15px] text-white" style="background:#191F28">저장하기</button><div id="sav-msg" class="text-center text-[11px] mt-2 text-[#8B95A1] min-h-[16px]"></div>
+    <button id="sav-save" onclick="saveSavNow()" class="w-full mt-2 py-4 rounded-2xl font-bold text-[15px] transition-colors" style="background:#E3E6EA;color:#6B7684">저장하기</button><div id="sav-msg" class="text-center text-[11px] mt-2 text-[#8B95A1] min-h-[16px]"></div>
     <p class="text-[10px] text-[#8B95A1] mt-3">※ 우대금리 조건·한도는 은행/시기별로 바뀔 수 있어요. 가입 전 해당 은행 공지를 꼭 확인하세요.</p>
    </div>
   </section>
@@ -463,7 +476,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
     <h2 class="text-[17px] font-extrabold leading-snug px-4" id="qna-question-text"></h2>
    </div>
    <div class="toss-card space-y-5" id="qna-body">
-    <div><label class="text-[13px] font-bold mb-2 block" id="qna-my-label">나의 답변</label><textarea id="qna-ans" maxlength="500" class="w-full bg-[#F5F6F8] rounded-2xl p-4 text-[14px] outline-none h-28 resize-none" style="user-select:text"></textarea><button onclick="submitQ()" class="w-full mt-2 bg-[#191F28] text-white py-3.5 rounded-xl font-bold">저장</button></div>
+    <div><label class="text-[13px] font-bold mb-2 block" id="qna-my-label">나의 답변</label><textarea id="qna-ans" maxlength="500" class="w-full bg-[#F5F6F8] rounded-2xl p-4 text-[14px] outline-none h-28 resize-none" style="user-select:text" oninput="paintQBtn()"></textarea><button id="qna-save" onclick="submitQ()" class="w-full mt-2 py-3.5 rounded-xl font-bold transition-colors" style="background:#E3E6EA;color:#8B95A1">저장</button></div>
     <div id="qna-partner-box" class="pt-5 border-t border-[#F2F3F5]"><label class="text-[13px] font-bold mb-2 block">상대방의 답변</label><div class="w-full bg-[#F5F6F8] rounded-2xl p-4 min-h-[7rem] flex flex-col items-center justify-center text-center"><div id="qna-partner" class="text-[14px] text-left w-full whitespace-pre-line" style="user-select:text"></div></div></div>
    </div>
   </section>
@@ -725,12 +738,12 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
     <div class="flex gap-2 items-center"><button onclick="menuSet(ymd(new Date()))" class="text-[12px] font-bold bg-white border border-[#E5E8EB] rounded-full px-3 py-1.5">오늘</button><button onclick="menuSet(ymd(new Date(Date.now()+864e5)))" class="text-[12px] font-bold bg-white border border-[#E5E8EB] rounded-full px-3 py-1.5">내일</button><input type="date" id="menu-date-input" onchange="menuSet(this.value)" class="text-[12px] font-bold bg-white border border-[#E5E8EB] rounded-full px-3 py-1 outline-none flex-1"></div>
     <div id="menu-cards" class="space-y-3"></div>
     <div id="menu-edit" class="hidden toss-card !p-5 space-y-3">
-     <div class="bg-[var(--mil-green-light)] rounded-xl p-3 space-y-2"><div class="text-[13px] font-extrabold">📥 공공데이터포털 식단 가져오기</div><p class="text-[11px] text-[#4E5968] leading-relaxed">① 아래 버튼으로 공공데이터포털에서 우리 부대 '식단정보' CSV를 내려받고 ② 파일을 선택하면 날짜별로 한꺼번에 자동 등록돼요. (부대가 데이터를 공개한 경우에만 있어요)</p><a id="menu-dg-link" target="_blank" rel="noopener" href="https://www.data.go.kr/tcs/dss/selectDataSetList.do?keyword=%EA%B5%AD%EB%B0%A9%EB%B6%80+%EC%8B%9D%EB%8B%A8%EC%A0%95%EB%B3%B4" class="block text-center bg-white border border-[#E5E8EB] rounded-lg py-2.5 text-[12px] font-bold text-[var(--mil-green)]">공공데이터포털에서 우리 부대 찾기 ▶</a><label class="block text-center bg-[var(--mil-green)] text-white rounded-lg py-2.5 text-[12px] font-bold cursor-pointer">CSV 파일 선택해서 가져오기<input type="file" accept=".csv,text/csv,text/plain" class="hidden" onchange="importMenuCsv(this)"></label></div><div class="text-[14px] font-extrabold">이 날 식단 입력</div>
+     <div class="bg-[var(--mil-green-light)] rounded-xl p-3 space-y-2"><div class="text-[13px] font-extrabold">📥 공공데이터포털 식단 가져오기</div><p class="text-[11px] text-[#4E5968] leading-relaxed">① 아래 버튼으로 공공데이터포털에서 우리 부대 '식단정보' CSV를 내려받고 ② 파일을 선택하면 날짜별로 한꺼번에 자동 등록돼요. (부대가 데이터를 공개한 경우에만 있어요)</p><a id="menu-dg-link" target="_blank" rel="noopener" href="https://www.data.go.kr/tcs/dss/selectDataSetList.do?keyword=%EA%B5%AD%EB%B0%A9%EB%B6%80+%EC%8B%9D%EB%8B%A8%EC%A0%95%EB%B3%B4" class="block text-center bg-white border border-[#E5E8EB] rounded-lg py-2.5 text-[12px] font-bold text-[var(--mil-green)]">공공데이터포털에서 우리 부대 찾기 ▶</a><label id="menu-import-lbl" class="block text-center bg-[var(--mil-green)] text-white rounded-lg py-2.5 text-[12px] font-bold cursor-pointer">CSV 파일 선택해서 가져오기<input type="file" accept=".csv,text/csv,text/plain" class="hidden" onchange="importMenuCsv(this)"></label></div><div class="text-[14px] font-extrabold">이 날 식단 입력</div>
      <label class="text-[12px] font-bold">🌅 조식</label><textarea id="menu-in-b" class="w-full bg-[#F5F6F8] rounded-xl p-3 text-[13px] outline-none h-16 resize-none" placeholder="쉼표(,)로 구분 · 예) 쌀밥, 미역국, 계란말이"></textarea>
      <label class="text-[12px] font-bold">☀️ 중식</label><textarea id="menu-in-l" class="w-full bg-[#F5F6F8] rounded-xl p-3 text-[13px] outline-none h-16 resize-none"></textarea>
      <label class="text-[12px] font-bold">🌙 석식</label><textarea id="menu-in-d" class="w-full bg-[#F5F6F8] rounded-xl p-3 text-[13px] outline-none h-16 resize-none"></textarea>
      <button onclick="saveMenu()" class="w-full bg-[#191F28] text-white py-3 rounded-xl font-bold text-[14px]">이 날 저장</button>
-     <div class="border-t border-[#F2F3F5] pt-3"><div class="text-[13px] font-extrabold mb-1">여러 날 한 번에 입력</div><p class="text-[11px] text-[#8B95A1] mb-2">한 줄에 하루씩, 날짜 뒤에 조식·중식·석식을 적어요.<br>예) 10/21 조식: 밥, 국 중식: 카레, 샐러드 석식: 불고기, 김치</p><textarea id="menu-bulk" class="w-full bg-[#F5F6F8] rounded-xl p-3 text-[12px] outline-none h-28 resize-none"></textarea><button onclick="saveBulk()" class="w-full mt-2 bg-[var(--mil-green)] text-white py-3 rounded-xl font-bold text-[14px]">일괄 저장</button></div>
+     <div class="border-t border-[#F2F3F5] pt-3"><div class="text-[13px] font-extrabold mb-1">여러 날 한 번에 입력</div><p class="text-[11px] text-[#8B95A1] mb-2">한 줄에 하루씩, 날짜 뒤에 조식·중식·석식을 적어요.<br>예) 10/21 조식: 밥, 국 중식: 카레, 샐러드 석식: 불고기, 김치</p><textarea id="menu-bulk" class="w-full bg-[#F5F6F8] rounded-xl p-3 text-[12px] outline-none h-28 resize-none"></textarea><button id="menu-bulk-save" onclick="saveBulk()" class="w-full mt-2 py-3 rounded-xl font-bold text-[14px] transition-colors" style="background:#E3E6EA;color:#6B7684">일괄 저장</button></div>
      <p class="text-[11px] text-[#8B95A1]">식단은 부대 밴드·더캠프 공지, 공공데이터포털의 '국방부 식단정보'에서 확인해 옮겨 적을 수 있어요.</p></div>
    </div></div></div>
 
@@ -739,6 +752,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 
 <script src="questions.js"></script>
 <script src="px.js"></script>
+<script src="route.js"></script>
 <script>
 /* ================= 설정: Supabase 프로젝트 값 입력 ================= */
 const SUPABASE_URL = 'https://fziblqwqtyhntmmvzhgv.supabase.co';
@@ -1844,7 +1858,7 @@ function renderQ(setInput) {
   q('qna-my-label').innerText = I.coupleMode ? '나의 답변' : '오늘의 기록 (나만 볼 수 있어요 🔒)';
   q('qna-partner-box').classList.toggle('hidden', !I.coupleMode);
   if (setInput || document.activeElement !== q('qna-ans')) q('qna-ans').value = qAns[me.id] || '';
-  q('qna-ans').placeholder = I.coupleMode ? '내가 답변해야 상대의 답변이 열려요.' : '오늘의 기록을 남겨보세요.';
+  q('qna-ans').placeholder = I.coupleMode ? '내가 답변해야 상대의 답변이 열려요.' : '오늘의 기록을 남겨보세요.'; paintQBtn();
   if (I.coupleMode) { const pa = qAns[me.partner_id], mine = qAns[me.id];
     q('qna-partner').innerHTML = !mine ? '<div class="text-center text-[#8B95A1] text-[12px]"><div class="text-2xl mb-1">🔒</div>먼저 내 답변을 저장해주세요</div>' : (pa ? esc(pa) : '<div class="text-center text-[#8B95A1] text-[12px]"><div class="text-2xl mb-1">⏳</div>상대방의 답변 대기중</div>'); }
 }
@@ -1866,13 +1880,21 @@ function deepLink() {
   else if (t && TABS.some(x => x[0] === t)) switchTab(t);
   if (t || sh) history.replaceState(null, '', location.pathname);
 }
+let qSaveSt = '';
+function paintQBtn(st) {
+  const b = q('qna-save'); if (!b) return; if (typeof st === 'string') qSaveSt = st;
+  const v = q('qna-ans').value.trim(), saved = v !== '' && v === String(qAns[me.id] || '').trim();
+  if (qSaveSt === 'saving') { b.innerText = '저장 중…'; b.style.cssText = 'background:#E3E6EA;color:#8B95A1'; return; }
+  if (qSaveSt === 'pend' && v) { b.innerText = '연결되면 저장돼요'; b.style.cssText = 'background:#E3E6EA;color:#8B95A1'; return; }
+  qSaveSt = ''; b.innerText = saved ? '저장됨' : '저장'; b.style.cssText = saved ? 'background:#191F28;color:#fff' : 'background:#E3E6EA;color:#8B95A1';
+}
 async function submitQ() {
-  const v = q('qna-ans').value.trim(); if (!v) return showAlert('알림', '내용을 작성해주세요.');
+  const v = q('qna-ans').value.trim(); if (!v) return showAlert('알림', '내용을 작성해주세요.'); paintQBtn('saving');
   const row = { user_id: me.id, day: qKey(), answer: v, updated_at: new Date().toISOString() };
   let error = null; try { ({ error } = await sb.from('qna_answers').upsert(row)); } catch (e) { error = e; }
-  if (error && (!navigator.onLine || /fetch|network/i.test(String(error.message || error)))) { pendAdd(row); return showAlert('저장 대기', '인터넷이 연결되면 자동으로 저장돼요.'); }
-  if (error) return showAlert('오류', esc(error.message));
-  await loadQ(); renderQ(false); showAlert('저장 완료', qInfo().coupleMode ? '답변이 저장됐어요! 상대방도 답하면 서로의 답이 공개돼요 💕' : '오늘의 기록이 저장됐어요. 나만 볼 수 있어요 🔒');
+  if (error && (!navigator.onLine || /fetch|network/i.test(String(error.message || error)))) { pendAdd(row); return paintQBtn('pend'); }
+  if (error) { paintQBtn(''); return showAlert('오류', esc(error.message)); }
+  await loadQ(); renderQ(false); paintQBtn('');
 }
 
 
@@ -2173,7 +2195,7 @@ const bD = [
  { id: 'im', n: 'iM뱅크', b: 5.0, max: 5.5, o: [{ n: '카드', r: .3, d: 'iM뱅크 카드 실적/발급' }, { n: '청약', r: .2, d: 'iM 주택청약 보유/가입' }] }];
 let savT;
 let savDirty = false;
-function paintSavBtn() { const b = q('sav-save'); if (!b) return; b.innerText = savDirty ? '저장하기' : '저장 완료'; b.style.cssText = savDirty ? 'background:#191F28;color:#fff' : 'background:#F0F3ED;color:var(--mil-green)'; }
+function paintSavBtn() { const b = q('sav-save'); if (!b) return; b.innerText = savDirty ? '저장하기' : '저장됨'; b.style.cssText = savDirty ? 'background:#E3E6EA;color:#6B7684' : 'background:#191F28;color:#fff'; }
 function markSav() { savDirty = true; q('sav-msg').innerText = '변경사항이 있어요. 저장하기를 눌러주세요.'; paintSavBtn(); }
 async function saveSavNow() {
   calcSav(); const payload = Object.assign({}, sav); const b = q('sav-save'); b.innerText = '저장 중…';
@@ -2298,39 +2320,36 @@ async function swFinish() {
 /* ---------- 경로 (이동수단 비교) ---------- */
 let gpsPt = null, routeCtx = null, routeSort = 'time';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-async function geocode(text) {
-  if (gpsPt && text === gpsPt.label) return { name: gpsPt.label, lat: gpsPt.lat, lng: gpsPt.lng };
-  const m = text.match(/^\s*(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)\s*$/); if (m) return { name: '현위치', lat: +m[1], lng: +m[2] };
-  const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&accept-language=ko&countrycodes=kr&q=' + encodeURIComponent(text));
-  const j = await r.json(); if (!j.length) return null; return { name: text, lat: +j[0].lat, lng: +j[0].lon };
-}
 function hav(a, b) { const d = x => x * Math.PI / 180, dl = d(b.lat - a.lat), dg = d(b.lng - a.lng), h = Math.sin(dl / 2) ** 2 + Math.cos(d(a.lat)) * Math.cos(d(b.lat)) * Math.sin(dg / 2) ** 2; return 12742 * Math.asin(Math.sqrt(h)); }
 const W = n => (Math.round(n / 100) * 100).toLocaleString('ko-KR') + '원';
 const TM = m => { m = Math.max(5, Math.round(m / 5) * 5); return m >= 60 ? `${Math.floor(m / 60)}시간${m % 60 ? ' ' + m % 60 + '분' : ''}` : `${m}분`; };
-function buildOpts(km, c) {
-  const road = km * 1.3, rail = km * 1.25, kk = m => `https://map.kakao.com/link/by/${m}/${encodeURIComponent(c.a.name)},${c.a.lat},${c.a.lng}/${encodeURIComponent(c.b.name)},${c.b.lat},${c.b.lng}`, o = [];
-  const KORAIL = ['코레일톡 시간표 ▶', 'https://www.letskorail.com'], SRT = ['SRT 시간표 ▶', 'https://etk.srail.kr'], KOBUS = ['고속버스 시간표 ▶', 'https://www.kobus.co.kr'], BUSTA = ['시외버스 시간표 ▶', 'https://www.bustago.or.kr'];
-  o.push({ n: '🚗 자가용 · 렌트', min: road / 80 * 60 + 10, cost: road * 142 + (road >= 40 ? road * 45 : 0), lines: [`유류비 약 ${W(road * 142)}${road >= 40 ? ` + 통행료 약 ${W(road * 45)}` : ''} (연비 12km/L 가정)`, `도로 약 ${Math.round(road)}km · 막히면 더 걸려요`], links: [['카카오맵 자동차 길찾기 ▶', kk('car')]] });
-  if (km < 60) o.push({ n: '🚕 택시', min: road / 45 * 60 + 5, cost: 4800 + Math.max(0, road - 1.6) * 1000, lines: ['기본요금+거리요금 단순 계산 (할증·지역별 차이)'], links: [['카카오맵 길찾기 ▶', kk('car')]] });
-  if (km < 45) o.push({ n: '🚇 시내버스 · 지하철', min: road / 20 * 60 + 15, cost: 1500 + Math.min(1500, Math.ceil(road / 10) * 150), lines: ['환승·대기 포함 단순 추정', '나라사랑카드 등 대중교통 청구할인 가능'], links: [['카카오맵 대중교통 ▶', kk('publictransit')]] });
-  if (km >= 30) { o.push({ n: '🚌 고속·시외버스 (일반)', min: road / 80 * 60 + 25, cost: road * 62, lines: ['군 장병 우대 10~20% 할인 가능(터미널 창구·티머니GO)', `할인 적용 시 약 ${W(road * 62 * 0.85)}`], links: [KOBUS, BUSTA] });
-    o.push({ n: '🚌 고속버스 (우등)', min: road / 80 * 60 + 25, cost: road * 93, lines: ['좌석이 넓은 우등 등급', `할인 적용 시 약 ${W(road * 93 * 0.85)}`], links: [KOBUS] }); }
-  if (km >= 90) { o.push({ n: '🚆 KTX · SRT', min: rail / 160 * 60 + 60, cost: rail * 143, lines: ['역 이동·대기 약 1시간 포함', `밀리패스 인증 시 약 10% 할인 → 약 ${W(rail * 143 * 0.9)}`, 'TMO 대상 휴가증(포상·위로·보상·청원)이면 무료'], links: [KORAIL, SRT] });
-    o.push({ n: '🚆 ITX · 무궁화호', min: rail / 74 * 60 + 40, cost: rail * 70, lines: ['KTX보다 느리지만 저렴', 'TMO 대상 휴가증이면 무료'], links: [KORAIL] }); }
-  return o;
+const fmtM = m => { m = Math.max(1, Math.round(m)); return m >= 60 ? `${Math.floor(m / 60)}시간${m % 60 ? ' ' + m % 60 + '분' : ''}` : `${m}분`; };
+function legLabel(x) {
+  if (x.t === 'walk') return '도보'; if (x.t === 'metro') return '전철'; if (x.t === 'bus' && !x.tx) return '버스';
+  return x.tx || '이동';
+}
+function rtLine(o, b) {
+  let h = `<div class="rt"><div class="rt-n"><i></i><span>${esc(routeCtx.a.name)}</span><em>출발</em></div>`;
+  o.legs.forEach((x, i) => {
+    if (x.from && i > 0 && o.legs[i - 1].to !== x.from) h += `<div class="rt-n"><i></i><span>${esc(x.from)}</span><em>승차</em></div>`;
+    h += `<div class="rt-r"><div class="rt-ic ${x.t}">${rico(x.t)}</div><div class="rt-t"><b>${legLabel(x)}</b> <span>${fmtM(x.min)}${x.tr ? ` · 환승 ${x.tr}회` : ''}</span></div>${x.cost ? `<div class="rt-c">${W(x.cost)}</div>` : ''}</div>`;
+    if (x.to && i < o.legs.length - 1 && x.to !== b.name) h += `<div class="rt-n"><i></i><span>${esc(x.to)}</span><em>${x.t === 'ktx' || x.big ? '도착' : '하차'}</em></div>`;
+  });
+  return h + `<div class="rt-n end"><i></i><span>${esc(b.name)}</span><em>도착</em></div></div>`;
 }
 function renderRoute() {
   const { a, b, km, opts } = routeCtx, box = q('route-results'), fast = Math.min(...opts.map(x => x.min)), cheap = Math.min(...opts.map(x => x.cost));
   const L = [...opts].sort((x, y) => routeSort === 'time' ? x.min - y.min : x.cost - y.cost);
   const nv = m => `https://map.naver.com/p/directions/${a.lng},${a.lat},${encodeURIComponent(a.name)}/${b.lng},${b.lat},${encodeURIComponent(b.name)}/-/${m}`;
-  box.innerHTML = `<div class="text-[12px] font-bold mb-1">${esc(a.name)} → ${esc(b.name)}</div><div class="text-[11px] text-[#8B95A1] mb-3">직선 약 ${Math.round(km)}km · 아래는 <b>예상치</b>예요. 실제 출발 시각·요금은 각 시간표 링크에서 확인하세요.</div>
-  <div class="flex gap-2 mb-3"><button onclick="routeSort='time';renderRoute()" class="flex-1 py-2 rounded-lg text-[12px] font-bold ${routeSort === 'time' ? 'bg-[#191F28] text-white' : 'bg-[#F5F6F8] text-[#4E5968]'}">⏱ 빠른 순</button><button onclick="routeSort='cost';renderRoute()" class="flex-1 py-2 rounded-lg text-[12px] font-bold ${routeSort === 'cost' ? 'bg-[#191F28] text-white' : 'bg-[#F5F6F8] text-[#4E5968]'}">💰 저렴한 순</button></div>
-  <div class="space-y-3">${L.map((x, i) => `<div class="bg-[#F5F6F8] rounded-2xl p-4 border border-[#E5E8EB]"><div class="flex justify-between items-start mb-2"><div class="text-[14px] font-extrabold">${i + 1}번 · ${x.n}</div><div class="flex gap-1">${x.min === fast ? '<span class="text-[10px] font-bold bg-[#191F28] text-white px-2 py-0.5 rounded-full">최단</span>' : ''}${x.cost === cheap ? '<span class="text-[10px] font-bold bg-[var(--mil-green)] text-white px-2 py-0.5 rounded-full">최저가</span>' : ''}</div></div>
-  <div class="flex gap-4 mb-2"><div><div class="text-[10px] text-[#8B95A1]">예상 소요</div><div class="text-[16px] font-black">${TM(x.min)}</div></div><div><div class="text-[10px] text-[#8B95A1]">예상 비용</div><div class="text-[16px] font-black">${W(x.cost)}</div></div></div>
+  box.innerHTML = `<div class="text-[12px] font-bold mb-1">${esc(a.name)} → ${esc(b.name)}</div><div class="text-[11px] text-[#8B95A1] mb-3">직선 약 ${Math.round(km)}km · 출발지에서 도착지까지 <b>문 앞~문 앞 전체 시간</b> 기준 예상치예요. 실제 출발 시각·요금은 각 시간표 링크에서 확인하세요.</div>
+  <div class="flex gap-2 mb-3"><button onclick="routeSort='time';renderRoute()" class="rt-sort ${routeSort === 'time' ? 'on' : ''}">${rico('clock')}빠른 순</button><button onclick="routeSort='cost';renderRoute()" class="rt-sort ${routeSort === 'cost' ? 'on' : ''}">${rico('wallet')}저렴한 순</button></div>
+  <div class="space-y-3">${L.map((x, i) => `<div class="bg-[#F5F6F8] rounded-2xl p-4 border border-[#E5E8EB]"><div class="flex justify-between items-start mb-3"><div class="text-[14px] font-extrabold flex items-center gap-1.5"><span class="rt-hd">${rico(x.icon)}</span>${i + 1}번 · ${esc(x.n)}</div><div class="flex gap-1">${x.min === fast ? '<span class="text-[10px] font-bold bg-[#191F28] text-white px-2 py-0.5 rounded-full">최단</span>' : ''}${x.cost === cheap ? '<span class="text-[10px] font-bold bg-[var(--mil-green)] text-white px-2 py-0.5 rounded-full">최저가</span>' : ''}</div></div>
+  <div class="grid gap-1 mb-1 rt-sum" style="grid-template-columns:1.35fr 1.15fr .65fr .85fr"><div><i>총 소요</i><b>${fmtM(x.min)}</b></div><div><i>총 비용</i><b>${W(x.cost)}</b></div><div><i>환승</i><b>${x.tr}회</b></div><div><i>도보</i><b>${x.walk ? fmtM(x.walk) : '없음'}</b></div></div>
+  ${rtLine(x, b)}
   <div class="text-[11px] text-[#4E5968] space-y-0.5 mb-2">${x.lines.map(l => `<div>· ${esc(l)}</div>`).join('')}</div>
   <div class="flex flex-wrap gap-2">${x.links.map(l => `<a target="_blank" rel="noopener" href="${esc(l[1])}" class="text-[11px] font-bold bg-white border border-[#E5E8EB] rounded-lg px-3 py-1.5 text-[var(--mil-green)]">${l[0]}</a>`).join('')}</div></div>`).join('')}</div>
-  <div class="grid grid-cols-2 gap-2 mt-3"><a target="_blank" rel="noopener" href="https://map.kakao.com/link/by/publictransit/${encodeURIComponent(a.name)},${a.lat},${a.lng}/${encodeURIComponent(b.name)},${b.lat},${b.lng}" class="block text-center bg-[#FEE500] text-[#191F28] rounded-xl py-3 text-[12px] font-bold">카카오맵 ▶</a><a target="_blank" rel="noopener" href="${nv('transit')}" class="block text-center bg-[#03C75A] text-white rounded-xl py-3 text-[12px] font-bold">네이버지도 ▶</a></div>
-  <p class="text-[10px] text-[#8B95A1] mt-3">※ 시간·요금은 거리 기반 단순 추정이에요. 열차·버스 실제 출발 시각과 정확한 요금은 위 링크(코레일톡·SRT·고속버스·시외버스)에서 확인하세요.</p>`;
+  <div class="grid grid-cols-2 gap-2 mt-3"><a target="_blank" rel="noopener" href="https://map.kakao.com/link/by/publictransit/${encodeURIComponent(a.name)},${a.lat},${a.lng}/${encodeURIComponent(b.name)},${b.lat},${b.lng}" class="block text-center bg-[#FEE500] text-[#191F28] rounded-xl py-3 text-[12px] font-bold">카카오맵에서 정확히 보기</a><a target="_blank" rel="noopener" href="${nv('transit')}" class="block text-center bg-[#03C75A] text-white rounded-xl py-3 text-[12px] font-bold">네이버지도에서 보기</a></div>
+  <p class="text-[10px] text-[#8B95A1] mt-3">※ 구간별 시간·요금·환승 횟수는 거리 기반 추정이에요. 열차·버스 실제 출발 시각과 정확한 요금, 막차는 위 링크(코레일톡·SRT·고속버스·시외버스·지도 앱)에서 확인하세요.</p>`;
 }
 const picks = { start: null, end: null, unit: null }, sugCache = {}, sugT = {};
 const inId = w => w === 'unit' ? 'set-unit-addr' : 'route-' + w;
@@ -2341,29 +2360,53 @@ function kakaoReady() {
     sc.onload = () => kakao.maps.load(() => res(true)); sc.onerror = () => res(false); document.head.appendChild(sc);
   });
 }
+const nomName = x => (x.namedetails && (x.namedetails['name:ko'] || x.namedetails.name)) || x.name || '';
+const nomAddr = x => String(x.display_name || '').split(',').map(t => t.trim()).filter(t => t && !/^\d{5}$/.test(t) && t !== '대한민국');
+async function nomSearch(t) {
+  const r = await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=8&addressdetails=0&namedetails=1&accept-language=ko&countrycodes=kr&q=' + encodeURIComponent(t));
+  return (await r.json()).map(x => { const ad = nomAddr(x); return { name: nomName(x) || ad[0] || t, addr: ad.slice(0, 4).join(' '), lat: +x.lat, lng: +x.lon }; });
+}
+async function photonSearch(t) {
+  const r = await fetch('https://photon.komoot.io/api/?limit=8&bbox=124.5,33,131.9,38.7&q=' + encodeURIComponent(t));
+  return ((await r.json()).features || []).filter(f => !f.properties.countrycode || f.properties.countrycode === 'KR').map(f => { const p = f.properties, st = p.street ? p.street + (p.housenumber ? ' ' + p.housenumber : '') : '';
+    return { name: p.name || st || p.district || p.city || t, addr: [p.state, p.county || p.city, p.district || p.suburb, st && st !== p.name ? st : ''].filter(Boolean).join(' '), lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0] }; });
+}
+function qVariants(t) {
+  const v = [t], sp = t.replace(/([가-힣])(\d)/g, '$1 $2').replace(/(\d)([가-힣])/g, '$1 $2'), w = t.split(/\s+/);
+  if (sp !== t) v.push(sp);
+  if (!/\d|아파트|역|터미널|대학|병원|학교|공원|시장/.test(t)) v.push(t + ' 아파트');
+  if (w.length > 2) v.push(w.slice(-2).join(' '), w.slice(0, 2).join(' '));
+  if (w.length > 1) v.push(w[w.length - 1]);
+  return [...new Set(v)].slice(0, 5);
+}
 async function searchPlaces(text) {
   if (await kakaoReady()) {
     const st = kakao.maps.services.Status, kw = await new Promise(r => new kakao.maps.services.Places().keywordSearch(text, (d, s) => r(s === st.OK ? d.slice(0, 8).map(x => ({ name: x.place_name, addr: x.road_address_name || x.address_name, lat: +x.y, lng: +x.x })) : [])));
     if (kw.length) return kw;
     return new Promise(r => new kakao.maps.services.Geocoder().addressSearch(text, (d, s) => r(s === st.OK ? d.slice(0, 6).map(x => ({ name: x.road_address ? x.road_address.address_name : x.address_name, addr: x.address_name, lat: +x.y, lng: +x.x })) : [])));
   }
-  const nom = async t => { const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=6&accept-language=ko&countrycodes=kr&q=' + encodeURIComponent(t)); return (await r.json()).map(x => ({ name: x.name || x.display_name.split(',')[0], addr: x.display_name.split(',').slice(0, 4).join(','), lat: +x.lat, lng: +x.lon })); };
-  let r = await nom(text);
-  if (!r.length && text.includes(' ')) { await sleep(1100); r = await nom(text.split(/\s+/).slice(-2).join(' ')); }
-  return r;
+  const out = [], add = L => (L || []).forEach(x => { if (isFinite(x.lat) && isFinite(x.lng) && !out.some(o => Math.abs(o.lat - x.lat) < .0007 && Math.abs(o.lng - x.lng) < .0007)) out.push(x); });
+  const vs = qVariants(text);
+  for (let i = 0; i < vs.length && out.length < 3; i++) {
+    const [a, b] = await Promise.allSettled([nomSearch(vs[i]), photonSearch(vs[i])]);
+    add(a.value); add(b.value);
+    if (out.length < 3 && i < vs.length - 1) await sleep(1100);
+  }
+  return out.slice(0, 8);
 }
 function placeInput(w) {
-  picks[w] = null; clearTimeout(sugT[w]); const v = q(inId(w)).value.trim(), box = q('sug-' + w);
+  picks[w] = null; clearTimeout(sugT[w]); routeBtn(); const v = q(inId(w)).value.trim(), box = q('sug-' + w);
   if (v.length < 2) { box.classList.add('hidden'); return; }
   sugT[w] = setTimeout(async () => {
     box.classList.remove('hidden'); box.innerHTML = '<div class="p-3 text-[12px] text-[#8B95A1]">검색 중...</div>';
     let r = []; try { r = await searchPlaces(v); } catch (e) { }
     if (q(inId(w)).value.trim() !== v) return; sugCache[w] = r;
     box.innerHTML = r.length ? r.map((x, i) => `<button onclick="pickPlace('${w}',${i})" class="w-full text-left px-3 py-2.5 border-b border-[#F2F3F5] active:bg-[#F5F6F8]"><div class="text-[13px] font-bold">${esc(x.name)}</div><div class="text-[11px] text-[#8B95A1]">${esc(x.addr || '')}</div></button>`).join('')
-      : `<div class="p-3 text-[12px] text-[#8B95A1]">검색 결과가 없어요. 동·도로명이나 건물 이름을 바꿔 보세요.${KAKAO_JS_KEY ? '' : '<br>※ 아파트·상가 이름은 카카오 키를 연결하면 훨씬 정확해져요.'}</div>`;
+      : `<div class="p-3 text-[12px] text-[#8B95A1]">검색 결과가 없어요. ‘연천군 신서면’처럼 시·군·동까지 넣거나 도로명(예: 동내로 970)으로 바꿔 보세요.<a target="_blank" rel="noopener" href="https://map.kakao.com/?q=${encodeURIComponent(v)}" class="block mt-1.5 font-bold text-[var(--mil-green)]">카카오맵에서 ‘${esc(v)}’ 찾아보기</a></div>`;
   }, 450);
 }
-function pickPlace(w, i) { const x = sugCache[w][i], label = x.name; q(inId(w)).value = label; picks[w] = { label, name: x.name, lat: x.lat, lng: x.lng }; q('sug-' + w).classList.add('hidden'); }
+function pickPlace(w, i) { const x = sugCache[w][i], label = x.name; q(inId(w)).value = label; picks[w] = { label, name: x.name, lat: x.lat, lng: x.lng }; q('sug-' + w).classList.add('hidden'); routeBtn(); }
+function routeBtn() { const b = q('route-go'); if (!b) return; const ok = q('route-start').value.trim() && q('route-end').value.trim() && q('route-start').value !== '위치 확인 중...'; b.disabled = !ok; b.className = 'w-full py-3 rounded-xl font-bold text-[14px] ' + (ok ? 'bg-[#191F28] text-white' : 'bg-[#E5E8EB] text-[#A0A7B1]'); }
 async function resolvePlace(w) {
   const text = q(inId(w)).value.trim(), p = picks[w]; if (p && p.label === text) return { name: p.name, lat: p.lat, lng: p.lng };
   const c = text.match(/^\s*(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)\s*$/); if (c) return { name: '현위치', lat: +c[1], lng: +c[2] };
@@ -2371,7 +2414,7 @@ async function resolvePlace(w) {
 }
 async function calcRoute() {
   const s = q('route-start').value.trim(), e = q('route-end').value.trim(); ['start', 'end'].forEach(w => q('sug-' + w).classList.add('hidden'));
-  if (!s || !e) return showAlert('알림', '출발지와 도착지를 입력해주세요.');
+  if (!s || !e) return;
   const box = q('route-results'); box.classList.remove('hidden'); box.innerHTML = '<div class="text-[12px] text-[#8B95A1] text-center py-3">이동 방법 비교 중...</div>';
   try {
     const a = await resolvePlace('start'); const b = await resolvePlace('end');
@@ -2386,8 +2429,8 @@ function getGPS() {
   navigator.geolocation.getCurrentPosition(async p => {
     const lat = p.coords.latitude, lng = p.coords.longitude; let label = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
     try { const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&accept-language=ko&lat=${lat}&lon=${lng}`); const j = await r.json(); if (j.display_name) { const t = j.display_name.split(',').map(x => x.trim()).filter(x => x && !/^\d+$/.test(x) && x !== '대한민국'); label = t.slice(0, 3).reverse().join(' '); } } catch (e) { }
-    q('route-start').value = label; picks.start = { label, name: label, lat, lng };
-  }, () => { q('route-start').value = ''; showAlert('알림', '위치 권한을 허용해주세요.'); }, { enableHighAccuracy: true, timeout: 10000 });
+    q('route-start').value = label; picks.start = { label, name: label, lat, lng }; routeBtn();
+  }, () => { q('route-start').value = ''; routeBtn(); showAlert('알림', '위치 권한을 허용해주세요.'); }, { enableHighAccuracy: true, timeout: 10000 });
 }
 
 /* ---------- 식단표 ---------- */
@@ -2430,7 +2473,7 @@ async function importMenuCsv(inp) {
   const out = Object.values(map).sort((a, b) => a.menu_date.localeCompare(b.menu_date)); if (!out.length) return showAlert('알림', '날짜를 읽을 수 있는 줄이 없어요.');
   for (let i = 0; i < out.length; i += 200) { const { error } = await sb.from('menus').upsert(out.slice(i, i + 200), { onConflict: 'created_by,menu_date' }); if (error) return showAlert('오류', esc(error.message)); }
   out.forEach(r => menus[r.menu_date] = r); menuEdit = false; menuDate = out.find(r => r.menu_date >= ymd(new Date())) ? out.find(r => r.menu_date >= ymd(new Date())).menu_date : out[out.length - 1].menu_date; renderMenu();
-  showAlert('가져오기 완료', `${out.length}일치 식단을 등록했어요.<br>${out[0].menu_date} ~ ${out[out.length - 1].menu_date}`);
+  { const t = q('menu-import-lbl'); if (t) { const o = t.dataset.o || (t.dataset.o = t.childNodes[0].nodeValue); t.childNodes[0].nodeValue = `${out.length}일치 등록됨`; t.style.background = '#191F28'; setTimeout(() => { t.childNodes[0].nodeValue = o; t.style.background = ''; }, 2600); } }
 }
 function parseBulk(txt) {
   const rows = [], now = new Date();
@@ -2443,10 +2486,11 @@ function parseBulk(txt) {
   });
   return rows;
 }
+function flashBtn(id, txt) { const b = q(id); if (!b) return; const o = b.innerText, st = b.getAttribute('style'); b.innerText = txt; b.style.background = '#191F28'; b.style.color = '#fff'; clearTimeout(b._ft); b._ft = setTimeout(() => { b.innerText = o; b.setAttribute('style', st); }, 2600); }
 async function saveBulk() {
   const rows = parseBulk(q('menu-bulk').value); if (!rows.length) return showAlert('알림', '읽을 수 있는 줄이 없어요. 예) 10/21 조식: 밥, 국 중식: 카레 석식: 불고기');
   const { error } = await sb.from('menus').upsert(rows, { onConflict: 'created_by,menu_date' }); if (error) return showAlert('오류', esc(error.message));
-  rows.forEach(r => menus[r.menu_date] = r); q('menu-bulk').value = ''; renderMenu(); showAlert('저장 완료', `${rows.length}일치 식단을 저장했어요.`);
+  rows.forEach(r => menus[r.menu_date] = r); q('menu-bulk').value = ''; renderMenu(); flashBtn('menu-bulk-save', `${rows.length}일치 저장됨`);
 }
 
 /* ---------- 혜택 · 이벤트 ---------- */
