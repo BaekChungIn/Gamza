@@ -1961,17 +1961,40 @@ const GT = { '크림': ['#F5F0E4', '#8A7440'], '세럼': ['#E8F2EE', '#4F8A74'],
 const GCATS = ['전체', '크림', '세럼', '토너·패드', '마스크', '선케어', '클렌징', '트러블', '색조', '남성', '헤어', '바디', '립·향수'];
 const pxI = (window.PXI || []).map((a, i) => ({ i, b: a[0], n: a[1], c: a[2], p: a[3], k: a[0] + ' ' + a[1] }));
 const pxK = {}; pxI.forEach(x => pxK[x.k] = x);
-let gm = { q: '', cat: '전체', seg: 'all', lim: 60, wish: [], cart: [], asks: [], rcp: [], askTab: 'in', askFrom: null, saveT: null, glT: [], poll: null };
+let gm = { q: '', cat: '전체', seg: 'all', lim: 60, wish: [], cart: [], xw: [], xc: [], asks: [], rcp: [], askTab: 'in', askFrom: null, saveT: null, glT: [], poll: null };
 const gmKey = () => 'gm:' + (me ? me.id : '');
 async function loadGm() {
   let L = null; try { L = JSON.parse(localStorage.getItem(gmKey())); } catch (e) { }
-  try { const { data, error } = await sb.from('px_lists').select('*').eq('user_id', me.id).maybeSingle(); if (!error && data) L = { wish: data.wish || [], cart: data.cart || [] }; } catch (e) { }
-  L = L || {}; gm.wish = (L.wish || []).filter(k => pxK[k]); gm.cart = (L.cart || []).filter(k => pxK[k]);
+  let srv = null, ok = false;
+  try { const { data, error } = await sb.from('px_lists').select('*').eq('user_id', me.id).maybeSingle(); if (!error) { ok = true; srv = data; } else console.warn('px_lists', error.message); } catch (e) { }
+  const lt = (L && L.t) || 0, st = srv && srv.updated_at ? Date.parse(srv.updated_at) : 0;
+  let use = L, push = false;
+  if (srv && (!L || L.dirty !== true || st >= lt)) use = { wish: srv.wish || [], cart: srv.cart || [], t: st };
+  else if (L && ok && (L.dirty || !srv)) push = true;
+  use = use || {};
+  const W = use.wish || [], C = use.cart || [];
+  gm.wish = W.filter(k => pxK[k]); gm.cart = C.filter(k => pxK[k]);
+  gm.xw = W.filter(k => !pxK[k]); gm.xc = C.filter(k => !pxK[k]);
+  gmLocal(push, use.t || Date.now());
+  if (push) gmPush();
+}
+function gmLocal(dirty, t) { try { localStorage.setItem(gmKey(), JSON.stringify({ wish: gm.wish.concat(gm.xw || []), cart: gm.cart.concat(gm.xc || []), t: t || Date.now(), dirty: !!dirty })); } catch (e) { } }
+async function gmPush() {
+  if (!me) return; clearTimeout(gm.saveT); gm.saveT = null;
+  const t = new Date().toISOString();
+  try {
+    const { error } = await sb.from('px_lists').upsert({ user_id: me.id, wish: gm.wish.concat(gm.xw || []), cart: gm.cart.concat(gm.xc || []), updated_at: t });
+    if (!error) gmLocal(false, Date.parse(t)); else console.warn('px_lists save', error.message);
+  } catch (e) { }
 }
 function saveGm() {
-  try { localStorage.setItem(gmKey(), JSON.stringify({ wish: gm.wish, cart: gm.cart })); } catch (e) { }
-  clearTimeout(gm.saveT); gm.saveT = setTimeout(async () => { try { await sb.from('px_lists').upsert({ user_id: me.id, wish: gm.wish, cart: gm.cart, updated_at: new Date().toISOString() }); } catch (e) { } }, 700);
+  gmLocal(true, Date.now());
+  clearTimeout(gm.saveT); gm.saveT = setTimeout(gmPush, 250);
 }
+function gmFlush() { if (gm.saveT) gmPush(); }
+document.addEventListener('visibilitychange', () => { if (document.hidden) gmFlush(); });
+window.addEventListener('pagehide', gmFlush);
+window.addEventListener('online', () => { try { const L = JSON.parse(localStorage.getItem(gmKey())); if (L && L.dirty) gmPush(); } catch (e) { } });
 const CHK = '<svg viewBox="0 0 24 24"><polyline points="4 12.5 9.5 18 20 6.5"/></svg>', BAGI = '<svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>';
 const HEART = '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
 function gmList() {
