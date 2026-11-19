@@ -228,13 +228,13 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 .rt-t{flex:1;min-width:0;font-size:12.5px}.rt-t b{font-weight:800}.rt-t span{color:#4E5968;font-weight:600}.rt-c{font-size:12px;font-weight:800;color:#191F28}
 .rl{position:fixed;inset:0;z-index:95;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:translateY(0);transition:transform .75s cubic-bezier(.7,0,.2,1)}
 .rl.hidden{display:none}.rl.rl-out{transform:translateY(-102%)}
-.rl-car{position:relative;width:min(82vw,340px);opacity:0;transform:translateY(14px);animation:rlUp .6s cubic-bezier(.22,1,.36,1) .05s forwards}
-@keyframes rlUp{to{opacity:1;transform:none}}
+.rl-car{position:relative;width:min(82vw,340px);animation:rlUp .6s cubic-bezier(.22,1,.36,1) .05s both}
+@keyframes rlUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .rl-body{display:block;width:100%}
 .rl-w{position:absolute;width:17%;height:auto;transform-origin:50% 50%;animation:rlSpin .5s linear infinite}
 @keyframes rlSpin{to{transform:rotate(-360deg)}}
-.rl-t{margin-top:26px;font-size:21px;font-weight:800;letter-spacing:-.5px;color:#191F28;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Apple SD Gothic Neo",Pretendard,sans-serif;opacity:0;animation:rlUp .6s ease .25s forwards}
-.rl-s{margin-top:7px;font-size:13.5px;font-weight:500;color:#8B95A1;opacity:0;animation:rlUp .6s ease .4s forwards}
+.rl-t{margin-top:26px;font-size:21px;font-weight:800;letter-spacing:-.5px;color:#191F28;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Apple SD Gothic Neo",Pretendard,sans-serif;animation:rlUp .6s ease .25s both}
+.rl-s{margin-top:7px;font-size:13.5px;font-weight:500;color:#8B95A1;animation:rlUp .6s ease .4s both}
 .rl-s i{font-style:normal;display:inline-block;animation:rlDot 1.2s infinite}.rl-s i:nth-child(2){animation-delay:.2s}.rl-s i:nth-child(3){animation-delay:.4s}
 @keyframes rlDot{0%,60%,100%{opacity:.2}30%{opacity:1}}
 .rt-anim .rt-fade{animation:rtIn .7s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--i,0)*110ms + 120ms)}
@@ -2441,7 +2441,7 @@ async function calcRoute() {
   if (!s || !e) return;
   if (routeBusy) return; routeBusy = true;
   const box = q('route-results'), err = q('route-err'), ov = q('rt-load'), t0 = Date.now(); let ok = false; err.innerHTML = ''; box.innerHTML = '';
-  ov.classList.remove('hidden', 'rl-out'); void ov.offsetWidth; document.activeElement && document.activeElement.blur();
+  rlReset(ov); ov.classList.remove('hidden'); document.activeElement && document.activeElement.blur();
   try {
     const a = await resolvePlace('start'); const b = await resolvePlace('end');
     if (!a || !b) { const bad = !a ? s : e; err.innerHTML = `<div class="bg-[#FFF0F3] text-[#D94867] text-[12px] font-bold rounded-xl p-3 mt-3 mb-2">'${esc(bad)}' 위치를 찾지 못했어요. 입력칸 아래 검색 목록에서 항목을 직접 골라주세요.</div><a target="_blank" rel="noopener" href="https://map.kakao.com/?q=${encodeURIComponent(bad)}" class="block bg-[#F5F6F8] rounded-xl p-3 text-[12px] font-bold text-[var(--mil-green)]">카카오맵에서 '${esc(bad)}' 검색 ▶</a>`; }
@@ -2451,9 +2451,11 @@ async function calcRoute() {
   finally {
     await sleep(Math.max(0, 2300 - (Date.now() - t0)));
     if (ok) { routeAnim = true; renderRoute(); openM('modal-route'); q('route-body').scrollTop = 0; await sleep(350); }
-    ov.classList.add('rl-out'); await sleep(800); ov.classList.add('hidden'); ov.classList.remove('rl-out'); routeBusy = false;
+    ov.classList.add('rl-out'); await sleep(800); ov.classList.add('hidden'); routeBusy = false;
   }
 }
+const RL_HTML = '<div class="rl-car"><img src="rl_car.png" class="rl-body"><img src="rl_wheelL.png" class="rl-w" style="left:8.93%;top:61.2%"><img src="rl_wheelR.png" class="rl-w" style="left:69.06%;top:61.2%"></div><div class="rl-t">집으로 가는 길을 찾고 있어요</div><div class="rl-s">가장 좋은 방법을 비교하는 중<i>.</i><i>.</i><i>.</i></div>';
+function rlReset(ov) { ov.style.transition = 'none'; ov.classList.remove('rl-out', 'hidden'); ov.classList.add('hidden'); ov.innerHTML = RL_HTML; void ov.offsetWidth; ov.style.transition = ''; }
 function getGPS() {
   if (!navigator.geolocation) return showAlert('알림', '위치 기능을 지원하지 않는 기기입니다.');
   q('route-start').value = '위치 확인 중...';
