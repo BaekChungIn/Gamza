@@ -226,6 +226,21 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 .rt-ic{width:26px;height:26px;border-radius:9px;background:#fff;border:1px solid #E5E8EB;display:flex;align-items:center;justify-content:center;color:#4E5968;position:relative;z-index:1;margin-left:-4px}.rt-ic .ri{width:16px;height:16px}
 .rt-ic.ktx{color:#2F6FD0}.rt-ic.metro{color:#3F7F5F}.rt-ic.bus{color:#C27A1A}.rt-ic.walk{color:#6B7684}
 .rt-t{flex:1;min-width:0;font-size:12.5px}.rt-t b{font-weight:800}.rt-t span{color:#4E5968;font-weight:600}.rt-c{font-size:12px;font-weight:800;color:#191F28}
+.rl{position:fixed;inset:0;z-index:95;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:translateY(0);transition:transform .75s cubic-bezier(.7,0,.2,1)}
+.rl.hidden{display:none}.rl.rl-out{transform:translateY(-102%)}
+.rl-car{width:190px;opacity:0;transform:translateY(14px);animation:rlUp .6s cubic-bezier(.22,1,.36,1) .05s forwards}
+@keyframes rlUp{to{opacity:1;transform:none}}
+.rl-w{transform-box:fill-box;transform-origin:center;animation:rlSpin .55s linear infinite}
+@keyframes rlSpin{to{transform:rotate(360deg)}}
+.rl-road{width:150px;height:3px;border-radius:2px;background:#E5E8EB;margin-top:6px}
+.rl-t{margin-top:26px;font-size:21px;font-weight:800;letter-spacing:-.5px;color:#191F28;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Apple SD Gothic Neo",Pretendard,sans-serif;opacity:0;animation:rlUp .6s ease .25s forwards}
+.rl-s{margin-top:7px;font-size:13.5px;font-weight:500;color:#8B95A1;opacity:0;animation:rlUp .6s ease .4s forwards}
+.rl-s i{font-style:normal;display:inline-block;animation:rlDot 1.2s infinite}.rl-s i:nth-child(2){animation-delay:.2s}.rl-s i:nth-child(3){animation-delay:.4s}
+@keyframes rlDot{0%,60%,100%{opacity:.2}30%{opacity:1}}
+.rt-anim .rt-fade{animation:rtIn .7s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--i,0)*110ms + 120ms)}
+.rt-anim .rt-r,.rt-anim .rt-n{animation:rtRow .55s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--i,0)*110ms + var(--k,0)*75ms + 450ms)}
+@keyframes rtIn{from{opacity:0;transform:translateY(36px)}to{opacity:1;transform:none}}
+@keyframes rtRow{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .gl-tabw{position:sticky;top:0;z-index:5;margin:0 -18px;padding:8px 18px 10px;background:linear-gradient(#fff 78%,rgba(255,255,255,0))}
 .gl-tabs{display:flex;gap:4px;padding:4px;border-radius:15px;background:#ECEEF1}
 .gl-tabs button{flex:1;height:38px;border-radius:12px;font-size:14px;font-weight:700;color:#6B7684;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s}
@@ -674,6 +689,13 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
  <div class="relative flex items-center justify-between px-4 pb-3" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeAsks()" class="w-10 h-10 rounded-full bg-white border border-[#E5E8EB] font-bold text-[18px]" aria-label="뒤로">‹</button><div id="gma-title" class="ios-t" style="top:max(14px,env(safe-area-inset-top));line-height:40px">선물 조르기</div><div class="w-10"></div></div>
  <div class="px-4 pb-3"><div id="gma-tabs" class="gm-seg"></div></div>
  <div id="gma-list" class="flex-1 overflow-y-auto no-scrollbar px-4 pb-8 space-y-3"></div>
+</div>
+<div id="rt-load" class="rl hidden">
+ <svg class="rl-car" viewBox="0 0 200 100" fill="none"><path d="M18 64c0-6 3-10 9-12l16-5 17-18c3-3 6-5 11-5h46c6 0 10 2 14 6l16 17 21 5c6 2 9 6 9 12v8c0 3-2 5-5 5h-12" stroke="#191F28" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M66 78h66M18 78h13" stroke="#191F28" stroke-width="5" stroke-linecap="round"/><path d="M60 47l11-12c2-2 4-3 7-3h20v15zM105 32h14c3 0 5 1 7 3l11 12h-32z" fill="#E9EDF1" stroke="#191F28" stroke-width="4" stroke-linejoin="round"/>
+  <g transform="translate(48 79)"><g class="rl-w"><circle r="15" fill="#fff" stroke="#191F28" stroke-width="5"/><circle r="3" fill="#191F28"/><path d="M0-12v7M0 5v7M-12 0h7M5 0h7M-8.5-8.5l5 5M3.5 3.5l5 5M8.5-8.5l-5 5M-3.5 3.5l-5 5" stroke="#191F28" stroke-width="2.6" stroke-linecap="round"/></g></g>
+  <g transform="translate(150 79)"><g class="rl-w"><circle r="15" fill="#fff" stroke="#191F28" stroke-width="5"/><circle r="3" fill="#191F28"/><path d="M0-12v7M0 5v7M-12 0h7M5 0h7M-8.5-8.5l5 5M3.5 3.5l5 5M8.5-8.5l-5 5M-3.5 3.5l-5 5" stroke="#191F28" stroke-width="2.6" stroke-linecap="round"/></g></g></svg>
+ <div class="rl-road"></div>
+ <div class="rl-t">집으로 가는 길을 찾고 있어요</div><div class="rl-s">가장 좋은 방법을 비교하는 중<i>.</i><i>.</i><i>.</i></div>
 </div>
 <!-- 굿맨 변신 -->
 <div id="modal-glow" class="fixed inset-0 z-[90] hidden flex-col gl-s0" style="background:#fff">
@@ -2318,7 +2340,7 @@ async function swFinish() {
 }
 
 /* ---------- 경로 (이동수단 비교) ---------- */
-let gpsPt = null, routeCtx = null, routeSort = 'time';
+let gpsPt = null, routeCtx = null, routeSort = 'time', routeBusy = false, routeAnim = false;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function hav(a, b) { const d = x => x * Math.PI / 180, dl = d(b.lat - a.lat), dg = d(b.lng - a.lng), h = Math.sin(dl / 2) ** 2 + Math.cos(d(a.lat)) * Math.cos(d(b.lat)) * Math.sin(dg / 2) ** 2; return 12742 * Math.asin(Math.sqrt(h)); }
 const W = n => (Math.round(n / 100) * 100).toLocaleString('ko-KR') + '원';
@@ -2328,24 +2350,25 @@ function legLabel(x) {
   if (x.t === 'walk') return '도보'; if (x.t === 'metro') return '전철'; if (x.t === 'bus' && !x.tx) return '버스';
   return x.tx || '이동';
 }
-function rtLine(o, b) {
-  let h = `<div class="rt"><div class="rt-n"><i></i><span>${esc(routeCtx.a.name)}</span><em>출발</em></div>`;
+function rtLine(o, b, ci) {
+  let k = 0, h = `<div class="rt" style="--i:${ci}"><div class="rt-n" style="--k:${k++}"><i></i><span>${esc(routeCtx.a.name)}</span><em>출발</em></div>`;
   o.legs.forEach((x, i) => {
-    if (x.from && i > 0 && o.legs[i - 1].to !== x.from) h += `<div class="rt-n"><i></i><span>${esc(x.from)}</span><em>승차</em></div>`;
-    h += `<div class="rt-r"><div class="rt-ic ${x.t}">${rico(x.t)}</div><div class="rt-t"><b>${legLabel(x)}</b> <span>${fmtM(x.min)}${x.tr ? ` · 환승 ${x.tr}회` : ''}</span></div>${x.cost ? `<div class="rt-c">${W(x.cost)}</div>` : ''}</div>`;
-    if (x.to && i < o.legs.length - 1 && x.to !== b.name) h += `<div class="rt-n"><i></i><span>${esc(x.to)}</span><em>${x.t === 'ktx' || x.big ? '도착' : '하차'}</em></div>`;
+    if (x.from && i > 0 && o.legs[i - 1].to !== x.from) h += `<div class="rt-n" style="--k:${k++}"><i></i><span>${esc(x.from)}</span><em>승차</em></div>`;
+    h += `<div class="rt-r" style="--k:${k++}"><div class="rt-ic ${x.t}">${rico(x.t)}</div><div class="rt-t"><b>${legLabel(x)}</b> <span>${fmtM(x.min)}${x.tr ? ` · 환승 ${x.tr}회` : ''}</span></div>${x.cost ? `<div class="rt-c">${W(x.cost)}</div>` : ''}</div>`;
+    if (x.to && i < o.legs.length - 1 && x.to !== b.name) h += `<div class="rt-n" style="--k:${k++}"><i></i><span>${esc(x.to)}</span><em>${x.t === 'ktx' || x.big ? '도착' : '하차'}</em></div>`;
   });
-  return h + `<div class="rt-n end"><i></i><span>${esc(b.name)}</span><em>도착</em></div></div>`;
+  return h + `<div class="rt-n end" style="--k:${k++}"><i></i><span>${esc(b.name)}</span><em>도착</em></div></div>`;
 }
 function renderRoute() {
   const { a, b, km, opts } = routeCtx, box = q('route-results'), fast = Math.min(...opts.map(x => x.min)), cheap = Math.min(...opts.map(x => x.cost));
   const L = [...opts].sort((x, y) => routeSort === 'time' ? x.min - y.min : x.cost - y.cost);
   const nv = m => `https://map.naver.com/p/directions/${a.lng},${a.lat},${encodeURIComponent(a.name)}/${b.lng},${b.lat},${encodeURIComponent(b.name)}/-/${m}`;
-  box.innerHTML = `<div class="text-[12px] font-bold mb-1">${esc(a.name)} → ${esc(b.name)}</div><div class="text-[11px] text-[#8B95A1] mb-3">직선 약 ${Math.round(km)}km · 출발지에서 도착지까지 <b>문 앞~문 앞 전체 시간</b> 기준 예상치예요. 실제 출발 시각·요금은 각 시간표 링크에서 확인하세요.</div>
-  <div class="flex gap-2 mb-3"><button onclick="routeSort='time';renderRoute()" class="rt-sort ${routeSort === 'time' ? 'on' : ''}">${rico('clock')}빠른 순</button><button onclick="routeSort='cost';renderRoute()" class="rt-sort ${routeSort === 'cost' ? 'on' : ''}">${rico('wallet')}저렴한 순</button></div>
-  <div class="space-y-3">${L.map((x, i) => `<div class="bg-[#F5F6F8] rounded-2xl p-4 border border-[#E5E8EB]"><div class="flex justify-between items-start mb-3"><div class="text-[14px] font-extrabold flex items-center gap-1.5"><span class="rt-hd">${rico(x.icon)}</span>${i + 1}번 · ${esc(x.n)}</div><div class="flex gap-1">${x.min === fast ? '<span class="text-[10px] font-bold bg-[#191F28] text-white px-2 py-0.5 rounded-full">최단</span>' : ''}${x.cost === cheap ? '<span class="text-[10px] font-bold bg-[var(--mil-green)] text-white px-2 py-0.5 rounded-full">최저가</span>' : ''}</div></div>
+  box.classList.toggle('rt-anim', routeAnim); routeAnim = false;
+  box.innerHTML = `<div class="text-[12px] font-bold mb-1 rt-fade">${esc(a.name)} → ${esc(b.name)}</div><div class="text-[11px] text-[#8B95A1] mb-3 rt-fade">직선 약 ${Math.round(km)}km · 출발지에서 도착지까지 <b>문 앞~문 앞 전체 시간</b> 기준 예상치예요. 실제 출발 시각·요금은 각 시간표 링크에서 확인하세요.</div>
+  <div class="flex gap-2 mb-3 rt-fade" style="--i:1"><button onclick="routeSort='time';renderRoute()" class="rt-sort ${routeSort === 'time' ? 'on' : ''}">${rico('clock')}빠른 순</button><button onclick="routeSort='cost';renderRoute()" class="rt-sort ${routeSort === 'cost' ? 'on' : ''}">${rico('wallet')}저렴한 순</button></div>
+  <div class="space-y-3">${L.map((x, i) => `<div class="bg-[#F5F6F8] rounded-2xl p-4 border border-[#E5E8EB] rt-fade" style="--i:${i + 2}"><div class="flex justify-between items-start mb-3"><div class="text-[14px] font-extrabold flex items-center gap-1.5"><span class="rt-hd">${rico(x.icon)}</span>${i + 1}번 · ${esc(x.n)}</div><div class="flex gap-1">${x.min === fast ? '<span class="text-[10px] font-bold bg-[#191F28] text-white px-2 py-0.5 rounded-full">최단</span>' : ''}${x.cost === cheap ? '<span class="text-[10px] font-bold bg-[var(--mil-green)] text-white px-2 py-0.5 rounded-full">최저가</span>' : ''}</div></div>
   <div class="grid gap-1 mb-1 rt-sum" style="grid-template-columns:1.35fr 1.15fr .65fr .85fr"><div><i>총 소요</i><b>${fmtM(x.min)}</b></div><div><i>총 비용</i><b>${W(x.cost)}</b></div><div><i>환승</i><b>${x.tr}회</b></div><div><i>도보</i><b>${x.walk ? fmtM(x.walk) : '없음'}</b></div></div>
-  ${rtLine(x, b)}
+  ${rtLine(x, b, i + 2)}
   <div class="text-[11px] text-[#4E5968] space-y-0.5 mb-2">${x.lines.map(l => `<div>· ${esc(l)}</div>`).join('')}</div>
   <div class="flex flex-wrap gap-2">${x.links.map(l => `<a target="_blank" rel="noopener" href="${esc(l[1])}" class="text-[11px] font-bold bg-white border border-[#E5E8EB] rounded-lg px-3 py-1.5 text-[var(--mil-green)]">${l[0]}</a>`).join('')}</div></div>`).join('')}</div>
   <div class="grid grid-cols-2 gap-2 mt-3"><a target="_blank" rel="noopener" href="https://map.kakao.com/link/by/publictransit/${encodeURIComponent(a.name)},${a.lat},${a.lng}/${encodeURIComponent(b.name)},${b.lat},${b.lng}" class="block text-center bg-[#FEE500] text-[#191F28] rounded-xl py-3 text-[12px] font-bold">카카오맵에서 정확히 보기</a><a target="_blank" rel="noopener" href="${nv('transit')}" class="block text-center bg-[#03C75A] text-white rounded-xl py-3 text-[12px] font-bold">네이버지도에서 보기</a></div>
@@ -2415,13 +2438,20 @@ async function resolvePlace(w) {
 async function calcRoute() {
   const s = q('route-start').value.trim(), e = q('route-end').value.trim(); ['start', 'end'].forEach(w => q('sug-' + w).classList.add('hidden'));
   if (!s || !e) return;
-  const box = q('route-results'); box.classList.remove('hidden'); box.innerHTML = '<div class="text-[12px] text-[#8B95A1] text-center py-3">이동 방법 비교 중...</div>';
+  if (routeBusy) return; routeBusy = true;
+  const box = q('route-results'), ov = q('rt-load'), t0 = Date.now(); box.classList.add('hidden'); box.innerHTML = '';
+  ov.classList.remove('hidden', 'rl-out'); void ov.offsetWidth; document.activeElement && document.activeElement.blur();
   try {
     const a = await resolvePlace('start'); const b = await resolvePlace('end');
     if (!a || !b) { const bad = !a ? s : e; box.innerHTML = `<div class="bg-[#FFF0F3] text-[#D94867] text-[12px] font-bold rounded-xl p-3 mb-2">'${esc(bad)}' 위치를 찾지 못했어요. 입력칸 아래 검색 목록에서 항목을 직접 골라주세요.</div><a target="_blank" rel="noopener" href="https://map.kakao.com/?q=${encodeURIComponent(bad)}" class="block bg-[#F5F6F8] rounded-xl p-3 text-[12px] font-bold text-[var(--mil-green)]">카카오맵에서 '${esc(bad)}' 검색 ▶</a>`; return; }
     const km = hav(a, b); if (km < 0.3) { box.innerHTML = '<div class="text-[12px] text-[#D94867] font-bold">출발지와 도착지가 거의 같아요.</div>'; return; }
-    routeCtx = { a, b, km }; routeCtx.opts = buildOpts(km, routeCtx); renderRoute();
-  } catch (err) { box.innerHTML = '<div class="bg-[#FFF0F3] text-[#D94867] text-[12px] font-bold rounded-xl p-3">위치 검색에 실패했어요. 잠시 후 다시 시도해주세요.</div>'; }
+    routeCtx = { a, b, km }; routeCtx.opts = buildOpts(km, routeCtx); routeAnim = true; renderRoute();
+  } catch (err) { box.classList.remove('hidden'); box.innerHTML = '<div class="bg-[#FFF0F3] text-[#D94867] text-[12px] font-bold rounded-xl p-3">위치 검색에 실패했어요. 잠시 후 다시 시도해주세요.</div>'; }
+  finally {
+    await sleep(Math.max(0, 2300 - (Date.now() - t0)));
+    box.classList.remove('hidden'); try { box.scrollIntoView({ block: 'start' }); } catch (e) { }
+    ov.classList.add('rl-out'); await sleep(800); ov.classList.add('hidden'); ov.classList.remove('rl-out'); routeBusy = false;
+  }
 }
 function getGPS() {
   if (!navigator.geolocation) return showAlert('알림', '위치 기능을 지원하지 않는 기기입니다.');
