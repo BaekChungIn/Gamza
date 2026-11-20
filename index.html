@@ -160,6 +160,29 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 .gmc-rc .av{width:32px;height:32px;border-radius:50%;overflow:hidden;background:#E1E1E1;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .gmc-rc small{font-size:10.5px;font-weight:700;opacity:.6;margin-left:1px}
 /* 선물 알림 */
+#qna-banner{background:linear-gradient(135deg,#EEF4FF,#DDE9FF);border:1px solid #C7D8F7;box-shadow:0 8px 22px rgba(76,123,217,.14)}
+.qb-ico{position:relative;width:46px;height:46px;border-radius:50%;background:#fff;color:#4C7BD9;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 10px rgba(76,123,217,.22)}
+.qb-ico svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.qb-ico::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:2px solid rgba(76,123,217,.5);animation:gbPulse 1.8s ease-out infinite}
+.qb-in{animation:qbIn .55s cubic-bezier(.22,1,.36,1) both}@keyframes qbIn{from{opacity:0;transform:translateY(-10px) scale(.98)}to{opacity:1;transform:none}}
+/* 편지 봉투 열기 */
+.lenv{position:fixed;inset:0;z-index:70;background:#FBF6EA;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .45s ease}
+.lenv.hidden{display:none}.lenv.out{opacity:0;pointer-events:none}
+.env{position:relative;width:min(78vw,300px);aspect-ratio:3/2;margin-top:120px;animation:envIn .55s cubic-bezier(.22,1,.36,1) both}
+@keyframes envIn{from{opacity:0;transform:translateY(40px) scale(.92)}to{opacity:1;transform:none}}
+.env-back{position:absolute;inset:0;border-radius:10px;background:#E2CB9A}
+.env-paper{position:absolute;left:6%;right:6%;top:5%;height:90%;border-radius:8px;background:#FFFDF7;border:1px solid #EFE4CC;box-shadow:0 6px 18px rgba(120,90,40,.12);padding:14px 16px;z-index:2;animation:envPaper .9s cubic-bezier(.3,.9,.3,1) 1.05s both}
+@keyframes envPaper{from{transform:translateY(0)}to{transform:translateY(-78%)}}
+.env-paper b{display:block;font-size:12px;font-weight:700;color:#9A8E78}.env-paper i{display:block;height:7px;border-radius:4px;background:#EFE6D2;margin-top:10px}
+.env-front{position:absolute;inset:0;z-index:3;border-radius:10px;background:linear-gradient(180deg,#F1E1BC,#EBD6A8);clip-path:polygon(0 0,50% 56%,100% 0,100% 100%,0 100%);box-shadow:inset 0 -2px 0 rgba(0,0,0,.04)}
+.env-front::before{content:"";position:absolute;inset:0;background:linear-gradient(to top right,transparent 49.6%,rgba(160,120,50,.18) 50%,transparent 50.4%),linear-gradient(to top left,transparent 49.6%,rgba(160,120,50,.18) 50%,transparent 50.4%)}
+.env-flap{position:absolute;left:0;right:0;top:0;height:60%;z-index:4;transform-origin:50% 0;background:linear-gradient(180deg,#E8D3A3,#DDC48D);clip-path:polygon(0 0,100% 0,50% 100%);animation:envFlap .6s ease-in-out .45s both}
+@keyframes envFlap{0%{transform:perspective(700px) rotateX(0);z-index:4}49%{z-index:4}50%{z-index:1}100%{transform:perspective(700px) rotateX(180deg);z-index:1}}
+.env-seal{position:absolute;left:50%;top:52%;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;background:#D94867;z-index:5;box-shadow:0 2px 6px rgba(150,40,60,.35);display:flex;align-items:center;justify-content:center;color:#fff;animation:envSeal .35s ease .3s both}
+.env-seal svg{width:16px;height:16px;fill:#fff}
+@keyframes envSeal{to{opacity:0;transform:scale(.4)}}
+.lenv-t{margin-top:34px;font-size:13px;font-weight:600;color:#9A8E78;animation:envIn .5s ease .2s both}
+.lv-rise{animation:lvRise .7s cubic-bezier(.22,1,.36,1) both}@keyframes lvRise{from{opacity:0;transform:translateY(60px) scale(.96)}to{opacity:1;transform:none}}
 #gift-banner{background:linear-gradient(135deg,#FFF6DD,#FFE9C2);border:1px solid #F4D9A2;box-shadow:0 8px 22px rgba(242,169,59,.16)}
 .gb-ico{position:relative;width:46px;height:46px;border-radius:50%;background:#fff;color:#E59B22;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 10px rgba(229,155,34,.25)}
 .gb-ico svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -371,6 +394,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
   <!-- 홈 -->
   <section id="tab-home" class="space-y-4 pt-2">
    <button id="gift-banner" onclick="openAsks()" class="hidden w-full text-left rounded-3xl p-4 flex items-center gap-3.5 active:scale-[.99] transition-transform"><span class="gb-ico"><svg viewBox="0 0 24 24"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></span><span class="flex-1 min-w-0"><span id="gb-t" class="block text-[15px] font-extrabold text-[#191F28] truncate">선물 조르기가 도착했어요</span><span id="gb-s" class="block text-[12px] font-semibold text-[#9A6A1B] mt-0.5"></span></span><svg viewBox="0 0 24 24" class="w-5 h-5 flex-shrink-0" style="fill:none;stroke:#C58A22;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round"><path d="m9 6 6 6-6 6"/></svg></button>
+   <button id="qna-banner" onclick="qnaGo()" class="hidden w-full text-left rounded-3xl p-4 flex items-center gap-3.5 active:scale-[.99] transition-transform"><span class="qb-ico"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.9-.9L3 20.5l1.6-4.4A8.4 8.4 0 1 1 21 11.5z"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="13" y2="14"/></svg></span><span class="flex-1 min-w-0"><span id="qb-t" class="block text-[15px] font-extrabold text-[#191F28] truncate">질문에 답이 도착했어요</span><span id="qb-s" class="block text-[12px] font-semibold text-[#3D6BC4] mt-0.5 truncate"></span></span><svg viewBox="0 0 24 24" class="w-5 h-5 flex-shrink-0" style="fill:none;stroke:#4C7BD9;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round"><path d="m9 6 6 6-6 6"/></svg></button>
    <div id="clean-state-banner" class="toss-card text-center py-10 hidden"><span class="text-4xl">🌱</span><h2 class="text-[18px] font-extrabold my-2">연동 대기중</h2><p class="text-[13px] text-[#8B95A1]">설정에서 내 코드를 남자친구에게 알려주거나<br>상대 코드를 입력해 연동해보세요!</p></div>
    <div id="profile-container" class="flex overflow-x-auto no-scrollbar" style="scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;align-items:stretch;margin:0 -6px;padding:2px 6px 14px">
     <div id="soldier-card" class="pg hidden">
@@ -659,9 +683,10 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
   <div class="px-5 pb-3"><div class="flex p-1 rounded-2xl bg-[#E9ECEF]"><button id="lt-in" onclick="lTabSet('in')" class="flex-1 py-2 rounded-xl text-[13px] font-bold relative">받은 편지</button><button id="lt-out" onclick="lTabSet('out')" class="flex-1 py-2 rounded-xl text-[13px] font-bold">보낸 편지</button></div></div>
   <div id="l-list" class="flex-1 overflow-y-auto no-scrollbar px-5 pb-10 space-y-2.5"></div></div>
  <div id="modal-lview" class="fixed inset-0 z-[63] hidden flex-col" style="background:#FBF6EA">
-  <div class="flex items-center gap-3 px-4 pb-3" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeModal('modal-lview')" class="w-10 h-10 rounded-full bg-white/80 border border-[#EADFC8] font-bold text-[18px]">‹</button><div id="lv-head" class="font-bold text-[16px] flex-1">편지</div><button onclick="lDelete()" class="text-[12px] text-[#9A8E78] underline px-2">삭제</button></div>
-  <div class="flex-1 overflow-y-auto no-scrollbar px-5 pb-10"><div class="rounded-[22px] p-6 min-h-[360px]" style="background:#FFFDF7;border:1px solid #EFE4CC;box-shadow:0 8px 24px rgba(150,120,60,.10)"><div id="lv-meta" class="text-[12px] text-[#9A8E78]"></div><div id="lv-title" class="text-[19px] font-extrabold mt-2 break-words"></div><div id="lv-body" class="text-[15px] leading-[1.85] mt-4 break-words" style="white-space:pre-wrap;color:#3B3426"></div></div>
+  <div class="flex items-center gap-3 px-4 pb-3" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeModal('modal-lview');lEnvDone()" class="w-10 h-10 rounded-full bg-white/80 border border-[#EADFC8] font-bold text-[18px]">‹</button><div id="lv-head" class="font-bold text-[16px] flex-1">편지</div><button onclick="lDelete()" class="text-[12px] text-[#9A8E78] underline px-2">삭제</button></div>
+  <div class="flex-1 overflow-y-auto no-scrollbar px-5 pb-10"><div id="lv-card" class="rounded-[22px] p-6 min-h-[360px]" style="background:#FFFDF7;border:1px solid #EFE4CC;box-shadow:0 8px 24px rgba(150,120,60,.10)"><div id="lv-meta" class="text-[12px] text-[#9A8E78]"></div><div id="lv-title" class="text-[19px] font-extrabold mt-2 break-words"></div><div id="lv-body" class="text-[15px] leading-[1.85] mt-4 break-words" style="white-space:pre-wrap;color:#3B3426"></div></div>
    <button id="lv-reply" onclick="lReply()" class="w-full h-12 mt-4 rounded-2xl bg-[#191F28] text-white text-[14px] font-bold">답장하기</button></div></div>
+ <div id="lenv" class="lenv hidden" onclick="lEnvSkip()"></div>
  <div id="modal-lwrite" class="fixed inset-0 z-[64] hidden flex-col" style="background:#FBF6EA">
   <div class="flex items-center gap-3 px-4 pb-3" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeModal('modal-lwrite')" class="w-10 h-10 rounded-full bg-white/80 border border-[#EADFC8] font-bold text-[18px]">‹</button><div class="font-bold text-[16px] flex-1">편지 쓰기</div><button onclick="sendLetter()" class="px-5 h-10 rounded-full bg-[#191F28] text-white text-[13px] font-bold">보내기</button></div>
   <div class="flex-1 overflow-y-auto no-scrollbar px-5 pb-10"><div class="text-[12px] font-bold text-[#9A8E78] mb-2">받는 사람</div><div id="lw-chips" class="flex gap-3 overflow-x-auto no-scrollbar pb-2"></div>
@@ -855,6 +880,7 @@ function qSetMode(m) { const linked = !!(me.partner_id && partner); if (m === 'c
 async function loadQ() {
   qNorm(); const { data } = await sb.from('qna_answers').select('*').eq('day', qKey());
   qAns = {}; (data || []).forEach(a => qAns[a.user_id] = a.answer);
+  if (curTab === 'qna' && qKey() < 10000 && partner && qAns[partner.id] && qnNew.some(a => a.day === qKey())) qnaMark(qKey());
 }
 function subscribe() {
   let t; const h = () => { clearTimeout(t); t = setTimeout(async () => { await loadAll(false); render(false); }, 250); };
@@ -1014,7 +1040,7 @@ function bfImg(theme, r) {
 const S_ = () => me.gender === 'M' ? me : (partner && partner.gender === 'M' ? partner : null);
 const G_ = () => me.gender === 'F' ? me : (partner && partner.gender === 'F' ? partner : null);
 function render(full) {
-  if (!me) return;
+  if (!me) return; setTimeout(qnaCheck, 0);
   const S = S_(), G = G_(), now = new Date(); applyTheme((S && S.branch) || 'army');
   q('clean-state-banner').classList.toggle('hidden', !!S);
   ['salary-card', 'vacation-card', 'menu-btn-row'].forEach(i => q(i).classList.toggle('hidden', !S));
@@ -1672,9 +1698,24 @@ function renderLetters() {
 async function openLetter(id) {
   const l = letters.find(x => x.id === id); if (!l) return; lCur = l; const P = lPerson(l);
   q('lv-head').innerText = l.mine ? '보낸 편지' : '받은 편지'; q('lv-meta').innerText = `${l.mine ? 'To' : 'From'}. ${P.nickname || '친구'} · ${fmDT(l.created_at)}`; q('lv-title').innerText = l.title || ''; q('lv-title').style.display = l.title ? '' : 'none'; q('lv-body').innerText = l.body; q('lv-reply').style.display = l.mine ? 'none' : '';
-  openM('modal-lview');
+  const card = q('lv-card'), rp = q('lv-reply'); [card, rp].forEach(e => { e.classList.remove('lv-rise'); e.style.visibility = 'hidden'; });
+  openM('modal-lview'); q('modal-lview').querySelector('.overflow-y-auto').scrollTop = 0; lEnvPlay(l, P);
   if (!l.mine && !l.read_at) { l.read_at = new Date().toISOString(); updateLetterDot(); renderLetters(); try { await sb.rpc('letter_read', { lid: id }); } catch (e) { } }
 }
+let lEnvT = [];
+function lEnvPlay(l, P) {
+  const ov = q('lenv'); lEnvT.forEach(clearTimeout); lEnvT = [];
+  ov.classList.remove('out'); ov.innerHTML = `<div class="env"><div class="env-back"></div><div class="env-paper"><b>${l.mine ? 'To' : 'From'}. ${esc(P.nickname || '친구')}</b><i style="width:82%"></i><i style="width:94%"></i><i style="width:70%"></i><i style="width:88%"></i></div><div class="env-front"></div><div class="env-flap"></div><div class="env-seal"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.7 4.5c2.2 0 3.6 1.2 4.3 2.4h2c.7-1.2 2.1-2.4 4.3-2.4 3.7 0 5.8 3.9 4.3 7.3C19.5 16.4 12 21 12 21z"/></svg></div></div><div class="lenv-t">${l.mine ? '보낸 편지를 꺼내는 중' : '편지를 여는 중'}…</div>`;
+  ov.classList.remove('hidden'); void ov.offsetWidth;
+  lEnvT.push(setTimeout(lEnvDone, 2150));
+}
+function lEnvDone() {
+  const ov = q('lenv'); if (ov.classList.contains('hidden')) return; lEnvT.forEach(clearTimeout); lEnvT = [];
+  const card = q('lv-card'), rp = q('lv-reply');
+  card.style.visibility = ''; rp.style.visibility = ''; card.classList.remove('lv-rise'); rp.classList.remove('lv-rise'); void card.offsetWidth; card.classList.add('lv-rise'); rp.classList.add('lv-rise'); rp.style.animationDelay = '.15s';
+  ov.classList.add('out'); lEnvT.push(setTimeout(() => { ov.classList.add('hidden'); ov.classList.remove('out'); ov.innerHTML = ''; }, 460));
+}
+function lEnvSkip() { lEnvDone(); }
 function lReply() { if (!lCur) return; closeModal('modal-lview'); openWrite(lCur.mine ? lCur.recipient : lCur.sender); }
 async function lDelete() { if (!lCur || !confirm('이 편지를 삭제할까요?')) return; const id = lCur.id; closeModal('modal-lview'); letters = letters.filter(x => x.id !== id); updateLetterDot(); renderLetters(); try { await sb.rpc('letter_delete', { lid: id }); } catch (e) { } }
 function openWrite(u) {
@@ -1868,6 +1909,34 @@ function qInfo() {
   const I = milInfo(S), td = Math.ceil((I.dis - I.e) / 864e5) + 1, today = Math.max(1, Math.min(td, Math.floor((new Date() - I.e) / 864e5) + 1)); return { td, today, coupleMode };
 }
 async function qDay(d) { const I = qInfo(); if (I.none) return; qDayN = Math.max(1, Math.min(I.today, qDayN + d)); await loadQ(); renderQ(true); }
+/* 상대방 Q&A 답변 알림 */
+let qnT = 0, qnNew = [];
+const qnKey = () => 'qseen:' + (me ? me.id : '');
+const qnSig = a => a.day + ':' + String(a.answer || '').length + ':' + String(a.answer || '').slice(0, 12);
+function qnSeen() { try { return JSON.parse(localStorage.getItem(qnKey()) || 'null'); } catch (e) { return null; } }
+function qnSave(v) { try { localStorage.setItem(qnKey(), JSON.stringify(v.slice(-400))); } catch (e) { } }
+async function qnaCheck() {
+  if (!window._qnI) { window._qnI = setInterval(() => { if (me && !document.hidden) { qnT = 0; qnaCheck(); } }, 40000); document.addEventListener('visibilitychange', () => { if (!document.hidden && me) { qnT = 0; qnaCheck(); } }); }
+  if (!me || !partner || !me.partner_id) { qnNew = []; qnaBanner(); return; }
+  const now = Date.now(); if (now - qnT < 4000) return; qnT = now;
+  let rows = []; try { const { data, error } = await sb.from('qna_answers').select('day,answer').eq('user_id', partner.id).lt('day', 10000); if (error) return; rows = (data || []).filter(a => String(a.answer || '').trim()); } catch (e) { return; }
+  let seen = qnSeen(); const I = qInfo();
+  if (!seen) { seen = rows.filter(a => !I || I.none || a.day < I.today - 2).map(qnSig); qnSave(seen); }
+  qnNew = rows.filter(a => !seen.includes(qnSig(a))).sort((a, b) => b.day - a.day); qnaBanner();
+}
+function qnaBanner() {
+  const b = q('qna-banner'); if (!b) return; const show = qnNew.length > 0, was = !b.classList.contains('hidden'); b.classList.toggle('hidden', !show);
+  if (!show) return; const nm = (partner && partner.nickname) || '연인', a = qnNew[0];
+  q('qb-t').innerText = qnNew.length > 1 ? `${nm}님이 질문 ${qnNew.length}개에 답했어요` : `${nm}님이 질문에 답했어요`;
+  let qt = ''; try { const I = qInfo(); qt = qRow(a.day, I.coupleMode).q; } catch (e) { }
+  q('qb-s').innerText = `Day ${a.day}` + (qt ? ` · ${qt}` : '') ;
+  if (!was) { b.classList.remove('qb-in'); void b.offsetWidth; b.classList.add('qb-in'); }
+}
+function qnaMark(day) { const seen = qnSeen() || []; qnNew.filter(a => a.day === day).forEach(a => seen.includes(qnSig(a)) || seen.push(qnSig(a))); qnSave(seen); qnNew = qnNew.filter(a => a.day !== day); qnaBanner(); }
+async function qnaGo() {
+  const a = qnNew[0]; if (!a) return; if (me.gender === 'M') qMode = 'couple'; qInit = true; qDayN = a.day; switchTab('qna'); window.scrollTo(0, 0);
+  await loadQ(); renderQ(true); qnaMark(a.day);
+}
 function renderQ(setInput) {
   const I = qInfo(), box = q('qna-body');
   if (I.none) { q('qna-day-badge').innerText = ''; q('qna-question-text').innerText = '연동 후 오늘의 질문이 열려요'; box.classList.add('hidden'); return; }
