@@ -109,9 +109,19 @@ Deno.serve(async (req) => {
   if (!ok) return json({ error: 'forbidden' }, 403);
   if (!NID || !GROQ) return json({ error: 'NAVER / GROQ keys missing' }, 500);
 
-  const T = today(), reports: { kind: string; title: string; detail: any }[] = [], log: string[] = [];
   let body: any = {}; try { body = (await req.json()) ?? {}; } catch { /* 기본값 */ }
+  // 일은 뒤에서 하고, 요청에는 바로 답해요 (연결이 오래 걸려 끊기지 않게)
+  const task = runTask(body);
+  try { EdgeRuntime.waitUntil(task); } catch { await task; }
+  return json({ ok: true, started: true, mode: body.mode || 'content' });
+});
+
+let RUN_ID = '';
+async function runTask(body: any) {
+  const T = today(), reports: { kind: string; title: string; detail: any }[] = [], log: string[] = [];
   const mode = body.mode || 'content', offset = Number(body.offset || 0), run = String(body.run || new Date().toISOString());
+  RUN_ID = run;
+  const logKey = mode === 'stars' || mode === 'star_verify' ? 'run_log_stars' : 'run_log_content';
   try {
     if (mode === 'stars') {
       await checkStars(T, reports, log);
@@ -120,8 +130,8 @@ Deno.serve(async (req) => {
       const idx = Number(body.idx || 0);
       const more = await verifyStar(idx, T, reports, log);
       if (reports.length) await saveReports(reports, log);
-      if (more) chain({ mode: 'star_verify', idx: idx + 1, run });
-      else { const { data: all } = await db.from('content_reports').select('kind,title,detail').gte('created_at', run).eq('kind', 'new_star'); if (all && all.length) await sendMail(T, all, log); }
+      if (more) { chain({ mode: 'star_verify', idx: idx + 1, run }); log.push('다음 후보 이어서 확인'); }
+      else { log.push('스타 확인 완료'); const { data: all } = await db.from('content_reports').select('kind,title,detail').gte('created_at', run).eq('kind', 'new_star'); if (all && all.length) await sendMail(T, all, log); }
     } else if (mode === 'content') {
       await stepEvents(T, reports, log);
       if (reports.length) await saveReports(reports, log);
@@ -139,19 +149,29 @@ Deno.serve(async (req) => {
       }
       if (reports.length) await saveReports(reports, log);
       log.push(`검증 ${Math.min(offset + STEP, checks.length)}/${checks.length}`);
-      if (offset + STEP < checks.length) chain({ mode: 'verify', offset: offset + STEP, run });
+      if (offset + STEP < checks.length) { chain({ mode: 'verify', offset: offset + STEP, run }); log.push('다음 묶음 이어서 진행'); }
       else {
+        log.push('검증 완료');
         // 마지막 단계: 이번 실행에서 나온 결과를 모아 메일 한 통
         const { data: all } = await db.from('content_reports').select('kind,title,detail').gte('created_at', run).neq('kind', 'new_star');
         if (all && all.length) await sendMail(T, all, log);
       }
     }
     if (MODEL) log.push('AI ' + MODEL);
-    return json({ ok: true, reports: reports.length, log });
   } catch (e) {
-    return json({ ok: false, error: String(e), log }, 500);
+    log.push('오류: ' + String(e).slice(0, 200));
   }
-});
+  await runLog(logKey, run, mode === 'content' || mode === 'stars', log, mode);
+}
+async function runLog(key: string, run: string, reset: boolean, lines: string[], mode: string) {
+  let prev: any = reset ? null : await getContent(key);
+  if (!prev || prev.run !== run) prev = { run, lines: [] };
+  const done = (mode === 'verify' || mode === 'star_verify') ? !lines.some((l) => /이어서|뒤에서/.test(l)) : false;
+  prev.lines = [...prev.lines, ...lines].slice(-40); prev.at = new Date().toISOString(); prev.mode = mode;
+  await db.from('app_content').upsert({ key, data: prev, updated_at: prev.at, updated_by: 'auto' });
+}
+
+
 
 // ---------- 한 번에 조금씩 (서버 함수 시간 제한 때문에) ----------
 declare const EdgeRuntime: any;
@@ -247,7 +267,7 @@ JSON 으로만: {"stars":[{"n":"이름","g":"그룹/소속(배우면 '배우')",
   // 2차는 후보 한 명씩 따로 실행해요 (시간 제한 때문에)
   const { error: qe } = await db.from('app_content').upsert({ key: 'star_queue', data: { day: T, cands }, updated_at: new Date().toISOString(), updated_by: 'auto' });
   if (qe) { log.push('DB 저장 실패: ' + qe.message); return; }
-  if (cands.length) { chain({ mode: 'star_verify', idx: 0, run: new Date().toISOString() }); log.push(`후보 ${cands.length}명 교차 확인은 뒤에서 진행돼요`); }
+  if (cands.length) { chain({ mode: 'star_verify', idx: 0, run: RUN_ID }); log.push(`후보 ${cands.length}명 교차 확인은 뒤에서 이어서 진행돼요`); } else log.push('스타 확인 완료');
 }
 async function verifyStar(idx: number, T: string, reports: any[], log: string[]): Promise<boolean> {
   const q0 = await getContent('star_queue'); const cands: any[] = q0?.cands ?? [];
