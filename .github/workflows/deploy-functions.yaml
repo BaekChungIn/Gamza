@@ -1,0 +1,29 @@
+name: Deploy Supabase Functions
+on:
+  push:
+    branches: [main]
+    paths: ['naver-search.ts', 'content-check.ts', '.github/workflows/**']
+  workflow_dispatch: {}
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      REF: fziblqwqtyhntmmvzhgv
+    steps:
+      - uses: actions/checkout@v4
+      - name: check token
+        run: |
+          if [ -z "$TOKEN" ]; then echo "SUPABASE_ACCESS_TOKEN is missing in GitHub Secrets"; exit 1; fi
+      - name: deploy naver-search
+        run: |
+          curl -sS --fail-with-body -X POST "https://api.supabase.com/v1/projects/$REF/functions/deploy?slug=naver-search" \
+            -H "Authorization: Bearer $TOKEN" \
+            -F 'metadata={"entrypoint_path":"index.ts","name":"naver-search","verify_jwt":true}' \
+            -F "file=@naver-search.ts;filename=index.ts"
+      - name: deploy content-check
+        run: |
+          curl -sS --fail-with-body -X POST "https://api.supabase.com/v1/projects/$REF/functions/deploy?slug=content-check" \
+            -H "Authorization: Bearer $TOKEN" \
+            -F 'metadata={"entrypoint_path":"index.ts","name":"content-check","verify_jwt":false}' \
+            -F "file=@content-check.ts;filename=index.ts"
