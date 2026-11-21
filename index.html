@@ -2214,8 +2214,8 @@ async function starRowSave(r) {
   const row = { user_id: me.id, star_id: r.id, since: r.since || ymd(new Date()), photo: r.photo || null, theme: r.theme || 'black_gold', ord: (k => k >= 0 ? k : myStars.length)(myStars.findIndex(x => x.id === r.id)) };
   thLocalSet(r.id, row.theme);
   const { data, error } = await sb.from('star_fans').upsert(row).select('star_id,theme');
-  if (!error && data && data.length) { stFansOK = true; return true; }
-  stFansOK = false; return false;
+  if (!error && data && data.length) { stFansOK = true; window._stErr = ''; return true; }
+  window._stErr = error ? (error.message || error.code || '') : '저장된 줄이 없어요 (권한)'; stFansOK = false; return false;
 }
 const myRow = id => myStars.find(x => x.id === id);
 function myStar() { return myStars[0] ? starK[myStars[0].id] || null : null; }
@@ -2329,7 +2329,7 @@ async function thSave() {
   const ok = await starRowSave(r);
   stRefresh();
   if (ok) thPaintBtn(true, '저장됨');
-  else { thPaintBtn(true, '이 기기에만 저장됨'); showAlert('알림', '서버 저장이 안 됐어요. Supabase SQL Editor 에서 <b>schema_star3.sql</b> 을 실행하면 모든 기기에 저장돼요.<br><span class="text-[11px] text-[#8B95A1]">지금은 이 기기에만 저장했어요.</span>'); }
+  else { thPaintBtn(true, '이 기기에만 저장됨'); showAlert('알림', '서버 저장이 안 됐어요. Supabase SQL Editor 에서 <b>schema_star3_fix.sql</b> 을 실행하면 모든 기기에 저장돼요.<br><span class="text-[11px] text-[#8B95A1]">지금은 이 기기에만 저장했어요.</span><br><span class="text-[11px] text-[#E5484D]">오류: ' + esc(window._stErr || '') + '</span>'); }
   if (old !== k) setTimeout(() => { if (q('star-sheet').classList.contains('show') && window._thId === id) stSheetClose(); }, 700);
 }
 async function starUnset(id) {
