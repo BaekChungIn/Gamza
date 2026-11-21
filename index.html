@@ -210,7 +210,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 .st-tag{font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:6px;background:#F2F4F6;color:#6B7684}.st-tag.pre{background:#EEF4FF;color:#3D6BC4}.st-tag.my{background:#191F28;color:#fff}.st-tag.new{background:var(--mil-green-light);color:var(--mil-green)}
 .st-sheet{position:fixed;inset:0;z-index:72;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.42);opacity:0;transition:opacity .25s}
 .st-sheet.show{opacity:1}.st-sheet.hidden{display:none}
-.st-sheet>div{width:100%;max-width:480px;background:#fff;border-radius:28px 28px 0 0;padding:22px 20px max(22px,env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .38s cubic-bezier(.22,1,.36,1)}
+.st-sheet>div{width:100%;max-width:480px;max-height:92vh;overflow-y:auto;background:#fff;border-radius:28px 28px 0 0;padding:22px 20px max(22px,env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .38s cubic-bezier(.22,1,.36,1)}
 .st-sheet.show>div{transform:none}
 .st-in{animation:stIn .5s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--i,0)*35ms)}
 @keyframes stIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
@@ -2197,13 +2197,25 @@ let stStats = {}, stCat = 'all', stImg = {}, stStatT = 0, stTabCur = 'my', mySta
 const STAR_SVG = '<svg viewBox="0 0 24 24"><path d="M12 2.8l2.75 5.6 6.15.9-4.45 4.33 1.05 6.12L12 16.87l-5.5 2.88 1.05-6.12L3.1 9.3l6.15-.9z"/></svg>';
 const CHEER_SVG = '<svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
 /* 내 스타 목록 (여러 명) */
+const thLocalKey = () => 'zt_stth:' + (me ? me.id : '');
+function thLocal() { try { return JSON.parse(localStorage.getItem(thLocalKey()) || '{}'); } catch (e) { return {}; } }
+function thLocalSet(id, k) { try { const m = thLocal(); m[id] = k; localStorage.setItem(thLocalKey(), JSON.stringify(m)); } catch (e) { } }
 async function loadMyStars() {
-  if (!me) return; let rows = null;
-  try { const { data, error } = await sb.from('star_fans').select('*').eq('user_id', me.id).order('ord').order('created_at'); if (!error) rows = data; else stFansOK = false; } catch (e) { stFansOK = false; }
-  if (!rows) rows = me.star_id ? [{ star_id: me.star_id, since: String(me.star_since || '').slice(0, 10) || ymd(new Date()), photo: me.star_photo || null, theme: 'black_gold' }] : [];
-  myStars = rows.filter(r => starK[r.star_id]).map(r => ({ id: r.star_id, since: String(r.since || '').slice(0, 10) || ymd(new Date()), photo: r.photo || '', theme: STAR_TH[r.theme] ? r.theme : 'black_gold' }));
+  if (!me) return; let rows = null; stFansOK = true;
+  try { const { data, error } = await sb.from('star_fans').select('*').eq('user_id', me.id).order('ord').order('created_at'); if (!error) rows = data || []; else stFansOK = false; } catch (e) { stFansOK = false; }
+  const L = thLocal();
+  if (!rows || (!rows.length && me.star_id)) rows = me.star_id ? [{ star_id: me.star_id, since: String(me.star_since || '').slice(0, 10) || ymd(new Date()), photo: me.star_photo || null, theme: L[me.star_id] || 'black_gold', _local: true }] : [];
+  myStars = rows.filter(r => starK[r.star_id]).map(r => { const th = stFansOK && !r._local ? r.theme : (L[r.star_id] || r.theme); return { id: r.star_id, since: String(r.since || '').slice(0, 10) || ymd(new Date()), photo: r.photo || '', theme: STAR_TH[th] ? th : 'black_gold' }; });
   me.star_id = myStars[0] ? myStars[0].id : null;
   if (!stSel || !myStars.some(x => x.id === stSel)) stSel = myStars[0] ? myStars[0].id : null;
+}
+/* 서버에 내 스타 한 명 저장 (없으면 만들고, 있으면 고쳐요) */
+async function starRowSave(r) {
+  const row = { user_id: me.id, star_id: r.id, since: r.since || ymd(new Date()), photo: r.photo || null, theme: r.theme || 'black_gold', ord: (k => k >= 0 ? k : myStars.length)(myStars.findIndex(x => x.id === r.id)) };
+  thLocalSet(r.id, row.theme);
+  const { data, error } = await sb.from('star_fans').upsert(row).select('star_id,theme');
+  if (!error && data && data.length) { stFansOK = true; return true; }
+  stFansOK = false; return false;
 }
 const myRow = id => myStars.find(x => x.id === id);
 function myStar() { return myStars[0] ? starK[myStars[0].id] || null : null; }
@@ -2299,20 +2311,32 @@ function stSheetClose() { const el = q('star-sheet'); el.classList.remove('show'
 /* 테마 고르기 */
 function thGrid(cur, fn) { return `<div class="th-grid">${Object.keys(STAR_TH).map(k => { const t = STAR_TH[k]; return `<button class="${cur === k ? 'on' : ''}" style="background:${t.bg};color:${t.fg}" onclick="${fn}('${k}')"><div class="tn">${t.n}</div><div class="tb" style="background:${t.trk}"><i style="background:${t.bar}"></i></div></button>`; }).join('')}</div>`; }
 function thSheet(id) {
-  const r = myRow(id), s = starK[id]; if (!r) return; window._thId = id;
-  sheetOpen(`<div class="w-10 h-1.5 rounded-full bg-[#E5E8EB] mx-auto -mt-1 mb-4"></div><div class="text-[20px] font-extrabold">프로필 테마</div><div class="text-[13px] text-[#8B95A1] mt-1">${esc(s.n)} 프로필 카드의 색을 골라요</div><div id="th-prev" class="mt-4">${stkCard(s, false)}</div>${thGrid(r.theme, 'thPick')}<div class="h-2"></div>`);
+  const r = myRow(id), s = starK[id]; if (!r) return; window._thId = id; window._thDraft = r.theme;
+  sheetOpen(`<div class="w-10 h-1.5 rounded-full bg-[#E5E8EB] mx-auto -mt-1 mb-4"></div><div class="text-[20px] font-extrabold">프로필 테마</div><div class="text-[13px] text-[#8B95A1] mt-1">${esc(s.n)} 프로필 카드의 색을 고르고 저장하세요</div><div id="th-prev" class="mt-4">${thPrev(id, r.theme)}</div>${thGrid(r.theme, 'thPick')}
+   <div class="sticky bottom-0 pt-3 bg-white"><button id="th-save" class="sf-cta" style="background:#D5D9DE" onclick="thSave()">저장됨</button></div>`);
 }
-async function thPick(k) {
-  const id = window._thId, r = myRow(id); if (!r) return; r.theme = k;
-  q('th-prev').innerHTML = stkCard(starK[id], false); q('star-sheet-in').querySelectorAll('.th-grid button').forEach((b, i) => b.classList.toggle('on', Object.keys(STAR_TH)[i] === k));
+function thPrev(id, k) { const r = myRow(id), old = r.theme; r.theme = k; const h = stkCard(starK[id], false).replace('onclick="openStar', 'data-x="'); r.theme = old; return h; }
+function thPaintBtn(saved, txt) { const b = q('th-save'); if (!b) return; b.disabled = false; b.style.background = saved ? '#191F28' : 'var(--mil-green)'; b.innerText = txt || (saved ? '저장됨' : '이 테마로 저장하기'); }
+function thPick(k) {
+  const id = window._thId, r = myRow(id); if (!r) return; window._thDraft = k;
+  q('th-prev').innerHTML = thPrev(id, k); q('star-sheet-in').querySelectorAll('.th-grid button').forEach((b, i) => b.classList.toggle('on', Object.keys(STAR_TH)[i] === k));
+  thPaintBtn(false); if (k === r.theme) { const b = q('th-save'); b.style.background = '#D5D9DE'; b.innerText = '저장됨'; }
+}
+async function thSave() {
+  const id = window._thId, r = myRow(id), k = window._thDraft; if (!r || !k) return;
+  const b = q('th-save'); b.disabled = true; b.innerText = '저장 중…';
+  const old = r.theme; r.theme = k;
+  const ok = await starRowSave(r);
   stRefresh();
-  if (stFansOK) { const { error } = await sb.from('star_fans').update({ theme: k }).eq('user_id', me.id).eq('star_id', id); if (error) showAlert('알림', 'schema_star3.sql 을 Supabase SQL Editor 에서 먼저 실행해주세요.'); }
+  if (ok) thPaintBtn(true, '저장됨');
+  else { thPaintBtn(true, '이 기기에만 저장됨'); showAlert('알림', '서버 저장이 안 됐어요. Supabase SQL Editor 에서 <b>schema_star3.sql</b> 을 실행하면 모든 기기에 저장돼요.<br><span class="text-[11px] text-[#8B95A1]">지금은 이 기기에만 저장했어요.</span>'); }
+  if (old !== k) setTimeout(() => { if (q('star-sheet').classList.contains('show') && window._thId === id) stSheetClose(); }, 700);
 }
 async function starUnset(id) {
   const s = starK[id]; if (!s || !confirm(`MY스타(${s.n})를 삭제할까요?\n팬이 된 날짜와 고른 사진·테마도 함께 지워져요.`)) return;
   let error = null;
-  if (stFansOK) ({ error } = await sb.from('star_fans').delete().eq('user_id', me.id).eq('star_id', id));
-  else ({ error } = await sb.rpc('star_set', { sid: '', since: null, photo: null }));
+  ({ error } = await sb.from('star_fans').delete().eq('user_id', me.id).eq('star_id', id));
+  if (error || !stFansOK) ({ error } = await sb.rpc('star_set', { sid: '', since: null, photo: null }));
   if (error) return showAlert('알림', 'schema_star3.sql 을 Supabase SQL Editor 에서 먼저 실행해주세요.');
   myStars = myStars.filter(x => x.id !== id); me.star_id = myStars[0] ? myStars[0].id : null; stSel = me.star_id;
   stStatT = 0; loadStarStats(true); renderStarMy(true); renderStarHome(); renderSetRowsSafe(); try { renderQ(true); } catch (e) { }
@@ -2405,10 +2429,8 @@ function sfUpload(inp) {
 async function sfSave() {
   const b = q('sf-reg'); b.disabled = true; b.innerText = '저장 중…';
   const row = { user_id: me.id, star_id: sfS.id, since: sfS.since || ymd(new Date()), photo: sfS.photo || null, theme: sfS.theme, ord: myRow(sfS.id) ? myStars.findIndex(x => x.id === sfS.id) : myStars.length };
-  let error = null;
-  if (stFansOK) ({ error } = await sb.from('star_fans').upsert(row));
-  else ({ error } = await sb.rpc('star_set', { sid: sfS.id, since: row.since, photo: row.photo }));
-  if (error) { b.disabled = false; b.innerHTML = CHEER_SVG + '등록하기'; return showAlert('알림', 'schema_star3.sql 을 Supabase SQL Editor 에서 먼저 실행해주세요.<br><span class="text-[11px] text-[#8B95A1]">' + esc(error.message) + '</span>'); }
+  let ok = await starRowSave({ id: sfS.id, since: row.since, photo: row.photo, theme: row.theme });
+  if (!ok) { const { error } = await sb.rpc('star_set', { sid: sfS.id, since: row.since, photo: row.photo }); if (error) { b.disabled = false; b.innerHTML = CHEER_SVG + '등록하기'; return showAlert('알림', 'schema_star3.sql 을 Supabase SQL Editor 에서 먼저 실행해주세요.<br><span class="text-[11px] text-[#8B95A1]">' + esc(error.message) + '</span>'); } }
   const was = sfS.edit, nr = { id: sfS.id, since: row.since, photo: row.photo || '', theme: row.theme };
   const k = myStars.findIndex(x => x.id === sfS.id); if (k >= 0) myStars[k] = nr; else myStars.push(nr);
   me.star_id = myStars[0].id; stSel = sfS.id; stStatT = 0;
