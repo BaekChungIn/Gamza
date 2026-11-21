@@ -2126,10 +2126,24 @@ async function adReports() {
   rl.innerHTML = (data || []).length ? data.map(r => `<div class="ad-card ${r.status === 'done' ? 'opacity-50' : ''}"><div class="flex items-start justify-between gap-2"><b class="text-[14px]">${esc(r.title)}</b><button class="text-[11px] font-extrabold flex-shrink-0 ${r.status === 'done' ? 'text-[#8B95A1]' : 'text-[var(--mil-green)]'}" onclick="adDone(${r.id},'${r.status === 'done' ? 'new' : 'done'}')">${r.status === 'done' ? '되돌리기' : '처리 완료'}</button></div><div class="text-[11px] text-[#8B95A1]">${esc((r.created_at || '').slice(0, 16).replace('T', ' '))}</div>${(r.detail || []).map(i => i.fix ? `<div class="mt-2 text-[12px] leading-relaxed bg-[#F7F8FA] rounded-xl p-2.5"><b>${esc(i.item)}</b><br><span class="text-[#8B95A1]">앱:</span> ${esc(i.ours)}<br><span class="text-[#8B95A1]">검색:</span> ${esc(i.found)}<br><b class="text-[#D94867]">수정: ${esc(i.fix)}</b>${i.source ? ` <a href="${esc(i.source)}" target="_blank" rel="noopener" class="text-[var(--mil-green)] font-bold">근거</a>` : ''}</div>` : `<div class="mt-2 text-[12px] bg-[#F7F8FA] rounded-xl p-2.5"><b>${esc(i.title)}</b> · ${esc(i.start)} ~ ${esc(i.end)}<br>${esc(i.benefit)}</div>`).join('')}</div>`).join('') : '<div class="py-10 text-center text-[13px] text-[#8B95A1]">아직 점검 결과가 없어요</div>';
 }
 async function adDone(id, st) { await sb.from('content_reports').update({ status: st }).eq('id', id); adReports(); }
+async function fnErr(error) {
+  let st = '', body = '';
+  try { const r = error.context; if (r) { st = r.status; body = await r.text(); try { const j = JSON.parse(body); body = j.error || j.msg || j.message || body; } catch (x) { } } } catch (x) { }
+  const m = String(body || error.message || '');
+  let hint = '';
+  if (st === 404 || /not found/i.test(m)) hint = '서버 함수가 아직 배포 안 됐어요 (GitHub Actions 확인)';
+  else if (st === 401) hint = '로그인/JWT 문제 — content-check 의 Verify JWT 를 꺼주세요';
+  else if (st === 403 || /forbidden/i.test(m)) hint = '관리자 권한이 없어요 (schema_admin.sql 의 이메일 확인)';
+  else if (/keys missing/i.test(m)) hint = 'Secrets 에 NAVER_CLIENT_ID / NAVER_CLIENT_SECRET / GROQ_API_KEY 를 넣어주세요';
+  else if (/groq 401|invalid api key/i.test(m)) hint = 'GROQ_API_KEY 가 틀렸어요';
+  else if (/groq 4/i.test(m)) hint = 'Groq 오류 (모델 이름 또는 사용량)';
+  else if (!st && /fetch|network|Failed to send/i.test(m)) hint = '서버 함수에 연결이 안 돼요 (배포·이름 확인)';
+  return `[${st || '연결'}] ${hint ? hint + ' · ' : ''}${m.slice(0, 160)}`;
+}
 async function adRun() {
   const b = q('ad-run'); b.innerText = '점검 중… (2~4분)'; b.disabled = true;
   const out = [];
-  for (const mode of ['content', 'stars']) { q('ad-runlog').innerText = (mode === 'content' ? '혜택·적금·카드 점검 중…' : '새로 입대한 스타 확인 중…'); try { const { data, error } = await sb.functions.invoke('content-check', { body: { mode } }); out.push(error ? `${mode}: 실패 (서버 함수·키 설정 확인)` : (data.log || []).join(' · ') + (data.reports ? ` · 결과 ${data.reports}건 (메일 발송)` : ' · 문제 없음')); } catch (e) { out.push(mode + ': 실패'); } }
+  for (const mode of ['content', 'stars']) { q('ad-runlog').innerText = (mode === 'content' ? '혜택·적금·카드 점검 중…' : '새로 입대한 스타 확인 중…'); try { const { data, error } = await sb.functions.invoke('content-check', { body: { mode } }); out.push(error ? `${mode}: 실패 — ${await fnErr(error)}` : (data.log || []).join(' · ') + (data.reports ? ` · 결과 ${data.reports}건 (메일 발송)` : ' · 문제 없음')); } catch (e) { out.push(mode + ': 실패 — ' + (e && e.message || e)); } }
   q('ad-runlog').innerText = out.join('\n'); await loadContent(); await loadMyStars(); stRefresh(); if (curTab === 'benefits') renderBenefits(); if (curTab === 'savings') renderSav();
   b.innerText = '지금 최신화'; b.disabled = false; if (adT === 'reports') { const l = q('ad-runlog').innerText; await adReports(); q('ad-runlog').innerText = l; }
 }
