@@ -165,20 +165,34 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 /* ===== MY스타 ===== */
 .st-ava{position:relative;border-radius:50%;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;letter-spacing:-.5px;background:#E9ECEF}
 .st-ava img{width:100%;height:100%;object-fit:cover;display:block}
-/* 블랙 프로필 카드 */
-.stk{position:relative;overflow:hidden;border-radius:26px;padding:20px;color:#fff;background:#0B0C0B;box-shadow:0 14px 34px rgba(0,0,0,.22),inset 0 0 0 1px rgba(255,255,255,.07)}
-.stk::before{content:"";position:absolute;inset:-40% -30% auto auto;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.10),transparent 65%);pointer-events:none}
-.stk::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.05) 45%,transparent 60%);background-size:250% 100%;animation:stkSheen 6s ease-in-out infinite;pointer-events:none}
+/* MY스타 프로필 카드 (테마: --bg --fg --sub --trk --bar --pt --bd --cb --cf) */
+.stk{position:relative;overflow:hidden;border-radius:26px;padding:20px;color:var(--fg,#fff);background:var(--bg,#0B0C0B);box-shadow:0 14px 34px rgba(0,0,0,.16),inset 0 0 0 1px var(--bd,rgba(255,255,255,.07))}
+.stk::before{content:"";position:absolute;inset:-40% -30% auto auto;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,var(--glow,rgba(255,255,255,.10)),transparent 65%);pointer-events:none}
+.stk::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,var(--sheen,rgba(255,255,255,.06)) 45%,transparent 60%);background-size:250% 100%;animation:stkSheen 6s ease-in-out infinite;pointer-events:none}
 @keyframes stkSheen{0%,100%{background-position:120% 0}50%{background-position:-20% 0}}
-.stk .lb{font-size:11px;font-weight:600;opacity:.6;letter-spacing:.1px}
-.stk .pbar{background:rgba(255,255,255,.12)}
-.stk-bar{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#3E4A36,#7D8C6A 70%,#C9D4B6);transition:width .3s linear}
-.stk-bar::after{content:"";position:absolute;right:0;top:0;bottom:0;width:24px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35));animation:stkPulse 1.6s ease-in-out infinite}
+.stk .lb{font-size:11px;font-weight:600;color:var(--sub,rgba(255,255,255,.6));letter-spacing:.1px}
+.stk .op{color:var(--sub,rgba(255,255,255,.6))}
+.stk .pbar{background:var(--trk,rgba(255,255,255,.12))}
+.stk-bar{position:absolute;inset:0 auto 0 0;background:var(--bar);border-radius:14px 0 0 14px}
+.stk-bar::after{content:"";position:absolute;right:0;top:0;bottom:0;width:26px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55));animation:stkPulse 1.6s ease-in-out infinite}
 @keyframes stkPulse{50%{opacity:.25}}
-.stk-ring{box-shadow:0 0 0 2px rgba(255,255,255,.9),0 0 0 5px rgba(255,255,255,.12)}
-.stk-cheer{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 15px;border-radius:99px;font-size:13px;font-weight:800;background:#fff;color:#0B0C0B;transition:transform .15s}
-.stk-cheer:active{transform:scale(.95)}.stk-cheer.done{background:rgba(255,255,255,.12);color:rgba(255,255,255,.75)}
+.stk-live{color:var(--pt,#fff);text-shadow:var(--pts,0 1px 3px rgba(0,0,0,.35))}
+.stk-ring{box-shadow:0 0 0 2px var(--ring,rgba(255,255,255,.9)),0 0 0 6px var(--ring2,rgba(255,255,255,.12))}
+.stk-cheer{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 15px;border-radius:99px;font-size:13px;font-weight:800;background:var(--cb,#fff);color:var(--cf,#0B0C0B);transition:transform .15s}
+.stk-cheer:active{transform:scale(.95)}.stk-cheer.done{background:var(--trk,rgba(255,255,255,.12));color:var(--sub,rgba(255,255,255,.75))}
 .stk-cheer svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.st-pager{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;gap:12px;margin:0 -2px;padding:2px 2px 4px}
+.st-pager>div{flex:0 0 100%;scroll-snap-align:center;scroll-snap-stop:always;min-width:0}
+.st-dots{display:flex;justify-content:center;gap:6px;margin-top:10px}.st-dots i{width:7px;height:7px;border-radius:99px;background:#D5D9DE;transition:all .25s}.st-dots i.on{width:18px;background:#191F28}
+.st-mine{display:flex;gap:14px;overflow-x:auto;padding:4px 2px 14px;margin:0 -2px}
+.st-mine button{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#8B95A1;width:64px}
+.st-mine button .st-ava{transition:box-shadow .2s}.st-mine button.on{color:#191F28}.st-mine button.on .st-ava{box-shadow:0 0 0 2.5px #fff,0 0 0 5px #191F28}
+.st-mine .add{width:56px;height:56px;border-radius:50%;border:2px dashed #C9CED6;display:flex;align-items:center;justify-content:center;font-size:24px;color:#8B95A1}
+.th-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px}
+.th-grid button{border-radius:18px;padding:12px;text-align:left;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
+.th-grid button.on{box-shadow:0 0 0 3px #fff,0 0 0 5px var(--mil-green)}
+.th-grid .tb{height:10px;border-radius:99px;margin-top:22px;overflow:hidden}.th-grid .tb i{display:block;height:100%;width:72%}
+.th-grid .tn{font-size:13px;font-weight:800}
 .st-ppl{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;opacity:.8}
 .st-ppl i{width:7px;height:7px;border-radius:50%;background:#7BE08F;box-shadow:0 0 0 3px rgba(123,224,143,.2);animation:stLive 1.6s ease-in-out infinite}
 @keyframes stLive{50%{box-shadow:0 0 0 6px rgba(123,224,143,0)}}
@@ -795,6 +809,11 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
  </div>
 </div>
 <div id="star-flow" class="sf hidden"></div>
+<div id="modal-admin" class="fixed inset-0 z-[66] hidden flex-col" style="background:var(--bg-main)">
+ <div class="relative flex items-center justify-between px-4 pb-3" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeModal('modal-admin')" class="w-10 h-10 rounded-full bg-white border border-[#E5E8EB] font-bold text-[18px] relative z-10">‹</button><div class="ios-t">관리자</div><button onclick="adTab('reports');setTimeout(adRun,60)" class="relative z-10 h-10 px-3.5 rounded-full text-[13px] font-extrabold text-white flex items-center gap-1.5" style="background:var(--mil-green)"><svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>지금 최신화</button></div>
+ <div class="px-5 pb-3"><div class="flex p-1 rounded-2xl bg-[#E9ECEF]"><button id="ad-t-users" class="ad-tab" onclick="adTab('users')">회원</button><button id="ad-t-reports" class="ad-tab" onclick="adTab('reports')">점검 결과</button><button id="ad-t-content" class="ad-tab" onclick="adTab('content')">콘텐츠</button></div></div>
+ <div id="ad-body" class="flex-1 overflow-y-auto no-scrollbar px-5 pb-12"></div>
+</div>
 <div id="star-sheet" class="st-sheet hidden" onclick="if(event.target===this)stSheetClose()"><div id="star-sheet-in"></div></div>
 <div id="lenv" class="lenv hidden" onclick="lEnvSkip()"></div>
  <div id="modal-lwrite" class="fixed inset-0 z-[64] hidden flex-col" style="background:#FBF6EA">
@@ -981,6 +1000,7 @@ async function loadAll(first) {
   { const sid = me.gender === 'M' ? me.id : me.partner_id; menus = {}; if (sid) { const { data: mm } = await sb.from('menus').select('*').eq('created_by', sid); (mm || []).forEach(x => menus[x.menu_date] = x); } }
   if (first) { let ls = null; try { ls = JSON.parse(localStorage.getItem('sav:' + me.id)); } catch (e) { } sav = Object.assign({ banks: [], amts: {}, opts: {} }, (me.savings && me.savings.banks && me.savings.banks.length) ? me.savings : (ls || me.savings || {})); }
   if (first) await loadContent();
+  await loadMyStars();
   await loadFriends(); loadLetters(); await loadAsks();
   if (first) { await loadGm(); clearInterval(gm.poll); gm.poll = setInterval(() => { if (me && !document.hidden) loadAsks(); }, 45000); }
   await loadQ();
@@ -1210,9 +1230,9 @@ function renderSetRows() {
   const S = S_(), isM = me.gender === 'M', th = isM ? (me.bf_theme === 'gamja' ? '감자돌이' : '짬타이거') : (me.gf_theme === 'cat' ? '꽃냥이' : '곰신 베어');
   const row = (ic, label, val, go, red) => `<button onclick="${go}" class="w-full flex items-center gap-4 px-5 py-4 border-b border-[#F2F3F5] active:bg-[#F5F6F8]"><span class="text-xl w-7">${ic}</span><span class="flex-1 text-left text-[15px] font-semibold ${red ? 'text-[#E5484D]' : ''}">${label}</span><span class="text-[13px] text-[#8B95A1] max-w-[45%] truncate">${esc(val || '')}</span><span class="text-[#B0B8C1]">›</span></button>`, gap = '<div class="h-2.5 bg-[#F5F6F8]"></div>';
   q('set-name').innerText = me.nickname || (isM ? '🪖 군인' : me.gender === 'S' ? '⭐ 팬' : '💕 곰신');
-  q('set-rows').innerHTML = gap + row('✏️', '프로필 (이름·별명)', me.nickname || '미설정', "setGo('profile')") + row('⭐', 'MY스타', myStar() ? myStar().n : '미등록', "closeModal('modal-settings');" + (myStar() ? "openStar('my')" : 'starFlow()')) + row('💑', '사귄 날짜', me.love_date ? me.love_date.replace(/-/g, '.') : '미설정', "setGo('profile')") + row('💕', '커플 연동', me.partner_id ? '연동 중' : '미연동', "setGo('couple')") + row('👤', '계정', '', "setGo('account')") + gap
+  q('set-rows').innerHTML = gap + row('✏️', '프로필 (이름·별명)', me.nickname || '미설정', "setGo('profile')") + row('⭐', 'MY스타', myStars.length ? myStars.map(r => (starK[r.id] || {}).n).join(', ') : '미등록', "closeModal('modal-settings');" + (myStars.length ? "openStar('my')" : 'starFlow()')) + row('💑', '사귄 날짜', me.love_date ? me.love_date.replace(/-/g, '.') : '미설정', "setGo('profile')") + row('💕', '커플 연동', me.partner_id ? '연동 중' : '미연동', "setGo('couple')") + row('👤', '계정', '', "setGo('account')") + gap
     + row('🪖', '복무 정보', isM ? (BR[me.branch] || BR.army).k : '군인 계정에서 설정', "setGo('service')") + row('📍', '자대 등록', (S && S.unit_name) || '미등록', "setGo('unit')") + row('🎭', '캐릭터 테마', th, "setGo('theme')") + gap
-    + (me.is_admin ? row('🛠️', '관리자', '회원 · 콘텐츠 · 점검', "closeModal('modal-settings');openAdmin()") + gap : '')
+    + (me.is_admin ? row('🛠', '관리자', '회원 · 콘텐츠 · 점검', "closeModal('modal-settings');openAdmin()") + gap : '')
     + row('🚪', '로그아웃', '', 'logout()', true);
 }
 function openSettings() {
@@ -1351,10 +1371,11 @@ const ICONS = {
  eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
  star:'<polygon fill="currentColor" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
  clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+ tool:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
  trash:'<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>'
 };
 const ico = (n, ex = '') => `<svg class="ic" viewBox="0 0 24 24" ${ex}>${ICONS[n] || ''}</svg>`;
-const EMO = { '💕':'heart','❤':'heart','💑':'users','💌':'mail','✉':'mail','🛒':'bag','🌙':'moon','✨':'sparkle','🎉':'sparkle','🔒':'lock','🪖':'shield','🛡':'shield','🌱':'sprout','🌿':'leaf','🌷':'flower','🌸':'flower','💐':'award','🏖':'umbrella','📍':'pin','📌':'pin','🚶':'walk','☀':'sun','✏':'pencil','🚆':'train','🚇':'train','🍚':'utensils','⚡':'zap','🌅':'sunrise','👤':'user','🥔':'user','🐯':'user','🐻':'user','🐈‍⬛':'user','🐈':'user','🚌':'bus','💰':'wallet','💬':'msg','💳':'card','🏠':'home','📓':'book','📚':'book','📷':'camera','✅':'checkc','🔄':'refresh','📥':'download','🎭':'smile','🚪':'logout','🔥':'flame','💧':'drop','🫧':'drop','🚗':'car','🚕':'car','🎢':'ticket','📱':'phone','🪪':'idcard','🎁':'gift','📅':'cal','ℹ':'info','▶':'chev','⚠':'info','⭐':'star','★':'star','⏳':'clock','👁':'eye','♡':'heart' };
+const EMO = { '🛠':'tool','💕':'heart','❤':'heart','💑':'users','💌':'mail','✉':'mail','🛒':'bag','🌙':'moon','✨':'sparkle','🎉':'sparkle','🔒':'lock','🪖':'shield','🛡':'shield','🌱':'sprout','🌿':'leaf','🌷':'flower','🌸':'flower','💐':'award','🏖':'umbrella','📍':'pin','📌':'pin','🚶':'walk','☀':'sun','✏':'pencil','🚆':'train','🚇':'train','🍚':'utensils','⚡':'zap','🌅':'sunrise','👤':'user','🥔':'user','🐯':'user','🐻':'user','🐈‍⬛':'user','🐈':'user','🚌':'bus','💰':'wallet','💬':'msg','💳':'card','🏠':'home','📓':'book','📚':'book','📷':'camera','✅':'checkc','🔄':'refresh','📥':'download','🎭':'smile','🚪':'logout','🔥':'flame','💧':'drop','🫧':'drop','🚗':'car','🚕':'car','🎢':'ticket','📱':'phone','🪪':'idcard','🎁':'gift','📅':'cal','ℹ':'info','▶':'chev','⚠':'info','⭐':'star','★':'star','⏳':'clock','👁':'eye','♡':'heart' };
 const EMO_RE = new RegExp('(' + Object.keys(EMO).sort((a, b) => b.length - a.length).map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\uFE0F?', 'g');
 function emoSwap(root) {
   if (!root) return; if (root.nodeType === 3) root = root.parentNode; if (!root || !root.nodeType) return;
@@ -1376,7 +1397,7 @@ const catName = k => String(k).startsWith('star_') ? '⭐ ' + ((typeof starK !==
 let cmCat = 'all', cmCur = null, cAnon = true, wAnon = true, wCat = 'free', cmBusy = false;
 const timeAgo = iso => { const d = (Date.now() - new Date(iso)) / 1000; if (d < 60) return '방금 전'; if (d < 3600) return Math.floor(d / 60) + '분 전'; if (d < 86400) return Math.floor(d / 3600) + '시간 전'; if (d < 86400 * 7) return Math.floor(d / 86400) + '일 전'; const t = new Date(iso); return `${t.getMonth() + 1}/${t.getDate()}`; };
 const cmErr = e => /community_|schema cache|does not exist|function/i.test((e && e.message) || '') ? 'schema_community.sql 을 Supabase SQL Editor 에서 먼저 실행해주세요.' : '잠시 후 다시 시도해주세요.';
-function syncStarCat() { for (let i = CATS.length - 1; i >= 0; i--) if (CATS[i][0].startsWith('star_')) CATS.splice(i, 1); const s = myStar(); if (s) CATS.splice(2, 0, ['star_' + s.id, '⭐ ' + s.n + ' 팬']); if (cmCat.startsWith('star_') && !CATS.some(c => c[0] === cmCat)) cmCat = 'all'; }
+function syncStarCat() { for (let i = CATS.length - 1; i >= 0; i--) if (CATS[i][0].startsWith('star_')) CATS.splice(i, 1); myStars.slice().reverse().forEach(r => { const x = starK[r.id]; if (x) CATS.splice(2, 0, ['star_' + x.id, '⭐ ' + x.n + ' 팬']); }); if (cmCat.startsWith('star_') && !CATS.some(c => c[0] === cmCat)) cmCat = 'all'; }
 function renderCmCats() { syncStarCat(); q('cm-cats').innerHTML = CATS.map(c => `<button class="cm-chip ${cmCat === c[0] ? 'on' : ''}" onclick="cmCat='${c[0]}';loadCommunity()">${c[0] === 'hot' ? ico('flame') + ' ' : ''}${c[1]}</button>`).join(''); }
 async function loadCommunity() {
   if (!sb || !me) return; renderCmCats();
@@ -2099,7 +2120,7 @@ async function adSave() {
 }
 async function adUnlink() { if (!confirm('이 회원의 커플 연동을 해제할까요? 상대방도 함께 해제돼요.')) return; const { error } = await sb.rpc('admin_unlink', { uid: adSel.id }); if (error) return showAlert('실패', adErr(error)); adSel.partner_id = null; adSel.partner_name = null; adEdit(adUsers.indexOf(adSel)); }
 async function adReports() {
-  const b = q('ad-body'); b.innerHTML = `<div class="ad-card"><div class="text-[14px] font-extrabold">자동 점검</div><div class="text-[12px] text-[#8B95A1] mt-1 leading-relaxed">매일 아침 9시에 네이버 검색으로 혜택·적금·카드 내용을 확인하고, 틀린 내용과 새 이벤트를 메일로 보내요.</div><button id="ad-run" class="ad-btn dark w-full mt-3" onclick="adRun()">지금 점검 실행</button><div id="ad-runlog" class="text-[11px] text-[#8B95A1] mt-2"></div></div><div id="ad-rl" class="mt-3 space-y-2"><div class="py-10 text-center text-[13px] text-[#8B95A1]">불러오는 중…</div></div>`;
+  const b = q('ad-body'); b.innerHTML = `<div class="ad-card"><div class="text-[14px] font-extrabold">실시간 최신화</div><div class="text-[12px] text-[#8B95A1] mt-1 leading-relaxed">매일 아침 9시에 자동으로 하는 일을 지금 바로 실행해요. 끝난 혜택 정리 · 새 혜택 추가 · 적금/카드 내용 검증 · 새로 입대한 스타 추가 (2~4분). 바뀐 내용은 모든 사용자 앱에 바로 반영되고 메일로도 보내요.</div><button id="ad-run" class="ad-btn dark w-full mt-3" onclick="adRun()">지금 최신화</button><div id="ad-runlog" class="text-[11px] text-[#8B95A1] mt-2"></div></div><div id="ad-rl" class="mt-3 space-y-2"><div class="py-10 text-center text-[13px] text-[#8B95A1]">불러오는 중…</div></div>`;
   const { data, error } = await sb.from('content_reports').select('*').order('created_at', { ascending: false }).limit(40);
   const rl = q('ad-rl'); if (error) { rl.innerHTML = `<div class="py-10 text-center text-[13px] text-[#8B95A1]">${adErr(error)}</div>`; return; }
   rl.innerHTML = (data || []).length ? data.map(r => `<div class="ad-card ${r.status === 'done' ? 'opacity-50' : ''}"><div class="flex items-start justify-between gap-2"><b class="text-[14px]">${esc(r.title)}</b><button class="text-[11px] font-extrabold flex-shrink-0 ${r.status === 'done' ? 'text-[#8B95A1]' : 'text-[var(--mil-green)]'}" onclick="adDone(${r.id},'${r.status === 'done' ? 'new' : 'done'}')">${r.status === 'done' ? '되돌리기' : '처리 완료'}</button></div><div class="text-[11px] text-[#8B95A1]">${esc((r.created_at || '').slice(0, 16).replace('T', ' '))}</div>${(r.detail || []).map(i => i.fix ? `<div class="mt-2 text-[12px] leading-relaxed bg-[#F7F8FA] rounded-xl p-2.5"><b>${esc(i.item)}</b><br><span class="text-[#8B95A1]">앱:</span> ${esc(i.ours)}<br><span class="text-[#8B95A1]">검색:</span> ${esc(i.found)}<br><b class="text-[#D94867]">수정: ${esc(i.fix)}</b>${i.source ? ` <a href="${esc(i.source)}" target="_blank" rel="noopener" class="text-[var(--mil-green)] font-bold">근거</a>` : ''}</div>` : `<div class="mt-2 text-[12px] bg-[#F7F8FA] rounded-xl p-2.5"><b>${esc(i.title)}</b> · ${esc(i.start)} ~ ${esc(i.end)}<br>${esc(i.benefit)}</div>`).join('')}</div>`).join('') : '<div class="py-10 text-center text-[13px] text-[#8B95A1]">아직 점검 결과가 없어요</div>';
@@ -2109,8 +2130,8 @@ async function adRun() {
   const b = q('ad-run'); b.innerText = '점검 중… (2~4분)'; b.disabled = true;
   const out = [];
   for (const mode of ['content', 'stars']) { q('ad-runlog').innerText = (mode === 'content' ? '혜택·적금·카드 점검 중…' : '새로 입대한 스타 확인 중…'); try { const { data, error } = await sb.functions.invoke('content-check', { body: { mode } }); out.push(error ? `${mode}: 실패 (서버 함수·키 설정 확인)` : (data.log || []).join(' · ') + (data.reports ? ` · 결과 ${data.reports}건 (메일 발송)` : ' · 문제 없음')); } catch (e) { out.push(mode + ': 실패'); } }
-  q('ad-runlog').innerText = out.join('\n'); await loadContent();
-  b.innerText = '지금 점검 실행'; b.disabled = false; if (adT === 'reports') { const l = q('ad-runlog').innerText; await adReports(); q('ad-runlog').innerText = l; }
+  q('ad-runlog').innerText = out.join('\n'); await loadContent(); await loadMyStars(); stRefresh(); if (curTab === 'benefits') renderBenefits(); if (curTab === 'savings') renderSav();
+  b.innerText = '지금 최신화'; b.disabled = false; if (adT === 'reports') { const l = q('ad-runlog').innerText; await adReports(); q('ad-runlog').innerText = l; }
 }
 /* 콘텐츠 편집 (모양 그대로 편집하는 폼) */
 const JF_L = { title: '제목', org: '기관', benefit: '혜택', target: '대상', start: '시작일', end: '종료일', note: '메모', url: '출처 링크', n: '이름', b: '기본금리(%)', max: '최고금리(%)', o: '우대조건', r: '우대(%p)', d: '설명', id: 'ID', img: '이미지', tag: '태그', sum: '요약', items: '혜택 항목', events: '이벤트 목록', updated: '업데이트일', auto: '자동 추가', closed: '종료 처리', added: '추가일' };
@@ -2151,18 +2172,41 @@ async function adCSave() {
 /* ===================== MY스타 ===================== */
 const STAR_CAT = [['all', '전체'], ['idol', '아이돌'], ['singer', '가수'], ['actor', '배우'], ['sports', '운동선수'], ['creator', '인플루언서']];
 const STAR_SVC = { army: '육군 현역', marine: '해병대', navy: '해군', airforce: '공군', social: '사회복무요원', band: '육군 군악대' };
+const GOLD = 'linear-gradient(90deg,#8C6A2A,#C9A24C 45%,#EED9A0 85%,#FFF4D2)', SILVER = 'linear-gradient(90deg,#6B7076,#A9AFB5 45%,#DDE1E5 85%,#FFFFFF)', SILVER_D = 'linear-gradient(90deg,#7C838A,#AEB4BA 50%,#D7DCE0)', ROSE = 'linear-gradient(90deg,#9E6450,#CE9479 50%,#F1CDB9)';
+const STAR_TH = {
+  black_gold: { n: '블랙 골드', bg: '#0B0C0B', fg: '#fff', sub: 'rgba(255,255,255,.58)', trk: 'rgba(255,255,255,.12)', bar: GOLD, pt: '#fff', cb: '#E3C77E', cf: '#1A1508', ring: '#E3C77E', ring2: 'rgba(227,199,126,.18)', glow: 'rgba(227,199,126,.16)' },
+  black_silver: { n: '블랙 실버', bg: '#0B0C0D', fg: '#fff', sub: 'rgba(255,255,255,.58)', trk: 'rgba(255,255,255,.12)', bar: SILVER, pt: '#fff', cb: '#fff', cf: '#0B0C0D', ring: '#E6E9EC', ring2: 'rgba(255,255,255,.12)' },
+  white_gold: { n: '화이트 골드', bg: '#FFFFFF', fg: '#14130F', sub: 'rgba(20,19,15,.48)', trk: 'rgba(0,0,0,.06)', bar: GOLD, pt: '#14130F', pts: 'none', cb: '#14130F', cf: '#fff', bd: 'rgba(0,0,0,.07)', ring: '#D9B866', ring2: 'rgba(217,184,102,.18)', glow: 'rgba(217,184,102,.18)', sheen: 'rgba(255,255,255,.7)' },
+  white_silver: { n: '화이트 실버', bg: '#FFFFFF', fg: '#111315', sub: 'rgba(17,19,21,.46)', trk: 'rgba(0,0,0,.06)', bar: SILVER_D, pt: '#111315', pts: 'none', cb: '#111315', cf: '#fff', bd: 'rgba(0,0,0,.07)', ring: '#B9BFC5', ring2: 'rgba(0,0,0,.05)', glow: 'rgba(0,0,0,.04)', sheen: 'rgba(255,255,255,.7)' },
+  khaki_gold: { n: '카키 골드', bg: 'linear-gradient(155deg,#36412D 0%,#222A1D 100%)', fg: '#fff', sub: 'rgba(255,255,255,.6)', trk: 'rgba(255,255,255,.13)', bar: GOLD, pt: '#fff', cb: '#E3C77E', cf: '#1E2418', ring: '#E3C77E', ring2: 'rgba(227,199,126,.2)', glow: 'rgba(227,199,126,.14)' },
+  navy_silver: { n: '미드나잇 실버', bg: 'linear-gradient(155deg,#18233A 0%,#0C1322 100%)', fg: '#fff', sub: 'rgba(255,255,255,.6)', trk: 'rgba(255,255,255,.12)', bar: SILVER, pt: '#fff', cb: '#fff', cf: '#0C1322', ring: '#DDE3EC', ring2: 'rgba(255,255,255,.12)', glow: 'rgba(140,170,230,.16)' },
+  ivory_rose: { n: '아이보리 로즈골드', bg: 'linear-gradient(155deg,#FFFCF7 0%,#F6EEE4 100%)', fg: '#2A211C', sub: 'rgba(42,33,28,.5)', trk: 'rgba(42,33,28,.07)', bar: ROSE, pt: '#2A211C', pts: 'none', cb: '#2A211C', cf: '#fff', bd: 'rgba(42,33,28,.08)', ring: '#D9A58B', ring2: 'rgba(217,165,139,.2)', glow: 'rgba(217,165,139,.2)', sheen: 'rgba(255,255,255,.6)' },
+  carbon_gold: { n: '카본 블랙 골드', bg: 'repeating-linear-gradient(45deg,#121212 0 6px,#171717 6px 12px)', fg: '#fff', sub: 'rgba(255,255,255,.58)', trk: 'rgba(255,255,255,.1)', bar: GOLD, pt: '#fff', cb: '#E3C77E', cf: '#121212', ring: '#E3C77E', ring2: 'rgba(227,199,126,.16)', glow: 'rgba(227,199,126,.12)' }
+};
+const thVars = k => { const t = STAR_TH[k] || STAR_TH.black_gold; return ['bg', 'fg', 'sub', 'trk', 'bar', 'pt', 'pts', 'cb', 'cf', 'bd', 'ring', 'ring2', 'glow', 'sheen'].filter(x => t[x]).map(x => `--${x}:${t[x]}`).join(';'); };
 let STARL = [], starK = {};
 function rebuildStars() {
   const base = (window.STARS || []).map(a => ({ id: a[0], n: a[1], g: a[2], c: a[3], e: a[4], d: a[5], t: a[6] }));
-  const extra = (CONTENT && Array.isArray(CONTENT.stars) ? CONTENT.stars : []).filter(x => x && x.id && x.n && x.e && x.d && !x.hidden).map(x => ({ id: x.id, n: x.n, g: x.g || '', c: x.c || 'idol', e: x.e, d: x.d, t: x.t || 'army', auto: !!x.auto }));
-  const hide = new Set((CONTENT && Array.isArray(CONTENT.stars) ? CONTENT.stars : []).filter(x => x && x.hidden).map(x => x.id));
+  const all = (typeof CONTENT !== 'undefined' && CONTENT && Array.isArray(CONTENT.stars)) ? CONTENT.stars : [];
+  const extra = all.filter(x => x && x.id && x.n && x.e && x.d && !x.hidden).map(x => ({ id: x.id, n: x.n, g: x.g || '', c: x.c || 'idol', e: x.e, d: x.d, t: x.t || 'army', auto: !!x.auto }));
+  const hide = new Set(all.filter(x => x && x.hidden).map(x => x.id));
   STARL = base.filter(x => !hide.has(x.id)).concat(extra.filter(x => !base.some(b => b.id === x.id))); starK = {}; STARL.forEach(x => starK[x.id] = x);
 }
 rebuildStars();
-let stStats = {}, stCat = 'all', stImg = {}, stStatT = 0, stTabCur = 'my';
+let stStats = {}, stCat = 'all', stImg = {}, stStatT = 0, stTabCur = 'my', myStars = [], stSel = null, stFansOK = true;
 const STAR_SVG = '<svg viewBox="0 0 24 24"><path d="M12 2.8l2.75 5.6 6.15.9-4.45 4.33 1.05 6.12L12 16.87l-5.5 2.88 1.05-6.12L3.1 9.3l6.15-.9z"/></svg>';
 const CHEER_SVG = '<svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
-function myStar() { return me && me.star_id ? starK[me.star_id] || null : null; }
+/* 내 스타 목록 (여러 명) */
+async function loadMyStars() {
+  if (!me) return; let rows = null;
+  try { const { data, error } = await sb.from('star_fans').select('*').eq('user_id', me.id).order('ord').order('created_at'); if (!error) rows = data; else stFansOK = false; } catch (e) { stFansOK = false; }
+  if (!rows) rows = me.star_id ? [{ star_id: me.star_id, since: String(me.star_since || '').slice(0, 10) || ymd(new Date()), photo: me.star_photo || null, theme: 'black_gold' }] : [];
+  myStars = rows.filter(r => starK[r.star_id]).map(r => ({ id: r.star_id, since: String(r.since || '').slice(0, 10) || ymd(new Date()), photo: r.photo || '', theme: STAR_TH[r.theme] ? r.theme : 'black_gold' }));
+  me.star_id = myStars[0] ? myStars[0].id : null;
+  if (!stSel || !myStars.some(x => x.id === stSel)) stSel = myStars[0] ? myStars[0].id : null;
+}
+const myRow = id => myStars.find(x => x.id === id);
+function myStar() { return myStars[0] ? starK[myStars[0].id] || null : null; }
 function starPct(s, now) { const e = pd(s.e).getTime(), D = pd(s.d).getTime() + 864e5, t = (now || Date.now()); return t <= e ? 0 : t >= D ? 100 : (t - e) / (D - e) * 100; }
 function starInfo(s, now) {
   now = now || new Date(); const e = pd(s.e), d = pd(s.d), D = new Date(d.getTime() + 864e5), T0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -2173,83 +2217,105 @@ function starInfo(s, now) {
   const total = Math.round((d - e) / 864e5) + 1, served = Math.max(0, Math.min(total, Math.floor((T0 - e) / 864e5) + 1));
   return { e, d, pct, dday, pre, done, rank, total, served, left: Math.max(0, total - served), toEnlist: Math.ceil((e - T0) / 864e5) };
 }
-function starPhoto(s) { if (!s) return ''; if (me && me.star_id === s.id && me.star_photo) return me.star_photo; return stImg[s.id] || ''; }
+function starPhoto(s) { if (!s) return ''; const r = myRow(s.id); if (r && r.photo) return r.photo; return stImg[s.id] || ''; }
 function starAva(s, px, cls) {
   const im = starPhoto(s), fs = Math.round(px * (s.n.length > 2 ? .28 : .34));
   return `<div class="st-ava ${cls || ''}" style="width:${px}px;height:${px}px;${im ? '' : 'background:#191F28;'}font-size:${fs}px">${im ? `<img src="${esc(im)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : esc(s.n.slice(0, 3))}</div>`;
 }
-const fanDays = () => me && me.star_since ? Math.max(1, Math.floor((new Date().setHours(0, 0, 0, 0) - pd(String(me.star_since).slice(0, 10)).getTime()) / 864e5) + 1) : 1;
+const daysSince = d => Math.max(1, Math.floor((new Date().setHours(0, 0, 0, 0) - pd(d || ymd(new Date())).getTime()) / 864e5) + 1);
+const fanDays = id => { const r = myRow(id || (myStars[0] && myStars[0].id)); return daysSince(r && r.since); };
 const stN = id => (stStats[id] || { fans: 0, cheers_today: 0, cheers_total: 0, cheered_today: false });
 const fmtPct = p => p >= 100 ? '100%' : p.toFixed(8) + '%';
 async function loadStarStats(force) {
   if (!me || (!force && Date.now() - stStatT < 20000)) return; stStatT = Date.now();
   try { const { data, error } = await sb.rpc('star_stats'); if (!error && data) { stStats = {}; data.forEach(r => stStats[r.star_id] = r); } } catch (e) { }
-  renderStarHome(); if (q('modal-star').classList.contains('flex')) { renderStarMy(); if (stTabCur === 'all') renderStarList(); }
+  stRefresh();
 }
+function stRefresh() { renderStarHome(); if (q('modal-star').classList.contains('flex')) { renderStarMy(false); if (stTabCur === 'all') renderStarList(false); } }
 function stDdayTxt(I) { return I.pre ? `입대 D-${I.toEnlist}` : I.done ? '전역' : I.dday <= 0 ? 'D-DAY' : `D-${I.dday}`; }
 /* 실시간 퍼센트 */
-setInterval(() => { const s = myStar(); if (!s || document.hidden) return; const p = starPct(s); document.querySelectorAll('.stk-live').forEach(el => el.innerText = fmtPct(p)); document.querySelectorAll('.stk-bar').forEach(el => el.style.width = p + '%'); }, 100);
-function stkCard(s, big) {
-  const I = starInfo(s), N = stN(s.id), on = N.cheered_today;
-  return `<div class="stk ${big ? 'st-in' : ''}" ${big ? '' : 'onclick="openStar()"'} style="${big ? '' : 'cursor:pointer'}"><div class="relative z-[1]">
-   <div class="flex items-center justify-between"><span class="lb">MY스타 · 팬이 된 지 ${fanDays()}일째</span><span class="lb">${esc(s.g)}</span></div>
+setInterval(() => { if (document.hidden) return; document.querySelectorAll('[data-stp]').forEach(card => { const s = starK[card.dataset.stp]; if (!s) return; const p = starPct(s); const t = card.querySelector('.stk-live'), b = card.querySelector('.stk-bar'); if (t) t.textContent = fmtPct(p); if (b) b.style.width = p + '%'; }); }, 100);
+function stkCard(s, big, anim) {
+  const I = starInfo(s), N = stN(s.id), on = N.cheered_today, r = myRow(s.id), th = r ? r.theme : 'black_gold';
+  return `<div class="stk ${anim ? 'st-in' : ''}" data-stp="${s.id}" ${big ? '' : `onclick="openStar('my','${s.id}')"`} style="${thVars(th)};${big ? '' : 'cursor:pointer'}"><div class="relative z-[1]">
+   <div class="flex items-center justify-between"><span class="lb">MY스타 · 팬이 된 지 ${fanDays(s.id)}일째</span><span class="lb">${esc(s.g)}</span></div>
    <div class="flex ${big ? 'flex-col text-center' : ''} items-center gap-3.5 mt-3">${starAva(s, big ? 118 : 72, 'stk-ring')}<div class="flex-1 min-w-0 ${big ? 'mt-2' : ''}"><div class="lb">대한민국 ${esc(STAR_SVC[s.t] || '')}</div><div class="text-[13px] font-bold mt-0.5">${esc(I.rank)}</div><div class="${big ? 'text-[32px]' : 'text-[25px]'} font-extrabold leading-tight tracking-tight truncate">${esc(s.n)}</div></div></div>
-   <div class="flex justify-between items-end mt-4 mb-1.5 text-[12px]"><span class="truncate"><span class="opacity-60">입대</span> <b>${s.e.replace(/-/g, '.')}</b> <span class="opacity-60">· 전역</span> <b>${s.d.replace(/-/g, '.')}</b></span><b class="text-[16px] font-black">${stDdayTxt(I)}</b></div>
+   <div class="flex justify-between items-end mt-4 mb-1.5 text-[12px]"><span class="truncate"><span class="op">입대</span> <b>${s.e.replace(/-/g, '.')}</b> <span class="op">· 전역</span> <b>${s.d.replace(/-/g, '.')}</b></span><b class="text-[16px] font-black">${stDdayTxt(I)}</b></div>
    <div class="pbar"><div class="stk-bar" style="width:${I.pct}%"></div><div class="stk-live relative px-3.5 h-full flex items-center text-[17px] font-black tabular-nums">${fmtPct(I.pct)}</div></div>
    <div class="flex items-center justify-between mt-3.5"><span class="st-ppl"><i></i>${N.fans.toLocaleString()}명이 응원중</span><button class="stk-cheer ${on ? 'done' : ''}" onclick="event.stopPropagation();starCheer('${s.id}',this)">${CHEER_SVG}${on ? '오늘 응원 완료' : '응원하기'}</button></div>
   </div></div>`;
 }
+let stHomeSig = '';
 function renderStarHome() {
-  const box = q('star-home'), s = myStar(); q('btn-star').classList.toggle('hidden', !s && me.gender !== 'S');
-  if (!s) { box.classList.add('hidden'); box.innerHTML = ''; return; }
+  const box = q('star-home'), L = myStars.map(r => starK[r.id]).filter(Boolean); q('btn-star').classList.toggle('hidden', !L.length && me.gender !== 'S');
+  if (!L.length) { box.classList.add('hidden'); box.innerHTML = ''; stHomeSig = ''; return; }
   if (!window._stImgTried) setTimeout(starImgLoad, 800);
-  box.classList.remove('hidden'); box.innerHTML = stkCard(s, false);
+  box.classList.remove('hidden');
+  const pg = box.querySelector('.st-pager'), keep = pg ? pg.scrollLeft : 0;
+  box.innerHTML = L.length === 1 ? stkCard(L[0], false) : `<div class="st-pager" onscroll="stDots(this)">${L.map(s => `<div>${stkCard(s, false)}</div>`).join('')}</div><div class="st-dots">${L.map((_, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('')}</div>`;
+  const np = box.querySelector('.st-pager'); if (np && keep) { np.scrollLeft = keep; stDots(np); }
 }
-function openStar(tab) { stCat = 'all'; q('star-q').value = ''; openM('modal-star'); stTab(tab || (myStar() ? 'my' : 'all')); loadStarStats(true); starImgLoad(); }
+function stDots(el) { const i = Math.round(el.scrollLeft / Math.max(1, el.clientWidth + 12)); el.parentNode.querySelectorAll('.st-dots i').forEach((d, k) => d.classList.toggle('on', k === i)); }
+function openStar(tab, sel) { stCat = 'all'; q('star-q').value = ''; if (sel) stSel = sel; openM('modal-star'); stTab(tab || (myStars.length ? 'my' : 'all')); loadStarStats(true); starImgLoad(); }
 function stTab(t) {
   stTabCur = t; q('st-t-my').classList.toggle('on', t === 'my'); q('st-t-all').classList.toggle('on', t === 'all');
   q('st-p-my').classList.toggle('hidden', t !== 'my'); q('st-p-all').classList.toggle('hidden', t !== 'all'); q('star-body').scrollTop = 0;
-  if (t === 'my') renderStarMy(); else renderStarList();
+  if (t === 'my') renderStarMy(true); else renderStarList(true);
 }
-function renderStarMy() {
-  const s = myStar(), h = q('st-p-my');
-  if (!s) { h.innerHTML = `<div class="text-center py-16 st-in"><div class="mx-auto w-20 h-20 rounded-full bg-[#F2F3F5] flex items-center justify-center"><span style="display:inline-flex;width:34px;height:34px;color:#191F28">${STAR_SVG.replace('<svg', '<svg style="width:34px;height:34px;fill:currentColor"')}</span></div><div class="text-[20px] font-extrabold mt-5">아직 MY스타가 없어요</div><div class="text-[14px] text-[#8B95A1] mt-1.5">기다릴 스타를 등록하면 복무 기간을 함께 세어줘요</div><button onclick="starFlow()" class="sf-cta mt-8">스타 등록하기</button><button onclick="stTab('all')" class="w-full mt-3 h-12 text-[14px] font-bold text-[#4E5968]">복무 중인 스타 둘러보기</button></div>`; return; }
-  const I = starInfo(s), N = stN(s.id), on = N.cheered_today;
-  h.innerHTML = stkCard(s, true) + `
-   <div class="rounded-[22px] bg-white border border-[#EEF0F2] mt-4 st-in" style="--i:2"><div class="st-stats">
+function renderStarMy(anim) {
+  const h = q('st-p-my');
+  if (!myStars.length) { h.innerHTML = `<div class="text-center py-16 ${anim ? 'st-in' : ''}"><div class="mx-auto w-20 h-20 rounded-full bg-[#F2F3F5] flex items-center justify-center"><span style="display:inline-flex;width:34px;height:34px;color:#191F28">${STAR_SVG.replace('<svg', '<svg style="width:34px;height:34px;fill:currentColor"')}</span></div><div class="text-[20px] font-extrabold mt-5">아직 MY스타가 없어요</div><div class="text-[14px] text-[#8B95A1] mt-1.5">기다릴 스타를 등록하면 복무 기간을 함께 세어줘요</div><button onclick="starFlow()" class="sf-cta mt-8">스타 등록하기</button><button onclick="stTab('all')" class="w-full mt-3 h-12 text-[14px] font-bold text-[#4E5968]">복무 중인 스타 둘러보기</button></div>`; return; }
+  if (!myRow(stSel)) stSel = myStars[0].id;
+  const s = starK[stSel], I = starInfo(s), N = stN(s.id), A = anim ? 'st-in' : '';
+  h.innerHTML = `<div class="st-mine no-scrollbar">${myStars.map(r => { const x = starK[r.id]; return `<button class="${r.id === stSel ? 'on' : ''}" onclick="stSel='${r.id}';renderStarMy(true)">${starAva(x, 56)}<span class="truncate w-full text-center">${esc(x.n)}</span></button>`; }).join('')}<button onclick="starFlow()"><span class="add">+</span><span>추가</span></button></div>` + stkCard(s, true, anim) + `
+   <div class="rounded-[22px] bg-white border border-[#EEF0F2] mt-4 ${A}" style="--i:2"><div class="st-stats">
     <div><b>${I.total.toLocaleString()}</b><span>전체 복무일</span></div><div><b>${I.pre ? 0 : I.served.toLocaleString()}</b><span>현재 복무일</span></div><div><b>${(I.pre ? I.total : I.left).toLocaleString()}</b><span>남은 복무일</span></div>
-    <div><b>${fanDays().toLocaleString()}</b><span>팬이 된 지</span></div><div><b>${N.fans.toLocaleString()}</b><span>함께 응원</span></div><div><b>${N.cheers_today.toLocaleString()}</b><span>오늘 응원</span></div></div></div>
-   <div class="grid grid-cols-2 gap-2 mt-4 st-in" style="--i:3"><button onclick="starBoard()" class="h-12 rounded-2xl bg-[#F2F3F5] text-[14px] font-bold">팬 게시판</button><button onclick="starFlow()" class="h-12 rounded-2xl bg-[#F2F3F5] text-[14px] font-bold">MY스타 변경</button></div>
-   <button onclick="starUnset()" class="w-full mt-3 h-12 rounded-2xl text-[14px] font-bold text-[#E5484D]">MY스타 삭제</button>`;
+    <div><b>${fanDays(s.id).toLocaleString()}</b><span>팬이 된 지</span></div><div><b>${N.fans.toLocaleString()}</b><span>함께 응원</span></div><div><b>${N.cheers_today.toLocaleString()}</b><span>오늘 응원</span></div></div></div>
+   <div class="grid grid-cols-2 gap-2 mt-4 ${A}" style="--i:3"><button onclick="starBoard('${s.id}')" class="h-12 rounded-2xl bg-[#F2F3F5] text-[14px] font-bold">팬 게시판</button><button onclick="thSheet('${s.id}')" class="h-12 rounded-2xl bg-[#F2F3F5] text-[14px] font-bold">테마 변경</button><button onclick="starFlow('${s.id}')" class="h-12 rounded-2xl bg-[#F2F3F5] text-[14px] font-bold">사진 · 날짜 변경</button><button onclick="starFlow()" class="h-12 rounded-2xl bg-[#F2F3F5] text-[14px] font-bold">스타 추가</button></div>
+   <button onclick="starUnset('${s.id}')" class="w-full mt-3 h-12 rounded-2xl text-[14px] font-bold text-[#E5484D]">${esc(s.n)} MY스타 삭제</button>`;
 }
 function starFilter(t) {
   t = (t || '').toLowerCase().replace(/\s+/g, '');
   return STARL.filter(s => (stCat === 'all' || s.c === stCat) && (!t || (s.n + s.g + (STAR_SVC[s.t] || '')).toLowerCase().replace(/\s+/g, '').includes(t)));
 }
-function renderStarList() {
-  q('star-cats').innerHTML = STAR_CAT.map(c => `<button class="st-chip ${stCat === c[0] ? 'on' : ''}" onclick="stCat='${c[0]}';renderStarList()">${c[1]}</button>`).join('');
+function renderStarList(anim) {
+  q('star-cats').innerHTML = STAR_CAT.map(c => `<button class="st-chip ${stCat === c[0] ? 'on' : ''}" onclick="stCat='${c[0]}';renderStarList(true)">${c[1]}</button>`).join('');
   const L = starFilter(q('star-q').value).map(s => ({ s, I: starInfo(s), N: stN(s.id) })).sort((a, b) => (a.I.pre - b.I.pre) || (b.N.fans - a.N.fans) || (b.I.pct - a.I.pct));
-  const mine = me && me.star_id;
   q('star-sub').innerText = `${STAR_CAT.find(c => c[0] === stCat)[1]} ${L.length}명`;
-  q('star-list').innerHTML = L.length ? L.map((x, i) => { const s = x.s, I = x.I; return `<button class="st-li st-in" style="--i:${Math.min(i, 14)}" onclick="starSheet('${s.id}')">${starAva(s, 56)}<div class="flex-1 min-w-0"><div class="flex items-center gap-1.5"><span class="nm truncate">${esc(s.n)}</span>${mine === s.id ? '<span class="st-tag my">MY</span>' : ''}${s.auto ? '<span class="st-tag new">NEW</span>' : ''}</div><div class="sb truncate">${esc(s.g)} · ${esc(I.pre ? '입대 예정' : I.rank)}</div><div class="st-mini"><b style="width:${I.pct.toFixed(1)}%"></b></div></div><div class="flex-shrink-0"><div class="dd">${stDdayTxt(I)}</div><div class="pc">${I.pre ? s.e.slice(5).replace('-', '.') + ' 입대' : I.pct.toFixed(1) + '%'}${x.N.fans ? ' · ' + x.N.fans + '명' : ''}</div></div></button>`; }).join('')
+  q('star-list').innerHTML = L.length ? L.map((x, i) => { const s = x.s, I = x.I; return `<button class="st-li ${anim !== false ? 'st-in' : ''}" style="--i:${Math.min(i, 14)}" onclick="starSheet('${s.id}')">${starAva(s, 56)}<div class="flex-1 min-w-0"><div class="flex items-center gap-1.5"><span class="nm truncate">${esc(s.n)}</span>${myRow(s.id) ? '<span class="st-tag my">MY</span>' : ''}${s.auto ? '<span class="st-tag new">NEW</span>' : ''}</div><div class="sb truncate">${esc(s.g)} · ${esc(I.pre ? '입대 예정' : I.rank)}</div><div class="st-mini"><b style="width:${I.pct.toFixed(1)}%"></b></div></div><div class="flex-shrink-0"><div class="dd">${stDdayTxt(I)}</div><div class="pc">${I.pre ? s.e.slice(5).replace('-', '.') + ' 입대' : I.pct.toFixed(1) + '%'}${x.N.fans ? ' · ' + x.N.fans + '명' : ''}</div></div></button>`; }).join('')
     : `<div class="py-14 text-center text-[13px] text-[#8B95A1]">찾는 스타가 목록에 없어요.<br>새로 입대한 스타는 매일 자동으로 추가돼요.</div>`;
   q('star-note').innerText = `기사·공식 발표 기준이에요. 전역일은 발표가 없으면 복무기간으로 계산한 예정일이에요. 새로 입대한 스타는 여러 번 교차 확인한 뒤 자동으로 추가돼요.`;
 }
+function sheetOpen(html) { q('star-sheet-in').innerHTML = html; const el = q('star-sheet'); el.classList.remove('hidden'); void el.offsetWidth; el.classList.add('show'); }
 function starSheet(id) {
-  const s = starK[id]; if (!s) return; const I = starInfo(s), N = stN(id), mine = me && me.star_id === id;
-  q('star-sheet-in').innerHTML = `<div class="w-10 h-1.5 rounded-full bg-[#E5E8EB] mx-auto -mt-1 mb-4"></div>
+  const s = starK[id]; if (!s) return; const I = starInfo(s), N = stN(id), mine = !!myRow(id);
+  sheetOpen(`<div class="w-10 h-1.5 rounded-full bg-[#E5E8EB] mx-auto -mt-1 mb-4"></div>
    <div class="flex items-center gap-4">${starAva(s, 76)}<div class="min-w-0"><div class="text-[12px] text-[#8B95A1]">${esc(s.g)}</div><div class="text-[24px] font-black tracking-tight">${esc(s.n)}</div><div class="text-[13px] font-bold text-[#4E5968]">${esc(STAR_SVC[s.t] || '')} · ${esc(I.rank)}</div></div></div>
    <div class="grid grid-cols-2 gap-2 mt-5 text-[13px]">${[['입대', s.e.replace(/-/g, '.')], ['전역 예정', s.d.replace(/-/g, '.')], [I.pre ? '입대까지' : '전역까지', stDdayTxt(I)], ['함께 응원', N.fans.toLocaleString() + '명']].map(x => `<div class="rounded-2xl bg-[#F5F6F8] px-4 py-3"><div class="text-[11px] text-[#8B95A1]">${x[0]}</div><div class="font-extrabold mt-0.5">${x[1]}</div></div>`).join('')}</div>
    <div class="mt-4"><div class="flex justify-between text-[12px] font-bold mb-1.5"><span class="text-[#8B95A1]">복무 진행률</span><span>${I.pct.toFixed(2)}%</span></div><div class="st-mini" style="height:8px;max-width:none"><b style="width:${I.pct.toFixed(2)}%"></b></div></div>
-   <button onclick="${mine ? "stSheetClose();stTab('my')" : `stSheetClose();starFlow('${id}')`}" class="sf-cta mt-6">${mine ? '내 MY스타 보기' : me && me.star_id ? 'MY스타로 바꾸기' : 'MY스타로 등록하기'}</button>`;
-  const el = q('star-sheet'); el.classList.remove('hidden'); void el.offsetWidth; el.classList.add('show');
+   <button onclick="${mine ? `stSheetClose();stSel='${id}';stTab('my')` : `stSheetClose();starFlow('${id}')`}" class="sf-cta mt-6">${mine ? '내 MY스타 보기' : 'MY스타로 등록하기'}</button>`);
 }
 function stSheetClose() { const el = q('star-sheet'); el.classList.remove('show'); setTimeout(() => el.classList.add('hidden'), 320); }
-async function starUnset() {
-  const s = myStar(); if (!s || !confirm(`MY스타(${s.n})를 삭제할까요?\n팬이 된 날짜와 고른 사진도 함께 지워져요.`)) return;
-  const { error } = await sb.rpc('star_set', { sid: '', since: null, photo: null });
-  if (error) return showAlert('알림', 'schema_star2.sql 을 Supabase SQL Editor 에서 먼저 실행해주세요.');
-  me.star_id = null; me.star_since = null; me.star_photo = null; stStatT = 0; loadStarStats(true); renderStarMy(); renderStarHome(); renderSetRowsSafe(); try { renderQ(true); } catch (e) { }
+/* 테마 고르기 */
+function thGrid(cur, fn) { return `<div class="th-grid">${Object.keys(STAR_TH).map(k => { const t = STAR_TH[k]; return `<button class="${cur === k ? 'on' : ''}" style="background:${t.bg};color:${t.fg}" onclick="${fn}('${k}')"><div class="tn">${t.n}</div><div class="tb" style="background:${t.trk}"><i style="background:${t.bar}"></i></div></button>`; }).join('')}</div>`; }
+function thSheet(id) {
+  const r = myRow(id), s = starK[id]; if (!r) return; window._thId = id;
+  sheetOpen(`<div class="w-10 h-1.5 rounded-full bg-[#E5E8EB] mx-auto -mt-1 mb-4"></div><div class="text-[20px] font-extrabold">프로필 테마</div><div class="text-[13px] text-[#8B95A1] mt-1">${esc(s.n)} 프로필 카드의 색을 골라요</div><div id="th-prev" class="mt-4">${stkCard(s, false)}</div>${thGrid(r.theme, 'thPick')}<div class="h-2"></div>`);
+}
+async function thPick(k) {
+  const id = window._thId, r = myRow(id); if (!r) return; r.theme = k;
+  q('th-prev').innerHTML = stkCard(starK[id], false); q('star-sheet-in').querySelectorAll('.th-grid button').forEach((b, i) => b.classList.toggle('on', Object.keys(STAR_TH)[i] === k));
+  stRefresh();
+  if (stFansOK) { const { error } = await sb.from('star_fans').update({ theme: k }).eq('user_id', me.id).eq('star_id', id); if (error) showAlert('알림', 'schema_star3.sql 을 Supabase SQL Editor 에서 먼저 실행해주세요.'); }
+}
+async function starUnset(id) {
+  const s = starK[id]; if (!s || !confirm(`MY스타(${s.n})를 삭제할까요?\n팬이 된 날짜와 고른 사진·테마도 함께 지워져요.`)) return;
+  let error = null;
+  if (stFansOK) ({ error } = await sb.from('star_fans').delete().eq('user_id', me.id).eq('star_id', id));
+  else ({ error } = await sb.rpc('star_set', { sid: '', since: null, photo: null }));
+  if (error) return showAlert('알림', 'schema_star3.sql 을 Supabase SQL Editor 에서 먼저 실행해주세요.');
+  myStars = myStars.filter(x => x.id !== id); me.star_id = myStars[0] ? myStars[0].id : null; stSel = me.star_id;
+  stStatT = 0; loadStarStats(true); renderStarMy(true); renderStarHome(); renderSetRowsSafe(); try { renderQ(true); } catch (e) { }
 }
 function renderSetRowsSafe() { try { renderSetRows(); } catch (e) { } }
 async function starCheer(id, btn) {
@@ -2257,29 +2323,31 @@ async function starCheer(id, btn) {
   try { const { data, error } = await sb.rpc('star_cheer', { sid: id }); if (error) return showAlert('알림', 'schema_star.sql 을 Supabase SQL Editor 에서 먼저 실행해주세요.'); ok = data !== false; } catch (e) { return; }
   const N = Object.assign({ star_id: id, fans: 0, cheers_today: 0, cheers_total: 0 }, stStats[id]); if (ok) { N.cheers_today++; N.cheers_total++; } N.cheered_today = true; stStats[id] = N;
   if (btn) { btn.classList.remove('st-pop'); void btn.offsetWidth; btn.classList.add('st-pop'); stBurst(btn); }
-  setTimeout(() => { renderStarHome(); if (q('modal-star').classList.contains('flex')) renderStarMy(); }, 420);
+  setTimeout(stRefresh, 420);
 }
 function stBurst(el) {
   const r = el.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-  for (let i = 0; i < 10; i++) { const d = document.createElement('div'), a = Math.PI * 2 * i / 10 + Math.random() * .4, R = 40 + Math.random() * 40; d.className = 'st-spark'; d.style.cssText = `left:${cx}px;top:${cy}px;--x:${Math.cos(a) * R}px;--y:${Math.sin(a) * R}px;--r:${Math.random() * 180}deg;color:${i % 2 ? '#6B7B5C' : '#F2878F'}`; d.innerHTML = i % 2 ? STAR_SVG : CHEER_SVG.replace('<svg', '<svg style="fill:currentColor"'); document.body.appendChild(d); setTimeout(() => d.remove(), 1300); }
+  for (let i = 0; i < 10; i++) { const d = document.createElement('div'), a = Math.PI * 2 * i / 10 + Math.random() * .4, R = 40 + Math.random() * 40; d.className = 'st-spark'; d.style.cssText = `left:${cx}px;top:${cy}px;--x:${Math.cos(a) * R}px;--y:${Math.sin(a) * R}px;--r:${Math.random() * 180}deg;color:${i % 2 ? '#C9A24C' : '#F2878F'}`; d.innerHTML = i % 2 ? STAR_SVG : CHEER_SVG.replace('<svg', '<svg style="fill:currentColor"'); document.body.appendChild(d); setTimeout(() => d.remove(), 1300); }
 }
-function starBoard() { if (!me.star_id) return; closeModal('modal-star'); cmCat = 'star_' + me.star_id; switchTab('community'); window.scrollTo(0, 0); }
-/* ---------- 스타 등록 (흰 화면 · 3단계) ---------- */
-let sfS = { step: 1, id: null, photo: '', photos: [], since: '', q: '' };
+function starBoard(id) { id = id || me.star_id; if (!id) return; closeModal('modal-star'); cmCat = 'star_' + id; switchTab('community'); window.scrollTo(0, 0); }
+/* ---------- 스타 등록 (흰 화면 · 4단계) ---------- */
+let sfS = { step: 1, id: null, photo: '', photos: [], since: '', q: '', theme: 'black_gold' };
 const BACK_SVG = '<svg viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></svg>';
 function starFlow(id) {
-  sfS = { step: id ? 2 : 1, id: id || null, photo: '', photos: [], since: ymd(new Date()), q: '' };
+  const r = id ? myRow(id) : null;
+  sfS = { step: id ? 2 : 1, id: id || null, photo: r ? r.photo || '' : '', photos: [], since: r ? r.since : ymd(new Date()), q: '', theme: r ? r.theme : 'black_gold', edit: !!r };
   const el = q('star-flow'); el.classList.remove('hidden'); void el.offsetWidth; el.classList.add('show'); sfRender(); if (id) sfLoadPhotos();
 }
 function sfClose() { const el = q('star-flow'); el.classList.remove('show'); setTimeout(() => { el.classList.add('hidden'); el.innerHTML = ''; }, 380); }
-function sfBack() { if (sfS.step === 4) return sfClose(); if (sfS.step <= 1) return sfClose(); sfS.step--; sfRender(); }
+function sfBack() { if (sfS.step >= 5 || sfS.step <= 1 || (sfS.edit && sfS.step === 2)) return sfClose(); sfS.step--; sfRender(); }
+function sfPrevCard() { const s = starK[sfS.id]; const tmp = { id: s.id, since: sfS.since, photo: sfS.photo, theme: sfS.theme }; const old = myStars.slice(); myStars = [tmp].concat(myStars.filter(x => x.id !== s.id)); const h = stkCard(s, false); myStars = old; return h.replace('onclick="openStar', 'data-x="'); }
 function sfRender() {
   const el = q('star-flow'), st = sfS.step, s = sfS.id ? starK[sfS.id] : null;
-  const top = `<div class="sf-top"><button class="sf-back" onclick="sfBack()">${BACK_SVG}</button><div class="sf-tt">스타 등록하기</div></div>`;
-  const dots = `<div class="sf-dots">${[1, 2, 3].map(i => `<i class="${i === st ? 'on' : ''}"></i>`).join('')}</div>`;
+  const top = `<div class="sf-top"><button class="sf-back" onclick="sfBack()">${BACK_SVG}</button><div class="sf-tt">${sfS.edit ? 'MY스타 수정' : '스타 등록하기'}</div></div>`;
+  const dots = `<div class="sf-dots">${[1, 2, 3, 4].map(i => `<i class="${i === st ? 'on' : ''}"></i>`).join('')}</div>`;
   const big = (px) => s ? `<div class="sf-big">${sfS.photo ? `<div class="st-ava" style="width:${px}px;height:${px}px"><img src="${esc(sfS.photo)}" referrerpolicy="no-referrer" alt=""></div>` : starAva(s, px)}</div>` : '';
   if (st === 1) {
-    el.innerHTML = top + dots + `<div class="sf-body"><div class="sf-h">스타 등록하기</div><div class="sf-p">지금 군 복무 중인 스타를 찾아보세요</div>
+    el.innerHTML = top + dots + `<div class="sf-body"><div class="sf-h">스타 등록하기</div><div class="sf-p">지금 군 복무 중인 스타를 찾아보세요${myStars.length ? ` · 여러 명 등록할 수 있어요` : ''}</div>
      <div class="sf-search"><label class="sf-in"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="sf-q" value="${esc(sfS.q)}" placeholder="스타 이름 검색 (예: 차은우, 세븐틴)" oninput="sfS.q=this.value" onkeydown="if(event.key==='Enter'){this.blur();sfSearch()}"></label><button class="sf-go" onclick="sfSearch()">검색</button></div>
      <div id="sf-res" class="sf-res"></div></div>`;
     if (sfS.q) sfSearch(); return;
@@ -2287,31 +2355,36 @@ function sfRender() {
   if (st === 2) {
     el.innerHTML = top + dots + `<div class="sf-body text-center">${big(150)}<div class="text-[28px] font-black tracking-tight mt-4">${esc(s.n)}</div><div class="text-[14px] text-[#8B95A1] mt-1">프로필 사진을 골라 주세요</div>
      <div class="sf-grid"><label class="up"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>내 사진으로<input type="file" accept="image/*" class="hidden" onchange="sfUpload(this)"></label>
-     ${sfS.photos.length ? sfS.photos.map((u, i) => `<button class="${sfS.photo === u ? 'on' : ''}" onclick="sfPick(${i})"><img src="${esc(u)}" loading="lazy" referrerpolicy="no-referrer" alt="" onerror="this.parentNode.remove()"></button>`).join('') : `<div class="col-span-3 flex items-center justify-center text-[12px] text-[#8B95A1]" id="sf-ph-msg">${sfS.loading ? '사진을 불러오는 중…' : '사진을 찾지 못했어요. 내 사진으로 등록해보세요'}</div>`}</div></div>
+     ${sfS.photos.length ? sfS.photos.map((u, i) => `<button class="${sfS.photo === u ? 'on' : ''}" onclick="sfPick(${i})"><img src="${esc(u)}" loading="lazy" referrerpolicy="no-referrer" alt="" onerror="this.parentNode.remove()"></button>`).join('') : `<div class="col-span-3 flex items-center justify-center text-[12px] text-[#8B95A1]">${sfS.loading ? '사진을 불러오는 중…' : '사진을 찾지 못했어요. 내 사진으로 등록해보세요'}</div>`}</div></div>
      <div class="sf-foot"><button class="sf-cta" onclick="sfS.step=3;sfRender()">${sfS.photo ? '다음' : '사진 없이 다음'}</button></div>`;
     return;
   }
   if (st === 3) {
-    el.innerHTML = top + dots + `<div class="sf-body text-center">${big(140)}<div class="text-[28px] font-black tracking-tight mt-6">언제부터 좋아했나요?</div><div class="text-[14px] text-[#8B95A1] mt-1">${esc(s.n)}</div>
-     <input type="date" class="sf-date" value="${sfS.since}" max="${ymd(new Date())}" onchange="sfS.since=this.value||ymd(new Date());q('sf-days').innerText='팬이 된 지 '+sfDays()+'일째'">
-     <div id="sf-days" class="text-[16px] font-extrabold mt-4" style="color:var(--mil-green)">팬이 된 지 ${sfDays()}일째</div>
-     <button class="sf-cta mt-7" id="sf-reg" onclick="sfSave()">${CHEER_SVG}등록하기</button></div>`;
+    el.innerHTML = top + dots + `<div class="sf-body"><div class="text-[26px] font-black tracking-tight text-center mt-1">프로필 테마를 골라 주세요</div><div class="text-[14px] text-[#8B95A1] mt-1 text-center">홈 화면에 보일 ${esc(s.n)} 카드의 색이에요</div>
+     <div id="sf-th-prev" class="mt-5">${sfPrevCard()}</div>${thGrid(sfS.theme, 'sfTheme')}</div>
+     <div class="sf-foot"><button class="sf-cta" onclick="sfS.step=4;sfRender()">다음</button></div>`;
     return;
   }
-  // 4: 완료
+  if (st === 4) {
+    el.innerHTML = top + dots + `<div class="sf-body text-center">${big(140)}<div class="text-[28px] font-black tracking-tight mt-6">언제부터 좋아했나요?</div><div class="text-[14px] text-[#8B95A1] mt-1">${esc(s.n)}</div>
+     <input type="date" class="sf-date" value="${sfS.since}" max="${ymd(new Date())}" onchange="sfS.since=this.value||ymd(new Date());q('sf-days').innerText='팬이 된 지 '+daysSince(sfS.since)+'일째'">
+     <div id="sf-days" class="text-[16px] font-extrabold mt-4" style="color:var(--mil-green)">팬이 된 지 ${daysSince(sfS.since)}일째</div>
+     <button class="sf-cta mt-7" id="sf-reg" onclick="sfSave()">${CHEER_SVG}${sfS.edit ? '저장하기' : '등록하기'}</button></div>`;
+    return;
+  }
   el.innerHTML = `<div class="sf-top" style="border:0"></div><div class="sf-done"><div class="sf-glow">${sfS.photo ? `<div class="st-ava" style="width:190px;height:190px"><img src="${esc(sfS.photo)}" referrerpolicy="no-referrer" alt=""></div>` : starAva(s, 190)}<div class="sf-heart">${CHEER_SVG}</div></div>
-   <div class="sf-name">${esc(s.n)}</div><div class="sf-msg">${esc(s.n)}의 팬이 되었습니다</div><div class="sf-pill">팬이 된 지 ${sfDays()}일째</div></div>
-   <div class="sf-foot"><button class="sf-cta" id="sf-start" disabled onclick="sfClose();openStar('my')">시작하기</button></div>`;
+   <div class="sf-name">${esc(s.n)}</div><div class="sf-msg">${esc(s.n)}의 팬이 되었습니다</div><div class="sf-pill">팬이 된 지 ${daysSince(sfS.since)}일째</div></div>
+   <div class="sf-foot"><button class="sf-cta" id="sf-start" disabled onclick="sfClose();openStar('my','${s.id}')">시작하기</button></div>`;
   setTimeout(() => { const b = q('sf-start'); if (b) b.disabled = false; }, 1200);
 }
-const sfDays = () => Math.max(1, Math.floor((new Date().setHours(0, 0, 0, 0) - pd(sfS.since || ymd(new Date())).getTime()) / 864e5) + 1);
+function sfTheme(k) { sfS.theme = k; q('sf-th-prev').innerHTML = sfPrevCard(); q('star-flow').querySelectorAll('.th-grid button').forEach((b, i) => b.classList.toggle('on', Object.keys(STAR_TH)[i] === k)); }
 function sfSearch() {
   const t = (sfS.q || '').toLowerCase().replace(/\s+/g, ''), box = q('sf-res'); if (!box) return;
   const L = STARL.filter(s => !t || (s.n + s.g).toLowerCase().replace(/\s+/g, '').includes(t)).map(s => ({ s, I: starInfo(s) })).filter(x => !x.I.done).sort((a, b) => a.I.pre - b.I.pre);
-  box.innerHTML = L.length ? L.map((x, i) => `<button class="st-in" style="--i:${Math.min(i, 12)}" onclick="sfChoose('${x.s.id}')">${starAva(x.s, 52)}<div class="flex-1 min-w-0"><div class="text-[16px] font-extrabold">${esc(x.s.n)} <span class="text-[12px] font-bold text-[#8B95A1]">${esc(x.s.g)}</span></div><div class="text-[12.5px] text-[#8B95A1] mt-0.5">${esc(STAR_SVC[x.s.t] || '')} · ${x.I.pre ? x.s.e.replace(/-/g, '.') + ' 입대 예정' : '전역까지 ' + stDdayTxt(x.I)}</div></div><svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:#C5CBD3;stroke-width:2.4;stroke-linecap:round"><path d="m9 6 6 6-6 6"/></svg></button>`).join('')
+  box.innerHTML = L.length ? L.map((x, i) => `<button class="st-in" style="--i:${Math.min(i, 12)}" onclick="sfChoose('${x.s.id}')">${starAva(x.s, 52)}<div class="flex-1 min-w-0"><div class="text-[16px] font-extrabold">${esc(x.s.n)} <span class="text-[12px] font-bold text-[#8B95A1]">${esc(x.s.g)}</span>${myRow(x.s.id) ? ' <span class="st-tag my">MY</span>' : ''}</div><div class="text-[12.5px] text-[#8B95A1] mt-0.5">${esc(STAR_SVC[x.s.t] || '')} · ${x.I.pre ? x.s.e.replace(/-/g, '.') + ' 입대 예정' : '전역까지 ' + stDdayTxt(x.I)}</div></div><svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:#C5CBD3;stroke-width:2.4;stroke-linecap:round"><path d="m9 6 6 6-6 6"/></svg></button>`).join('')
     : `<div class="py-14 text-center text-[14px] text-[#8B95A1] leading-relaxed">‘${esc(sfS.q)}’은(는) 복무 중인 스타 목록에 없어요.<br>새로 입대한 스타는 매일 확인해서 자동으로 추가돼요.</div>`;
 }
-function sfChoose(id) { sfS.id = id; sfS.photo = ''; sfS.photos = []; sfS.step = 2; if (me.star_id === id && me.star_photo) sfS.photo = me.star_photo; sfRender(); sfLoadPhotos(); }
+function sfChoose(id) { const r = myRow(id); sfS.id = id; sfS.edit = !!r; sfS.photo = r ? r.photo || '' : ''; sfS.since = r ? r.since : sfS.since; sfS.theme = r ? r.theme : sfS.theme; sfS.photos = []; sfS.step = 2; sfRender(); sfLoadPhotos(); }
 async function sfLoadPhotos() {
   const s = starK[sfS.id]; if (!s) return; sfS.loading = true; const id = s.id;
   if (stImg[id]) sfS.photos = [stImg[id]];
@@ -2320,6 +2393,7 @@ async function sfLoadPhotos() {
     if (!error && data && Array.isArray(data.photos)) sfS.photos = [...new Set(sfS.photos.concat(data.photos))].slice(0, 23);
   } catch (e) { }
   sfS.loading = false; if (!sfS.photo && sfS.photos[0]) sfS.photo = sfS.photos[0];
+  if (sfS.photo && sfS.photo.startsWith('data:') && !sfS.photos.includes(sfS.photo)) sfS.photos.unshift(sfS.photo);
   if (sfS.step === 2 && sfS.id === id) sfRender();
 }
 function sfPick(i) { sfS.photo = sfS.photos[i]; sfRender(); }
@@ -2329,20 +2403,26 @@ function sfUpload(inp) {
   rd.readAsDataURL(f);
 }
 async function sfSave() {
-  const b = q('sf-reg'); b.disabled = true; b.innerText = '등록 중…';
-  const { error } = await sb.rpc('star_set', { sid: sfS.id, since: sfS.since || null, photo: sfS.photo || null });
-  if (error) { b.disabled = false; b.innerHTML = CHEER_SVG + '등록하기'; return showAlert('알림', /star_set|function|schema|argument/i.test(error.message) ? 'schema_star2.sql 을 Supabase SQL Editor 에서 먼저 실행해주세요.' : esc(error.message)); }
-  me.star_id = sfS.id; me.star_since = sfS.since; me.star_photo = sfS.photo || null; stStatT = 0;
-  sfS.step = 4; sfRender(); loadStarStats(true); renderStarHome(); renderSetRowsSafe(); if (q('modal-star').classList.contains('flex')) stTab('my'); try { renderQ(true); } catch (e) { }
+  const b = q('sf-reg'); b.disabled = true; b.innerText = '저장 중…';
+  const row = { user_id: me.id, star_id: sfS.id, since: sfS.since || ymd(new Date()), photo: sfS.photo || null, theme: sfS.theme, ord: myRow(sfS.id) ? myStars.findIndex(x => x.id === sfS.id) : myStars.length };
+  let error = null;
+  if (stFansOK) ({ error } = await sb.from('star_fans').upsert(row));
+  else ({ error } = await sb.rpc('star_set', { sid: sfS.id, since: row.since, photo: row.photo }));
+  if (error) { b.disabled = false; b.innerHTML = CHEER_SVG + '등록하기'; return showAlert('알림', 'schema_star3.sql 을 Supabase SQL Editor 에서 먼저 실행해주세요.<br><span class="text-[11px] text-[#8B95A1]">' + esc(error.message) + '</span>'); }
+  const was = sfS.edit, nr = { id: sfS.id, since: row.since, photo: row.photo || '', theme: row.theme };
+  const k = myStars.findIndex(x => x.id === sfS.id); if (k >= 0) myStars[k] = nr; else myStars.push(nr);
+  me.star_id = myStars[0].id; stSel = sfS.id; stStatT = 0;
+  loadStarStats(true); renderStarHome(); renderSetRowsSafe(); if (q('modal-star').classList.contains('flex')) stTab('my'); try { renderQ(true); } catch (e) { }
+  if (was) { sfClose(); return; } sfS.step = 5; sfRender();
 }
 /* 스타 사진: 서버 함수(naver-search)로 목록용 사진을 불러와요 */
 async function starImgLoad() {
   if (window._stImgTried) return; window._stImgTried = true;
-  try { const c = JSON.parse(localStorage.getItem('zt_stimg') || '{}'); if (c.t && Date.now() - c.t < 7 * 864e5 && Object.keys(c.m || {}).length >= STARL.length * .8) { stImg = c.m || {}; renderStarHome(); return; } } catch (e) { }
+  try { const c = JSON.parse(localStorage.getItem('zt_stimg') || '{}'); if (c.t && Date.now() - c.t < 7 * 864e5 && Object.keys(c.m || {}).length >= STARL.length * .8) { stImg = c.m || {}; stRefresh(); return; } } catch (e) { }
   try {
     const { data, error } = await sb.functions.invoke('naver-search', { body: { kind: 'stars', items: STARL.map(s => ({ id: s.id, q: (s.g && !/배우|솔로|트로트|·/.test(s.g) ? s.g + ' ' : '') + s.n })) } });
     if (error || !data || !data.images) return; stImg = data.images; try { localStorage.setItem('zt_stimg', JSON.stringify({ t: Date.now(), m: stImg })); } catch (e) { }
-    renderStarHome(); if (q('modal-star').classList.contains('flex')) { renderStarMy(); if (stTabCur === 'all') renderStarList(); }
+    stRefresh();
   } catch (e) { }
 }
 /* 팬 전용 Q&A */
