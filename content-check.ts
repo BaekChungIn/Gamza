@@ -11,7 +11,7 @@ const CORS = {
 };
 const env = (k: string, d = '') => Deno.env.get(k) ?? d;
 const NID = env('NAVER_CLIENT_ID'), NSEC = env('NAVER_CLIENT_SECRET');
-const GROQ = env('GROQ_API_KEY'), GROQ_MODEL = env('GROQ_MODEL', 'llama-3.3-70b-versatile');
+const GROQ = env('GROQ_API_KEY'), GROQ_MODEL_ENV = env('GROQ_MODEL');
 const RESEND = env('RESEND_API_KEY'), MAIL_TO = env('REPORT_EMAIL', 'micbael11@naver.com'), MAIL_FROM = env('MAIL_FROM', '짬타이거 <onboarding@resend.dev>');
 const CRON_KEY = env('CRON_KEY');
 const SITE = env('SITE_URL', 'https://baekchungin.github.io/Gamza/');
@@ -45,19 +45,45 @@ async function search(query: string) {
   const [a, b] = await Promise.all([naver('news', query, 8).catch(() => []), naver('webkr', query, 6).catch(() => [])]);
   return [...a, ...b].slice(0, 14);
 }
+// Groq 모델은 자주 바뀌어서, 지금 내 키로 쓸 수 있는 모델 중 좋은 것을 자동으로 골라요
+let MODEL = '';
+const PREFER = ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-32b', 'meta-llama/llama-4-maverick-17b-128e-instruct', 'openai/gpt-oss-20b', 'llama-3.1-8b-instant'];
+async function pickModel(): Promise<string> {
+  if (MODEL) return MODEL;
+  if (GROQ_MODEL_ENV) return (MODEL = GROQ_MODEL_ENV);
+  try {
+    const r = await fetch('https://api.groq.com/openai/v1/models', { headers: { Authorization: `Bearer ${GROQ}` } });
+    const ids: string[] = ((await r.json()).data ?? []).filter((m: any) => m.active !== false).map((m: any) => m.id);
+    MODEL = PREFER.find((x) => ids.includes(x)) ?? ids.find((x) => !/whisper|guard|tts|playai|prompt|compound|embed|vision/i.test(x)) ?? 'openai/gpt-oss-120b';
+  } catch { MODEL = 'openai/gpt-oss-120b'; }
+  return MODEL;
+}
+function parseJSON(txt: string): any {
+  try { return JSON.parse(txt); } catch { /* 아래에서 다시 */ }
+  const m = String(txt ?? '').match(/\{[\s\S]*\}/); if (m) { try { return JSON.parse(m[0]); } catch { /* 무시 */ } }
+  return {};
+}
 async function groq(system: string, user: string): Promise<any> {
-  for (let t = 0; t < 3; t++) {
-    const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST', headers: { Authorization: `Bearer ${GROQ}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: GROQ_MODEL, temperature: 0.1, response_format: { type: 'json_object' }, messages: [{ role: 'system', content: system }, { role: 'user', content: user }] }),
-    });
+  let jsonMode = true;
+  for (let t = 0; t < 4; t++) {
+    const model = await pickModel();
+    const body: any = { model, temperature: 0.1, messages: [{ role: 'system', content: system + '\n반드시 JSON 객체 하나만 출력해.' }, { role: 'user', content: user }] };
+    if (jsonMode) body.response_format = { type: 'json_object' };
+    const r = await fetch('https://api.groq.com/openai/v1/chat/completions', { method: 'POST', headers: { Authorization: `Bearer ${GROQ}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     if (r.status === 429) { await new Promise((ok) => setTimeout(ok, 4000 * (t + 1))); continue; }
+    if (r.status === 404 || r.status === 400) {
+      const txt = await r.text();
+      if (/model/i.test(txt) && /not exist|decommission|not found|access/i.test(txt) && !GROQ_MODEL_ENV) { PREFER.splice(PREFER.indexOf(model) >>> 0, 1); MODEL = ''; const nx = PREFER.find(Boolean); if (nx) { MODEL = nx; continue; } }
+      if (jsonMode && /json|response_format/i.test(txt)) { jsonMode = false; continue; }
+      throw new Error('groq ' + r.status + ' ' + txt.slice(0, 200));
+    }
     if (!r.ok) throw new Error('groq ' + r.status + ' ' + (await r.text()).slice(0, 200));
     const d = await r.json();
-    try { return JSON.parse(d.choices[0].message.content); } catch { return {}; }
+    return parseJSON(d.choices?.[0]?.message?.content ?? '');
   }
   return {};
 }
+
 const CHECK_SYS = `너는 한국 군 장병 혜택 정보를 검수하는 꼼꼼한 편집자야. 앱에 적힌 내용(ours)과 네이버 검색 결과(evidence)를 비교해.
 검색 결과에 '분명한 근거'가 있을 때만 틀렸다고 판단하고, 근거가 없거나 애매하면 지적하지 마.
 반드시 JSON 으로만 답해: {"issues":[{"item":"항목 이름","ours":"앱에 적힌 내용","found":"검색 결과 내용","fix":"이렇게 고치면 됨","source":"근거 URL","confidence":"high|medium"}]}
@@ -150,6 +176,7 @@ ${(r.detail ?? []).map((i: any) => r.kind === 'new_star'
         log.push('메일 ' + (m.ok ? '보냄' : '실패 ' + m.status));
       }
     }
+    if (MODEL) log.push('AI ' + MODEL);
     return json({ ok: true, reports: reports.length, log });
   } catch (e) {
     return json({ ok: false, error: String(e), log }, 500);
