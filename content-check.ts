@@ -186,7 +186,9 @@ JSON 으로만: {"events":[{"title":"","org":"","benefit":"","target":"","start"
     if (add.length) reports.push({ kind: 'new_event', title: `새 혜택 이벤트 ${add.length}개를 자동으로 추가했어요`, detail: add });
     added = add.length; log.push(`새 이벤트 ${add.length}`);
   }
-  if (ended.length || added) await db.from('app_content').upsert({ key: 'events', data: { ...ev, events, updated: T }, updated_at: new Date().toISOString(), updated_by: 'auto' });
+  // 매일 확인했으니 '마지막 업데이트' 날짜를 오늘로 바꿔요
+  const { error: ue } = await db.from('app_content').upsert({ key: 'events', data: { ...ev, events, updated: T }, updated_at: new Date().toISOString(), updated_by: 'auto' });
+  log.push(ue ? '이벤트 저장 실패: ' + ue.message : '업데이트 날짜 ' + T);
 }
 async function buildChecks(T: string) {
   const checks: { kind: string; name: string; query: string; ours: any }[] = [];

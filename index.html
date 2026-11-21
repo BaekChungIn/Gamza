@@ -2177,6 +2177,7 @@ function adForm() {
 }
 async function adCSave() {
   const b = q('ac-save'); b.innerText = '저장 중…';
+  if (adCK === 'events' && adDraft && typeof adDraft === 'object' && !Array.isArray(adDraft)) adDraft.updated = ymd(new Date());
   const { error } = await sb.from('app_content').upsert({ key: adCK, data: adDraft, updated_at: new Date().toISOString(), updated_by: me.nickname || 'admin' });
   if (error) { b.innerText = '저장하기'; return showAlert('저장 실패', adErr(error)); }
   CONTENT[adCK] = JSON.parse(JSON.stringify(adDraft)); applyContent(); b.innerText = '저장됨'; b.className = 'ad-btn flex-1';
