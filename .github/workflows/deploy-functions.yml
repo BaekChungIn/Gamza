@@ -1,0 +1,25 @@
+name: Deploy Supabase Functions
+on:
+  push:
+    branches: [main]
+    paths: ['naver-search.ts', 'content-check.ts', '.github/workflows/deploy-functions.yml']
+  workflow_dispatch: {}
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: make folders
+        run: |
+          mkdir -p supabase/functions/naver-search supabase/functions/content-check
+          cp naver-search.ts supabase/functions/naver-search/index.ts
+          cp content-check.ts supabase/functions/content-check/index.ts
+      - name: deploy naver-search
+        run: supabase functions deploy naver-search --project-ref fziblqwqtyhntmmvzhgv --use-api
+      - name: deploy content-check
+        run: supabase functions deploy content-check --project-ref fziblqwqtyhntmmvzhgv --no-verify-jwt --use-api
