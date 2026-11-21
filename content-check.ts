@@ -15,7 +15,19 @@ const GROQ = env('GROQ_API_KEY'), GROQ_MODEL = env('GROQ_MODEL', 'llama-3.3-70b-
 const RESEND = env('RESEND_API_KEY'), MAIL_TO = env('REPORT_EMAIL', 'micbael11@naver.com'), MAIL_FROM = env('MAIL_FROM', '짬타이거 <onboarding@resend.dev>');
 const CRON_KEY = env('CRON_KEY');
 const SITE = env('SITE_URL', 'https://baekchungin.github.io/Gamza/');
-const db = createClient(env('SUPABASE_URL'), env('SUPABASE_SERVICE_ROLE_KEY'));
+
+// 서버 키: 예전 이름(SUPABASE_SERVICE_ROLE_KEY) 또는 새 이름(SUPABASE_SECRET_KEYS) 둘 다 지원
+function serverKey(): string {
+  const k = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  if (k) return k;
+  try { const j = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS') ?? '{}'); return j.default ?? Object.values(j)[0] ?? ''; } catch { return ''; }
+}
+// 요청한 사람으로 로그인된 클라이언트 (앱이 보낸 apikey + 로그인 토큰 그대로 사용)
+function userClient(req: Request) {
+  const anon = req.headers.get('apikey') || Deno.env.get('SUPABASE_ANON_KEY') || '';
+  return createClient(Deno.env.get('SUPABASE_URL')!, anon, { global: { headers: { Authorization: req.headers.get('Authorization') ?? '' } }, auth: { persistSession: false } });
+}
+const db = createClient(env('SUPABASE_URL'), serverKey());
 const json = (b: unknown, s = 200) => new Response(JSON.stringify(b), { status: s, headers: { ...CORS, 'Content-Type': 'application/json' } });
 const today = () => new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10); // 한국 날짜
 const strip = (s: string) => String(s ?? '').replace(/<[^>]+>/g, '').replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#39;/g, "'");
@@ -61,8 +73,10 @@ Deno.serve(async (req) => {
   // 실행 권한: 예약 실행(x-cron-key) 또는 관리자
   let ok = !!CRON_KEY && req.headers.get('x-cron-key') === CRON_KEY;
   if (!ok) {
-    const { data: u } = await db.auth.getUser((req.headers.get('Authorization') ?? '').replace('Bearer ', ''));
-    if (u?.user) { const { data: p } = await db.from('profiles').select('is_admin').eq('id', u.user.id).maybeSingle(); ok = !!p?.is_admin; }
+    const uc = userClient(req);
+    const { data: isA, error: ae } = await uc.rpc('is_admin');
+    ok = isA === true;
+    if (!ok) return json({ error: 'forbidden', why: ae ? ae.message : (isA === false ? 'not admin (profiles.is_admin = false)' : 'no login') }, 403);
   }
   if (!ok) return json({ error: 'forbidden' }, 403);
   if (!NID || !GROQ) return json({ error: 'NAVER / GROQ keys missing' }, 500);

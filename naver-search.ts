@@ -12,7 +12,19 @@ const CORS = {
 };
 const NID = Deno.env.get('NAVER_CLIENT_ID') ?? '';
 const NSEC = Deno.env.get('NAVER_CLIENT_SECRET') ?? '';
-const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+
+// 서버 키: 예전 이름(SUPABASE_SERVICE_ROLE_KEY) 또는 새 이름(SUPABASE_SECRET_KEYS) 둘 다 지원
+function serverKey(): string {
+  const k = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  if (k) return k;
+  try { const j = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS') ?? '{}'); return j.default ?? Object.values(j)[0] ?? ''; } catch { return ''; }
+}
+// 요청한 사람으로 로그인된 클라이언트 (앱이 보낸 apikey + 로그인 토큰 그대로 사용)
+function userClient(req: Request) {
+  const anon = req.headers.get('apikey') || Deno.env.get('SUPABASE_ANON_KEY') || '';
+  return createClient(Deno.env.get('SUPABASE_URL')!, anon, { global: { headers: { Authorization: req.headers.get('Authorization') ?? '' } }, auth: { persistSession: false } });
+}
+const admin = createClient(Deno.env.get('SUPABASE_URL')!, serverKey());
 const json = (b: unknown, s = 200) => new Response(JSON.stringify(b), { status: s, headers: { ...CORS, 'Content-Type': 'application/json' } });
 
 // 네이버 오픈API는 NAVER API HUB(네이버 클라우드)로 옮겨졌어요. 쇼핑 검색은 종료돼서 상품도 이미지 검색으로 찾아요.
@@ -32,7 +44,7 @@ Deno.serve(async (req) => {
   try {
     // 로그인한 사용자만
     const auth = req.headers.get('Authorization') ?? '';
-    const { data: u } = await admin.auth.getUser(auth.replace('Bearer ', ''));
+    const { data: u } = await userClient(req).auth.getUser(auth.replace('Bearer ', ''));
     if (!u?.user) return json({ error: 'login required' }, 401);
     if (!NID || !NSEC) return json({ error: 'NAVER keys missing' }, 500);
 

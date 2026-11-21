@@ -2128,7 +2128,7 @@ async function adReports() {
 async function adDone(id, st) { await sb.from('content_reports').update({ status: st }).eq('id', id); adReports(); }
 async function fnErr(error) {
   let st = '', body = '';
-  try { const r = error.context; if (r) { st = r.status; body = await r.text(); try { const j = JSON.parse(body); body = j.error || j.msg || j.message || body; } catch (x) { } } } catch (x) { }
+  try { const r = error.context; if (r) { st = r.status; body = await r.text(); try { const j = JSON.parse(body); body = (j.error || j.msg || j.message || body) + (j.why ? ' (' + j.why + ')' : ''); } catch (x) { } } } catch (x) { }
   const m = String(body || error.message || '');
   let hint = '';
   if (st === 404 || /not found/i.test(m)) hint = '서버 함수가 아직 배포 안 됐어요 (GitHub Actions 확인)';
