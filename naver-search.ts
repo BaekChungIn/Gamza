@@ -15,7 +15,7 @@ const NSEC = Deno.env.get('NAVER_CLIENT_SECRET') ?? '';
 
 // 서버 키: 예전 이름(SUPABASE_SERVICE_ROLE_KEY) 또는 새 이름(SUPABASE_SECRET_KEYS) 둘 다 지원
 function serverKey(): string {
-  const k = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  const k = Deno.env.get('SB_SERVICE_KEY') || Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
   if (k) return k;
   try { const j = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS') ?? '{}'); return j.default ?? Object.values(j)[0] ?? ''; } catch { return ''; }
 }

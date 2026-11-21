@@ -18,7 +18,7 @@ const SITE = env('SITE_URL', 'https://baekchungin.github.io/Gamza/');
 
 // 서버 키: 예전 이름(SUPABASE_SERVICE_ROLE_KEY) 또는 새 이름(SUPABASE_SECRET_KEYS) 둘 다 지원
 function serverKey(): string {
-  const k = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  const k = Deno.env.get('SB_SERVICE_KEY') || Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
   if (k) return k;
   try { const j = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS') ?? '{}'); return j.default ?? Object.values(j)[0] ?? ''; } catch { return ''; }
 }
@@ -110,6 +110,12 @@ Deno.serve(async (req) => {
   if (!NID || !GROQ) return json({ error: 'NAVER / GROQ keys missing' }, 500);
 
   let body: any = {}; try { body = (await req.json()) ?? {}; } catch { /* 기본값 */ }
+  if (body.mode === 'diag') {
+    const k = serverKey(), out: any = { has_service_role: !!Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'), has_secret_keys: !!Deno.env.get('SUPABASE_SECRET_KEYS'), has_custom: !!Deno.env.get('SB_SERVICE_KEY'), key_type: k.startsWith('sb_secret') ? 'sb_secret' : k.startsWith('ey') ? 'jwt' : (k ? 'other' : 'none') };
+    const r1 = await db.from('app_content').select('key').limit(1); out.read = r1.error ? 'X ' + r1.error.message : 'OK (' + (r1.data || []).length + ')';
+    const r2 = await db.from('app_content').upsert({ key: 'diag', data: { at: new Date().toISOString() }, updated_by: 'diag' }); out.write = r2.error ? 'X ' + r2.error.message : 'OK';
+    return json(out);
+  }
   // 일은 뒤에서 하고, 요청에는 바로 답해요 (연결이 오래 걸려 끊기지 않게)
   const task = runTask(body);
   try { EdgeRuntime.waitUntil(task); } catch { await task; }
