@@ -2145,7 +2145,7 @@ async function adRun() {
   const out = [];
   for (const mode of ['content', 'stars']) { q('ad-runlog').innerText = (mode === 'content' ? '혜택·적금·카드 점검 중…' : '새로 입대한 스타 확인 중…'); try { const { data, error } = await sb.functions.invoke('content-check', { body: { mode } }); out.push(error ? `${mode}: 실패 — ${await fnErr(error)}` : (data.log || []).join(' · ') + (data.reports ? ` · 결과 ${data.reports}건 (메일 발송)` : ' · 문제 없음')); } catch (e) { out.push(mode + ': 실패 — ' + (e && e.message || e)); } }
   q('ad-runlog').innerText = out.join('\n'); await loadContent(); await loadMyStars(); stRefresh(); if (curTab === 'benefits') renderBenefits(); if (curTab === 'savings') renderSav();
-  b.innerText = '지금 최신화'; b.disabled = false; if (adT === 'reports') { const l = q('ad-runlog').innerText; await adReports(); q('ad-runlog').innerText = l; }
+  b.innerText = '지금 최신화'; b.disabled = false; [90000, 200000].forEach(ms => setTimeout(() => { if (adT === 'reports' && q('modal-admin').classList.contains('flex')) { const l = q('ad-runlog') ? q('ad-runlog').innerText : ''; adReports().then(() => { if (q('ad-runlog')) q('ad-runlog').innerText = l; }); } }, ms)); if (adT === 'reports') { const l = q('ad-runlog').innerText; await adReports(); q('ad-runlog').innerText = l; }
 }
 /* 콘텐츠 편집 (모양 그대로 편집하는 폼) */
 const JF_L = { title: '제목', org: '기관', benefit: '혜택', target: '대상', start: '시작일', end: '종료일', note: '메모', url: '출처 링크', n: '이름', b: '기본금리(%)', max: '최고금리(%)', o: '우대조건', r: '우대(%p)', d: '설명', id: 'ID', img: '이미지', tag: '태그', sum: '요약', items: '혜택 항목', events: '이벤트 목록', updated: '업데이트일', auto: '자동 추가', closed: '종료 처리', added: '추가일' };

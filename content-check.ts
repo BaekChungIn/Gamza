@@ -64,16 +64,18 @@ function parseJSON(txt: string): any {
   return {};
 }
 async function groq(system: string, user: string): Promise<any> {
-  let jsonMode = true;
-  for (let t = 0; t < 4; t++) {
+  let jsonMode = true, reason = true;
+  for (let t = 0; t < 6; t++) {
     const model = await pickModel();
     const body: any = { model, temperature: 0.1, messages: [{ role: 'system', content: system + '\n반드시 JSON 객체 하나만 출력해.' }, { role: 'user', content: user }] };
     if (jsonMode) body.response_format = { type: 'json_object' };
+    if (reason && /gpt-oss/.test(model)) body.reasoning_effort = 'low';
     const r = await fetch('https://api.groq.com/openai/v1/chat/completions', { method: 'POST', headers: { Authorization: `Bearer ${GROQ}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     if (r.status === 429) { await new Promise((ok) => setTimeout(ok, 4000 * (t + 1))); continue; }
     if (r.status === 404 || r.status === 400) {
       const txt = await r.text();
       if (/model/i.test(txt) && /not exist|decommission|not found|access/i.test(txt) && !GROQ_MODEL_ENV) { PREFER.splice(PREFER.indexOf(model) >>> 0, 1); MODEL = ''; const nx = PREFER.find(Boolean); if (nx) { MODEL = nx; continue; } }
+      if (reason && /reasoning/i.test(txt)) { reason = false; continue; }
       if (jsonMode && /json|response_format/i.test(txt)) { jsonMode = false; continue; }
       throw new Error('groq ' + r.status + ' ' + txt.slice(0, 200));
     }
@@ -108,72 +110,34 @@ Deno.serve(async (req) => {
   if (!NID || !GROQ) return json({ error: 'NAVER / GROQ keys missing' }, 500);
 
   const T = today(), reports: { kind: string; title: string; detail: any }[] = [], log: string[] = [];
-  let mode = 'content'; try { mode = (await req.json())?.mode || 'content'; } catch { /* 기본값 */ }
+  let body: any = {}; try { body = (await req.json()) ?? {}; } catch { /* 기본값 */ }
+  const mode = body.mode || 'content', offset = Number(body.offset || 0), run = String(body.run || new Date().toISOString());
   try {
-    if (mode === 'stars') { await checkStars(T, reports, log); }
-    else {
-    // ---------- 1) 혜택 이벤트: 끝난 것 정리 + 새 이벤트 찾기 ----------
-    let ev = await getContent('events');
-    if (!ev) { try { ev = await (await fetch(SITE + 'events.json?' + Date.now())).json(); } catch { ev = { events: [] }; } }
-    const events: any[] = Array.isArray(ev.events) ? ev.events : [];
-    const live = events.filter((e) => !e.end || e.end >= T);
-    const ended = events.filter((e) => e.end && e.end < T && !e.closed);
-    ended.forEach((e) => (e.closed = true));
-    log.push(`이벤트: 진행 ${live.length} · 오늘 종료 처리 ${ended.length}`);
-
-    const news = (await Promise.all(['나라사랑카드 이벤트', '국군장병 할인 이벤트', '군인 장병 캐시백 이벤트', '장병 혜택 이벤트 기간'].map((q) => naver('news', q, 12).catch(() => [])))).flat();
-    const seen = new Set<string>(); const uniq = news.filter((n) => !seen.has(n.url) && seen.add(n.url)).slice(0, 36);
-    if (uniq.length) {
-      const found = await groq(`너는 한국 군 장병 대상 혜택 이벤트를 정리하는 편집자야. 오늘은 ${T}.
-뉴스 목록에서 '지금 진행 중이거나 곧 시작하는' 장병·군인 대상 이벤트만 골라. 이미 있는 이벤트(existing)와 같은 건 빼.
-기간(시작·종료일)이 기사에 분명히 있는 것만 넣고, 날짜는 YYYY-MM-DD. 종료일이 오늘보다 이전이면 빼.
-JSON 으로만: {"events":[{"title":"","org":"","benefit":"","target":"","start":"","end":"","note":"","url":""}]}`,
-        JSON.stringify({ existing: events.map((e) => e.title), news: uniq.map((n) => ({ t: n.title, d: n.desc, u: n.url, p: n.date })) }));
-      const add = (found.events ?? []).filter((e: any) => e && e.title && e.end && e.end >= T && /^\d{4}-\d{2}-\d{2}$/.test(e.end) && !events.some((x) => x.title === e.title || (e.url && x.url === e.url)));
-      add.forEach((e: any) => { e.auto = true; e.added = T; events.push(e); });
-      if (add.length) reports.push({ kind: 'new_event', title: `새 혜택 이벤트 ${add.length}개를 자동으로 추가했어요`, detail: add });
-      log.push(`새 이벤트 ${add.length}`);
-    }
-    if (ended.length || reports.some((r) => r.kind === 'new_event')) {
-      await db.from('app_content').upsert({ key: 'events', data: { ...ev, events, updated: T }, updated_at: new Date().toISOString(), updated_by: 'auto' });
-    }
-
-    // ---------- 2) 내용 검증 ----------
-    const checks: { kind: string; name: string; query: string; ours: any }[] = [];
-    const cards = await getContent('cards');
-    for (const c of Array.isArray(cards) ? cards : []) if (!/중단/.test(c.tag ?? '')) checks.push({ kind: 'card', name: c.n, query: `${c.n} 혜택 ${T.slice(0, 4)}`, ours: c.items });
-    const sav = await getContent('savings');
-    for (const b of Array.isArray(sav) ? sav : []) checks.push({ kind: 'savings', name: `${b.n} 장병내일준비적금`, query: `${b.n}은행 장병내일준비적금 우대금리`, ours: { 기본금리: b.b, 최고금리: b.max, 우대조건: b.o } });
-    for (const e of events.filter((e) => !e.closed && !e.auto && (!e.end || e.end >= T)).slice(0, 8)) checks.push({ kind: 'event', name: e.title, query: e.title, ours: { 기간: `${e.start} ~ ${e.end}`, 혜택: e.benefit, 대상: e.target } });
-
-    for (const c of checks) {
-      const ev2 = await search(c.query);
-      if (!ev2.length) continue;
-      const r = await groq(CHECK_SYS, JSON.stringify({ 항목: c.name, ours: c.ours, evidence: ev2 }));
-      const issues = (r.issues ?? []).filter((i: any) => i && i.fix && i.confidence !== 'low');
-      if (issues.length) reports.push({ kind: c.kind, title: `${c.name} — 확인 필요 ${issues.length}건`, detail: issues });
-      await new Promise((ok) => setTimeout(ok, 1200));
-    }
-    log.push(`검증 ${checks.length}개 · 문제 ${reports.filter((r) => r.kind !== 'new_event').length}개`);
-
-    }
-    // ---------- 3) 저장 + 메일 ----------
-    if (reports.length) {
-      await db.from('content_reports').insert(reports);
-      if (RESEND) {
-        const html = `<div style="font-family:sans-serif;max-width:640px">
-<h2 style="margin:0 0 4px">짬타이거 자동 점검 결과 (${T})</h2><p style="color:#8B95A1;margin:0 0 18px">앱 관리자 화면 → 점검 결과에서도 볼 수 있어요.</p>
-${reports.map((r) => `<div style="border:1px solid #E5E8EB;border-radius:12px;padding:14px;margin-bottom:12px"><b>${esc(r.title)}</b>
-${(r.detail ?? []).map((i: any) => r.kind === 'new_star'
-  ? `<div style="margin-top:8px;font-size:13px">• <b>${esc(i.n)}</b> (${esc(i.g)}) ${esc(i.t)} · 입대 ${esc(i.e)} → 전역 예정 ${esc(i.d)} · 확인 ${esc(i.votes)}/5</div>`
-  : r.kind === 'new_event'
-  ? `<div style="margin-top:8px;font-size:13px">• <b>${esc(i.title)}</b> (${esc(i.org)}) ${esc(i.start)} ~ ${esc(i.end)}<br>${esc(i.benefit)} <a href="${esc(i.url)}">출처</a></div>`
-  : `<div style="margin-top:8px;font-size:13px">• <b>${esc(i.item)}</b><br>앱: ${esc(i.ours)}<br>검색: ${esc(i.found)}<br><b style="color:#D94867">수정: ${esc(i.fix)}</b> <a href="${esc(i.source)}">근거</a></div>`).join('')}</div>`).join('')}</div>`;
-        const m = await fetch('https://api.resend.com/emails', {
-          method: 'POST', headers: { Authorization: `Bearer ${RESEND}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ from: MAIL_FROM, to: [MAIL_TO], subject: `[짬타이거] 수정이 필요한 내용 ${reports.length}건 (${T})`, html }),
-        });
-        log.push('메일 ' + (m.ok ? '보냄' : '실패 ' + m.status));
+    if (mode === 'stars') {
+      await checkStars(T, reports, log);
+      if (reports.length) { await db.from('content_reports').insert(reports); await sendMail(T, reports, log); }
+    } else if (mode === 'content') {
+      await stepEvents(T, reports, log);
+      if (reports.length) await db.from('content_reports').insert(reports);
+      chain({ mode: 'verify', offset: 0, run });
+      log.push('카드·적금·이벤트 검증은 뒤에서 이어서 진행돼요 (몇 분 뒤 점검 결과·메일 확인)');
+    } else if (mode === 'verify') {
+      const checks = await buildChecks(T);
+      const part = checks.slice(offset, offset + STEP);
+      for (const c of part) {
+        const ev2 = await search(c.query);
+        if (!ev2.length) continue;
+        const r = await groq(CHECK_SYS, JSON.stringify({ 항목: c.name, ours: c.ours, evidence: ev2 }));
+        const issues = (r.issues ?? []).filter((x: any) => x && x.fix && x.confidence !== 'low');
+        if (issues.length) reports.push({ kind: c.kind, title: `${c.name} — 확인 필요 ${issues.length}건`, detail: issues });
+      }
+      if (reports.length) await db.from('content_reports').insert(reports);
+      log.push(`검증 ${Math.min(offset + STEP, checks.length)}/${checks.length}`);
+      if (offset + STEP < checks.length) chain({ mode: 'verify', offset: offset + STEP, run });
+      else {
+        // 마지막 단계: 이번 실행에서 나온 결과를 모아 메일 한 통
+        const { data: all } = await db.from('content_reports').select('kind,title,detail').gte('created_at', run).neq('kind', 'new_star');
+        if (all && all.length) await sendMail(T, all, log);
       }
     }
     if (MODEL) log.push('AI ' + MODEL);
@@ -182,6 +146,64 @@ ${(r.detail ?? []).map((i: any) => r.kind === 'new_star'
     return json({ ok: false, error: String(e), log }, 500);
   }
 });
+
+// ---------- 한 번에 조금씩 (서버 함수 시간 제한 때문에) ----------
+declare const EdgeRuntime: any;
+const STEP = 3;
+function chain(next: any) {
+  const p = fetch(env('SUPABASE_URL') + '/functions/v1/content-check', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-cron-key': CRON_KEY }, body: JSON.stringify(next) }).catch(() => null);
+  try { EdgeRuntime.waitUntil(p); } catch { /* 로컬 */ }
+}
+async function stepEvents(T: string, reports: any[], log: string[]) {
+  let ev = await getContent('events');
+  if (!ev) { try { ev = await (await fetch(SITE + 'events.json?' + Date.now())).json(); } catch { ev = { events: [] }; } }
+  const events: any[] = Array.isArray(ev.events) ? ev.events : [];
+  const live = events.filter((e) => !e.end || e.end >= T);
+  const ended = events.filter((e) => e.end && e.end < T && !e.closed);
+  ended.forEach((e) => (e.closed = true));
+  log.push(`이벤트: 진행 ${live.length} · 오늘 종료 처리 ${ended.length}`);
+  const news = (await Promise.all(['나라사랑카드 이벤트', '국군장병 할인 이벤트', '군인 장병 캐시백 이벤트', '장병 혜택 이벤트 기간'].map((q) => naver('news', q, 10).catch(() => [])))).flat();
+  const seen = new Set<string>(); const uniq = news.filter((n) => !seen.has(n.url) && seen.add(n.url)).slice(0, 28);
+  let added = 0;
+  if (uniq.length) {
+    const found = await groq(`너는 한국 군 장병 대상 혜택 이벤트를 정리하는 편집자야. 오늘은 ${T}.
+뉴스 목록에서 '지금 진행 중이거나 곧 시작하는' 장병·군인 대상 이벤트만 골라. 이미 있는 이벤트(existing)와 같은 건 빼.
+기간(시작·종료일)이 기사에 분명히 있는 것만 넣고, 날짜는 YYYY-MM-DD. 종료일이 오늘보다 이전이면 빼.
+JSON 으로만: {"events":[{"title":"","org":"","benefit":"","target":"","start":"","end":"","note":"","url":""}]}`,
+      JSON.stringify({ existing: events.map((e) => e.title), news: uniq.map((n) => ({ t: n.title, d: n.desc.slice(0, 160), u: n.url, p: n.date })) }));
+    const add = (found.events ?? []).filter((e: any) => e && e.title && e.end && e.end >= T && /^\d{4}-\d{2}-\d{2}$/.test(e.end) && !events.some((x) => x.title === e.title || (e.url && x.url === e.url)));
+    add.forEach((e: any) => { e.auto = true; e.added = T; events.push(e); });
+    if (add.length) reports.push({ kind: 'new_event', title: `새 혜택 이벤트 ${add.length}개를 자동으로 추가했어요`, detail: add });
+    added = add.length; log.push(`새 이벤트 ${add.length}`);
+  }
+  if (ended.length || added) await db.from('app_content').upsert({ key: 'events', data: { ...ev, events, updated: T }, updated_at: new Date().toISOString(), updated_by: 'auto' });
+}
+async function buildChecks(T: string) {
+  const checks: { kind: string; name: string; query: string; ours: any }[] = [];
+  const cards = await getContent('cards');
+  for (const c of Array.isArray(cards) ? cards : []) if (!/중단/.test(c.tag ?? '')) checks.push({ kind: 'card', name: c.n, query: `${c.n} 혜택 ${T.slice(0, 4)}`, ours: c.items });
+  const sav = await getContent('savings');
+  for (const b of Array.isArray(sav) ? sav : []) checks.push({ kind: 'savings', name: `${b.n} 장병내일준비적금`, query: `${b.n}은행 장병내일준비적금 우대금리`, ours: { 기본금리: b.b, 최고금리: b.max, 우대조건: b.o } });
+  const ev = await getContent('events'); const events: any[] = ev && Array.isArray(ev.events) ? ev.events : [];
+  for (const e of events.filter((e) => !e.closed && !e.auto && (!e.end || e.end >= T)).slice(0, 8)) checks.push({ kind: 'event', name: e.title, query: e.title, ours: { 기간: `${e.start} ~ ${e.end}`, 혜택: e.benefit, 대상: e.target } });
+  return checks;
+}
+async function sendMail(T: string, reports: any[], log: string[]) {
+  if (!RESEND || !reports.length) return;
+  const html = `<div style="font-family:sans-serif;max-width:640px">
+<h2 style="margin:0 0 4px">짬타이거 자동 점검 결과 (${T})</h2><p style="color:#8B95A1;margin:0 0 18px">앱 관리자 화면 → 점검 결과에서도 볼 수 있어요.</p>
+${reports.map((r) => `<div style="border:1px solid #E5E8EB;border-radius:12px;padding:14px;margin-bottom:12px"><b>${esc(r.title)}</b>
+${(r.detail ?? []).map((i: any) => r.kind === 'new_star'
+  ? `<div style="margin-top:8px;font-size:13px">• <b>${esc(i.n)}</b> (${esc(i.g)}) ${esc(i.t)} · 입대 ${esc(i.e)} → 전역 예정 ${esc(i.d)} · 확인 ${esc(i.votes)}/5</div>`
+  : r.kind === 'new_event'
+  ? `<div style="margin-top:8px;font-size:13px">• <b>${esc(i.title)}</b> (${esc(i.org)}) ${esc(i.start)} ~ ${esc(i.end)}<br>${esc(i.benefit)} <a href="${esc(i.url)}">출처</a></div>`
+  : `<div style="margin-top:8px;font-size:13px">• <b>${esc(i.item)}</b><br>앱: ${esc(i.ours)}<br>검색: ${esc(i.found)}<br><b style="color:#D94867">수정: ${esc(i.fix)}</b> <a href="${esc(i.source)}">근거</a></div>`).join('')}</div>`).join('')}</div>`;
+  const m = await fetch('https://api.resend.com/emails', {
+    method: 'POST', headers: { Authorization: `Bearer ${RESEND}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ from: MAIL_FROM, to: [MAIL_TO], subject: `[짬타이거] 수정이 필요한 내용 ${reports.length}건 (${T})`, html }),
+  });
+  log.push('메일 ' + (m.ok ? '보냄' : '실패 ' + m.status));
+}
 
 // ================= MY스타: 새로 입대한 스타 찾기 (5번 교차 확인) =================
 const SVC_M: Record<string, number> = { army: 18, band: 18, marine: 18, navy: 20, airforce: 21, social: 21 };
