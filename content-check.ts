@@ -22,8 +22,9 @@ const strip = (s: string) => String(s ?? '').replace(/<[^>]+>/g, '').replace(/&q
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
 
 async function naver(api: 'news' | 'webkr', query: string, n = 10) {
-  const r = await fetch(`https://openapi.naver.com/v1/search/${api}.json?display=${n}&sort=${api === 'news' ? 'date' : 'sim'}&query=${encodeURIComponent(query)}`,
-    { headers: { 'X-Naver-Client-Id': NID, 'X-Naver-Client-Secret': NSEC } });
+  // NAVER API HUB (네이버 클라우드) 방식
+  const r = await fetch(`https://naverapihub.apigw.ntruss.com/search/v1/${api}?display=${n}&sort=${api === 'news' ? 'date' : 'sim'}&query=${encodeURIComponent(query)}`,
+    { headers: { 'X-NCP-APIGW-API-KEY-ID': NID, 'X-NCP-APIGW-API-KEY': NSEC } });
   if (!r.ok) return [];
   const d = await r.json();
   return (d.items ?? []).map((x: any) => ({ title: strip(x.title), desc: strip(x.description), url: x.originallink || x.link, date: x.pubDate || '' }));
@@ -67,7 +68,10 @@ Deno.serve(async (req) => {
   if (!NID || !GROQ) return json({ error: 'NAVER / GROQ keys missing' }, 500);
 
   const T = today(), reports: { kind: string; title: string; detail: any }[] = [], log: string[] = [];
+  let mode = 'content'; try { mode = (await req.json())?.mode || 'content'; } catch { /* 기본값 */ }
   try {
+    if (mode === 'stars') { await checkStars(T, reports, log); }
+    else {
     // ---------- 1) 혜택 이벤트: 끝난 것 정리 + 새 이벤트 찾기 ----------
     let ev = await getContent('events');
     if (!ev) { try { ev = await (await fetch(SITE + 'events.json?' + Date.now())).json(); } catch { ev = { events: [] }; } }
@@ -112,6 +116,7 @@ JSON 으로만: {"events":[{"title":"","org":"","benefit":"","target":"","start"
     }
     log.push(`검증 ${checks.length}개 · 문제 ${reports.filter((r) => r.kind !== 'new_event').length}개`);
 
+    }
     // ---------- 3) 저장 + 메일 ----------
     if (reports.length) {
       await db.from('content_reports').insert(reports);
@@ -119,7 +124,9 @@ JSON 으로만: {"events":[{"title":"","org":"","benefit":"","target":"","start"
         const html = `<div style="font-family:sans-serif;max-width:640px">
 <h2 style="margin:0 0 4px">짬타이거 자동 점검 결과 (${T})</h2><p style="color:#8B95A1;margin:0 0 18px">앱 관리자 화면 → 점검 결과에서도 볼 수 있어요.</p>
 ${reports.map((r) => `<div style="border:1px solid #E5E8EB;border-radius:12px;padding:14px;margin-bottom:12px"><b>${esc(r.title)}</b>
-${(r.detail ?? []).map((i: any) => r.kind === 'new_event'
+${(r.detail ?? []).map((i: any) => r.kind === 'new_star'
+  ? `<div style="margin-top:8px;font-size:13px">• <b>${esc(i.n)}</b> (${esc(i.g)}) ${esc(i.t)} · 입대 ${esc(i.e)} → 전역 예정 ${esc(i.d)} · 확인 ${esc(i.votes)}/5</div>`
+  : r.kind === 'new_event'
   ? `<div style="margin-top:8px;font-size:13px">• <b>${esc(i.title)}</b> (${esc(i.org)}) ${esc(i.start)} ~ ${esc(i.end)}<br>${esc(i.benefit)} <a href="${esc(i.url)}">출처</a></div>`
   : `<div style="margin-top:8px;font-size:13px">• <b>${esc(i.item)}</b><br>앱: ${esc(i.ours)}<br>검색: ${esc(i.found)}<br><b style="color:#D94867">수정: ${esc(i.fix)}</b> <a href="${esc(i.source)}">근거</a></div>`).join('')}</div>`).join('')}</div>`;
         const m = await fetch('https://api.resend.com/emails', {
@@ -134,3 +141,58 @@ ${(r.detail ?? []).map((i: any) => r.kind === 'new_event'
     return json({ ok: false, error: String(e), log }, 500);
   }
 });
+
+// ================= MY스타: 새로 입대한 스타 찾기 (5번 교차 확인) =================
+const SVC_M: Record<string, number> = { army: 18, band: 18, marine: 18, navy: 20, airforce: 21, social: 21 };
+function addMonths(d: string, m: number) { const x = new Date(d + 'T00:00:00Z'); x.setUTCMonth(x.getUTCMonth() + m); x.setUTCDate(x.getUTCDate() - 1); return x.toISOString().slice(0, 10); }
+function sid(name: string, group: string) { let h = 0; for (const ch of name + '|' + group) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return 'a_' + h.toString(36); }
+const wait = (ms: number) => new Promise((ok) => setTimeout(ok, ms));
+async function checkStars(T: string, reports: any[], log: string[]) {
+  // 현재 목록: 앱 기본 목록(stars.js) + 자동 추가 목록
+  let baseNames: string[] = [];
+  try { const txt = await (await fetch(SITE + 'stars.js?' + Date.now())).text(); baseNames = [...txt.matchAll(/\['[a-z0-9_]+', '([^']+)', '([^']*)'/g)].map((m) => m[1] + '|' + m[2]); } catch { /* 무시 */ }
+  const extra: any[] = (await getContent('stars')) ?? [];
+  const known = new Set([...baseNames.map((x) => x.split('|')[0]), ...extra.map((x) => x.n)]);
+
+  // 1차: 뉴스에서 입대 소식 모으기
+  const qs = ['연예인 입대', '아이돌 현역 입대', '배우 입대 훈련소', '사회복무요원 복무 시작 아이돌', '해병대 입대 가수', '군악대 입대 아이돌', '상무 입대 선수', '입대 앞두고 팬들에게'];
+  const news = (await Promise.all(qs.map((q) => naver('news', q, 15).catch(() => [])))).flat();
+  const seen = new Set<string>(); const uniq = news.filter((n) => !seen.has(n.url) && seen.add(n.url)).slice(0, 60);
+  if (!uniq.length) { log.push('스타: 뉴스 없음'); return; }
+  const ext = await groq(`너는 한국 연예인·운동선수의 군 입대 정보를 정리하는 꼼꼼한 기자야. 오늘은 ${T}.
+뉴스에서 '입대일이 날짜로 분명히 나온' 한국 스타만 뽑아. 입대일은 오늘 기준 1년 전 ~ 60일 후 사이만.
+이미 목록에 있는 사람(known)은 빼. 추측 금지. 날짜가 애매하면 빼.
+cat: idol(아이돌)/singer(가수)/actor(배우)/sports(운동선수)/creator(인플루언서·유튜버)
+svc: army(육군 현역)/band(군악대)/marine(해병대)/navy(해군)/airforce(공군)/social(사회복무요원)
+JSON 으로만: {"stars":[{"n":"이름","g":"그룹/소속(배우면 '배우')","cat":"","e":"YYYY-MM-DD","svc":"","d":"전역일 기사에 있으면 YYYY-MM-DD 없으면 빈칸"}]}`,
+    JSON.stringify({ known: [...known], news: uniq.map((n) => ({ t: n.title, d: n.desc, p: n.date })) }));
+  const cands = (ext.stars ?? []).filter((c: any) => c && c.n && /^\d{4}-\d{2}-\d{2}$/.test(c.e) && !known.has(c.n) && SVC_M[c.svc]).slice(0, 4);
+  log.push(`스타 후보 ${cands.length}`);
+
+  // 2차: 후보마다 서로 다른 검색 5번 → 5번 중 4번 이상 같은 입대일이 확인돼야 추가
+  const added: any[] = [];
+  for (const c of cands) {
+    const probes = [`${c.n} 입대`, `${c.n} 입소`, `${c.n} ${c.g} 군 복무`, `${c.n} 전역 예정`, `${c.n} ${c.e.slice(0, 7).replace('-', '년 ')}월 입대`];
+    let votes = 0, dVotes: Record<string, number> = {};
+    for (const q of probes) {
+      const ev = await search(q);
+      if (!ev.length) continue;
+      const v = await groq(`검색 결과만 근거로 판단해. 질문: "${c.n}"(${c.g})이(가) ${c.e}에 입대(또는 복무 시작)했거나 할 예정인가?
+JSON 으로만: {"confirmed":true/false,"enlist":"근거상 입대일 YYYY-MM-DD 또는 빈칸","svc":"army/band/marine/navy/airforce/social 또는 빈칸","discharge":"근거상 전역(소집해제) 예정일 YYYY-MM-DD 또는 빈칸"}`,
+        JSON.stringify(ev.slice(0, 10)));
+      if (v.confirmed === true && v.enlist === c.e) { votes++; if (/^\d{4}-\d{2}-\d{2}$/.test(v.discharge || '')) dVotes[v.discharge] = (dVotes[v.discharge] || 0) + 1; }
+      await wait(2100);
+    }
+    if (votes >= 4) {
+      const dTop = Object.entries(dVotes).sort((a, b) => b[1] - a[1])[0];
+      const d = dTop && dTop[1] >= 2 ? dTop[0] : (/^\d{4}-\d{2}-\d{2}$/.test(c.d || '') ? c.d : addMonths(c.e, SVC_M[c.svc]));
+      const row = { id: sid(c.n, c.g || ''), n: c.n, g: c.g || '', c: ['idol', 'singer', 'actor', 'sports', 'creator'].includes(c.cat) ? c.cat : 'idol', e: c.e, d, t: c.svc, auto: true, added: T, votes };
+      extra.push(row); added.push(row); known.add(c.n);
+    } else log.push(`${c.n}: 확인 ${votes}/5 (보류)`);
+  }
+  if (added.length) {
+    await db.from('app_content').upsert({ key: 'stars', data: extra, updated_at: new Date().toISOString(), updated_by: 'auto' });
+    reports.push({ kind: 'new_star', title: `새로 입대한 스타 ${added.length}명을 자동으로 추가했어요`, detail: added });
+  }
+  log.push(`스타 추가 ${added.length}`);
+}
