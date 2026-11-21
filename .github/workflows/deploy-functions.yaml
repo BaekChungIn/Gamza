@@ -1,0 +1,26 @@
+# naver-search.ts / content-check.ts 를 GitHub 에 올리면 Supabase 서버 함수가 자동으로 배포돼요.
+name: Deploy Supabase Functions
+on:
+  push:
+    branches: [main]
+    paths: ['naver-search.ts', 'content-check.ts', '.github/workflows/deploy-functions.yml']
+  workflow_dispatch: {}
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: 함수 폴더 만들기
+        run: |
+          mkdir -p supabase/functions/naver-search supabase/functions/content-check
+          cp naver-search.ts supabase/functions/naver-search/index.ts
+          cp content-check.ts supabase/functions/content-check/index.ts
+      - name: naver-search 배포
+        run: supabase functions deploy naver-search --project-ref fziblqwqtyhntmmvzhgv --use-api --yes
+      - name: content-check 배포 (Verify JWT 끔)
+        run: supabase functions deploy content-check --project-ref fziblqwqtyhntmmvzhgv --no-verify-jwt --use-api --yes
