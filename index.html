@@ -1421,6 +1421,7 @@ function renderSetRows() {
   q('set-name').innerText = me.nickname || (isM ? '🪖 군인' : me.gender === 'S' ? '⭐ 팬' : '💕 곰신');
   q('set-rows').innerHTML = gap + row('✏️', '프로필 (이름·별명)', me.nickname || '미설정', "setGo('profile')") + row('⭐', 'MY스타', myStars.length ? myStars.map(r => (starK[r.id] || {}).n).join(', ') : '미등록', "closeModal('modal-settings');" + (myStars.length ? "openStar('my')" : 'starFlow()')) + (isS ? '' : row('💕', '커플 연동', me.partner_id ? (me.love_date ? '연동 중 · ' + me.love_date.replace(/-/g, '.') : '연동 중') : '미연동', "setGo('couple')")) + row('👤', '계정', '', "setGo('account')") + gap
     + (isS ? '' : row('🪖', '복무 정보', isM ? (BR[me.branch] || BR.army).k : '군인 계정에서 설정', "setGo('service')") + row('📍', '자대 등록', (S && S.unit_name) || '미등록', "setGo('unit')") + row('🎭', '캐릭터 테마', th, "setGo('theme')"))
+    + (isS && typeof zpSlot === 'function' ? row('🖼', '홈 화면 카드', zpSlot() === 'q' ? '오늘의 질문' : '포토카드', 'zpSlotPick()') : '')
     + (typeof zpWxOn === 'function' ? row('☀', '날씨 표시', zpWxOn() ? '켜짐' : '꺼짐', 'zpWxToggle()') : '') + gap
     + (me.is_admin ? row('🛠', '관리자', '회원 · 콘텐츠 · 점검', "closeModal('modal-settings');openAdmin()") + gap : '')
     + row('🚪', '로그아웃', '', 'logout()', true)

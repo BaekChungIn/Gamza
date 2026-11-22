@@ -26,6 +26,25 @@ const ZP_ITEMS = {
   pc_holo: { n: '홀로그램', k: 'frame', aud: 'fan' },
   pc_army: { n: '군번줄', k: 'frame', aud: 'fan' },
   pc_star: { n: '별빛', k: 'frame', aud: 'fan' },
+  pf_cat: { n: '블랙캣 스티커', k: 'frame', aud: 'fan', img: 1 },
+  pf_jelly_sky: { n: '젤리 구름', k: 'frame', aud: 'fan', img: 1 },
+  pf_jelly_pink: { n: '젤리 하트 핑크', k: 'frame', aud: 'fan', img: 1 },
+  pf_jelly_mint: { n: '젤리 체리 민트', k: 'frame', aud: 'fan', img: 1 },
+  pf_jelly_lilac: { n: '젤리 라일락', k: 'frame', aud: 'fan', img: 1 },
+  pf_ging_peach: { n: '깅엄 피치', k: 'frame', aud: 'fan', img: 1 },
+  pf_ging_blue: { n: '깅엄 블루', k: 'frame', aud: 'fan', img: 1 },
+  pf_ging_lilac: { n: '깅엄 라일락', k: 'frame', aud: 'fan', img: 1 },
+  pf_camera: { n: '실버 디카', k: 'frame', aud: 'fan', img: 1 },
+  pf_vintage: { n: '빈티지 페이퍼', k: 'frame', aud: 'fan', img: 1 },
+  pf_fabric: { n: '체크 패브릭', k: 'frame', aud: 'fan', img: 1 },
+  pf_rhine_heart: { n: '큐빅 하트', k: 'frame', aud: 'fan', img: 1, gem: 1 },
+  pf_rhine_crown: { n: '큐빅 크라운', k: 'frame', aud: 'fan', img: 1, gem: 1 },
+  pf_crystal: { n: '크리스탈 나비', k: 'frame', aud: 'fan', img: 1, gem: 1 },
+  pf_pearl_cream: { n: '진주 생크림', k: 'frame', aud: 'fan', img: 1, gem: 1 },
+  pf_choco: { n: '초코 베어', k: 'frame', aud: 'fan', img: 1 },
+  pf_berry: { n: '딸기 케이크', k: 'frame', aud: 'fan', img: 1, gem: 1 },
+  pf_holo: { n: '홀로 보석', k: 'frame', aud: 'fan', img: 1, gem: 1 },
+  pf_ocean: { n: '오션 레진', k: 'frame', aud: 'fan', img: 1, gem: 1 },
   sk_love: { n: '러브 스티커 팩', k: 'sticker', aud: 'fan' },
   sk_army: { n: '밀리터리 스티커 팩', k: 'sticker', aud: 'fan' }
 };
@@ -94,7 +113,19 @@ function zpToast(t) { const d = document.createElement('div'); d.className = 'zp
 .pc2{position:relative;aspect-ratio:2/3;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 8px 20px rgba(17,20,26,.12);container-type:inline-size}
 .pc2 .ph{position:absolute;inset:0;background:#E9ECEF center/cover no-repeat}
 .pc2 .ph.empty{display:flex;align-items:center;justify-content:center;color:#B0B8C1;font-size:12px;font-weight:700}
-.pc2 .lay{position:absolute;inset:0;pointer-events:none}
+.pc2 .lay{position:absolute;inset:0;pointer-events:none;z-index:3}
+.zp-slots{display:flex;flex-direction:column;gap:8px;margin-top:4px;text-align:left}
+.zp-slot{display:flex;align-items:center;gap:12px;text-align:left;padding:13px 14px;border-radius:14px;border:1.5px solid #E5E8EB;background:#fff;width:100%}
+.zp-slot .ic{font-size:22px}.zp-slot .tx{flex:1;display:flex;flex-direction:column}.zp-slot b{font-size:15px;color:#191F28}.zp-slot small{font-size:12px;color:#8B95A1;margin-top:2px}
+.zp-slot .ck{width:20px;height:20px;border-radius:50%;border:2px solid #D1D6DB}
+.zp-slot.on{border-color:#191F28;background:#F9FAFB}.zp-slot.on .ck{border:6px solid #191F28}
+.pc2 .fimg{position:absolute;inset:0;background:center/100% 100% no-repeat;pointer-events:none;z-index:2}
+.pc2.pfi{background:#F4F5F7}.pc2.pfi .cap{z-index:4}
+.pc2 .gl{position:absolute;inset:0;pointer-events:none;z-index:2;-webkit-mask-size:100% 100%;mask-size:100% 100%;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.0) 40%,rgba(255,255,255,.85) 48%,rgba(210,240,255,.6) 50%,rgba(255,220,250,.5) 52%,transparent 62%);background-size:300% 100%;animation:zpGl 3.6s ease-in-out infinite;mix-blend-mode:screen}
+@keyframes zpGl{0%{background-position:120% 0}60%,100%{background-position:-60% 0}}
+.pc2 .tw{position:absolute;width:7cqw;height:7cqw;margin:-3.5cqw;pointer-events:none;z-index:3;background:radial-gradient(circle,#fff 0 7%,transparent 9%),linear-gradient(#fff,#fff) center/8% 100% no-repeat,linear-gradient(90deg,#fff,#fff) center/100% 8% no-repeat;-webkit-mask:radial-gradient(circle,#000 20%,transparent 70%);mask:radial-gradient(circle,#000 20%,transparent 70%);filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 5px rgba(200,230,255,.9));animation:zpTwk 2.2s ease-in-out infinite;opacity:0}
+@keyframes zpTwk{0%,100%{opacity:0;transform:scale(.3) rotate(0)}45%{opacity:1;transform:scale(1) rotate(45deg)}70%{opacity:0;transform:scale(.4) rotate(90deg)}}
+@media (prefers-reduced-motion:reduce){.pc2 .gl,.pc2 .tw{animation:none!important;opacity:0}}
 .pc2 .sk{position:absolute;width:18%;aspect-ratio:1;transform:translate(-50%,-50%) scale(var(--s,1));pointer-events:auto;touch-action:none}
 .pc2 .sk svg{width:100%;height:100%;filter:drop-shadow(0 2px 3px rgba(0,0,0,.25))}
 .pc2 .sk.sel{outline:2px dashed #fff;outline-offset:3px;border-radius:6px}
@@ -284,8 +315,36 @@ function zpRender() {
   let ph = q('zp-fan-home');
   if (fan) {
     if (!ph) { ph = document.createElement('div'); ph.id = 'zp-fan-home'; ph.className = 'space-y-4'; const sh = q('star-home'); sh.parentNode.insertBefore(ph, sh.nextSibling); }
-    ph.innerHTML = `<div id="zp-wx-home"></div><div id="zp-pc-home"></div>`; zpWxHome(); zpPCHome();
+    const sl = zpSlot(); ph.innerHTML = `<div id="zp-wx-home"></div><div id="${sl === 'q' ? 'zp-q-home' : 'zp-pc-home'}"></div>`; zpWxHome(); if (sl === 'q') zpQHome(); else zpPCHome();
   } else { if (ph) ph.remove(); zpMilWx(); }
+}
+/* 팬 홈 카드 자리: 포토카드 또는 오늘의 질문 (설정에서 골라요) */
+const zpSlotKey = () => 'zt_homeslot:' + (me ? me.id : '');
+function zpSlot() { try { return localStorage.getItem(zpSlotKey()) === 'q' ? 'q' : 'pc'; } catch (e) { return 'pc'; } }
+async function zpSlotPick() {
+  let v = zpSlot();
+  const opt = (k, ic, t, d) => `<button type="button" data-k="${k}" class="zp-slot ${v === k ? 'on' : ''}"><span class="ic">${ic}</span><span class="tx"><b>${t}</b><small>${d}</small></span><span class="ck"></span></button>`;
+  const html = `<div class="zp-slots">${opt('pc', '🖼', '포토카드', '꾸민 포토카드를 크게 보여줘요')}${opt('q', '💬', '오늘의 질문', 'MY스타 질문 카드를 보여줘요')}</div>`;
+  const p = zDialog({ title: '홈 화면 카드', html, ok: '저장' });
+  setTimeout(() => document.querySelectorAll('.zp-slot').forEach(b => b.onclick = () => { v = b.dataset.k; document.querySelectorAll('.zp-slot').forEach(x => x.classList.toggle('on', x === b)); }), 0);
+  if (!(await p)) return;
+  try { localStorage.setItem(zpSlotKey(), v); } catch (e) { }
+  if (typeof renderSetRows === 'function') renderSetRows(); zpToast(v === 'q' ? '홈에 오늘의 질문을 보여줘요' : '홈에 포토카드를 보여줘요'); zpRender();
+}
+function zpQHome() {
+  const box = q('zp-q-home'); if (!box) return;
+  const s = typeof sqStar === 'function' ? sqStar() : null;
+  if (!s) { box.innerHTML = `<button class="zp-pc-add" style="min-height:160px" onclick="starFlow()"><span class="plus">+</span><b class="text-[15px] text-[#191F28]">MY스타를 등록하면 오늘의 질문이 열려요</b></button>`; return; }
+  if (!(window.STARQ && window.STARQ.army)) { box.innerHTML = `<div class="toss-card text-center py-8 text-[13px] text-[#8B95A1]">오늘의 질문을 불러오는 중…</div>`; sqEnsure().then(() => { if (q('zp-q-home')) zpQHome(); }).catch(() => { box.innerHTML = ''; }); return; }
+  const I = starInfo(s), Q = window.STARQ[sqBranch(s)] || window.STARQ.army, L = Q.length, nm = starCall(s), r = myRow(s.id), th = r ? r.theme : 'black_gold', TH = STAR_TH[th] || {};
+  const go = `switchTab('qna');window.scrollTo(0,0)`;
+  if (I.pre) { box.innerHTML = `<div class="stk ${TH.m ? 'mt' : ''} text-center" onclick="${go}" style="${thVars(th)};cursor:pointer"><div class="relative z-[1]"><span class="lb">${esc(callAs(nm, '의'))} 입대까지 D-${I.toEnlist}</span><h2 class="text-[18px] font-extrabold leading-snug mt-4">입대하는 날부터<br>하루 한 질문이 열려요</h2></div></div>`; return; }
+  const d = sqMap(I, L), row = Q[d - 1] || [], sp = row[2] || '', rk = row[3] || '';
+  box.innerHTML = `<div class="stk ${TH.m ? 'mt' : ''} text-center active:scale-[.99] transition-transform" onclick="${go}" style="${thVars(th)};cursor:pointer"><div class="relative z-[1]">
+   <span class="lb">${I.done ? esc(callAs(nm, '의')) + ' 전역을 축하해요' : esc(callAs(nm, '를')) + ' 기다린 지 ' + I.served + '일째'}</span>
+   <div class="flex items-center justify-center gap-1.5 mt-3 flex-wrap">${sp ? `<span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold" style="background:var(--fg,#fff);color:var(--bg,#111)">${esc(sp)}</span>` : ''}<span class="px-2.5 py-1 rounded-full text-[11px] font-bold" style="background:rgba(127,127,127,.2)">Day ${d} / ${L}</span>${rk ? `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold" style="background:rgba(127,127,127,.2)">${esc(rk)}</span>` : ''}</div>
+   <h2 class="text-[18px] font-extrabold leading-snug mt-3 break-keep">“${esc(sqText(row[0], nm))}”</h2>
+   <p class="text-[12px] opacity-60 mt-2">${esc(row[1] || '오늘의 질문')}</p><p class="text-[11px] font-medium mt-3" style="opacity:.45">터치하면 답을 적을 수 있어요</p></div></div>`;
 }
 /* 군인·곰신: 자대 날씨 */
 function zpMilLine(S, w, mine) {
@@ -467,11 +526,17 @@ async function zpEquip(slot, id, quiet) {
 }
 
 /* ---------- 포토카드 ---------- */
+const ZP_TW = [[9, 6], [88, 9], [94, 42], [6, 58], [90, 88], [14, 93], [50, 4], [52, 96]];
 function zpPCHTML(c, mini, edit) {
   const d = c.deco || {}, fr = ZP_ITEMS[c.frame] ? c.frame : 'pc_basic';
   const photo = c.photo && /^data:image\/jpeg;base64,/.test(c.photo) ? c.photo : '';
   const sk = (d.st || []).map((s, i) => `<div class="sk ${edit && edit.sel === i ? 'sel' : ''}" data-i="${i}" style="left:${+s[1] || 50}%;top:${+s[2] || 50}%;--s:${Math.min(2.2, Math.max(.5, +s[3] || 1))}">${zpStkSVG(String(s[0]))}</div>`).join('');
-  return `<div class="pc2 pcf-${fr}" ${mini ? '' : ''}>${fr === 'pc_army' ? '<i class="tag"></i>' : ''}<div class="ph ${photo ? '' : 'empty'}" ${photo ? `style="background-image:url('${photo}')"` : ''}>${photo ? '' : (mini ? '' : '사진을 넣어주세요')}</div><div class="lay">${sk}</div>${d.cap ? `<div class="cap">${esc(String(d.cap).slice(0, 24))}</div>` : ''}</div>`;
+  const it = ZP_ITEMS[fr]; let ov = '';
+  if (it.img) {
+    const u = `${fr}.webp?v=1`; ov = `<i class="fimg" style="background-image:url('${u}')"></i>`;
+    if (it.gem) ov += `<i class="gl" style="-webkit-mask-image:url('${u}');mask-image:url('${u}')"></i>` + ZP_TW.map(([x, y], i) => `<i class="tw" style="left:${x}%;top:${y}%;animation-delay:${(i * .37).toFixed(2)}s"></i>`).join('');
+  }
+  return `<div class="pc2 pcf-${fr}${it.img ? ' pfi' : ''}">${fr === 'pc_army' ? '<i class="tag"></i>' : ''}<div class="ph ${photo ? '' : 'empty'}" ${photo ? `style="background-image:url('${photo}')"` : ''}>${photo ? '' : (mini ? '' : '사진을 넣어주세요')}</div>${ov}<div class="lay">${sk}</div>${d.cap ? `<div class="cap">${esc(String(d.cap).slice(0, 24))}</div>` : ''}</div>`;
 }
 function zpPCHome() {
   const box = q('zp-pc-home'); if (!box) return;
