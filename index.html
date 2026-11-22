@@ -83,6 +83,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 .zdlg-btns button{height:50px;border-radius:16px;font-size:15px;font-weight:800;transition:transform .1s}.zdlg-btns button:active{transform:scale(.97)}
 .zdlg-btns .c{background:#F2F3F5;color:#4E5968}.zdlg-btns .o{background:#191F28;color:#fff}.zdlg-btns .o.d{background:#E5484D}
 @keyframes zdIn{from{opacity:0}}@keyframes zdOut{to{opacity:0}}@keyframes zdPop{from{transform:scale(.9);opacity:0}}
+.th-lock{position:absolute;top:6px;right:6px;display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:800;padding:3px 7px 3px 4px;border-radius:999px;background:rgba(255,255,255,.92);color:#191F28;box-shadow:0 1px 4px rgba(0,0,0,.15)}.th-lock .zp-mug{width:13px;height:13px}
 </style>
 <style>
 .swp{position:absolute;inset:0;display:flex;flex-direction:column;background:#fff}
@@ -2075,7 +2076,7 @@ async function addFriend() {
   q('fr-input').value = ''; await loadFriends(); renderFriends(); showAlert('친구 추가', msg);
 }
 async function respondFriend(fid, ok) { const { error } = await sb.rpc('respond_friend', { fid, ok }); if (error) return showAlert('오류', esc(error.message)); await loadFriends(); renderFriends(); }
-async function removeFriend(fid, silent) { if (!silent && !confirm('이 친구를 삭제할까요?')) return; const { error } = await sb.rpc('remove_friend', { fid }); if (error) return showAlert('오류', esc(error.message)); await loadFriends(); renderFriends(); }
+async function removeFriend(fid, silent) { if (!silent && !(await zConfirm('이 친구를 삭제할까요?', { ok: '삭제', danger: true }))) return; const { error } = await sb.rpc('remove_friend', { fid }); if (error) return showAlert('오류', esc(error.message)); await loadFriends(); renderFriends(); }
 async function saveUnit() {
   const name = q('set-unit-name').value.trim(), addr = q('set-unit-addr').value.trim(), p = picks.unit && picks.unit.label === addr ? picks.unit : null;
   if (!name) return showAlert('알림', '부대명을 입력해주세요.');
@@ -2303,7 +2304,19 @@ function adEdit(i) {
    <label class="ad-lb">MY스타</label><select id="ae-star_id" class="ad-in"><option value="">없음</option>${STARL.map(s => `<option value="${s.id}" ${u.star_id === s.id ? 'selected' : ''}>${esc(s.n)} (${esc(s.g)})</option>`).join('')}</select>
    <label class="ad-lb">처음 설정 완료</label><select id="ae-onboarded" class="ad-in"><option value="true" ${u.onboarded ? 'selected' : ''}>완료</option><option value="false" ${!u.onboarded ? 'selected' : ''}>다시 하기 (다음 접속 때 첫 설정 화면)</option></select>
    <div class="flex gap-2 mt-4"><button id="ae-save" class="ad-btn dark flex-1" onclick="adSave()">저장하기</button>${u.partner_id ? `<button class="ad-btn" onclick="adUnlink()">연동 해제</button>` : ''}</div>
-   <div class="text-[11px] text-[#8B95A1] mt-3">연동: ${u.partner_name ? esc(u.partner_name) : '없음'}</div></div>`;
+   <div class="text-[11px] text-[#8B95A1] mt-3">연동: ${u.partner_name ? esc(u.partner_name) : '없음'}</div></div>
+   <div class="ad-card mt-3"><div class="flex items-center justify-between"><div class="text-[15px] font-extrabold">무궁화</div><div class="flex items-center gap-1.5 text-[18px] font-black">${typeof zpMug === 'function' ? zpMug() : ''}<span id="ae-coin">…</span></div></div>
+    <div class="grid grid-cols-4 gap-1.5 mt-3">${[-100, -10, 10, 100].map(d => `<button class="ad-btn" onclick="adCoin(${d})">${d > 0 ? '+' : ''}${d}</button>`).join('')}</div>
+    <div class="flex gap-2 mt-2"><input id="ae-coin-v" type="number" min="0" max="1000000" class="ad-in flex-1" placeholder="정확한 개수로 바꾸기"><button class="ad-btn dark" onclick="adCoin(null)">적용</button></div>
+    <input id="ae-coin-r" maxlength="40" class="ad-in mt-2" placeholder="사유 (선택) 예) 이벤트 보상"></div>`;
+  adCoinLoad();
+}
+async function adCoinLoad() { const { data, error } = await sb.from('coin_wallet').select('balance').eq('user_id', adSel.id).maybeSingle(); const e = q('ae-coin'); if (e) e.textContent = error ? '-' : (data ? data.balance : 0).toLocaleString(); }
+async function adCoin(d) {
+  const v = d === null ? parseInt(q('ae-coin-v').value, 10) : null; if (d === null && !(v >= 0)) return showAlert('알림', '0 이상의 숫자를 적어주세요.');
+  const { data, error } = await sb.rpc('admin_coin', { uid: adSel.id, delta: d, setto: v, why: (q('ae-coin-r').value || '').trim() || null });
+  if (error) return showAlert('실패', adErr(error)); q('ae-coin').textContent = Number(data).toLocaleString(); q('ae-coin-v').value = '';
+  if (adSel.id === me.id && typeof zpSetBal === 'function') zpSetBal(data, true);
 }
 async function adSave() {
   const u = adSel, patch = {}; ['nickname', 'gender', 'branch', 'enlist_date', 'discharge_date', 'unit_name', 'star_id'].forEach(k => patch[k] = q('ae-' + k).value.trim()); patch.onboarded = q('ae-onboarded').value === 'true';
@@ -2312,7 +2325,7 @@ async function adSave() {
   if (error) { b.innerText = '저장하기'; return showAlert('저장 실패', adErr(error)); }
   b.innerText = '저장됨'; b.style.background = 'var(--mil-green)'; Object.assign(u, patch);
 }
-async function adUnlink() { if (!confirm('이 회원의 커플 연동을 해제할까요? 상대방도 함께 해제돼요.')) return; const { error } = await sb.rpc('admin_unlink', { uid: adSel.id }); if (error) return showAlert('실패', adErr(error)); adSel.partner_id = null; adSel.partner_name = null; adEdit(adUsers.indexOf(adSel)); }
+async function adUnlink() { if (!(await zConfirm('이 회원의 커플 연동을 해제할까요?\n상대방도 함께 해제돼요.', { ok: '해제', danger: true }))) return; const { error } = await sb.rpc('admin_unlink', { uid: adSel.id }); if (error) return showAlert('실패', adErr(error)); adSel.partner_id = null; adSel.partner_name = null; adEdit(adUsers.indexOf(adSel)); }
 async function adReports() {
   const b = q('ad-body'); b.innerHTML = `<div class="ad-card"><div class="text-[14px] font-extrabold">실시간 최신화</div><div class="text-[12px] text-[#8B95A1] mt-1 leading-relaxed">매일 아침 9시에 자동으로 하는 일을 지금 바로 실행해요. 끝난 혜택 정리 · 새 혜택 추가 · 적금/카드 내용 검증 · 새로 입대한 스타 추가 (2~4분). 바뀐 내용은 모든 사용자 앱에 바로 반영되고 메일로도 보내요.</div><button id="ad-run" class="ad-btn dark w-full mt-3" onclick="adRun()">지금 최신화</button><button id="ad-mail" class="ad-btn w-full mt-2" onclick="adMailTest()">테스트 메일 보내기</button><div class="text-[11px] text-[#8B95A1] mt-2">메일은 고쳐야 할 내용이나 새 혜택·새 스타가 있을 때만 와요.</div><div id="ad-runlog" class="text-[11px] text-[#8B95A1] mt-2"></div></div><div id="ad-rl" class="mt-3 space-y-2"><div class="py-10 text-center text-[13px] text-[#8B95A1]">불러오는 중…</div></div>`;
   const { data, error } = await sb.from('content_reports').select('*').order('created_at', { ascending: false }).limit(40);
@@ -2560,7 +2573,7 @@ function starSheet(id) {
 function stSheetClose() { const el = q('star-sheet'); el.classList.remove('show'); setTimeout(() => el.classList.add('hidden'), 320); }
 /* 테마 고르기 */
 function thGrid(cur, fn) {
-  const btn = k => { const t = STAR_TH[k]; return `<button class="${cur === k ? 'on' : ''} ${t.m ? 'mt' : ''}" style="background:${t.bg};color:${t.fg}" onclick="${fn}('${k}')"><div class="tn">${t.n}</div><div class="tb" style="background:${t.trk}"><i style="background:${t.bar}"></i></div></button>`; };
+  const btn = k => { const t = STAR_TH[k], lk = typeof zpThLocked === 'function' && zpThLocked(k) && cur !== k; return `<button class="${cur === k ? 'on' : ''} ${t.m ? 'mt' : ''}" data-k="${k}" style="background:${t.bg};color:${t.fg};position:relative" onclick="${lk ? `zpThBuy('${k}','${fn}')` : `${fn}('${k}')`}"><div class="tn">${t.n}</div><div class="tb" style="background:${t.trk}"><i style="background:${t.bar}"></i></div>${lk ? `<span class="th-lock">${zpMug()}${zp.price['st_' + k] ?? 30}</span>` : ''}</button>`; };
   const K = Object.keys(STAR_TH), gl = K.filter(k => !STAR_TH[k].m), mt = K.filter(k => STAR_TH[k].m);
   return `<div class="th-h">유광</div><div class="th-grid">${gl.map(btn).join('')}</div><div class="th-h">무광 · 제복</div><div class="th-grid">${mt.map(btn).join('')}</div>`;
 }
@@ -2573,7 +2586,7 @@ function thPrev(id, k) { const r = myRow(id), old = r.theme; r.theme = k; const 
 function thPaintBtn(saved, txt) { const b = q('th-save'); if (!b) return; b.disabled = false; b.style.background = saved ? '#191F28' : 'var(--mil-green)'; b.innerText = txt || (saved ? '저장됨' : '이 테마로 저장하기'); }
 function thPick(k) {
   const id = window._thId, r = myRow(id); if (!r) return; window._thDraft = k;
-  q('th-prev').innerHTML = thPrev(id, k); q('star-sheet-in').querySelectorAll('.th-grid button').forEach((b, i) => b.classList.toggle('on', Object.keys(STAR_TH)[i] === k));
+  q('th-prev').innerHTML = thPrev(id, k); q('star-sheet-in').querySelectorAll('.th-grid button').forEach(b => b.classList.toggle('on', b.dataset.k === k));
   thPaintBtn(false); if (k === r.theme) { const b = q('th-save'); b.style.background = '#D5D9DE'; b.innerText = '저장됨'; }
 }
 async function thSave() {
@@ -2655,7 +2668,7 @@ function sfRender() {
    <div class="sf-foot"><button class="sf-cta" id="sf-start" disabled onclick="sfClose();openStar('my','${s.id}')">시작하기</button></div>`;
   setTimeout(() => { const b = q('sf-start'); if (b) b.disabled = false; }, 1200);
 }
-function sfTheme(k) { sfS.theme = k; q('sf-th-prev').innerHTML = sfPrevCard(); q('star-flow').querySelectorAll('.th-grid button').forEach((b, i) => b.classList.toggle('on', Object.keys(STAR_TH)[i] === k)); }
+function sfTheme(k) { sfS.theme = k; q('sf-th-prev').innerHTML = sfPrevCard(); q('star-flow').querySelectorAll('.th-grid button').forEach(b => b.classList.toggle('on', b.dataset.k === k)); }
 function sfSearch() {
   const t = (sfS.q || '').toLowerCase().replace(/\s+/g, ''), box = q('sf-res'); if (!box) return;
   const L = STARL.filter(s => !t || (s.n + s.g).toLowerCase().replace(/\s+/g, '').includes(t)).map(s => ({ s, I: starInfo(s) })).filter(x => !x.I.done).sort((a, b) => a.I.pre - b.I.pre);
