@@ -8,11 +8,19 @@ const ZP_ITEMS = {
   th_camo: { n: '디지털 위장', k: 'theme', aud: 'mil', bg: 'linear-gradient(90deg,rgba(0,0,0,.14) 50%,transparent 50%) 0 0/12px 12px,linear-gradient(rgba(255,255,255,.07) 50%,transparent 50%) 0 0/18px 18px,linear-gradient(155deg,#4E5B3A 0%,#3B4630 55%,#2C3424 100%)' },
   th_ocean: { n: '깊은 바다', k: 'theme', aud: 'mil', bg: 'radial-gradient(120% 60% at 50% 120%,rgba(120,200,255,.35),transparent 60%),linear-gradient(155deg,#2B6CB0 0%,#1E4E79 55%,#12355A 100%)' },
   th_gold: { n: '골드 에디션', k: 'theme', aud: 'mil', bg: 'linear-gradient(115deg,transparent 30%,rgba(255,255,255,.22) 45%,transparent 60%),linear-gradient(155deg,#2A220F 0%,#7A5C1C 45%,#C9A24C 72%,#5E4714 100%)' },
-  pt_elite: { n: '특급전사', k: 'patch', aud: 'mil', c: ['#1F2A1A', '#D9B25F', '#F6E7B0'], t: '특급전사' },
-  pt_shooter: { n: '특등사수', k: 'patch', aud: 'mil', c: ['#5A1E1E', '#E7C77A', '#FFF3D1'], t: '특등사수' },
+  pt_elite: { n: '특급전사', k: 'patch', aud: 'mil', d: 'arc', w: 58 },
+  pt_shooter: { n: '특등사수', k: 'patch', aud: 'mil', d: 'tab', w: 56 },
   pt_flag: { n: '태극기', k: 'patch', aud: 'mil', c: ['#FFFFFF', '#1D3B8B', '#C8102E'], t: 'flag' },
   pt_tiger: { n: '짬타이거', k: 'patch', aud: 'mil', c: ['#3B4630', '#F2BA49', '#FFFFFF'], t: 'TIGER' },
   pt_heart: { n: '곰신 하트', k: 'patch', aud: 'mil', c: ['#F4A0B9', '#FFFFFF', '#E5486F'], t: 'heart' },
+  bd_wings: { n: '은빛 날개 휘장', k: 'patch', aud: 'mil', d: 'wings', w: 58 },
+  bd_bolt: { n: '번개 방패', k: 'patch', aud: 'mil', d: 'bolt' },
+  bd_eagle: { n: '독수리 원형장', k: 'patch', aud: 'mil', d: 'eagle', w: 40 },
+  bd_tiger: { n: '호랑이 줄무늬', k: 'patch', aud: 'mil', d: 'tiger' },
+  bd_trefoil: { n: '삼엽 별 휘장', k: 'patch', aud: 'mil', d: 'trefoil', w: 42 },
+  bd_triangle: { n: '삼각 삼성장', k: 'patch', aud: 'mil', d: 'tri', w: 42 },
+  bd_anchor: { n: '닻과 별', k: 'patch', aud: 'mil', d: 'anchor' },
+  bd_compass: { n: '화살 나침장', k: 'patch', aud: 'mil', d: 'compass', w: 40 },
   pc_basic: { n: '기본 화이트', k: 'frame', aud: 'fan' },
   pc_polaroid: { n: '폴라로이드', k: 'frame', aud: 'fan' },
   pc_holo: { n: '홀로그램', k: 'frame', aud: 'fan' },
@@ -76,7 +84,9 @@ function zpToast(t) { const d = document.createElement('div'); d.className = 'zp
 .zp-item .pv{border:0;width:100%;cursor:pointer}.zp-pvl{position:absolute;right:8px;bottom:8px;font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.88);color:#191F28}
 .pcard.zp-lt .text-white{color:inherit!important}.pcard.zp-th .pbar{background:var(--ztrk)!important}.pcard.zp-th .pbar>div:first-child{background:var(--zbar)!important}
 .zp-pvs .pcard{text-align:left}
-.zp-patch{position:absolute;top:14px;right:14px;width:40px;height:48px;z-index:3;filter:drop-shadow(0 3px 5px rgba(0,0,0,.3));animation:zpPatchIn .5s cubic-bezier(.2,1.5,.4,1)}
+.zp-patches{position:relative;margin-top:12px;align-items:center!important;display:flex;align-items:flex-start;gap:5px;z-index:3;pointer-events:none}
+.zp-patch svg{width:100%;height:100%;display:block}
+.zp-patch{display:block;height:34px;filter:drop-shadow(0 3px 5px rgba(0,0,0,.3));animation:zpPatchIn .5s cubic-bezier(.2,1.5,.4,1)}
 @keyframes zpPatchIn{0%{transform:scale(.3) rotate(-20deg);opacity:0}}
 /* 포토카드 */
 .pc2{position:relative;aspect-ratio:2/3;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 8px 20px rgba(17,20,26,.12);container-type:inline-size}
@@ -163,8 +173,24 @@ function zpToast(t) { const d = document.createElement('div'); d.className = 'zp
 })();
 
 /* ---------- 패치·스티커 그림 ---------- */
+const ZP_DEFS = `<defs><linearGradient id="zpAg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".35" stop-color="#C9CED4"/><stop offset=".6" stop-color="#F4F6F8"/><stop offset="1" stop-color="#8C939B"/></linearGradient><linearGradient id="zpAu" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF3C4"/><stop offset=".4" stop-color="#E3B64A"/><stop offset=".7" stop-color="#FFE9A3"/><stop offset="1" stop-color="#9C7420"/></linearGradient><pattern id="zpEm" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect width="3" height="3" fill="none"/><line x1="0" y1="0" x2="0" y2="3" stroke="rgba(0,0,0,.13)" stroke-width="1"/></pattern></defs>`;
+const zpStar = (cx, cy, r, f, st) => { let d = ''; for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * .42 : r; d += (i ? 'L' : 'M') + (cx + Math.cos(a) * rr).toFixed(2) + ' ' + (cy + Math.sin(a) * rr).toFixed(2); } return `<path d="${d}Z" fill="${f}" ${st ? `stroke="${st}" stroke-width=".8"` : ''}/>`; };
 function zpPatchSVG(id) {
-  const it = ZP_ITEMS[id]; if (!it) return ''; const [b, e, f] = it.c;
+  const it = ZP_ITEMS[id]; if (!it) return '';
+  const SH = 'M24 2 44 9v17c0 14-9 23-20 28C13 49 4 40 4 26V9z';
+  switch (it.d) {
+    case 'arc': return `<svg viewBox="0 0 120 70">${ZP_DEFS}<path d="M4 50 Q60 -10 116 50 L100 67 Q60 22 20 67 Z" fill="#6E705A" stroke="#14140E" stroke-width="5" stroke-linejoin="round"/><path d="M4 50 Q60 -10 116 50 L100 67 Q60 22 20 67 Z" fill="url(#zpEm)"/><path id="zpArcT" d="M14 66 Q60 17 106 66" fill="none"/><text font-family="sans-serif" font-weight="900" font-size="16" fill="#16160F"><textPath href="#zpArcT" startOffset="22%" text-anchor="middle">특급</textPath></text><text font-family="sans-serif" font-weight="900" font-size="16" fill="#16160F"><textPath href="#zpArcT" startOffset="78%" text-anchor="middle">전사</textPath></text>${zpStar(60, 32, 9.5, '#F5C518', '#8A6A00')}</svg>`;
+    case 'tab': return `<svg viewBox="0 0 120 44">${ZP_DEFS}<rect x="3" y="3" width="114" height="38" rx="5" fill="#6E705A" stroke="#14140E" stroke-width="5"/><rect x="3" y="3" width="114" height="38" rx="5" fill="url(#zpEm)"/><g stroke="#16160F" stroke-width="2.4" fill="none"><circle cx="22" cy="22" r="8"/><path d="M22 10v6M22 28v6M10 22h6M28 22h6"/></g><circle cx="22" cy="22" r="2" fill="#C8102E"/><text x="74" y="29" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="17" fill="#16160F">특등사수</text></svg>`;
+    case 'wings': return `<svg viewBox="0 0 120 60">${ZP_DEFS}<g fill="url(#zpAg)" stroke="#6B7280" stroke-width=".9">${[0, 1, 2, 3].map(i => `<path d="M52 ${30 + i * 4} C ${40 - i * 6} ${24 + i * 5}, ${18 - i * 3} ${20 + i * 6}, ${4 + i * 4} ${18 + i * 8} C ${22 - i * 2} ${30 + i * 5}, ${38 - i * 3} ${34 + i * 4}, 52 ${38 + i * 3} Z"/><path d="M68 ${30 + i * 4} C ${80 + i * 6} ${24 + i * 5}, ${102 + i * 3} ${20 + i * 6}, ${116 - i * 4} ${18 + i * 8} C ${98 + i * 2} ${30 + i * 5}, ${82 + i * 3} ${34 + i * 4}, 68 ${38 + i * 3} Z"/>`).join('')}</g><circle cx="60" cy="34" r="14" fill="url(#zpAg)" stroke="#6B7280" stroke-width="1"/>${zpStar(60, 34, 12, 'url(#zpAu)', '#8C6B22')}</svg>`;
+    case 'bolt': return `<svg viewBox="0 0 48 56">${ZP_DEFS}<path d="${SH}" fill="#1E3A6E" stroke="url(#zpAg)" stroke-width="3.2"/><path d="M27 9 14 31h9l-4 16 15-24h-9l4-14z" fill="url(#zpAu)" stroke="#8C6B22" stroke-width=".8"/>${zpStar(12, 15, 3.2, '#fff')}${zpStar(36, 15, 3.2, '#fff')}</svg>`;
+    case 'eagle': return `<svg viewBox="0 0 48 48">${ZP_DEFS}<circle cx="24" cy="24" r="22" fill="url(#zpAg)"/><circle cx="24" cy="24" r="18" fill="#17233D"/><path d="M24 13c2 0 3 1.5 3 3l-1.4 1.2 1.2 2.6c4-3 9-4.2 13-3.6-3 1.4-5 3-6.5 5 2-.3 4 0 5.5.8-3 .5-5.4 1.8-7 3.6l-2 6 1.6 3.4H25l-1-2-1 2h-5.4l1.6-3.4-2-6c-1.6-1.8-4-3.1-7-3.6 1.5-.8 3.5-1.1 5.5-.8-1.5-2-3.5-3.6-6.5-5 4-.6 9 .6 13 3.6l1.2-2.6L21 16c0-1.5 1-3 3-3z" fill="url(#zpAu)" stroke="#8C6B22" stroke-width=".5"/>${zpStar(24, 9.5, 2.4, '#fff')}</svg>`;
+    case 'tiger': return `<svg viewBox="0 0 48 56">${ZP_DEFS}<path d="${SH}" fill="#E8892B"/><g fill="#1A1410"><path d="M4 14C12 14 18 18 21 23C15 21 9 21 4 22Z"/><path d="M44 14C36 14 30 18 27 23C33 21 39 21 44 22Z"/><path d="M4 28C12 28 17 32 19 37C13 35 8 35 4 36Z"/><path d="M44 28C36 28 31 32 29 37C35 35 40 35 44 36Z"/><path d="M8 42C13 42 17 45 19 49C14 47 11 47 8 48Z"/><path d="M40 42C35 42 31 45 29 49C34 47 37 47 40 48Z"/></g>${zpStar(24, 29, 7, 'url(#zpAu)', '#5A3D0C')}<path d="${SH}" fill="none" stroke="#1A1410" stroke-width="3"/></svg>`;
+    case 'trefoil': return `<svg viewBox="0 0 48 46">${ZP_DEFS}<g fill="url(#zpAu)" stroke="#1E2A55" stroke-width="2.6"><circle cx="24" cy="13" r="11"/><circle cx="13" cy="31" r="11"/><circle cx="35" cy="31" r="11"/></g><circle cx="24" cy="25" r="9" fill="#1E2A55"/>${zpStar(24, 25.5, 7, '#D8323C')}</svg>`;
+    case 'tri': return `<svg viewBox="0 0 48 44">${ZP_DEFS}<path d="M24 3 45 40H3z" fill="#1E2A55" stroke="url(#zpAg)" stroke-width="3.2" stroke-linejoin="round"/>${zpStar(24, 18, 5, '#F4F6F8')}${zpStar(16, 31, 4.4, '#F4F6F8')}${zpStar(32, 31, 4.4, '#F4F6F8')}</svg>`;
+    case 'anchor': return `<svg viewBox="0 0 48 56">${ZP_DEFS}<path d="${SH}" fill="#0F2A4A" stroke="url(#zpAu)" stroke-width="3"/><g fill="none" stroke="url(#zpAg)" stroke-width="3.2" stroke-linecap="round"><circle cx="24" cy="14" r="3"/><path d="M24 17v24M17 23h14M12 33c2 6 7 9 12 9s10-3 12-9"/></g>${zpStar(24, 31, 4, '#E3B64A')}</svg>`;
+    case 'compass': return `<svg viewBox="0 0 48 48">${ZP_DEFS}<circle cx="24" cy="24" r="21" fill="#2B3340" stroke="url(#zpAg)" stroke-width="3"/><path d="M24 5 29 24 24 43 19 24z" fill="url(#zpAg)"/><path d="M5 24 24 19 43 24 24 29z" fill="url(#zpAu)"/><path d="M24 5 29 24h-10z" fill="#D8323C"/><circle cx="24" cy="24" r="3" fill="#fff"/></svg>`;
+  }
+  const [b, e, f] = it.c;
   const shield = `<path d="M24 2 44 9v17c0 14-9 23-20 28C13 49 4 40 4 26V9z" fill="${b}" stroke="${e}" stroke-width="3"/>`;
   let mid = '';
   if (it.t === 'flag') mid = `<circle cx="24" cy="26" r="9" fill="${f}"/><path d="M15 26a9 9 0 0 0 18 0 4.5 4.5 0 0 1-9 0 4.5 4.5 0 0 0-9 0z" fill="${e}"/>` + [[12, 14], [36, 14], [12, 38], [36, 38]].map(([x, y]) => `<g transform="translate(${x} ${y}) rotate(${x < 24 === y < 26 ? 45 : -45})"><rect x="-4" y="-3" width="8" height="1.6" fill="#191F28"/><rect x="-4" y="-.8" width="8" height="1.6" fill="#191F28"/><rect x="-4" y="1.4" width="8" height="1.6" fill="#191F28"/></g>`).join('');
@@ -292,14 +318,19 @@ function zpStyleCard(card, thId, ptId) {
   if (it && it.star && STAR_TH[it.star]) { const t = STAR_TH[it.star]; card.style.background = t.bg; card.style.color = t.fg; card.classList.add('zp-th'); card.style.setProperty('--zbar', t.bar); card.style.setProperty('--ztrk', t.trk); if (zpLum(t.fg) < .5) card.classList.add('zp-lt'); }
   else if (it && it.bg) { card.style.background = it.bg; card.style.color = card.dataset.c0 || ''; }
   else { card.style.background = card.dataset.bg0; card.style.color = card.dataset.c0 || ''; }
-  let pt = card.querySelector('.zp-patch'); const pid = ZP_ITEMS[ptId] ? ptId : '';
-  if (!pid) { if (pt) pt.remove(); return; }
-  if (!pt || pt.dataset.id !== pid) { if (pt) pt.remove(); pt = document.createElement('div'); pt.className = 'zp-patch'; pt.dataset.id = pid; pt.innerHTML = zpPatchSVG(pid); pt.title = ZP_ITEMS[pid].n; card.appendChild(pt); }
+  const list = (Array.isArray(ptId) ? ptId : ptId ? [ptId] : []).filter(x => ZP_ITEMS[x]).slice(0, 3), sig = list.join(',');
+  let box = card.querySelector('.zp-patches');
+  if (!list.length) { if (box) box.remove(); return; }
+  if (box && box.dataset.sig === sig) return;
+  if (box) box.remove(); box = document.createElement('div'); box.className = 'zp-patches'; box.dataset.sig = sig;
+  box.innerHTML = list.map(x => { const it = ZP_ITEMS[x]; return `<i class="zp-patch" title="${esc(it.n)}" style="width:${Math.round((it.w || 34) * 34 / 40)}px">${zpPatchSVG(x)}</i>`; }).join('');
+  const top = card.firstElementChild; if (top && top.nextSibling) card.insertBefore(box, top.nextSibling); else card.appendChild(box);
 }
+const zpPatches = eq => { eq = eq || {}; return Array.isArray(eq.patches) ? eq.patches.slice(0, 3) : eq.patch ? [eq.patch] : []; };
 function zpApplyEquip() {
   if (!me || zpFan()) return;
   const sol = me.gender === 'M' ? me : (partner && partner.gender === 'M' ? partner : null), gom = me.gender === 'F' ? me : (partner && partner.gender === 'F' ? partner : null);
-  [['soldier-card', sol], ['gf-profile-card', gom]].forEach(([id, P]) => { const card = document.querySelector('#' + id + ' .pcard'); if (!card) return; const eq = (P && P.equip) || {}; zpStyleCard(card, eq.theme, eq.patch); });
+  [['soldier-card', sol], ['gf-profile-card', gom]].forEach(([id, P]) => { const card = document.querySelector('#' + id + ' .pcard'); if (!card) return; const eq = (P && P.equip) || {}; zpStyleCard(card, eq.theme, zpPatches(eq)); });
 }
 
 /* ---------- 상점 ---------- */
@@ -333,11 +364,11 @@ async function zpShopRender(el) {
    <div class="zp-chips mt-4">${cats.map(([k, n]) => `<button class="${k === zp.cat ? 'on' : ''}" onclick="zp.cat='${k}';zpShopRender(zpShopEl())">${n}${k === 'inv' && cnt ? ` ${cnt}` : ''}</button>`).join('')}</div>
    <p class="text-[12px] text-[#8B95A1] mt-3 mb-3 px-1">${note}</p>
    <div class="zp-grid">${list.map(([id, it]) => {
-    const own = zp.owned.has(id), on = (it.k === 'theme' && eq.theme === id) || (it.k === 'patch' && eq.patch === id);
+    const own = zp.owned.has(id), on = (it.k === 'theme' && eq.theme === id) || (it.k === 'patch' && zpPatches(eq).includes(id));
     let btn;
     if (!inv) btn = own ? `<button disabled class="bg-[#F2F3F5] text-[#8B95A1]">구매 완료</button>` : `<button onclick="zpBuy('${id}')" class="text-white" style="background:#191F28">구매하기</button>`;
-    else btn = (it.k === 'theme' || it.k === 'patch') ? `<button onclick="zpEquip('${it.k}',${on ? 'null' : `'${id}'`})" class="${on ? 'bg-[#F2F3F5] text-[#4E5968]' : 'text-white'}" ${on ? '' : 'style="background:var(--mil-green,#4E5B3A)"'}>${on ? '착용 해제' : '착용하기'}</button>` : it.k === 'frame' ? `<button onclick="zpPCEdit(null,'${id}')" class="text-white" style="background:var(--mil-green,#4E5B3A)">포토카드 만들기</button>` : `<button disabled class="bg-[#F2F3F5] text-[#8B95A1]">꾸미기에서 사용</button>`;
-    const tag = inv ? (on ? '<span class="text-[#3B8A5A]">착용 중</span>' : '<span class="text-[#8B95A1]">보관 중</span>') : own ? '<span class="text-[#3B8A5A]">구매 완료</span>' : zpMug() + zpFmt(zp.price[id]);
+    else btn = it.k === 'patch' ? `<button onclick="zpPatchToggle('${id}')" class="${on ? 'bg-[#F2F3F5] text-[#4E5968]' : 'text-white'}" ${on ? '' : 'style="background:var(--mil-green,#4E5B3A)"'}>${on ? '떼기' : '달기'}</button>` : it.k === 'theme' ? `<button onclick="zpEquip('theme',${on ? 'null' : `'${id}'`})" class="${on ? 'bg-[#F2F3F5] text-[#4E5968]' : 'text-white'}" ${on ? '' : 'style="background:var(--mil-green,#4E5B3A)"'}>${on ? '착용 해제' : '착용하기'}</button>` : it.k === 'frame' ? `<button onclick="zpPCEdit(null,'${id}')" class="text-white" style="background:var(--mil-green,#4E5B3A)">포토카드 만들기</button>` : `<button disabled class="bg-[#F2F3F5] text-[#8B95A1]">꾸미기에서 사용</button>`;
+    const tag = inv ? (on ? `<span class="text-[#3B8A5A]">${it.k === 'patch' ? '프로필에 다는 중' : '착용 중'}</span>` : '<span class="text-[#8B95A1]">보관 중</span>') : own ? '<span class="text-[#3B8A5A]">구매 완료</span>' : zpMug() + zpFmt(zp.price[id]);
     return `<div class="zp-item"><button class="pv" onclick="zpPreview('${id}')">${zpPV(id, it)}<span class="zp-pvl">미리보기</span></button><div class="nm">${esc(it.n)}</div><div class="pr">${tag}</div>${btn}</div>`;
   }).join('') || `<div class="col-span-2 text-center text-[13px] text-[#8B95A1] py-10">${inv ? '아직 산 아이템이 없어요' : '곧 새 상품이 들어와요'}</div>`}</div><div class="h-6"></div>`;
 }
@@ -354,7 +385,7 @@ function zpPreview(id) {
       if (src && src.offsetParent !== null) { card = src.cloneNode(true); card.querySelectorAll('[id]').forEach(e => e.removeAttribute('id')); card.querySelectorAll('button,input').forEach(e => { e.disabled = true; e.style.pointerEvents = 'none'; }); delete card.dataset.bg0; delete card.dataset.c0; card.style.background = src.dataset.bg0 !== undefined ? src.dataset.bg0 : src.style.background; card.style.color = src.dataset.c0 || ''; }
       else { card = document.createElement('div'); card.className = 'pcard'; card.style.background = 'linear-gradient(155deg,var(--mil-dark,#3B4630) 0%,var(--mil-dark2,#2C3424) 100%)'; card.innerHTML = `<div class="text-[11px] font-semibold" style="opacity:.7">대한민국 육군</div><div class="text-[25px] font-extrabold mt-1">${esc(me.nickname || '이름')}</div><div class="pbar mt-4"><div style="position:absolute;inset:0 40% 0 0;background:var(--mil-green,#6B7B5C)"></div><div class="relative px-3.5 h-full flex items-center text-[17px] font-black">60%</div></div>`; }
       card.style.height = 'auto'; card.style.minHeight = '200px'; box.appendChild(card);
-      const eq = (me && me.equip) || {}; zpStyleCard(card, it.k === 'theme' ? id : eq.theme, it.k === 'patch' ? id : eq.patch);
+      const eq = (me && me.equip) || {}, pl = zpPatches(eq).filter(x => x !== id); if (it.k === 'patch') { if (pl.length >= 3) pl.pop(); pl.push(id); } zpStyleCard(card, it.k === 'theme' ? id : eq.theme, pl);
     }, 0);
   } else if (it.k === 'frame') stage = `<div style="width:min(62vw,240px)">${zpPCHTML({ frame: id, photo: null, deco: { cap: '미리보기' } })}</div>`;
   else stage = `<div class="flex flex-wrap gap-4 justify-center" style="max-width:280px">${Object.keys(ZP_STK).filter(k => ZP_STK[k].p === id).map(k => `<span style="width:72px;height:72px;display:inline-block">${zpStkSVG(k)}</span>`).join('')}</div>`;
@@ -371,15 +402,21 @@ async function zpBuy(id, quiet) {
   if (error) { showAlert('구매 실패', /enough/.test(error.message) ? '무궁화가 부족해요.' : /owned/.test(error.message) ? '이미 가지고 있어요.' : '잠시 후 다시 시도해주세요.'); return false; }
   zp.owned.add(id); zpSetBal(data.balance, true); zpToast(`${it.n} 구매 완료!`);
   if (quiet) return true;
-  if (it.k === 'theme' || it.k === 'patch') { await zpEquip(it.k, id, true); zpToast(`${it.n} 착용! 보관함에서 바꿀 수 있어요`); }
+  if (it.k === 'theme') { await zpEquip('theme', id, true); zpToast(`${it.n} 착용! 보관함에서 바꿀 수 있어요`); }
+  else if (it.k === 'patch') { if (zpPatches(me.equip).length < 3) { await zpEquip('patch', id, true); zpToast(`${it.n}을(를) 프로필에 달았어요`.replace('을(를)', hasBat(it.n) ? '을' : '를')); } else zpToast('패치는 3개까지 · 보관함에서 바꿔 달 수 있어요'); }
   zpShopRender(zpShopEl());
   if (zpFan()) zpPCHome();
   return true;
 }
+async function zpPatchToggle(id) {
+  const on = zpPatches(me.equip).includes(id);
+  if (!on && zpPatches(me.equip).length >= 3) return showAlert('패치는 3개까지', '프로필에는 패치·배지를 3개까지 달 수 있어요.<br>달려 있는 것 중 하나를 먼저 떼주세요.');
+  await zpEquip(on ? 'patch_off' : 'patch', id);
+}
 async function zpEquip(slot, id, quiet) {
   const { data, error } = await sb.rpc('shop_equip', { slot, item: id });
   if (error) return showAlert('오류', '잠시 후 다시 시도해주세요.');
-  me.equip = data || {}; zpApplyEquip(); if (!quiet) zpToast(id ? '착용했어요' : '해제했어요');
+  me.equip = data || {}; zpApplyEquip(); if (!quiet) zpToast(slot === 'patch' ? '프로필에 달았어요' : slot === 'patch_off' ? '뗐어요' : id ? '착용했어요' : '해제했어요');
   if (!quiet) zpShopRender(zpShopEl());
 }
 
