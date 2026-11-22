@@ -1022,18 +1022,37 @@ let signup = false, signupGender = null, obG = null, obBranch = 'army', setBranc
 /* ---------- 인증 ---------- */
 /* 사람인지 확인 (Cloudflare Turnstile) — 비밀 키는 Supabase 에만 있어요 */
 const TS_KEY = '0x4AAAAAAGM47UGS_bwxP774';
-let tsTok = '', tsId = null, tsFail = false;
-function tsInit() {
-  if (!TS_KEY || tsId !== null) return;
-  const go = () => { try { tsId = turnstile.render('#ts-box', { sitekey: TS_KEY, size: 'flexible', theme: 'light', language: 'ko', callback: t => { tsTok = t; tsFail = false; }, 'expired-callback': () => { tsTok = ''; }, 'error-callback': () => { tsTok = ''; tsFail = true; } }); } catch (e) { tsFail = true; } };
-  if (window.turnstile) return go();
-  const sc = document.createElement('script'); sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'; sc.async = true; sc.onload = go; sc.onerror = () => { tsFail = true; }; document.head.appendChild(sc);
+let tsTok = '', tsId = null, tsFail = false, tsWait = null, tsUsed = false;
+/* 입력 중에는 아무것도 띄우지 않아요 (아이폰에서 입력칸이 튕기는 문제 방지).
+   스크립트만 미리 받아두고, 로그인 버튼을 누를 때 확인을 시작해요. */
+function tsLoad() {
+  if (!TS_KEY || window.turnstile || tsLoad.p) return tsLoad.p || Promise.resolve();
+  return (tsLoad.p = new Promise(res => { const sc = document.createElement('script'); sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'; sc.async = true; sc.onload = () => res(); sc.onerror = () => { tsFail = true; res(); }; document.head.appendChild(sc); }));
 }
-function tsReset() { tsTok = ''; try { if (window.turnstile && tsId !== null) turnstile.reset(tsId); } catch (e) { } }
-function tsNeed() { if (!TS_KEY || tsTok || tsFail) return false; showAlert('잠시만요', '버튼 위의 <b>사람인지 확인</b>이 끝난 뒤 다시 눌러주세요.'); return true; }
-const tsOpt = () => (tsTok ? { captchaToken: tsTok } : {});
+function tsInit() { tsLoad(); }
+function tsDone(t) { tsTok = t || ''; tsUsed = false; if (tsWait) { const w = tsWait; tsWait = null; w(tsTok); } }
+async function tsGet() {
+  if (!TS_KEY) return '';
+  if (tsTok && !tsUsed) return tsTok;
+  await tsLoad(); if (!window.turnstile) return '';
+  const p = new Promise(res => { tsWait = res; setTimeout(() => { if (tsWait === res) { tsWait = null; res(''); } }, 20000); });
+  try {
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    if (tsId === null) tsId = turnstile.render('#ts-box', { sitekey: TS_KEY, size: 'flexible', theme: 'light', language: 'ko', appearance: 'interaction-only', callback: tsDone, 'expired-callback': () => { tsTok = ''; }, 'error-callback': () => { tsFail = true; tsDone(''); } });
+    else { tsTok = ''; turnstile.reset(tsId); }
+  } catch (e) { tsFail = true; tsDone(''); }
+  return p;
+}
+function tsReset() { tsUsed = true; }
+/* 버튼을 누르면 확인 → 통과하면 바로 진행 */
+async function tsRun(btn) {
+  if (!TS_KEY) return {};
+  const old = btn ? btn.innerText : ''; if (btn) { btn.disabled = true; btn.innerText = '확인 중…'; }
+  const t = await tsGet(); if (btn) { btn.disabled = false; btn.innerText = old; }
+  return t ? { captchaToken: t } : {};
+}
 const isCaptchaErr = e => /captcha/i.test((e && e.message) || '');
-function authView(v) { if (v === 'email') tsInit(); q('auth-home').style.display = v === 'home' ? '' : 'none'; const e = q('auth-email-view'); e.style.display = v === 'email' ? 'flex' : 'none'; if (v === 'email') setTimeout(() => { try { q('auth-email').focus(); } catch (x) { } }, 60); }
+function authView(v) { if (v === 'email') tsInit(); q('auth-home').style.display = v === 'home' ? '' : 'none'; const e = q('auth-email-view'); e.style.display = v === 'email' ? 'flex' : 'none'; }
 function authToggleHTML() { q('auth-toggle-text').innerHTML = signup ? '이미 계정이 있나요? <span class="text-[var(--mil-green)] font-bold cursor-pointer" onclick="toggleAuthMode()">로그인</span>' : '계정이 없나요? <span class="text-[var(--mil-green)] font-bold cursor-pointer" onclick="toggleAuthMode()">새 계정 만들기</span>'; }
 function toggleAuthMode() { signup = !signup; q('auth-password').placeholder = signup ? '비밀번호 (8자 이상 · 영문+숫자)' : '비밀번호'; q('auth-password').autocomplete = signup ? 'new-password' : 'current-password'; q('auth-forgot').classList.toggle('hidden', signup); if (signup && !q('su-consent').innerHTML) q('su-consent').innerHTML = consentHTML('su'); q('auth-title').innerText = signup ? '회원가입' : '로그인'; q('auth-subtitle').innerText = signup ? '성별을 선택하고 비밀번호를 재확인해주세요.' : '계정을 연결하고 연인과 데이터를 동기화하세요.'; q('auth-signup-fields').classList.toggle('hidden', !signup); q('btn-auth-submit').innerText = signup ? '계정 생성하기' : '이메일로 로그인'; authToggleHTML(); }
 function setGender(g) { signupGender = g; [['M', 'var(--mil-green)', 'var(--mil-green-light)'], ['F', 'var(--pink-main)', 'var(--pink-light)'], ['S', '#C9881E', '#FFF6DD']].forEach(([k, c, bg]) => { const b = q('btn-gender-' + k); if (!b) return; b.className = 'flex-1 py-3 rounded-xl border-2 font-bold text-[13px] ' + (g === k ? '' : 'border-[#E5E8EB] bg-[#F5F6F8] text-[#8B95A1]'); b.style.cssText = g === k ? `border-color:${c};background:${bg};color:${c}` : ''; }); }
@@ -1048,8 +1067,7 @@ async function submitAuth() {
     if (p !== q('auth-password-confirm').value) return showAlert('오류', '비밀번호 재확인이 일치하지 않습니다.');
     if (!signupGender) return showAlert('오류', '회원 종류(군인·곰신·팬)를 선택해주세요.');
     const c = csGet('su'); if (!c.ok) return showAlert('알림', '[필수] 항목에 모두 동의해주세요.');
-    if (tsNeed()) return;
-    authBusy = true; let data, error; try { ({ data, error } = await sb.auth.signUp({ email: e, password: p, options: Object.assign({ data: Object.assign({ gender: signupGender }, csMeta(c)), emailRedirectTo: location.origin + location.pathname }, tsOpt()) })); } finally { authBusy = false; tsReset(); }
+    authBusy = true; const cap = await tsRun(q('btn-auth-submit')); let data, error; try { ({ data, error } = await sb.auth.signUp({ email: e, password: p, options: Object.assign({ data: Object.assign({ gender: signupGender }, csMeta(c)), emailRedirectTo: location.origin + location.pathname }, cap) })); } finally { authBusy = false; tsReset(); }
     if (isCaptchaErr(error)) return showAlert('확인 실패', '사람인지 확인이 만료됐어요. 다시 확인한 뒤 눌러주세요.');
     if (error) return showAlert('가입 실패', esc(error.message));
     if (data.user && data.user.identities && data.user.identities.length === 0) return showAlert('안내', '이미 가입된 이메일입니다. 로그인해주세요.');
@@ -1058,8 +1076,7 @@ async function submitAuth() {
     if (!p) return showAlert('오류', '비밀번호를 입력해주세요.');
     const L = lkGet(), now = Date.now();
     if (L.until > now) return showAlert('잠시 후 다시 시도', `로그인을 5번 실패해서 잠시 막아뒀어요.<br>${Math.ceil((L.until - now) / 60000)}분 뒤에 다시 시도하거나 <b>비밀번호 찾기</b>를 이용해주세요.`);
-    if (tsNeed()) return;
-    authBusy = true; let error; try { ({ error } = await sb.auth.signInWithPassword({ email: e, password: p, options: tsOpt() })); } finally { authBusy = false; tsReset(); }
+    authBusy = true; const cap = await tsRun(q('btn-auth-submit')); let error; try { ({ error } = await sb.auth.signInWithPassword({ email: e, password: p, options: cap })); } finally { authBusy = false; tsReset(); }
     if (isCaptchaErr(error)) return showAlert('확인 실패', '사람인지 확인이 만료됐어요. 다시 확인한 뒤 눌러주세요.');
     if (!error) { lkSet({}); return; }
     if (/confirm/i.test(error.message)) return showAlert('로그인 실패', '이메일 인증이 아직 완료되지 않았어요. 메일함의 인증 링크를 눌러주세요.');
@@ -1087,8 +1104,8 @@ async function consentSave() { const c = csGet('mc'); if (!c.ok) return showAler
 /* 비밀번호 찾기 · 바꾸기 */
 async function forgotPw() {
   const e = q('auth-email').value.trim(); if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return showAlert('비밀번호 찾기', '위 칸에 가입한 이메일 주소를 먼저 적어주세요.');
-  if (tsNeed()) return;
-  const { error } = await sb.auth.resetPasswordForEmail(e, Object.assign({ redirectTo: location.origin + location.pathname }, tsOpt())); tsReset();
+  const cap = await tsRun(null);
+  const { error } = await sb.auth.resetPasswordForEmail(e, Object.assign({ redirectTo: location.origin + location.pathname }, cap)); tsReset();
   if (isCaptchaErr(error)) return showAlert('확인 실패', '사람인지 확인이 만료됐어요. 다시 확인한 뒤 눌러주세요.');
   if (error && (error.status === 429 || /rate|many/i.test(error.message))) return showAlert('잠시 후 다시 시도', '메일을 너무 자주 요청했어요. 잠시 뒤 다시 시도해주세요.');
   showAlert('메일을 보냈어요 ✉️', `${esc(e)} 로 비밀번호 재설정 링크를 보냈어요.<br>메일의 링크를 누르면 새 비밀번호를 정할 수 있어요.`);
