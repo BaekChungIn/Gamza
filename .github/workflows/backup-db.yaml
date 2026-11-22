@@ -1,0 +1,47 @@
+# 짬타이거 · 매일 DB 백업 (암호화해서 GitHub Actions 보관함에 14일 보관)
+# 저장소가 공개라서, 백업 파일은 반드시 비밀번호로 암호화한 뒤에만 올려요.
+# 필요한 Secrets (GitHub 저장소 > Settings > Secrets and variables > Actions):
+#   SUPABASE_DB_URL  : Supabase > Connect > Session pooler 연결 문자열 (비밀번호 포함)
+#   BACKUP_PASSWORD  : 백업 파일을 여는 비밀번호 (직접 정한 긴 문장, 따로 적어두기)
+name: backup-db
+on:
+  schedule:
+    - cron: '30 18 * * *'   # 매일 새벽 3시 30분 (한국 시간)
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: 비밀값 확인
+        env:
+          DB: ${{ secrets.SUPABASE_DB_URL }}
+          PW: ${{ secrets.BACKUP_PASSWORD }}
+        run: |
+          if [ -z "$DB" ] || [ -z "$PW" ]; then echo "SUPABASE_DB_URL 또는 BACKUP_PASSWORD 가 없어요"; exit 1; fi
+      - name: pg_dump 17 설치
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y -qq postgresql-client-17
+      - name: 백업 + 암호화
+        env:
+          DB: ${{ secrets.SUPABASE_DB_URL }}
+          PW: ${{ secrets.BACKUP_PASSWORD }}
+        run: |
+          set -euo pipefail
+          F=zzam-$(date -u +%Y%m%d).sql.gz
+          /usr/lib/postgresql/17/bin/pg_dump "$DB" --schema=public --no-owner --no-privileges | gzip -9 > "$F"
+          /usr/lib/postgresql/17/bin/pg_dump "$DB" --schema=auth --data-only --table=auth.users --no-owner | gzip -9 > users.sql.gz
+          tar cf backup.tar "$F" users.sql.gz
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$PW" --symmetric --cipher-algo AES256 -o backup.tar.gpg backup.tar
+          rm -f "$F" users.sql.gz backup.tar
+          ls -la backup.tar.gpg
+      - uses: actions/upload-artifact@v4
+        with:
+          name: db-backup-${{ github.run_number }}
+          path: backup.tar.gpg
+          retention-days: 14
