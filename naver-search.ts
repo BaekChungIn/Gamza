@@ -39,6 +39,59 @@ async function naver(_api: 'shop' | 'image', query: string): Promise<string | nu
   return it.thumbnail || it.link || null;
 }
 
+
+// ---- 떡밥 자판기: 무대 추천(AI 후보 → 네이버 검색으로 확인) · 위로 문구(AI) · 최신 소식(네이버 뉴스) ----
+const GROQ = Deno.env.get('GROQ_API_KEY') ?? '';
+let gModel = '';
+async function groqJSON(sys: string, user: string): Promise<any> {
+  if (!GROQ) return null;
+  if (!gModel) {
+    try {
+      const r = await fetch('https://api.groq.com/openai/v1/models', { headers: { Authorization: 'Bearer ' + GROQ } });
+      const ids: string[] = ((await r.json()).data ?? []).map((m: any) => m.id);
+      gModel = ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'openai/gpt-oss-20b', 'llama-3.1-8b-instant'].find((x) => ids.includes(x)) || ids.find((x) => !/whisper|guard|tts/i.test(x)) || '';
+    } catch { return null; }
+  }
+  if (!gModel) return null;
+  const body: any = { model: gModel, temperature: 0.7, response_format: { type: 'json_object' }, messages: [{ role: 'system', content: sys }, { role: 'user', content: user }] };
+  if (gModel.startsWith('openai/')) body.reasoning_effort = 'low';
+  const r = await fetch('https://api.groq.com/openai/v1/chat/completions', { method: 'POST', headers: { Authorization: 'Bearer ' + GROQ, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if (!r.ok) return null;
+  try { return JSON.parse((await r.json()).choices[0].message.content); } catch { return null; }
+}
+const clean = (v: any, n: number) => String(v ?? '').replace(/<[^>]*>/g, '').replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;|&gt;/g, '').replace(/[<>]/g, '').trim().slice(0, n);
+async function hub(api: 'news' | 'webkr', q: string, n = 10) {
+  const r = await fetch(`${HUB}/${api}?display=${n}&sort=${api === 'news' ? 'date' : 'sim'}&query=${encodeURIComponent(q)}`, { headers: { 'X-NCP-APIGW-API-KEY-ID': NID, 'X-NCP-APIGW-API-KEY': NSEC } });
+  if (!r.ok) return [];
+  return ((await r.json()).items ?? []) as any[];
+}
+const yt = (q: string) => 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q);
+async function buildDrops(name: string, group: string) {
+  const who = (group && !/배우|솔로|트로트|·/.test(group) ? group + ' ' : '') + name;
+  const out: any = { stages: [], comforts: [], news: [] };
+  // 최신 소식 (네이버 뉴스, 실제 기사)
+  try {
+    const ns = await hub('news', `${who} 군대`, 10);
+    out.news = ns.map((x: any) => ({ t: clean(x.title, 90), u: String(x.originallink || x.link || '') })).filter((x: any) => x.t && /^https:\/\//.test(x.u)).slice(0, 6);
+  } catch { }
+  // 무대 추천: AI 후보를 네이버 웹검색으로 한 번 더 확인해서 확인된 것만
+  const ai = await groqJSON('너는 K-팝·배우 덕질을 잘 아는 도우미야. 확실히 아는 것만 말하고, 모르면 빈 배열을 줘. JSON으로만 답해.',
+    `"${who}"의 팬이 다시 보면 좋을 대표 무대·명장면 8개를 골라줘. 노래 제목(또는 작품명)과 무대/방송 이름을 정확히.\n그리고 군대 간 스타를 기다리는 팬을 위한 짧은 위로 문구 10개(스타가 한 말처럼 쓰지 말고, 팬에게 건네는 말로, 30자 이내).\n형식: {"stages":[{"song":"","show":"","year":""}],"comforts":[""]}`);
+  if (ai) {
+    out.comforts = (ai.comforts ?? []).map((x: any) => clean(x, 60)).filter((x: string) => x.length >= 4).slice(0, 12);
+    const cand = (ai.stages ?? []).map((x: any) => ({ song: clean(x.song, 40), show: clean(x.show, 40), year: clean(x.year, 6) })).filter((x: any) => x.song).slice(0, 8);
+    const ok = await Promise.all(cand.map(async (c: any) => {
+      try {
+        const items = await hub('webkr', `${name} ${c.song}`, 5);
+        const hit = items.some((it: any) => clean(it.title + ' ' + it.description, 400).replace(/\s/g, '').includes(c.song.replace(/\s/g, '')));
+        return hit ? c : null;
+      } catch { return null; }
+    }));
+    out.stages = ok.filter(Boolean).map((c: any) => ({ t: `${c.song}${c.show ? ' · ' + c.show : ''}${c.year ? ' (' + c.year + ')' : ''}`, u: yt(`${who} ${c.song} ${c.show || '무대'}`) }));
+  }
+  return out;
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   try {
@@ -63,6 +116,18 @@ Deno.serve(async (req) => {
       const photos = [...new Set((d.items ?? []).map((x: any) => x.thumbnail || x.link).filter(Boolean))].slice(0, 24);
       await admin.from('img_cache').upsert({ key: ck, url: JSON.stringify(photos), updated_at: new Date().toISOString() });
       return json({ photos });
+    }
+    // 떡밥 자판기 재료 (스타별로 하루 동안 모두가 같이 써요)
+    if (kind === 'drops') {
+      const sid = String(body.sid ?? '');
+      if (!/^[a-z0-9_]{1,40}$/.test(sid)) return json({ error: 'bad request' }, 400);
+      const name = clean(body.name, 20), group = clean(body.group, 30);
+      const ck = 'drops:' + sid;
+      const { data: c } = await admin.from('img_cache').select('url,updated_at').eq('key', ck).maybeSingle();
+      if (c?.url && c.updated_at > new Date(Date.now() - 864e5).toISOString()) return json(JSON.parse(c.url));
+      const d = await buildDrops(name, group);
+      if (d.stages.length || d.comforts.length || d.news.length) await admin.from('img_cache').upsert({ key: ck, url: JSON.stringify(d), updated_at: new Date().toISOString() });
+      return json(d);
     }
     if (!['products', 'stars'].includes(kind) || !Array.isArray(items)) return json({ error: 'bad request' }, 400);
     const list = items.slice(0, 300).filter((x: any) => x && typeof x.id === 'string' && typeof x.q === 'string' && x.q.length < 80);
