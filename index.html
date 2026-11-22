@@ -657,11 +657,12 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
   <section id="tab-qna" class="space-y-4 pt-2 hidden">
    <div id="qna-modes" class="flex gap-2 hidden"><button id="qm-couple" onclick="qSetMode('couple')" class="flex-1 py-2.5 rounded-xl text-[13px] font-bold">💕 커플 질문</button><button id="qm-diary" onclick="qSetMode('diary')" class="flex-1 py-2.5 rounded-xl text-[13px] font-bold">📓 군생활 일기 🔒</button><button id="qm-star" onclick="qSetMode('star')" class="hidden flex-1 py-2.5 rounded-xl text-[13px] font-bold">⭐ MY스타</button></div>
    <div id="qna-star" class="hidden"></div>
-   <div class="toss-card bg-gradient-to-br from-[var(--mil-soft)] to-[#FFF0F3] text-center py-8">
+   <div class="toss-card bg-gradient-to-br from-[var(--mil-soft)] to-[#FFF0F3] text-center py-8 active:scale-[.99] transition-transform" style="cursor:pointer" onclick="if(!event.target.closest('button'))openQcal()">
     <div class="flex justify-end px-1 mb-2"><button onclick="openQcal()" class="flex items-center gap-1.5 text-[12px] font-extrabold px-3.5 py-2 rounded-full bg-white/85 border border-white text-[#191F28] active:scale-95 transition-transform"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg>질문 전체보기</button></div>
     <div class="flex items-center justify-between px-2 mb-2"><button onclick="qDay(-1)" class="w-8 h-8 rounded-full bg-white/70 font-bold">◀</button><div class="text-[12px] font-bold text-[var(--mil-softtext)]" id="qna-day-badge"></div><button onclick="qDay(1)" class="w-8 h-8 rounded-full bg-white/70 font-bold">▶</button></div>
     <div id="qna-meta" class="flex flex-wrap justify-center gap-1.5 mb-3 px-4"></div>
     <h2 class="text-[17px] font-extrabold leading-snug px-4" id="qna-question-text"></h2>
+    <p class="text-[11px] font-medium mt-3 px-4" style="color:rgba(25,31,40,.38)">카드를 누르면 지난 질문을 달력으로 모아볼 수 있어요</p>
    </div>
    <div class="toss-card space-y-5" id="qna-body">
     <div><label class="text-[13px] font-bold mb-2 block" id="qna-my-label">나의 답변</label><textarea id="qna-ans" maxlength="500" class="w-full bg-[#F5F6F8] rounded-2xl p-4 text-[14px] outline-none h-28 resize-none" style="user-select:text" oninput="paintQBtn()"></textarea><button id="qna-save" onclick="submitQ()" class="w-full mt-2 py-3.5 rounded-xl font-bold transition-colors" style="background:#E3E6EA;color:#8B95A1">저장</button></div>
@@ -2695,11 +2696,11 @@ function renderStarQ() {
   const today = sqMap(I, L); let d = sqView[s.id] || today; if (d > today) d = today; if (d < 1) d = 1;
   const row = Q[d - 1] || [], qt = sqText(row[0], nm), sp = row[2] || '', rk = row[3] || '', key = sqKey(s, d);
   const nb = (on, act, lbl) => `<button ${on ? `onclick="${act}"` : 'disabled'} class="w-10 h-10 rounded-full flex items-center justify-center text-[18px] font-bold ${on ? 'bg-white border border-[#E5E8EB] text-[#191F28]' : 'text-[#D1D6DB]'}" aria-label="${lbl}">${lbl === '이전' ? '‹' : '›'}</button>`;
-  box.innerHTML = chips + `<div class="stk ${TH.m ? 'mt' : ''} text-center" style="${thVars(th)}"><div class="relative z-[1]">
+  box.innerHTML = chips + `<div class="flex justify-end mb-2"><button onclick="openQcal()" class="flex items-center gap-1.5 text-[12px] font-extrabold px-3.5 py-2 rounded-full bg-white border border-[#E5E8EB] text-[#191F28] active:scale-95 transition-transform"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg>질문 전체보기</button></div><div class="stk ${TH.m ? 'mt' : ''} text-center active:scale-[.99] transition-transform" onclick="openQcal()" style="${thVars(th)};cursor:pointer"><div class="relative z-[1]">
    <span class="lb">${I.done ? esc(callAs(nm, '의')) + ' 전역을 축하해요 · 지난 질문 다시 보기' : esc(callAs(nm, '를')) + ' 기다린 지 ' + I.served + '일째'}</span>
    <div class="flex items-center justify-center gap-1.5 mt-3 flex-wrap">${sp ? `<span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold" style="background:var(--fg,#fff);color:var(--bg,#111)">${esc(sp)}</span>` : ''}<span class="px-2.5 py-1 rounded-full text-[11px] font-bold" style="background:rgba(127,127,127,.2)">Day ${d} / ${L}</span>${rk ? `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold" style="background:rgba(127,127,127,.2)">${esc(rk)}</span>` : ''}</div>
    <h2 class="text-[18px] font-extrabold leading-snug mt-3 break-keep">“${esc(qt)}”</h2>
-   <p class="text-[12px] opacity-60 mt-2">${esc(row[1] || '')}${row[1] ? ' · ' : ''}나만 볼 수 있는 기다림 일기예요</p></div></div>
+   <p class="text-[12px] opacity-60 mt-2">${esc(row[1] || '')}${row[1] ? ' · ' : ''}나만 볼 수 있는 기다림 일기예요</p><p class="text-[11px] font-medium mt-3" style="opacity:.45">카드를 누르면 지난 질문을 달력으로 모아볼 수 있어요</p></div></div>
    <div class="flex items-center justify-between mt-3">${nb(d > 1, `sqGo(${d - 1})`, '이전')}${d < today ? `<button onclick="sqGo(${today})" class="h-9 px-4 rounded-full text-[12px] font-bold bg-white border border-[#E5E8EB] text-[#4E5968]">오늘 질문으로</button>` : `<span class="text-[12px] font-bold text-[#8B95A1]">오늘의 질문</span>`}${nb(d < today, `sqGo(${d + 1})`, '다음')}</div>
    <div class="toss-card mt-3"><textarea id="sq-in" rows="5" maxlength="1000" class="w-full outline-none text-[15px] leading-relaxed resize-none" placeholder="오늘의 마음을 적어보세요"></textarea><button id="sq-save" onclick="saveStarQ(${key})" class="w-full mt-3 h-12 rounded-2xl font-bold text-[14px] bg-[#E5E8EB] text-[#4E5968]">저장</button></div>`;
   sb.from('qna_answers').select('answer').eq('user_id', me.id).eq('day', key).maybeSingle().then(({ data }) => { const t = q('sq-in'); if (data && t && t.dataset.k !== 'typed') { t.value = data.answer || ''; const b = q('sq-save'); b.className = 'w-full mt-3 h-12 rounded-2xl font-bold text-[14px] text-white'; b.style.background = 'var(--mil-dark)'; b.innerText = '저장됨'; } }).catch(() => { });
@@ -2820,21 +2821,48 @@ async function submitQ() {
 /* ---------- 질문 전체보기 (캘린더) ---------- */
 let qcY = 2026, qcM = 0, qcSel = 1, qAll = {};
 const qcDate = d => { const e = milInfo(S_()).e; return new Date(e.getFullYear(), e.getMonth(), e.getDate() + d - 1); };
+let qcStar = null, qcSelIdx = 0;
+function qcStarInfo() { const s = sqStar(); if (!s || !(window.STARQ && window.STARQ.army)) return null; const I = starInfo(s), Q = window.STARQ[sqBranch(s)] || window.STARQ.army; return { s, I, Q, L: Q.length }; }
+const qcSm = (C, k) => sqMap({ served: k, total: C.I.total }, C.L);
 async function qcLoad() {
+  if (qcStar) { const C = qcStar, lo = sqKey(C.s, 1), hi = sqKey(C.s, C.L); const { data } = await sb.from('qna_answers').select('day,answer').eq('user_id', me.id).gte('day', lo).lte('day', hi); qAll = {}; (data || []).forEach(a => { if (String(a.answer || '').trim()) qAll[a.day - lo + 1] = { [me.id]: a.answer }; }); return; }
   const co = qMode === 'couple', lo = co ? 1 : 10001, hi = co ? 5000 : 15000, off = co ? 0 : 10000;
   const { data } = await sb.from('qna_answers').select('*').gte('day', lo).lte('day', hi); qAll = {};
   (data || []).forEach(a => { const k = a.day - off; (qAll[k] = qAll[k] || {})[a.user_id] = a.answer; });
 }
 async function openQcal() {
-  qNorm(); const I = qInfo(); if (I.none) return; qcSel = qDayN; const d = qcDate(qDayN); qcY = d.getFullYear(); qcM = d.getMonth();
+  qcStar = !q('qna-star').classList.contains('hidden') ? qcStarInfo() : null;
+  if (!q('qna-star').classList.contains('hidden') && (!qcStar || qcStar.I.pre)) return;
+  if (qcStar) {
+    const C = qcStar, cur = sqView[C.s.id] || sqMap(C.I, C.L); qcSelIdx = C.I.served;
+    for (let k = 1; k <= C.I.served; k++) if (qcSm(C, k) >= cur) { qcSelIdx = k; break; }
+    const d = new Date(C.I.e.getFullYear(), C.I.e.getMonth(), C.I.e.getDate() + qcSelIdx - 1); qcY = d.getFullYear(); qcM = d.getMonth(); qAll = {};
+  } else { qNorm(); const I = qInfo(); if (I.none) return; qcSel = qDayN; const d = qcDate(qDayN); qcY = d.getFullYear(); qcM = d.getMonth(); }
   const m = q('modal-qcal'); openM('modal-qcal'); m.animate([{ opacity: 0, transform: 'translateY(36px)' }, { opacity: 1, transform: 'none' }], { duration: 300, easing: 'cubic-bezier(.2,.8,.2,1)' });
   renderQcal(); await qcLoad(); renderQcal();
 }
 function closeQcal() { const m = q('modal-qcal'), a = m.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(36px)' }], { duration: 200, easing: 'ease-in' }); a.onfinish = () => closeModal('modal-qcal'); }
 function qcNav(d) { qcM += d; if (qcM < 0) { qcM = 11; qcY--; } if (qcM > 11) { qcM = 0; qcY++; } renderQcal(); }
 function qcPick(n) { qcGo(n); }
+function qcStarPick(sh) { const C = qcStar; if (!C) return; sqView[C.s.id] = sh; closeModal('modal-qcal'); renderStarQ(); window.scrollTo(0, 0); }
+function renderQcalStar() {
+  const C = qcStar, e = C.I.e, eT = new Date(e.getFullYear(), e.getMonth(), e.getDate()).getTime(), idxOf = x => Math.round((x - eT) / 864e5) + 1, tIdx = C.I.served;
+  q('qc-head').innerText = `${starCall(C.s)} 기다림 질문`; q('qc-title').innerText = `${qcY}년 ${qcM + 1}월`;
+  const t1 = new Date(e.getFullYear(), e.getMonth(), e.getDate() + tIdx - 1), minK = e.getFullYear() * 12 + e.getMonth(), maxK = t1.getFullYear() * 12 + t1.getMonth();
+  let cur = qcY * 12 + qcM; if (cur < minK) { qcY = e.getFullYear(); qcM = e.getMonth(); } if (cur > maxK) { qcY = t1.getFullYear(); qcM = t1.getMonth(); } cur = qcY * 12 + qcM;
+  q('qc-title').innerText = `${qcY}년 ${qcM + 1}월`; q('qc-prev').style.opacity = cur <= minK ? .25 : 1; q('qc-next').style.opacity = cur >= maxK ? .25 : 1;
+  const first = new Date(qcY, qcM, 1), days = new Date(qcY, qcM + 1, 0).getDate(); let h = '';
+  for (let i = 0; i < first.getDay(); i++) h += '<div></div>';
+  for (let d = 1; d <= days; d++) {
+    const x = new Date(qcY, qcM, d), k = idxOf(x.getTime()), ok = k >= 1 && k <= tIdx, dow = x.getDay(), sh = ok ? qcSm(C, k) : 0, mine = ok && qAll[sh], sp = ok && (C.Q[sh - 1] || [])[2], sel = ok && k === qcSelIdx;
+    h += `<button ${ok ? `onclick="qcStarPick(${sh})"` : 'disabled'} class="h-full flex flex-col items-center justify-start pt-3 relative"><span class="w-9 h-9 rounded-full flex items-center justify-center text-[14px] font-bold ${sel ? 'text-white' : !ok ? 'text-[#C5CBD3]' : dow === 0 ? 'text-[#E5484D]' : dow === 6 ? 'text-[#3B82F6]' : 'text-[#191F28]'} ${!sel && ok && k === tIdx ? 'border-2 border-[#191F28]' : ''}" ${sel ? 'style="background:#191F28"' : ''}>${d}</span>${mine ? '<i class="mt-1 w-1.5 h-1.5 rounded-full" style="background:#C9A24C"></i>' : ''}${sp ? '<span class="absolute top-2 right-1.5 text-[10px] leading-none" style="color:#D9A400">' + ico('star') + '</span>' : ''}</button>`;
+  }
+  q('qc-grid').innerHTML = h;
+  q('qc-prog').innerText = `기록 ${Object.keys(qAll).length} / ${sqMap(C.I, C.L)}일`;
+}
 async function qcGo(n) { qDayN = n; closeModal('modal-qcal'); await loadQ(); renderQ(true); window.scrollTo(0, 0); }
 function renderQcal() {
+  if (qcStar) return renderQcalStar();
   const I = qInfo(); if (I.none) return; const co = I.coupleMode, e = qcDate(1), eT = new Date(e.getFullYear(), e.getMonth(), e.getDate()).getTime(), dayOf = x => Math.round((x - eT) / 864e5) + 1;
   q('qc-head').innerText = co ? '커플 질문 전체보기' : '군생활 일기 전체보기'; q('qc-title').innerText = `${qcY}년 ${qcM + 1}월`;
   const t1 = qcDate(I.today), minK = e.getFullYear() * 12 + e.getMonth(), maxK = t1.getFullYear() * 12 + t1.getMonth(), cur = qcY * 12 + qcM;
