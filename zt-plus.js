@@ -8,7 +8,7 @@ const ZP_ITEMS = {
   th_camo: { n: '디지털 위장', k: 'theme', aud: 'mil', bg: 'linear-gradient(90deg,rgba(0,0,0,.14) 50%,transparent 50%) 0 0/12px 12px,linear-gradient(rgba(255,255,255,.07) 50%,transparent 50%) 0 0/18px 18px,linear-gradient(155deg,#4E5B3A 0%,#3B4630 55%,#2C3424 100%)' },
   th_ocean: { n: '깊은 바다', k: 'theme', aud: 'mil', bg: 'radial-gradient(120% 60% at 50% 120%,rgba(120,200,255,.35),transparent 60%),linear-gradient(155deg,#2B6CB0 0%,#1E4E79 55%,#12355A 100%)' },
   th_gold: { n: '골드 에디션', k: 'theme', aud: 'mil', bg: 'linear-gradient(115deg,transparent 30%,rgba(255,255,255,.22) 45%,transparent 60%),linear-gradient(155deg,#2A220F 0%,#7A5C1C 45%,#C9A24C 72%,#5E4714 100%)' },
-  pt_elite: { n: '특급전사', k: 'patch', aud: 'mil', d: 'arc', w: 58 },
+  pt_elite: { n: '특급전사', k: 'patch', aud: 'mil', d: 'tab', w: 56 },
   pt_shooter: { n: '특등사수', k: 'patch', aud: 'mil', d: 'tab', w: 56 },
   pt_flag: { n: '태극기', k: 'patch', aud: 'mil', c: ['#FFFFFF', '#1D3B8B', '#C8102E'], t: 'flag' },
   pt_tiger: { n: '짬타이거', k: 'patch', aud: 'mil', c: ['#3B4630', '#F2BA49', '#FFFFFF'], t: 'TIGER' },
@@ -84,9 +84,10 @@ function zpToast(t) { const d = document.createElement('div'); d.className = 'zp
 .zp-item .pv{border:0;width:100%;cursor:pointer}.zp-pvl{position:absolute;right:8px;bottom:8px;font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.88);color:#191F28}
 .pcard.zp-lt .text-white{color:inherit!important}.pcard.zp-th .pbar{background:var(--ztrk)!important}.pcard.zp-th .pbar>div:first-child{background:var(--zbar)!important}
 .zp-pvs .pcard{text-align:left}
-.zp-patches{position:relative;margin-top:12px;align-items:center!important;display:flex;align-items:flex-start;gap:5px;z-index:3;pointer-events:none}
+.zp-patches{position:absolute;top:16px;right:16px;display:flex;flex-direction:column;align-items:flex-end;gap:5px;z-index:3;pointer-events:none}
+.pcard.zp-hasp>div:first-child .flex-1{padding-right:var(--pw,0)}
 .zp-patch svg{width:100%;height:100%;display:block}
-.zp-patch{display:block;height:34px;filter:drop-shadow(0 3px 5px rgba(0,0,0,.3));animation:zpPatchIn .5s cubic-bezier(.2,1.5,.4,1)}
+.zp-patch{display:block;filter:drop-shadow(0 3px 5px rgba(0,0,0,.3));animation:zpPatchIn .5s cubic-bezier(.2,1.5,.4,1)}
 @keyframes zpPatchIn{0%{transform:scale(.3) rotate(-20deg);opacity:0}}
 /* 포토카드 */
 .pc2{position:relative;aspect-ratio:2/3;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 8px 20px rgba(17,20,26,.12);container-type:inline-size}
@@ -206,7 +207,7 @@ function zpPatchSVG(id) {
   const SH = 'M24 2 44 9v17c0 14-9 23-20 28C13 49 4 40 4 26V9z', SHi = 'M24 7 39.5 12.5v13.5c0 11-7 18.5-15.5 22.5C15.5 44.5 8.5 37 8.5 26V12.5z';
   const ARC = 'M4 50 Q60 -10 116 50 L100 67 Q60 22 20 67 Z';
   switch (id) {
-    case 'pt_elite': return zpEmb('0 0 120 72', ARC, '#6E705A', '#17170F', `<path id="zpArcT" d="M16 63 Q60 16 104 63" fill="none"/>${zpThreadT('font-family="sans-serif" font-weight="900" font-size="16"', '<textPath href="#zpArcT" startOffset="22%" text-anchor="middle">특급</textPath>', '#17170F', 'zpSat3')}${zpThreadT('font-family="sans-serif" font-weight="900" font-size="16"', '<textPath href="#zpArcT" startOffset="78%" text-anchor="middle">전사</textPath>', '#17170F', 'zpSat3')}${zpThread(zpStarD(60, 32, 9.5), '#F5C518')}`);
+    case 'pt_elite': return zpEmb('0 0 120 46', 'M5 5h110v36H5z', '#6E705A', '#17170F', `${zpThread(zpStarD(23, 23.5, 11), '#F5C518')}<path d="${zpStarD(23, 23.5, 11)}" fill="none" stroke="#8A6A00" stroke-width=".7"/>${zpThreadT('x="75" y="30" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="18"', '특급전사', '#17170F', 'zpSat3')}`);
     case 'pt_shooter': return zpEmb('0 0 120 46', 'M5 5h110v36H5z', '#6E705A', '#17170F', `<g stroke="#17170F" stroke-width="2.6" fill="none"><circle cx="23" cy="23" r="8.5"/><path d="M23 10v6.5M23 29.5V36M10 23h6.5M29.5 23H36"/></g><circle cx="23" cy="23" r="2.2" fill="#B3121F"/>${zpThreadT('x="75" y="30" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="18"', '특등사수', '#17170F', 'zpSat3')}`);
     case 'pt_flag': return zpEmb('0 0 48 58', SH, '#F7F5EE', '#1D3B8B', `${zpThread('M15 27a9 9 0 0 1 18 0 4.5 4.5 0 0 1-9 0 4.5 4.5 0 0 0-9 0z', '#C8102E')}${zpThread('M15 27a9 9 0 0 0 18 0 4.5 4.5 0 0 1-9 0 4.5 4.5 0 0 0-9 0z', '#1D3B8B')}` + [[13, 15, 45], [35, 15, -45], [13, 39, -45], [35, 39, 45]].map(([x, y, r]) => `<g transform="translate(${x} ${y}) rotate(${r})">${[-2.6, 0, 2.6].map(o => zpThread(`M-4.5 ${o - .7}h9v1.4h-9z`, '#1A1A1A')).join('')}</g>`).join(''));
     case 'pt_tiger': return zpEmb('0 0 48 58', SH, '#3B4630', '#E3A72F', `${zpThread('M13 20l5-7 6 4.5 6-4.5 5 7-2.6 1.8L30 17l-6 4.4-6-4.4-3.4 4.8z', '#E3A72F')}${zpThreadT('x="24" y="37" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="9.5" letter-spacing=".3"', 'TIGER', '#F6E7B0')}`);
@@ -236,6 +237,17 @@ const ZP_STK = {
 };
 const zpStkSVG = k => k === 'mug' ? MUG_SVG.replace('<svg', '<svg') : `<svg viewBox="0 0 24 24">${(ZP_STK[k] || {}).s || ''}</svg>`;
 
+const ZP_SPR = { b: { src: 'shop_badges.png', W: 1280, H: 768, m: {"pt_elite":[18,86,220,84],"pt_shooter":[274,86,220,84],"pt_flag":[549,18,182,220],"pt_tiger":[805,18,182,220],"pt_heart":[1061,18,182,220],"bd_wings":[18,327,220,114],"bd_bolt":[293,274,182,220],"bd_eagle":[530,274,220,220],"bd_tiger":[805,274,182,220],"bd_trefoil":[1042,279,220,211],"bd_triangle":[18,539,220,202],"bd_anchor":[293,530,182,220],"bd_compass":[530,530,220,220]} }, t: { src: 'shop_themes.png', W: 1440, H: 1392, m: {"th_night":[12,12,336,208],"th_sakura":[372,12,336,208],"th_camo":[732,12,336,208],"th_ocean":[1092,12,336,208],"th_gold":[12,244,336,208],"st_black_gold":[372,244,336,208],"st_black_silver":[732,244,336,208],"st_white_gold":[1092,244,336,208],"st_white_silver":[12,476,336,208],"st_khaki_gold":[372,476,336,208],"st_navy_silver":[732,476,336,208],"st_ivory_rose":[1092,476,336,208],"st_carbon_gold":[12,708,336,208],"st_matte_black":[372,708,336,208],"st_matte_white":[732,708,336,208],"st_army_dress":[1092,708,336,208],"st_airforce_dress":[12,940,336,208],"st_navy_dress":[372,940,336,208],"st_navy_summer":[732,940,336,208],"st_honor_guard":[1092,940,336,208],"st_ceremony_grey":[12,1172,336,208],"st_general_green":[372,1172,336,208]} } };
+/* 상점 그림(이미지) — 올라와 있으면 이미지로, 없으면 코드로 그린 그림으로 */
+zp.spr = {};
+['b', 't'].forEach(k => { const im = new Image(); im.onload = () => { zp.spr[k] = true; try { zpApplyEquip(); const el = zpShopEl(); if (el && el.querySelector('.zp-grid')) zpShopRender(el); } catch (e) { } }; im.src = ZP_SPR[k].src + '?v=2'; });
+function zpSpr(k, id, css) {
+  const S = ZP_SPR[k], r = S.m[id]; if (!r || !zp.spr[k]) return '';
+  const [x, y, w, h] = r;
+  return `<span class="zp-spr" style="display:block;aspect-ratio:${w}/${h};background-image:url(${S.src}?v=2);background-repeat:no-repeat;background-size:${(S.W / w * 100).toFixed(3)}% ${(S.H / h * 100).toFixed(3)}%;background-position:${(x / (S.W - w) * 100).toFixed(3)}% ${(y / (S.H - h) * 100).toFixed(3)}%;${css || ''}"></span>`;
+}
+const zpPAsp = id => { const r = ZP_SPR.b.m[id]; return r ? r[2] / r[3] : (ZP_ITEMS[id] && ZP_ITEMS[id].w || 34) / 40; };
+const zpPatchArt = id => zpSpr('b', id, 'width:100%;height:100%') || zpPatchSVG(id);
 /* ---------- 데이터 ---------- */
 async function zpLoadWallet() {
   try {
@@ -343,11 +355,12 @@ function zpStyleCard(card, thId, ptId) {
   else { card.style.background = card.dataset.bg0; card.style.color = card.dataset.c0 || ''; }
   const list = (Array.isArray(ptId) ? ptId : ptId ? [ptId] : []).filter(x => ZP_ITEMS[x]).slice(0, 3), sig = list.join(',');
   let box = card.querySelector('.zp-patches');
-  if (!list.length) { if (box) box.remove(); return; }
-  if (box && box.dataset.sig === sig) return;
-  if (box) box.remove(); box = document.createElement('div'); box.className = 'zp-patches'; box.dataset.sig = sig;
-  box.innerHTML = list.map(x => { const it = ZP_ITEMS[x]; return `<i class="zp-patch" title="${esc(it.n)}" style="width:${Math.round((it.w || 34) * 34 / 40)}px">${zpPatchSVG(x)}</i>`; }).join('');
-  const top = card.firstElementChild; if (top && top.nextSibling) card.insertBefore(box, top.nextSibling); else card.appendChild(box);
+  if (!list.length) { if (box) box.remove(); card.classList.remove('zp-hasp'); return; }
+  if (box && box.dataset.sig === sig + (zp.spr.b ? 'i' : '')) return;
+  if (box) box.remove(); box = document.createElement('div'); box.className = 'zp-patches'; box.dataset.sig = sig + (zp.spr.b ? 'i' : '');
+  const ph = x => zpPAsp(x) > 1.8 ? 25 : 29; box.innerHTML = list.map(x => { const it = ZP_ITEMS[x], h = ph(x); return `<i class="zp-patch" title="${esc(it.n)}" style="height:${h}px;width:${Math.round(h * zpPAsp(x))}px">${zpPatchArt(x)}</i>`; }).join('');
+  card.classList.add('zp-hasp'); card.style.setProperty('--pw', (Math.max(...list.map(x => Math.round(ph(x) * zpPAsp(x)))) + 8) + 'px');
+  card.appendChild(box);
 }
 const zpPatches = eq => { eq = eq || {}; return Array.isArray(eq.patches) ? eq.patches.slice(0, 3) : eq.patch ? [eq.patch] : []; };
 function zpApplyEquip() {
@@ -370,6 +383,8 @@ function zpOpenShop(cat) {
 function zpShopTab() { zpShopRender(q('tab-shop')); }
 const zpShopEl = () => (q('zp-shop-m') && !q('zp-shop-m').classList.contains('hidden')) ? q('zp-shop-body') : q('tab-shop');
 function zpPV(id, it, big) {
+  if (it.k === 'theme' && zp.spr.t && ZP_SPR.t.m[id]) return `<div style="width:${big ? 100 : 96}%">${zpSpr('t', id, 'width:100%;border-radius:12px')}</div>`;
+  if (it.k === 'patch' && zp.spr.b && ZP_SPR.b.m[id]) { const a = zpPAsp(id); return `<div style="height:${a > 1.5 ? 56 : 84}px;width:${Math.round((a > 1.5 ? 56 : 84) * a)}px;max-width:92%">${zpPatchArt(id)}</div>`; }
   if (it.k === 'theme') { if (it.star) { const t = STAR_TH[it.star]; return `<div style="position:absolute;inset:0;background:${t.bg}"></div><div class="relative" style="width:${big ? 86 : 78}%"><div class="text-[11px] font-extrabold" style="color:${t.fg}">${esc(t.n)}</div><div class="mt-2 rounded-full overflow-hidden" style="height:12px;background:${t.trk}"><i class="block h-full" style="width:64%;background:${t.bar}"></i></div></div>`; } return `<div style="position:absolute;inset:0;background:${it.bg}"></div><div class="relative text-white text-[12px] font-extrabold" style="text-shadow:0 1px 3px rgba(0,0,0,.4)">${esc(it.n)}</div>`; }
   if (it.k === 'patch') return `<div style="width:58px;height:70px">${zpPatchSVG(id)}</div>`;
   if (it.k === 'frame') return `<div style="width:70px">${zpPCHTML({ frame: id, photo: null, deco: { cap: '' } }, true)}</div>`;
