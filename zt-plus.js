@@ -82,7 +82,8 @@ function zpToast(t) { const d = document.createElement('div'); d.className = 'zp
 .zp-item .nm{font-size:14px;font-weight:800}.zp-item .pr{display:flex;align-items:center;gap:4px;font-size:13px;font-weight:800;color:#4E5968}
 .zp-item button{height:38px;border-radius:12px;font-size:13px;font-weight:800}
 .zp-item .pv{border:0;width:100%;cursor:pointer}.zp-pvl{position:absolute;right:8px;bottom:8px;font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.88);color:#191F28}
-.pcard.zp-lt .text-white{color:inherit!important}.pcard.zp-th .pbar{background:var(--ztrk)!important}.pcard.zp-th .pbar>div:first-child{background:var(--zbar)!important}
+.zp-lt .text-white{color:inherit!important}.zp-th .pbar{background:var(--ztrk)!important}.zp-th .pbar>div:first-child{background:var(--zbar)!important}
+.zp-th .bg-white\/10{background:var(--ztrk)!important}.zp-th .bg-white\/25{background:var(--zbar)!important;opacity:.75}
 .zp-pvs .pcard{text-align:left}
 .zp-patches{position:absolute;top:16px;right:16px;display:flex;flex-direction:column;align-items:flex-end;gap:5px;z-index:3;pointer-events:none}
 .pcard.zp-hasp>div:first-child .flex-1{padding-right:var(--pw,0)}
@@ -363,6 +364,13 @@ function zpStyleCard(card, thId, ptId) {
   card.appendChild(box);
 }
 const zpPatches = eq => { eq = eq || {}; return Array.isArray(eq.patches) ? eq.patches.slice(0, 3) : eq.patch ? [eq.patch] : []; };
+/* 자세히 보기(복무 현황 · 기다림 현황) 카드에도 같은 테마 · 패치 */
+function zpHero(which) {
+  if (!me || zpFan()) return; const h = q(which === 'gd' ? 'gd-hero' : 'sd-hero'); if (!h) return;
+  const card = h.parentElement && h.parentElement.parentElement; if (!card) return;
+  const P = which === 'gd' ? (typeof G_ === 'function' ? G_() : null) : (typeof S_ === 'function' ? S_() : null), eq = (P && P.equip) || {};
+  card.style.position = 'relative'; zpStyleCard(card, eq.theme, zpPatches(eq));
+}
 function zpApplyEquip() {
   if (!me || zpFan()) return;
   const sol = me.gender === 'M' ? me : (partner && partner.gender === 'M' ? partner : null), gom = me.gender === 'F' ? me : (partner && partner.gender === 'F' ? partner : null);

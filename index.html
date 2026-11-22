@@ -1637,12 +1637,12 @@ async function submitPost() {
 function openSd() {
   const S = S_(); if (!S || !S.enlist_date) return; const rk = rankOf(S, new Date()).r, h = hoInfo(S, new Date());
   q('sd-hero').innerHTML = safeImg(S.avatar) ? `<img src="${safeImg(S.avatar)}" class="w-[170px] h-[170px] rounded-full object-cover">` : (S.bf_theme === 'gamja' ? bfImg('gamja', rk) : `<img src="${rankFile(rk)}" alt="" class="h-[90%] object-contain">`);
-  q('sd-rank').innerText = rk === '전역' ? '전역' : `${rk} ${h.n}호봉`; q('sd-name').innerText = S.nickname || '군인'; q('sd-letter').classList.toggle('hidden', !(partner && me && S.id !== me.id)); xpRun('modal-sd', q('soldier-card').querySelector('.pcard'));
+  q('sd-rank').innerText = rk === '전역' ? '전역' : `${rk} ${h.n}호봉`; q('sd-name').innerText = S.nickname || '군인'; q('sd-letter').classList.toggle('hidden', !(partner && me && S.id !== me.id)); try { zpHero('sd'); } catch (e) { } xpRun('modal-sd', q('soldier-card').querySelector('.pcard'));
 }
 function openGd() {
   const G = G_(); if (!G) return; const S = S_(), rk = S && S.enlist_date ? rankOf(S, new Date()).r : '훈련병', gi = gfRank(rk);
   q('gd-hero').innerHTML = safeImg(G.avatar) ? `<img src="${safeImg(G.avatar)}" class="w-full h-full object-cover">` : `<img src="${G.gf_theme === 'cat' ? 'gf_cat.png' : 'gf_bear.png'}" class="w-full h-full object-cover">`;
-  q('gd-rank').innerHTML = `${gi[0]} 곰신 ${gi[1]}`; q('gd-name').innerText = G.nickname || (G.gf_theme === 'cat' ? '꽃냥이' : '곰신 베어'); q('gd-love').innerHTML = q('gf-love-days').innerHTML; q('gd-letter').classList.toggle('hidden', !(partner && me && G.id !== me.id)); xpRun('modal-gd', q('gf-profile-card').querySelector('.pcard'));
+  q('gd-rank').innerHTML = `${gi[0]} 곰신 ${gi[1]}`; q('gd-name').innerText = G.nickname || (G.gf_theme === 'cat' ? '꽃냥이' : '곰신 베어'); q('gd-love').innerHTML = q('gf-love-days').innerHTML; q('gd-letter').classList.toggle('hidden', !(partner && me && G.id !== me.id)); try { zpHero('gd'); } catch (e) { } xpRun('modal-gd', q('gf-profile-card').querySelector('.pcard'));
 }
 /* ---------- 카드 → 전체화면 확장 애니메이션 (토스 느낌) ---------- */
 let xpAnim = false, xpEl = null, xpBusy = false, xpBypass = false, xpPrevTC = null; const XP_EASE = 'cubic-bezier(.22,.9,.24,1)', XP_TC = { 'modal-sd': '#F7F8F9', 'modal-gd': '#F7F8F9', 'modal-sal': '#1C241A', 'modal-fd': '#F7F8F9' };
