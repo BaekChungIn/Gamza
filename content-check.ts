@@ -110,6 +110,13 @@ Deno.serve(async (req) => {
   if (!NID || !GROQ) return json({ error: 'NAVER / GROQ keys missing' }, 500);
 
   let body: any = {}; try { body = (await req.json()) ?? {}; } catch { /* 기본값 */ }
+  if (body.mode === 'mailtest') {
+    if (!RESEND) return json({ ok: false, error: 'RESEND_API_KEY 가 없어요' });
+    const m = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: `Bearer ${RESEND}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from: MAIL_FROM, to: [MAIL_TO], subject: '[짬타이거] 테스트 메일', html: '<p>짬타이거 자동 점검 메일이 정상적으로 연결됐어요. 앞으로 수정할 내용이 생기면 이 주소로 보내드려요.</p>' }) });
+    const t = await m.text();
+    return json({ ok: m.ok, status: m.status, to: MAIL_TO, detail: t.slice(0, 300) });
+  }
   if (body.mode === 'diag') {
     const k = serverKey(), out: any = { has_service_role: !!Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'), has_secret_keys: !!Deno.env.get('SUPABASE_SECRET_KEYS'), has_custom: !!Deno.env.get('SB_SERVICE_KEY'), key_type: k.startsWith('sb_secret') ? 'sb_secret' : k.startsWith('ey') ? 'jwt' : (k ? 'other' : 'none') };
     const r1 = await db.from('app_content').select('key').limit(1); out.read = r1.error ? 'X ' + r1.error.message : 'OK (' + (r1.data || []).length + ')';

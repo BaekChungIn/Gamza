@@ -188,6 +188,18 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 .st-mine button{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#8B95A1;width:64px}
 .st-mine button .st-ava{transition:box-shadow .2s}.st-mine button.on{color:#191F28}.st-mine button.on .st-ava{box-shadow:0 0 0 2.5px #fff,0 0 0 5px #191F28}
 .st-mine .add{width:56px;height:56px;border-radius:50%;border:2px dashed #C9CED6;display:flex;align-items:center;justify-content:center;font-size:24px;color:#8B95A1}
+
+.th-h{font-size:12px;font-weight:800;color:#8B95A1;margin:18px 2px -8px}
+.th-grid button.mt{box-shadow:inset 0 0 0 1px rgba(0,0,0,.05)}.th-grid button.mt.on{box-shadow:0 0 0 3px #fff,0 0 0 5px var(--mil-green)}
+.stk.mt{box-shadow:0 8px 22px rgba(0,0,0,.10),inset 0 0 0 1px var(--bd,rgba(255,255,255,.04))}
+.stk.mt::before,.stk.mt::after{display:none}
+.stk.mt .stk-bar::after{display:none}
+.stk.mt .stk-bar{border-radius:14px 0 0 14px}
+.stk.mt .stk-ring{box-shadow:0 0 0 2px var(--ring),0 0 0 6px var(--ring2)}
+.st-ppl{gap:6px}.st-ppl b{font-weight:900}
+.st-hb{display:inline-flex;width:18px;height:18px;border-radius:50%;align-items:center;justify-content:center;background:var(--ring2,rgba(255,255,255,.12));color:var(--ring,#fff)}
+.st-hb svg{width:11px;height:11px;fill:currentColor;stroke:none;animation:stBeat 2.4s ease-in-out infinite}
+@keyframes stBeat{0%,60%,100%{transform:scale(1)}10%{transform:scale(1.22)}20%{transform:scale(.95)}30%{transform:scale(1.12)}}
 .th-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px}
 .th-grid button{border-radius:18px;padding:12px;text-align:left;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
 .th-grid button.on{box-shadow:0 0 0 3px #fff,0 0 0 5px var(--mil-green)}
@@ -2120,7 +2132,7 @@ async function adSave() {
 }
 async function adUnlink() { if (!confirm('이 회원의 커플 연동을 해제할까요? 상대방도 함께 해제돼요.')) return; const { error } = await sb.rpc('admin_unlink', { uid: adSel.id }); if (error) return showAlert('실패', adErr(error)); adSel.partner_id = null; adSel.partner_name = null; adEdit(adUsers.indexOf(adSel)); }
 async function adReports() {
-  const b = q('ad-body'); b.innerHTML = `<div class="ad-card"><div class="text-[14px] font-extrabold">실시간 최신화</div><div class="text-[12px] text-[#8B95A1] mt-1 leading-relaxed">매일 아침 9시에 자동으로 하는 일을 지금 바로 실행해요. 끝난 혜택 정리 · 새 혜택 추가 · 적금/카드 내용 검증 · 새로 입대한 스타 추가 (2~4분). 바뀐 내용은 모든 사용자 앱에 바로 반영되고 메일로도 보내요.</div><button id="ad-run" class="ad-btn dark w-full mt-3" onclick="adRun()">지금 최신화</button><div id="ad-runlog" class="text-[11px] text-[#8B95A1] mt-2"></div></div><div id="ad-rl" class="mt-3 space-y-2"><div class="py-10 text-center text-[13px] text-[#8B95A1]">불러오는 중…</div></div>`;
+  const b = q('ad-body'); b.innerHTML = `<div class="ad-card"><div class="text-[14px] font-extrabold">실시간 최신화</div><div class="text-[12px] text-[#8B95A1] mt-1 leading-relaxed">매일 아침 9시에 자동으로 하는 일을 지금 바로 실행해요. 끝난 혜택 정리 · 새 혜택 추가 · 적금/카드 내용 검증 · 새로 입대한 스타 추가 (2~4분). 바뀐 내용은 모든 사용자 앱에 바로 반영되고 메일로도 보내요.</div><button id="ad-run" class="ad-btn dark w-full mt-3" onclick="adRun()">지금 최신화</button><button id="ad-mail" class="ad-btn w-full mt-2" onclick="adMailTest()">테스트 메일 보내기</button><div class="text-[11px] text-[#8B95A1] mt-2">메일은 고쳐야 할 내용이나 새 혜택·새 스타가 있을 때만 와요.</div><div id="ad-runlog" class="text-[11px] text-[#8B95A1] mt-2"></div></div><div id="ad-rl" class="mt-3 space-y-2"><div class="py-10 text-center text-[13px] text-[#8B95A1]">불러오는 중…</div></div>`;
   const { data, error } = await sb.from('content_reports').select('*').order('created_at', { ascending: false }).limit(40);
   const rl = q('ad-rl'); if (error) { rl.innerHTML = `<div class="py-10 text-center text-[13px] text-[#8B95A1]">${adErr(error)}</div>`; return; }
   rl.innerHTML = (data || []).length ? data.map(r => `<div class="ad-card ${r.status === 'done' ? 'opacity-50' : ''}"><div class="flex items-start justify-between gap-2"><b class="text-[14px]">${esc(r.title)}</b><button class="text-[11px] font-extrabold flex-shrink-0 ${r.status === 'done' ? 'text-[#8B95A1]' : 'text-[var(--mil-green)]'}" onclick="adDone(${r.id},'${r.status === 'done' ? 'new' : 'done'}')">${r.status === 'done' ? '되돌리기' : '처리 완료'}</button></div><div class="text-[11px] text-[#8B95A1]">${esc((r.created_at || '').slice(0, 16).replace('T', ' '))}</div>${(r.detail || []).map(i => i.fix ? `<div class="mt-2 text-[12px] leading-relaxed bg-[#F7F8FA] rounded-xl p-2.5"><b>${esc(i.item)}</b><br><span class="text-[#8B95A1]">앱:</span> ${esc(i.ours)}<br><span class="text-[#8B95A1]">검색:</span> ${esc(i.found)}<br><b class="text-[#D94867]">수정: ${esc(i.fix)}</b>${i.source ? ` <a href="${esc(i.source)}" target="_blank" rel="noopener" class="text-[var(--mil-green)] font-bold">근거</a>` : ''}</div>` : `<div class="mt-2 text-[12px] bg-[#F7F8FA] rounded-xl p-2.5"><b>${esc(i.title)}</b> · ${esc(i.start)} ~ ${esc(i.end)}<br>${esc(i.benefit)}</div>`).join('')}</div>`).join('') : '<div class="py-10 text-center text-[13px] text-[#8B95A1]">아직 점검 결과가 없어요</div>';
@@ -2139,6 +2151,16 @@ async function fnErr(error) {
   else if (/groq 4/i.test(m)) hint = 'Groq 오류 (모델 이름 또는 사용량)';
   else if (!st && /fetch|network|Failed to send/i.test(m)) hint = '서버 함수에 연결이 안 돼요 (배포·이름 확인)';
   return `[${st || '연결'}] ${hint ? hint + ' · ' : ''}${m.slice(0, 160)}`;
+}
+async function adMailTest() {
+  const b = q('ad-mail'); b.disabled = true; b.innerText = '보내는 중…';
+  try {
+    const { data, error } = await sb.functions.invoke('content-check', { body: { mode: 'mailtest' } });
+    if (error) b.innerText = '실패 — ' + (await fnErr(error));
+    else if (data.ok) b.innerText = '보냈어요 → ' + data.to + ' (스팸함도 확인)';
+    else b.innerText = '메일 실패 [' + (data.status || '') + '] ' + String(data.error || data.detail || '').slice(0, 120);
+  } catch (e) { b.innerText = '실패'; }
+  b.disabled = false;
 }
 async function adRun() {
   const b = q('ad-run'); if (!b || b.disabled) return; b.innerText = '시작하는 중…'; b.disabled = true;
@@ -2214,7 +2236,17 @@ const STAR_TH = {
   khaki_gold: { n: '카키 골드', bg: 'linear-gradient(155deg,#36412D 0%,#222A1D 100%)', fg: '#fff', sub: 'rgba(255,255,255,.6)', trk: 'rgba(255,255,255,.13)', bar: GOLD, pt: '#fff', cb: '#E3C77E', cf: '#1E2418', ring: '#E3C77E', ring2: 'rgba(227,199,126,.2)', glow: 'rgba(227,199,126,.14)' },
   navy_silver: { n: '미드나잇 실버', bg: 'linear-gradient(155deg,#18233A 0%,#0C1322 100%)', fg: '#fff', sub: 'rgba(255,255,255,.6)', trk: 'rgba(255,255,255,.12)', bar: SILVER, pt: '#fff', cb: '#fff', cf: '#0C1322', ring: '#DDE3EC', ring2: 'rgba(255,255,255,.12)', glow: 'rgba(140,170,230,.16)' },
   ivory_rose: { n: '아이보리 로즈골드', bg: 'linear-gradient(155deg,#FFFCF7 0%,#F6EEE4 100%)', fg: '#2A211C', sub: 'rgba(42,33,28,.5)', trk: 'rgba(42,33,28,.07)', bar: ROSE, pt: '#2A211C', pts: 'none', cb: '#2A211C', cf: '#fff', bd: 'rgba(42,33,28,.08)', ring: '#D9A58B', ring2: 'rgba(217,165,139,.2)', glow: 'rgba(217,165,139,.2)', sheen: 'rgba(255,255,255,.6)' },
-  carbon_gold: { n: '카본 블랙 골드', bg: 'repeating-linear-gradient(45deg,#121212 0 6px,#171717 6px 12px)', fg: '#fff', sub: 'rgba(255,255,255,.58)', trk: 'rgba(255,255,255,.1)', bar: GOLD, pt: '#fff', cb: '#E3C77E', cf: '#121212', ring: '#E3C77E', ring2: 'rgba(227,199,126,.16)', glow: 'rgba(227,199,126,.12)' }
+  carbon_gold: { n: '카본 블랙 골드', bg: 'repeating-linear-gradient(45deg,#121212 0 6px,#171717 6px 12px)', fg: '#fff', sub: 'rgba(255,255,255,.58)', trk: 'rgba(255,255,255,.1)', bar: GOLD, pt: '#fff', cb: '#E3C77E', cf: '#121212', ring: '#E3C77E', ring2: 'rgba(227,199,126,.16)', glow: 'rgba(227,199,126,.12)' },
+  /* ---- 무광 · 제복 ---- */
+  matte_black: { m: 1, n: '무광 블랙', bg: '#1D1D1F', fg: '#F2F2F2', sub: 'rgba(242,242,242,.5)', trk: 'rgba(255,255,255,.08)', bar: 'linear-gradient(90deg,#8D9196,#B9BDC1)', pt: '#fff', pts: 'none', cb: '#E9E9EA', cf: '#1D1D1F', ring: '#B9BDC1', ring2: 'rgba(255,255,255,.06)' },
+  matte_white: { m: 1, n: '무광 화이트', bg: '#EFEFEC', fg: '#1E1F21', sub: 'rgba(30,31,33,.48)', trk: 'rgba(0,0,0,.07)', bar: 'linear-gradient(90deg,#3A3D41,#5C6066)', pt: '#fff', pts: 'none', cb: '#1E1F21', cf: '#EFEFEC', bd: 'rgba(0,0,0,.05)', ring: '#5C6066', ring2: 'rgba(0,0,0,.05)' },
+  army_dress: { m: 1, n: '육군 정복', bg: '#454C3B', fg: '#F3EFE2', sub: 'rgba(243,239,226,.55)', trk: 'rgba(255,255,255,.1)', bar: 'linear-gradient(90deg,#9C8450,#C2A866)', pt: '#fff', pts: 'none', cb: '#C2A866', cf: '#2E3327', ring: '#C2A866', ring2: 'rgba(194,168,102,.18)' },
+  airforce_dress: { m: 1, n: '공군 정복', bg: '#3D5373', fg: '#F2F5FA', sub: 'rgba(242,245,250,.58)', trk: 'rgba(255,255,255,.12)', bar: 'linear-gradient(90deg,#AEB8C6,#DCE2EA)', pt: '#2B3B52', pts: 'none', cb: '#DCE2EA', cf: '#2B3B52', ring: '#DCE2EA', ring2: 'rgba(255,255,255,.12)' },
+  navy_dress: { m: 1, n: '해군 정복', bg: '#1F2433', fg: '#F2EFE6', sub: 'rgba(242,239,230,.55)', trk: 'rgba(255,255,255,.09)', bar: 'linear-gradient(90deg,#A2864C,#C9AC69)', pt: '#fff', pts: 'none', cb: '#C9AC69', cf: '#1F2433', ring: '#C9AC69', ring2: 'rgba(201,172,105,.16)' },
+  navy_summer: { m: 1, n: '해군 하정복', bg: '#F4F3EE', fg: '#1C2130', sub: 'rgba(28,33,48,.5)', trk: 'rgba(28,33,48,.08)', bar: 'linear-gradient(90deg,#1C2130,#3A4260)', pt: '#fff', pts: 'none', cb: '#1C2130', cf: '#F4F3EE', bd: 'rgba(0,0,0,.06)', ring: '#B79A5B', ring2: 'rgba(183,154,91,.2)' },
+  honor_guard: { m: 1, n: '의장대', bg: '#8B2525', fg: '#FFF6EA', sub: 'rgba(255,246,234,.62)', trk: 'rgba(0,0,0,.22)', bar: 'linear-gradient(90deg,#B38E45,#D7B567)', pt: '#2A1010', pts: 'none', cb: '#151515', cf: '#D7B567', ring: '#D7B567', ring2: 'rgba(21,21,21,.35)' },
+  ceremony_grey: { m: 1, n: '예복 그레이', bg: '#62666A', fg: '#F4F4F2', sub: 'rgba(244,244,242,.58)', trk: 'rgba(0,0,0,.18)', bar: 'linear-gradient(90deg,#8E3A35,#B2504A)', pt: '#fff', pts: 'none', cb: '#F4F4F2', cf: '#3E4144', ring: '#B2504A', ring2: 'rgba(178,80,74,.22)' },
+  general_green: { m: 1, n: '장군 정복', bg: '#3B4A3A', fg: '#F1EEE3', sub: 'rgba(241,238,227,.55)', trk: 'rgba(0,0,0,.2)', bar: 'linear-gradient(90deg,#1E1E1E,#3B3B3B)', pt: '#fff', pts: 'none', cb: '#D9C27E', cf: '#2A3329', ring: '#D9C27E', ring2: 'rgba(217,194,126,.18)' }
 };
 const thVars = k => { const t = STAR_TH[k] || STAR_TH.black_gold; return ['bg', 'fg', 'sub', 'trk', 'bar', 'pt', 'pts', 'cb', 'cf', 'bd', 'ring', 'ring2', 'glow', 'sheen'].filter(x => t[x]).map(x => `--${x}:${t[x]}`).join(';'); };
 let STARL = [], starK = {};
@@ -2282,12 +2314,13 @@ function stDdayTxt(I) { return I.pre ? `입대 D-${I.toEnlist}` : I.done ? '전�
 setInterval(() => { if (document.hidden) return; document.querySelectorAll('[data-stp]').forEach(card => { const s = starK[card.dataset.stp]; if (!s) return; const p = starPct(s); const t = card.querySelector('.stk-live'), b = card.querySelector('.stk-bar'); if (t) t.textContent = fmtPct(p); if (b) b.style.width = p + '%'; }); }, 100);
 function stkCard(s, big, anim) {
   const I = starInfo(s), N = stN(s.id), on = N.cheered_today, r = myRow(s.id), th = r ? r.theme : 'black_gold';
-  return `<div class="stk ${anim ? 'st-in' : ''}" data-stp="${s.id}" ${big ? '' : `onclick="openStar('my','${s.id}')"`} style="${thVars(th)};${big ? '' : 'cursor:pointer'}"><div class="relative z-[1]">
+ const TH = STAR_TH[th] || {};
+  return `<div class="stk ${TH.m ? 'mt' : ''} ${anim ? 'st-in' : ''}" data-stp="${s.id}" ${big ? '' : `onclick="openStar('my','${s.id}')"`} style="${thVars(th)};${big ? '' : 'cursor:pointer'}"><div class="relative z-[1]">
    <div class="flex items-center justify-between"><span class="lb">MY스타 · 팬이 된 지 ${fanDays(s.id)}일째</span><span class="lb">${esc(s.g)}</span></div>
    <div class="flex ${big ? 'flex-col text-center' : ''} items-center gap-3.5 mt-3">${starAva(s, big ? 118 : 72, 'stk-ring')}<div class="flex-1 min-w-0 ${big ? 'mt-2' : ''}"><div class="lb">대한민국 ${esc(STAR_SVC[s.t] || '')}</div><div class="text-[13px] font-bold mt-0.5">${esc(I.rank)}</div><div class="${big ? 'text-[32px]' : 'text-[25px]'} font-extrabold leading-tight tracking-tight truncate">${esc(s.n)}</div></div></div>
    <div class="flex justify-between items-end mt-4 mb-1.5 text-[12px]"><span class="truncate"><span class="op">입대</span> <b>${s.e.replace(/-/g, '.')}</b> <span class="op">· 전역</span> <b>${s.d.replace(/-/g, '.')}</b></span><b class="text-[16px] font-black">${stDdayTxt(I)}</b></div>
    <div class="pbar"><div class="stk-bar" style="width:${I.pct}%"></div><div class="stk-live relative px-3.5 h-full flex items-center text-[17px] font-black tabular-nums">${fmtPct(I.pct)}</div></div>
-   <div class="flex items-center justify-between mt-3.5"><span class="st-ppl"><i></i>${N.fans.toLocaleString()}명이 응원중</span><button class="stk-cheer ${on ? 'done' : ''}" onclick="event.stopPropagation();starCheer('${s.id}',this)">${CHEER_SVG}${on ? '오늘 응원 완료' : '응원하기'}</button></div>
+   <div class="flex items-center justify-between mt-3.5"><span class="st-ppl"><span class="st-hb">${CHEER_SVG}</span><span><b>${N.fans.toLocaleString()}</b>명이 응원중</span></span><button class="stk-cheer ${on ? 'done' : ''}" onclick="event.stopPropagation();starCheer('${s.id}',this)">${CHEER_SVG}${on ? '오늘 응원 완료' : '응원하기'}</button></div>
   </div></div>`;
 }
 let stHomeSig = '';
@@ -2342,7 +2375,11 @@ function starSheet(id) {
 }
 function stSheetClose() { const el = q('star-sheet'); el.classList.remove('show'); setTimeout(() => el.classList.add('hidden'), 320); }
 /* 테마 고르기 */
-function thGrid(cur, fn) { return `<div class="th-grid">${Object.keys(STAR_TH).map(k => { const t = STAR_TH[k]; return `<button class="${cur === k ? 'on' : ''}" style="background:${t.bg};color:${t.fg}" onclick="${fn}('${k}')"><div class="tn">${t.n}</div><div class="tb" style="background:${t.trk}"><i style="background:${t.bar}"></i></div></button>`; }).join('')}</div>`; }
+function thGrid(cur, fn) {
+  const btn = k => { const t = STAR_TH[k]; return `<button class="${cur === k ? 'on' : ''} ${t.m ? 'mt' : ''}" style="background:${t.bg};color:${t.fg}" onclick="${fn}('${k}')"><div class="tn">${t.n}</div><div class="tb" style="background:${t.trk}"><i style="background:${t.bar}"></i></div></button>`; };
+  const K = Object.keys(STAR_TH), gl = K.filter(k => !STAR_TH[k].m), mt = K.filter(k => STAR_TH[k].m);
+  return `<div class="th-h">유광</div><div class="th-grid">${gl.map(btn).join('')}</div><div class="th-h">무광 · 제복</div><div class="th-grid">${mt.map(btn).join('')}</div>`;
+}
 function thSheet(id) {
   const r = myRow(id), s = starK[id]; if (!r) return; window._thId = id; window._thDraft = r.theme;
   sheetOpen(`<div class="w-10 h-1.5 rounded-full bg-[#E5E8EB] mx-auto -mt-1 mb-4"></div><div class="text-[20px] font-extrabold">프로필 테마</div><div class="text-[13px] text-[#8B95A1] mt-1">${esc(s.n)} 프로필 카드의 색을 고르고 저장하세요</div><div id="th-prev" class="mt-4">${thPrev(id, r.theme)}</div>${thGrid(r.theme, 'thPick')}
