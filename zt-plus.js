@@ -111,13 +111,17 @@ function zpToast(t) { const d = document.createElement('div'); d.className = 'zp
 .pcf-pc_star::after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 12% 8%,#FFE7A3 0 .8cqw,transparent 1.4cqw),radial-gradient(circle at 88% 15%,#fff 0 .6cqw,transparent 1.2cqw),radial-gradient(circle at 92% 90%,#FFE7A3 0 .9cqw,transparent 1.6cqw),radial-gradient(circle at 6% 85%,#fff 0 .5cqw,transparent 1.1cqw);animation:zpTw 2.4s ease-in-out infinite alternate}
 @keyframes zpTw{to{opacity:.4}}
 .zp-pcv .x{position:absolute;top:max(18px,env(safe-area-inset-top));right:18px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;font-size:24px;line-height:1}
-.zp-pcv .cw{perspective:1100px;touch-action:pan-y;-webkit-box-reflect:below 12px linear-gradient(transparent 82%,rgba(255,255,255,.2));animation:zpPop .45s cubic-bezier(.2,1.4,.4,1)}
-.zp-pcv .cube{position:relative;width:100%;height:100%;transform-style:preserve-3d}
-.zp-pcv .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
-.zp-pcv .face .pc2{width:100%;height:100%;aspect-ratio:auto;box-shadow:0 24px 50px rgba(0,0,0,.35)}
-.zp-pcv .face::after{content:'';position:absolute;inset:0;border-radius:14px;pointer-events:none;background:linear-gradient(105deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,.08) 40%,rgba(0,0,0,.25) 100%);opacity:calc(var(--sh,0) * .9)}
+.zp-pchome{display:flex;flex-direction:column;align-items:center;padding:6px 0 4px}
+.zp-pchome .cw,.zp-pcv .cw{perspective:1100px;touch-action:pan-y;-webkit-box-reflect:below 12px linear-gradient(transparent 82%,rgba(255,255,255,.2));animation:zpPop .45s cubic-bezier(.2,1.4,.4,1)}
+.zp-pchome .cube,.zp-pcv .cube{position:relative;width:100%;height:100%;transform-style:preserve-3d}
+.zp-pchome .face,.zp-pcv .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.zp-pchome .face .pc2,.zp-pcv .face .pc2{width:100%;height:100%;aspect-ratio:auto;box-shadow:0 24px 50px rgba(0,0,0,.35)}
+.zp-pchome .face::after,.zp-pcv .face::after{content:'';position:absolute;inset:0;border-radius:14px;pointer-events:none;background:linear-gradient(105deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,.08) 40%,rgba(0,0,0,.25) 100%);opacity:calc(var(--sh,0) * .9)}
 .zp-pcv .nav{display:flex;align-items:center;gap:14px;margin-top:96px}
 .zp-pcv .nav button{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;font-size:20px;font-weight:700}
+.zp-pchome .cw{-webkit-box-reflect:below 10px linear-gradient(transparent 86%,rgba(255,255,255,.09))}
+.zp-pchome .dots{display:flex;gap:6px;margin-top:52px;min-height:7px}.zp-pchome .dots i{width:7px;height:7px;border-radius:99px;background:#D5D9DE;transition:all .25s}.zp-pchome .dots i.on{width:18px;background:#191F28}.zp-pchome .dots i.add{background:transparent;box-shadow:inset 0 0 0 1.5px #B0B8C1}.zp-pchome .dots i.add.on{background:#B0B8C1}
+.zp-pchome .face .pc2{box-shadow:0 18px 36px rgba(17,20,26,.22)}
 .zp-pcv .dots{display:flex;gap:6px}.zp-pcv .dots i{width:7px;height:7px;border-radius:99px;background:rgba(255,255,255,.35);transition:all .25s}.zp-pcv .dots i.on{width:18px;background:#fff}
 .zp-pc-add{width:100%;border:2px dashed #D1D6DB;border-radius:24px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#8B95A1;text-align:center;padding:22px}
 .zp-pc-add .plus{width:56px;height:56px;border-radius:50%;background:#F2F3F5;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:300;color:#4E5968}
@@ -449,8 +453,12 @@ function zpPCHTML(c, mini, edit) {
 function zpPCHome() {
   const box = q('zp-pc-home'); if (!box) return;
   if (!zp.pcs.length) { box.innerHTML = `<button class="zp-pc-add" style="min-height:236px" onclick="zpPCNew()"><span class="plus">+</span><b class="text-[15px] text-[#191F28]">무궁화를 모으고 포토카드를 만들어 추가하세요</b><span class="text-[12px]">상점에서 포토카드 틀을 사면 원하는 사진으로 꾸밀 수 있어요</span></button>`; return; }
-  box.innerHTML = `<div class="zp-card"><div class="flex items-center justify-between mb-3"><h3 class="text-[16px] font-bold">내 포토카드 <span class="text-[#8B95A1] font-semibold text-[13px]">${zp.pcs.length}</span></h3><button onclick="zpOpenShop('frame')" class="text-[12px] font-bold text-[#8B95A1]">틀 사러가기 ›</button></div>
-   <div class="zp-pcs">${zp.pcs.map(c => `<button onclick="zpPCView(${c.id})" class="text-left">${zpPCHTML(c, true)}</button>`).join('')}<button class="zp-pc-add" style="aspect-ratio:2/3;border-radius:14px;padding:8px" onclick="zpPCNew()"><span class="plus" style="width:40px;height:40px;font-size:24px">+</span><span class="text-[11px] font-bold">새 포토카드</span></button></div></div>`;
+  /* 큰 포토카드 한 장 · 옆으로 밀면 큐브처럼 돌아가요 (마지막 면은 새 포토카드 추가) */
+  const W = Math.min(innerWidth * .74, 300), n = zp.pcs.length + 1;
+  zp.pcIdx = Math.min(zp.pcIdx || 0, n - 1);
+  box.innerHTML = `<div class="zp-pchome"><div class="cw" style="width:${W}px;height:${W * 1.5}px"><div class="cube"><div class="face f0"></div><div class="face f1"></div></div></div><div class="dots"></div></div>`;
+  const face = i => i < zp.pcs.length ? zpPCHTML(zp.pcs[i]) : `<div class="zp-pc-add" style="height:100%;border-radius:14px;padding:20px"><span class="plus">+</span><b class="text-[14px] text-[#191F28]">새 포토카드 만들기</b><span class="text-[11px]">상점에서 틀을 사면 원하는 사진으로 꾸밀 수 있어요</span></div>`;
+  zpCube(box.querySelector('.cw'), { n, idx: zp.pcIdx, face, onIndex: i => { zp.pcIdx = i; const d = box.querySelector('.dots'); if (d) d.innerHTML = n > 1 ? Array.from({ length: n }, (_, k) => `<i class="${k === i ? 'on' : ''} ${k === n - 1 ? 'add' : ''}"></i>`).join('') : ''; }, onTap: i => i < zp.pcs.length ? zpPCView(zp.pcs[i].id) : zpPCNew() });
 }
 function zpPCNew() {
   const fr = Object.keys(ZP_ITEMS).filter(k => ZP_ITEMS[k].k === 'frame' && zp.owned.has(k));
@@ -458,6 +466,33 @@ function zpPCNew() {
   zpPCEdit(null, fr[0]);
 }
 /* 포토카드 크게 보기 — 옆으로 밀면 큐브처럼 돌아가며 다음 카드로 */
+/* 큐브 넘기기 (홈 · 크게 보기 공용) */
+function zpCube(cw, o) {
+  const cube = cw.querySelector('.cube'), f0 = cw.querySelector('.f0'), f1 = cw.querySelector('.f1'), W = cw.offsetWidth || parseFloat(cw.style.width), half = W / 2;
+  let idx = o.idx || 0, busy = false;
+  const setA = (a, anim) => { cube.style.transition = anim ? 'transform .55s cubic-bezier(.3,.9,.3,1)' : 'none'; cube.style.transform = `translateZ(${-half}px) rotateY(${a}deg)`; const k = Math.min(1, Math.abs(a) / 90); f0.style.setProperty('--sh', k.toFixed(3)); f1.style.setProperty('--sh', (1 - k).toFixed(3)); };
+  const paint = () => { f0.innerHTML = o.face(idx); f0.style.transform = `rotateY(0deg) translateZ(${half}px)`; f1.style.visibility = 'hidden'; setA(0, false); o.onIndex && o.onIndex(idx); };
+  const side = dir => { const j = idx + dir; if (j < 0 || j >= o.n) return false; f1.innerHTML = o.face(j); f1.style.transform = `rotateY(${dir * 90}deg) translateZ(${half}px)`; f1.style.visibility = 'visible'; return true; };
+  const go = dir => { if (busy) return; if (!side(dir)) { setA(dir * -8, true); setTimeout(() => setA(0, true), 160); return; } busy = true; setA(-dir * 90, true); setTimeout(() => { idx += dir; paint(); busy = false; }, 560); };
+  paint();
+  let sx = null, sy = 0, dx = 0, dir = 0, ok = false, horiz = null;
+  cw.addEventListener('pointerdown', e => { if (busy) return; sx = e.clientX; sy = e.clientY; dx = 0; dir = 0; horiz = null; });
+  cw.addEventListener('pointermove', e => {
+    if (sx === null) return; dx = e.clientX - sx; const dy = e.clientY - sy;
+    if (horiz === null && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) { horiz = Math.abs(dx) > Math.abs(dy); if (horiz) try { cw.setPointerCapture(e.pointerId); } catch (x) { } }
+    if (!horiz) return;
+    const d = dx < 0 ? 1 : -1; if (d !== dir) { dir = d; ok = side(dir); }
+    setA(ok ? Math.max(-90, Math.min(90, dx / W * 110)) : dx / W * 18, false);
+  });
+  const end = () => {
+    if (sx === null) return; const was = horiz; sx = null;
+    if (!was) { if (Math.abs(dx) < 6 && o.onTap) o.onTap(idx); return; }
+    if (ok && Math.abs(dx) > W * .22) { busy = true; setA(-dir * 90, true); setTimeout(() => { idx += dir; paint(); busy = false; }, 560); } else setA(0, true);
+  };
+  cw.addEventListener('pointerup', end); cw.addEventListener('pointercancel', () => { sx = null; setA(0, true); });
+  return { go, get idx() { return idx; } };
+}
+/* 포토카드 크게 보기 */
 function zpPCView(id) {
   let idx = zp.pcs.findIndex(x => x.id === id); if (idx < 0) return;
   const ov = document.createElement('div'); ov.className = 'zp-ov zp-pcv';
@@ -466,30 +501,11 @@ function zpPCView(id) {
    <div class="nav"><button class="pv" aria-label="이전">‹</button><div class="dots"></div><button class="nx" aria-label="다음">›</button></div>
    <div class="flex gap-2 mt-5"><button class="ok ed" style="margin:0;padding:13px 26px">꾸미기</button><button class="ok dl" style="margin:0;padding:13px 22px;background:rgba(255,255,255,.16);color:#fff">삭제</button></div>`;
   document.body.appendChild(ov);
-  const cube = ov.querySelector('.cube'), f0 = ov.querySelector('.f0'), f1 = ov.querySelector('.f1'), half = W / 2;
-  const setA = (a, anim) => { cube.style.transition = anim ? 'transform .5s cubic-bezier(.3,.9,.3,1)' : 'none'; cube.style.transform = `translateZ(${-half}px) rotateY(${a}deg)`; const k = Math.min(1, Math.abs(a) / 90); f0.style.setProperty('--sh', k.toFixed(3)); f1.style.setProperty('--sh', (1 - k).toFixed(3)); };
-  const paint = () => {
-    f0.innerHTML = zpPCHTML(zp.pcs[idx]); f0.style.transform = `rotateY(0deg) translateZ(${half}px)`; f1.style.visibility = 'hidden';
-    ov.querySelector('.dots').innerHTML = zp.pcs.length > 1 ? zp.pcs.map((_, i) => `<i class="${i === idx ? 'on' : ''}"></i>`).join('') : '';
-    ov.querySelector('.pv').style.opacity = idx > 0 ? 1 : .25; ov.querySelector('.nx').style.opacity = idx < zp.pcs.length - 1 ? 1 : .25; setA(0, false);
-  };
-  const side = dir => { const j = idx + dir; if (j < 0 || j >= zp.pcs.length) return false; f1.innerHTML = zpPCHTML(zp.pcs[j]); f1.style.transform = `rotateY(${dir * 90}deg) translateZ(${half}px)`; f1.style.visibility = 'visible'; return true; };
-  let busy = false;
-  const go = dir => { if (busy || !side(dir)) { setA(dir * -8, true); setTimeout(() => setA(0, true), 160); return; } busy = true; setA(-dir * 90, true); setTimeout(() => { idx += dir; paint(); busy = false; }, 510); };
-  paint();
-  ov.querySelector('.pv').onclick = () => go(-1); ov.querySelector('.nx').onclick = () => go(1);
+  const C = zpCube(ov.querySelector('.cw'), { n: zp.pcs.length, idx, face: i => zpPCHTML(zp.pcs[i]), onIndex: i => { idx = i; ov.querySelector('.dots').innerHTML = zp.pcs.length > 1 ? zp.pcs.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('') : ''; ov.querySelector('.pv').style.opacity = i > 0 ? 1 : .25; ov.querySelector('.nx').style.opacity = i < zp.pcs.length - 1 ? 1 : .25; } });
+  ov.querySelector('.pv').onclick = () => C.go(-1); ov.querySelector('.nx').onclick = () => C.go(1);
   ov.querySelector('.x').onclick = () => ov.remove(); ov.onclick = e => { if (e.target === ov) ov.remove(); };
   ov.querySelector('.ed').onclick = () => { const c = zp.pcs[idx]; ov.remove(); zpPCEdit(c.id); };
   ov.querySelector('.dl').onclick = e => zpPCDel(zp.pcs[idx].id, e.currentTarget);
-  const cw = ov.querySelector('.cw'); let sx = null, dx = 0, dir = 0, ok = false;
-  cw.addEventListener('pointerdown', e => { if (busy) return; sx = e.clientX; dx = 0; dir = 0; cw.setPointerCapture(e.pointerId); });
-  cw.addEventListener('pointermove', e => {
-    if (sx === null) return; dx = e.clientX - sx; const d = dx < 0 ? 1 : -1;
-    if (d !== dir) { dir = d; ok = side(dir); }
-    const a = ok ? Math.max(-90, Math.min(90, dx / W * 110)) : dx / W * 18; setA(a, false);
-  });
-  const end = () => { if (sx === null) return; sx = null; if (ok && Math.abs(dx) > W * .22) { busy = true; setA(-dir * 90, true); setTimeout(() => { idx += dir; paint(); busy = false; }, 510); } else setA(0, true); };
-  cw.addEventListener('pointerup', end); cw.addEventListener('pointercancel', end);
 }
 async function zpPCDel(id, b) {
   if (!(await zConfirm('이 포토카드를 삭제할까요?', { ok: '삭제', danger: true }))) return;
