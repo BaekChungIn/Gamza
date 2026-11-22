@@ -2155,10 +2155,10 @@ async function adRun() {
     try { const { data } = await sb.from('app_content').select('key,data').in('key', ['run_log_content', 'run_log_stars']); (data || []).forEach(r => { if (r.data && r.data.at >= t0) { if (r.key === 'run_log_content') lc = r.data; else ls = r.data; } }); } catch (e) { }
     const el = q('ad-runlog'); if (el) el.innerText = [show(lc, '혜택·적금·카드'), show(ls, 'MY스타'), ...errs].join('\n');
     const dC = lc && (lc.lines || []).some(l => /검증 완료|오류/.test(l)), dS = ls && (ls.lines || []).some(l => /스타 확인 완료|오류/.test(l));
-    if ((dC && dS) || n > 90) {
+    if ((dC && dS) || n > 150) {
       const bb = q('ad-run'); if (bb) { bb.innerText = '지금 최신화'; bb.disabled = false; }
       const keep = el ? el.innerText : ''; await loadContent(); await loadMyStars(); stRefresh(); if (curTab === 'benefits') renderBenefits(); if (curTab === 'savings') renderSav();
-      if (adT === 'reports' && q('modal-admin').classList.contains('flex')) { await adReports(); if (q('ad-runlog')) q('ad-runlog').innerText = keep + (n > 90 ? '\n(시간이 오래 걸려 화면 갱신을 멈췄어요. 결과는 메일과 점검 결과에서 확인하세요)' : '\n✓ 최신화 완료'); }
+      if (adT === 'reports' && q('modal-admin').classList.contains('flex')) { await adReports(); if (q('ad-runlog')) q('ad-runlog').innerText = keep + (n > 150 ? '\n(시간이 오래 걸려 화면 갱신을 멈췄어요. 결과는 메일과 점검 결과에서 확인하세요)' : '\n✓ 최신화 완료'); }
       return;
     }
     setTimeout(tick, 4000);

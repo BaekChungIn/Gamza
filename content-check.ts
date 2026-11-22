@@ -117,6 +117,8 @@ Deno.serve(async (req) => {
     return json(out);
   }
   // 일은 뒤에서 하고, 요청에는 바로 답해요 (연결이 오래 걸려 끊기지 않게)
+  // 다음 단계 호출에도 같은 로그인 정보를 넘겨요 (Verify JWT 가 켜져 있어도 통과)
+  FWD = { auth: req.headers.get('Authorization') ?? '', apikey: req.headers.get('apikey') ?? '' };
   const task = runTask(body);
   try { EdgeRuntime.waitUntil(task); } catch { await task; }
   return json({ ok: true, started: true, mode: body.mode || 'content' });
@@ -146,13 +148,15 @@ async function runTask(body: any) {
     } else if (mode === 'verify') {
       const checks = await buildChecks(T);
       const part = checks.slice(offset, offset + STEP);
-      for (const c of part) {
-        const ev2 = await search(c.query);
-        if (!ev2.length) continue;
-        const r = await groq(CHECK_SYS, JSON.stringify({ 항목: c.name, ours: c.ours, evidence: ev2 }));
-        const issues = (r.issues ?? []).filter((x: any) => x && x.fix && x.confidence !== 'low');
-        if (issues.length) reports.push({ kind: c.kind, title: `${c.name} — 확인 필요 ${issues.length}건`, detail: issues });
-      }
+      await Promise.all(part.map(async (c) => {
+        try {
+          const ev2 = await search(c.query);
+          if (!ev2.length) return;
+          const r = await groq(CHECK_SYS, JSON.stringify({ 항목: c.name, ours: c.ours, evidence: ev2.slice(0, 10).map((x: any) => ({ t: x.title, d: String(x.desc).slice(0, 180), u: x.url })) }));
+          const issues = (r.issues ?? []).filter((x: any) => x && x.fix && x.confidence !== 'low');
+          if (issues.length) reports.push({ kind: c.kind, title: `${c.name} — 확인 필요 ${issues.length}건`, detail: issues });
+        } catch (e) { log.push(c.name + ' 건너뜀'); }
+      }));
       if (reports.length) await saveReports(reports, log);
       log.push(`검증 ${Math.min(offset + STEP, checks.length)}/${checks.length}`);
       if (offset + STEP < checks.length) { chain({ mode: 'verify', offset: offset + STEP, run }); log.push('다음 묶음 이어서 진행'); }
@@ -186,8 +190,13 @@ async function saveReports(reports: any[], log: string[]) {
   const { error } = await db.from('content_reports').insert(reports);
   if (error) log.push('점검 결과 저장 실패: ' + error.message);
 }
+let FWD = { auth: '', apikey: '' };
 function chain(next: any) {
-  const p = fetch(env('SUPABASE_URL') + '/functions/v1/content-check', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-cron-key': CRON_KEY }, body: JSON.stringify(next) }).catch(() => null);
+  const h: Record<string, string> = { 'Content-Type': 'application/json', 'x-cron-key': CRON_KEY };
+  if (FWD.auth) h.Authorization = FWD.auth; if (FWD.apikey) h.apikey = FWD.apikey;
+  const p = fetch(env('SUPABASE_URL') + '/functions/v1/content-check', { method: 'POST', headers: h, body: JSON.stringify(next) })
+    .then(async (r) => { if (!r.ok) await runLog('run_log_content', String(next.run || ''), false, ['다음 단계 호출 실패 ' + r.status + ' ' + (await r.text()).slice(0, 120)], 'chain'); })
+    .catch((e) => runLog('run_log_content', String(next.run || ''), false, ['다음 단계 호출 실패 ' + String(e).slice(0, 120)], 'chain'));
   try { EdgeRuntime.waitUntil(p); } catch { /* 로컬 */ }
 }
 async function stepEvents(T: string, reports: any[], log: string[]) {
