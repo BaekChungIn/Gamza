@@ -224,6 +224,11 @@ async function stepEvents(T: string, reports: any[], log: string[]) {
 JSON 으로만: {"events":[{"title":"","org":"","benefit":"","target":"","start":"","end":"","note":"","url":""}]}`,
       JSON.stringify({ existing: events.map((e) => e.title), news: uniq.map((n) => ({ t: n.title, d: n.desc.slice(0, 160), u: n.url, p: n.date })) }));
     const add = (found.events ?? []).filter((e: any) => e && e.title && e.end && e.end >= T && /^\d{4}-\d{2}-\d{2}$/.test(e.end) && !events.some((x) => x.title === e.title || (e.url && x.url === e.url)));
+    // 보안: AI 가 만든 값은 정해진 칸·길이만 남기고, 링크는 실제 뉴스 주소(https)만 허용해요
+    const okUrls = new Set(uniq.map((n) => n.url));
+    const S = (v: any, n: number) => String(v ?? '').replace(/[<>]/g, '').slice(0, n);
+    const clean = add.map((e: any) => ({ title: S(e.title, 80), org: S(e.org, 40), benefit: S(e.benefit, 160), target: S(e.target, 60), start: /^\d{4}-\d{2}-\d{2}$/.test(e.start) ? e.start : '', end: e.end, note: S(e.note, 120), url: (/^https?:\/\//i.test(e.url) && okUrls.has(e.url)) ? S(e.url, 500) : '' }));
+    add.length = 0; clean.forEach((e: any) => add.push(e));
     add.forEach((e: any) => { e.auto = true; e.added = T; events.push(e); });
     if (add.length) reports.push({ kind: 'new_event', title: `새 혜택 이벤트 ${add.length}개를 자동으로 추가했어요`, detail: add });
     added = add.length; log.push(`새 이벤트 ${add.length}`);

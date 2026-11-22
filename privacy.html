@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>짬타이거 개인정보처리방침</title>
+<style>
+:root{--fg:#191F28;--sub:#4E5968;--line:#E5E8EB;--bg:#F7F8F9;--card:#fff;--accent:#6B7B5C}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--fg:#F2F4F6;--sub:#B0B8C1;--line:#333D4B;--bg:#17171C;--card:#202027;--accent:#9BAE87}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;line-height:1.7;font-size:15px}
+main{max-width:720px;margin:0 auto;padding:32px 16px 64px}
+h1{font-size:26px;margin:0 0 4px;letter-spacing:-.5px}.d{color:var(--sub);font-size:13px;margin-bottom:24px}
+section{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px;margin-bottom:14px}
+h2{font-size:17px;margin:0 0 8px;color:var(--accent)}ul{margin:6px 0 0;padding-left:20px}li{margin:3px 0}p{margin:6px 0}
+table{width:100%;border-collapse:collapse;font-size:14px}td,th{border-top:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top}th{color:var(--sub);font-weight:600;width:34%}
+</style>
+</head>
+<body><main>
+<h1>짬타이거 개인정보처리방침</h1>
+<div class="d">시행일: 2026년 11월 22일</div>
+
+<section><h2>1. 수집하는 정보</h2>
+<table>
+<tr><th>회원 가입</th><td>이메일 주소, 비밀번호(암호화되어 저장)</td></tr>
+<tr><th>프로필</th><td>닉네임, 회원 종류(군인·곰신·팬), 프로필 사진(직접 올린 경우), 상태 메시지</td></tr>
+<tr><th>복무 정보</th><td>군종, 입대일, 전역일, 부대명(선택), 휴가·외박·외출 일정</td></tr>
+<tr><th>서비스 이용 기록</th><td>연인·친구 연동 정보, 편지, Q&A·일기 답변, 커뮤니티 글·댓글, MY스타 등록 정보와 응원 기록, 적금·장바구니 설정</td></tr>
+<tr id="loc"><th>위치(선택)</th><td>‘집으로 가기’ 경로 찾기에서 현재 위치 사용을 허용한 경우에만 그 순간의 위치를 사용하며 서버에 저장하지 않아요. 위치 이용 동의는 선택이며, 동의하지 않아도 출발지를 직접 검색해 쓸 수 있어요</td></tr>
+<tr><th>동의 기록</th><td>약관·개인정보 동의 시각, 위치정보 동의 여부</td></tr>
+</table></section>
+
+<section><h2>2. 이용 목적</h2>
+<ul><li>전역일·진급일·복무율 계산 등 앱 기능 제공</li><li>연인·친구 연동, 편지·질문 등 사용자 간 기능 제공</li><li>커뮤니티 운영과 부적절한 게시물 관리</li><li>문의 응대와 오류 수정</li></ul></section>
+
+<section><h2>3. 보관 기간과 파기</h2>
+<p>회원 탈퇴 시 지체 없이 삭제해요. 법령에 따라 보관이 필요한 경우에는 그 기간 동안만 보관한 뒤 삭제해요.</p></section>
+
+<section><h2>4. 처리를 맡기는 곳 (위탁·외부 서비스)</h2>
+<ul>
+<li><b>Supabase</b> — 회원 인증과 데이터 저장</li>
+<li><b>GitHub Pages</b> — 앱 화면 제공</li>
+<li><b>카카오맵</b> — 장소 검색과 지도(검색어·위치만 전달)</li>
+<li><b>OpenStreetMap(Nominatim)</b> — 현재 위치를 주소로 바꾸기(좌표만 전달, 위치 이용에 동의한 경우)</li>
+<li><b>네이버 검색 API</b> — 상품·스타 사진과 공개 뉴스 검색(개인정보는 전달하지 않음)</li>
+<li><b>Groq</b> — 공개된 혜택 정보 검증(개인정보는 전달하지 않음)</li>
+<li><b>Resend</b> — 운영자 알림 메일 발송(사용자 정보는 포함하지 않음)</li>
+</ul></section>
+
+<section><h2>5. 제3자 제공</h2>
+<p>이용자의 개인정보를 외부에 판매하거나 제공하지 않아요. 단, 법령에 따른 요청이 있는 경우는 예외예요.</p></section>
+
+<section id="delete"><h2>6. 이용자의 권리와 계정 삭제</h2>
+<p>앱 설정에서 언제든지 정보를 확인·수정할 수 있어요.</p>
+<p><b>계정 삭제 방법</b></p>
+<ul><li>앱에서: 설정 → <b>계정</b> → <b>회원 탈퇴</b></li>
+<li>앱을 쓸 수 없을 때: 가입한 이메일로 micbael11@naver.com 에 '계정 삭제 요청'을 보내면 7일 안에 처리해요</li></ul>
+<p>탈퇴하면 프로필, 복무 정보, 편지, 질문 답변, MY스타 기록, 장바구니가 바로 삭제돼요. 커뮤니티에 쓴 글과 댓글도 함께 삭제돼요.</p></section>
+
+<section><h2>6-1. 개인정보를 지키는 방법 (안전성 확보 조치)</h2>
+<ul><li>비밀번호는 되돌릴 수 없는 방식(해시)으로 바꿔 저장해 운영자도 볼 수 없어요</li>
+<li>모든 통신은 HTTPS로 암호화돼요</li>
+<li>데이터베이스는 '본인 것만 읽고 쓰기' 규칙(행 수준 보안)으로 다른 사람의 정보에 접근할 수 없어요</li>
+<li>로그인 실패가 반복되면 잠시 로그인을 막아요</li>
+<li>외부 서비스 열쇠(API 키)는 앱 화면이 아니라 서버에만 보관해요</li></ul></section>
+
+<section><h2>7. 아동의 개인정보</h2>
+<p>만 14세 미만은 가입할 수 없어요. 가입할 때 만 14세 이상임을 확인해요.</p></section>
+
+<section><h2>8. 문의</h2>
+<p>개인정보 보호 담당: 짬타이거 운영자<br>이메일: micbael11@naver.com</p></section>
+
+<section><h2>9. 변경</h2>
+<p>이 방침이 바뀌면 앱 공지 또는 이 페이지를 통해 알려드려요.</p></section>
+</main></body>
+</html>

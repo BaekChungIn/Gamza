@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>짬타이거</title>
 <meta name="description" content="군인과 곰신, 그리고 군 복무 중인 스타를 기다리는 팬들을 위한 군생활 앱">
+<meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'; form-action 'self'">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#6B7B5C">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -66,6 +67,12 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 .in-card{border-radius:24px;padding:18px;box-shadow:0 10px 30px rgba(25,31,40,.10);border:1px solid rgba(0,0,0,.04)}
 .in-chip{font-size:12px;font-weight:700;background:#fff;border:1px solid #E5E8EB;border-radius:99px;padding:6px 12px}
 .in-t{text-align:center}.in-k{font-size:15px;color:#6B7684;font-weight:500}.in-h{font-size:30px;font-weight:900;letter-spacing:-.03em;margin:4px 0 10px;color:#191F28}.in-d{font-size:13.5px;line-height:1.65;color:#8B95A1}
+.cs{border:1px solid #E5E8EB;border-radius:16px;padding:4px 14px;background:#fff;text-align:left}
+.cs label{display:flex;align-items:center;gap:10px;padding:9px 0;font-size:13px;color:#4E5968;cursor:pointer}
+.cs label.all{font-weight:800;color:#191F28;font-size:14px;border-bottom:1px solid #F2F3F5}
+.cs input{width:20px;height:20px;accent-color:var(--mil-green);flex-shrink:0}
+.cs a{margin-left:auto;font-size:12px;color:#8B95A1;text-decoration:underline;flex-shrink:0;padding-left:6px}
+.legal a{text-decoration:underline}
 </style>
 <style>
 .swp{position:absolute;inset:0;display:flex;flex-direction:column;background:#fff}
@@ -473,6 +480,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
   <div class="pb-6">
    <button onclick="googleAuth()" class="w-full h-14 rounded-2xl flex items-center justify-center gap-2.5 bg-white border border-[#E5E8EB] font-bold text-[15px] active:scale-[.98] transition"><svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>Google로 계속하기</button>
    <button onclick="authView('email')" class="w-full h-12 mt-2 text-[14px] font-semibold text-[#4E5968]">이메일로 계속하기</button>
+   <div class="legal text-center text-[11px] text-[#8B95A1] mt-2"><a href="terms.html" target="_blank" rel="noopener">이용약관</a> · <a href="privacy.html" target="_blank" rel="noopener"><b>개인정보처리방침</b></a></div>
   </div>
  </div>
  <div id="auth-email-view" class="hidden flex-1 flex-col px-6 min-h-0 overflow-y-auto no-scrollbar">
@@ -481,7 +489,8 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
   <p class="text-[14px] text-[#8B95A1] mt-2 mb-8" id="auth-subtitle">계정을 연결하고 연인과 데이터를 동기화하세요.</p></div>
   <div class="w-full space-y-3 mb-5">
    <input type="email" id="auth-email" placeholder="이메일 주소" class="inp" autocomplete="email">
-   <input type="password" id="auth-password" placeholder="비밀번호 (6자리 이상)" class="inp" autocomplete="current-password">
+   <input type="password" id="auth-password" placeholder="비밀번호" class="inp" autocomplete="current-password">
+   <div id="auth-forgot" class="text-right -mt-1"><button onclick="forgotPw()" class="text-[12px] text-[#8B95A1] underline px-1 py-1">비밀번호를 잊으셨나요?</button></div>
    <div id="auth-signup-fields" class="hidden space-y-3">
     <input type="password" id="auth-password-confirm" placeholder="비밀번호 재확인" class="inp">
     <div class="flex gap-2">
@@ -489,6 +498,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
      <button id="btn-gender-F" onclick="setGender('F')" class="flex-1 py-3 rounded-xl border-2 border-[#E5E8EB] bg-[#F5F6F8] text-[#8B95A1] font-bold text-[13px]">여자 (곰신)</button>
      <button id="btn-gender-S" onclick="setGender('S')" class="flex-1 py-3 rounded-xl border-2 border-[#E5E8EB] bg-[#F5F6F8] text-[#8B95A1] font-bold text-[13px]">팬 (MY스타)</button>
     </div>
+    <div id="su-consent"></div>
    </div>
   </div>
   <button id="btn-auth-submit" onclick="submitAuth()" class="w-full h-14 bg-[#191F28] text-white rounded-2xl font-bold text-[15px] active:scale-[.98] transition mb-4">이메일로 로그인</button>
@@ -510,6 +520,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
    <p id="ob-star-box" class="hidden text-[13px] text-[#4E5968]">다음 화면에서 기다릴 MY스타를 골라요. 스타의 복무 기간이 홈에 나타나요 ⭐</p>
    <p id="ob-f-note" class="hidden text-[13px] text-[#4E5968]">곰신은 입대 정보 없이 시작해요. 설정에서 내 연결 코드를 남자친구에게 알려주고 연동하면 남자친구의 복무 정보가 나타납니다 💕</p>
   </div>
+  <div id="ob-consent" class="hidden mt-6"></div>
   <button onclick="completeOnboarding()" class="w-full mt-8 bg-[var(--mil-green)] text-white py-4 rounded-xl font-bold text-[15px] active:scale-95 transition">설정 완료하고 시작하기</button>
  </div>
 </div>
@@ -684,7 +695,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
      <div id="set-unit-form"><label class="text-[12px] font-bold text-[#4E5968] block mb-2">부대명</label><input id="set-unit-name" maxlength="30" placeholder="예) 제00사단 00연대 0대대" class="inp mb-4"><label class="text-[12px] font-bold text-[#4E5968] block mb-2">부대 위치 (선택 · 집으로가기 출발지로 쓰여요)</label><div class="relative mb-5"><input id="set-unit-addr" placeholder="부대 주소나 근처 장소 검색" class="inp" autocomplete="off" oninput="placeInput('unit')"><div id="sug-unit" class="hidden absolute z-30 left-0 right-0 bg-white border border-[#E5E8EB] rounded-xl shadow-lg mt-1 max-h-60 overflow-y-auto"></div></div><button onclick="saveUnit()" class="w-full bg-[#191F28] text-white py-3.5 rounded-xl font-bold text-[15px]">자대 등록</button></div></div>
     <div id="set-p-theme" class="hidden px-5 pt-2"><div id="settings-theme-bf" class="hidden"><h4 class="text-[13px] font-bold mb-2">나의 캐릭터 (군인)</h4><div class="grid grid-cols-2 gap-2 mb-5"><button onclick="cTh('bf','gamja')" id="theme-bf-gamja" class="py-3 rounded-xl border-2 font-bold text-[13px]">🥔 감자돌이</button><button onclick="cTh('bf','tiger')" id="theme-bf-tiger" class="py-3 rounded-xl border-2 font-bold text-[13px]">🐯 짬타이거</button></div></div>
      <div id="settings-theme-gf" class="hidden"><h4 class="text-[13px] font-bold mb-2">나의 캐릭터 (곰신)</h4><div class="grid grid-cols-2 gap-2 mb-5"><button onclick="cTh('gf','gomsin')" id="theme-gf-gomsin" class="py-3 rounded-xl border-2 font-bold text-[13px]">🐻 곰신 베어</button><button onclick="cTh('gf','cat')" id="theme-gf-cat" class="py-3 rounded-xl border-2 font-bold text-[13px]">🐈‍⬛ 꽃냥이</button></div></div><button onclick="saveS()" class="w-full bg-[#191F28] text-white py-3.5 rounded-xl font-bold text-[15px]">저장</button></div>
-    <div id="set-p-account" class="hidden px-5 pt-2"><div class="bg-[#F5F6F8] rounded-xl p-4 mb-5"><div class="text-[11px] text-[#8B95A1]">로그인 계정</div><div id="set-acc-email" class="text-[14px] font-bold break-all"></div></div><button onclick="logout()" class="w-full border border-[#E5E8EB] text-[#E5484D] py-3.5 rounded-xl font-bold text-[14px]">로그아웃</button></div>
+    <div id="set-p-account" class="hidden px-5 pt-2"><div class="bg-[#F5F6F8] rounded-xl p-4 mb-5"><div class="text-[11px] text-[#8B95A1]">로그인 계정</div><div id="set-acc-email" class="text-[14px] font-bold break-all"></div></div><button onclick="logout()" class="w-full border border-[#E5E8EB] text-[#E5484D] py-3.5 rounded-xl font-bold text-[14px]">로그아웃</button><button onclick="deleteAccount()" class="w-full mt-6 py-3 text-[13px] text-[#8B95A1] underline">회원 탈퇴</button><p class="text-[11px] text-[#B0B8C1] text-center leading-relaxed mt-1">탈퇴하면 프로필·편지·답변·MY스타 기록이 모두 지워지고 되돌릴 수 없어요.</p></div>
    </div></div></div>
 
  <div id="modal-pop" class="fixed inset-0 z-[120] hidden flex-col items-center overflow-hidden" style="background:linear-gradient(180deg,#fff 0%,#FFF3F5 100%)">
@@ -954,6 +965,9 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
      <p class="text-[11px] text-[#8B95A1]">식단은 부대 밴드·더캠프 공지, 공공데이터포털의 '국방부 식단정보'에서 확인해 옮겨 적을 수 있어요.</p></div>
    </div></div></div>
 
+ <div id="modal-consent" style="z-index:105" class="fixed inset-0 bg-[#191F28]/60 backdrop-blur-sm hidden items-end sm:items-center justify-center"><div class="bg-white w-full max-w-md rounded-t-[28px] sm:rounded-[28px] p-6" style="padding-bottom:max(24px,env(safe-area-inset-bottom))"><h3 class="text-[19px] font-extrabold">약관 동의가 필요해요</h3><p class="text-[13px] text-[#8B95A1] mt-1 mb-4">짬타이거를 계속 쓰려면 아래 필수 항목에 동의해주세요.</p><div id="mc-box"></div><button id="mc-ok" onclick="consentSave()" class="w-full mt-5 h-14 rounded-2xl bg-[#191F28] text-white font-bold text-[15px]">동의하고 계속하기</button><button onclick="logout()" class="w-full mt-1 h-11 text-[13px] text-[#8B95A1]">동의하지 않고 로그아웃</button></div></div>
+ <div id="modal-pw" style="z-index:115" class="fixed inset-0 bg-[#191F28]/60 backdrop-blur-sm hidden items-center justify-center p-4"><div class="bg-white w-full max-w-[340px] rounded-[24px] p-6"><h3 class="text-[18px] font-extrabold">새 비밀번호 설정</h3><p class="text-[12px] text-[#8B95A1] mt-1 mb-4">8자 이상, 영문과 숫자를 함께 써주세요.</p><input type="password" id="pw-new" class="inp" placeholder="새 비밀번호" autocomplete="new-password"><input type="password" id="pw-new2" class="inp mt-2" placeholder="새 비밀번호 재확인" autocomplete="new-password"><button id="pw-ok" onclick="pwSave()" class="w-full mt-4 h-12 rounded-2xl bg-[#191F28] text-white font-bold text-[14px]">변경하기</button><button onclick="closeModal('modal-pw')" class="w-full mt-1 h-10 text-[13px] text-[#8B95A1]">나중에</button></div></div>
+ <div id="fatal" class="fixed inset-0 hidden flex-col items-center justify-center text-center px-8" style="z-index:200;background:var(--bg-main)"><img src="logo.png" alt="" class="w-20 h-20 rounded-[22px] border border-[#E5E8EB]"><h2 class="text-[20px] font-extrabold mt-6">잠시 문제가 생겼어요</h2><p id="fatal-msg" class="text-[13px] text-[#8B95A1] mt-2 leading-relaxed">인터넷 연결을 확인하고 다시 시도해주세요.</p><button onclick="location.reload()" class="mt-7 w-full max-w-[260px] h-13 py-3.5 rounded-2xl bg-[#191F28] text-white font-bold text-[15px]">다시 시도</button><button onclick="fatalReset()" class="mt-2 w-full max-w-[260px] py-3 text-[13px] font-semibold text-[#4E5968]">그래도 안 되면 · 앱 새로 받기</button></div>
  <div id="modal-alert" class="fixed inset-0 z-[110] bg-[#191F28]/60 backdrop-blur-sm hidden items-center justify-center p-4"><div class="bg-white w-full max-w-[320px] rounded-[24px] p-6 text-center shadow-2xl"><h3 id="alert-title" class="font-bold text-[17px] mb-3">알림</h3><div id="alert-message" class="text-[13px] text-[#4E5968] mb-6 whitespace-pre-line text-left leading-relaxed max-h-[60vh] overflow-y-auto no-scrollbar"></div><button onclick="closeModal('modal-alert')" class="w-full py-3.5 bg-[#191F28] text-white rounded-xl font-bold text-[14px]">확인</button></div></div>
 </div>
 
@@ -973,6 +987,17 @@ const q = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const openM = id => { q(id).classList.remove('hidden'); q(id).classList.add('flex'); };
 function closeModal(id) { if ((id === 'modal-sd' || id === 'modal-gd' || id === 'modal-sal' || id === 'modal-fd') && typeof xpClose === 'function' && xpClose(id)) return; if (typeof xpEl !== 'undefined' && xpEl && (id === 'modal-sd' || id === 'modal-gd' || id === 'modal-sal' || id === 'modal-fd')) { xpEl.style.visibility = ''; xpTCRestore(); } q(id).classList.add('hidden'); q(id).classList.remove('flex'); if (id === 'modal-sal' && typeof salClose === 'function') salClose(); if (id === 'modal-friends' && typeof stopFriendTimers === 'function') stopFriendTimers(); if (id === 'modal-settings' && typeof me !== 'undefined' && me) applyTheme((S_() || {}).branch || 'army'); }
+/* 보안: 사용자가 바꿀 수 있는 주소는 정해진 형식만 화면에 넣어요 */
+const safeUrl = u => { u = String(u || '').trim(); return /^https?:\/\/[^\s"'<>]+$/i.test(u) ? esc(u) : '#'; };
+const safeImg = u => { u = String(u || '').trim(); return (/^data:image\/(jpeg|png|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(u) || /^https:\/\/[^\s"'<>]+$/i.test(u)) ? esc(u) : ''; };
+/* 보안: 올릴 수 있는 파일 종류·크기 제한 */
+function fileOK(f, kind) {
+  if (!f) return false;
+  if (kind === 'csv') { if (!/\.csv$/i.test(f.name) || f.size > 2 * 1048576) { showAlert('알림', 'CSV 파일(2MB 이하)만 올릴 수 있어요.'); return false; } return true; }
+  if (!/^image\/(jpeg|png|webp|heic|heif|gif)$/i.test(f.type) && !/\.(jpe?g|png|webp|heic|heif|gif)$/i.test(f.name)) { showAlert('알림', '사진 파일(JPG·PNG·WEBP·HEIC)만 올릴 수 있어요.'); return false; }
+  if (f.size > 15 * 1048576) { showAlert('알림', '15MB 이하 사진만 올릴 수 있어요.'); return false; }
+  return true;
+}
 const showAlert = (t, m) => { q('alert-title').innerText = t; q('alert-message').innerHTML = m; openM('modal-alert'); };
 const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const pd = s => new Date(s + 'T00:00:00');
@@ -995,25 +1020,74 @@ let signup = false, signupGender = null, obG = null, obBranch = 'army', setBranc
 /* ---------- 인증 ---------- */
 function authView(v) { q('auth-home').style.display = v === 'home' ? '' : 'none'; const e = q('auth-email-view'); e.style.display = v === 'email' ? 'flex' : 'none'; if (v === 'email') setTimeout(() => { try { q('auth-email').focus(); } catch (x) { } }, 60); }
 function authToggleHTML() { q('auth-toggle-text').innerHTML = signup ? '이미 계정이 있나요? <span class="text-[var(--mil-green)] font-bold cursor-pointer" onclick="toggleAuthMode()">로그인</span>' : '계정이 없나요? <span class="text-[var(--mil-green)] font-bold cursor-pointer" onclick="toggleAuthMode()">새 계정 만들기</span>'; }
-function toggleAuthMode() { signup = !signup; q('auth-title').innerText = signup ? '회원가입' : '로그인'; q('auth-subtitle').innerText = signup ? '성별을 선택하고 비밀번호를 재확인해주세요.' : '계정을 연결하고 연인과 데이터를 동기화하세요.'; q('auth-signup-fields').classList.toggle('hidden', !signup); q('btn-auth-submit').innerText = signup ? '계정 생성하기' : '이메일로 로그인'; authToggleHTML(); }
+function toggleAuthMode() { signup = !signup; q('auth-password').placeholder = signup ? '비밀번호 (8자 이상 · 영문+숫자)' : '비밀번호'; q('auth-password').autocomplete = signup ? 'new-password' : 'current-password'; q('auth-forgot').classList.toggle('hidden', signup); if (signup && !q('su-consent').innerHTML) q('su-consent').innerHTML = consentHTML('su'); q('auth-title').innerText = signup ? '회원가입' : '로그인'; q('auth-subtitle').innerText = signup ? '성별을 선택하고 비밀번호를 재확인해주세요.' : '계정을 연결하고 연인과 데이터를 동기화하세요.'; q('auth-signup-fields').classList.toggle('hidden', !signup); q('btn-auth-submit').innerText = signup ? '계정 생성하기' : '이메일로 로그인'; authToggleHTML(); }
 function setGender(g) { signupGender = g; [['M', 'var(--mil-green)', 'var(--mil-green-light)'], ['F', 'var(--pink-main)', 'var(--pink-light)'], ['S', '#C9881E', '#FFF6DD']].forEach(([k, c, bg]) => { const b = q('btn-gender-' + k); if (!b) return; b.className = 'flex-1 py-3 rounded-xl border-2 font-bold text-[13px] ' + (g === k ? '' : 'border-[#E5E8EB] bg-[#F5F6F8] text-[#8B95A1]'); b.style.cssText = g === k ? `border-color:${c};background:${bg};color:${c}` : ''; }); }
 const needCfg = () => { if (!configured) { showAlert('설정 필요', 'index.html 맨 아래 스크립트의 SUPABASE_URL / SUPABASE_ANON_KEY 를 본인 Supabase 값으로 바꿔주세요.'); return true; } };
 async function submitAuth() {
   if (needCfg()) return;
   const e = q('auth-email').value.trim(), p = q('auth-password').value;
-  if (!e || p.length < 6) return showAlert('오류', '이메일과 6자리 이상의 비밀번호를 입력해주세요.');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return showAlert('오류', '이메일 주소를 확인해주세요.');
+  if (authBusy) return;
   if (signup) {
+    if (!pwStrong(p)) return showAlert('오류', '비밀번호는 8자 이상, 영문과 숫자를 함께 써주세요.');
     if (p !== q('auth-password-confirm').value) return showAlert('오류', '비밀번호 재확인이 일치하지 않습니다.');
-    if (!signupGender) return showAlert('오류', '성별(남자/여자)을 선택해주세요.');
-    const { data, error } = await sb.auth.signUp({ email: e, password: p, options: { data: { gender: signupGender }, emailRedirectTo: location.origin + location.pathname } });
+    if (!signupGender) return showAlert('오류', '회원 종류(군인·곰신·팬)를 선택해주세요.');
+    const c = csGet('su'); if (!c.ok) return showAlert('알림', '[필수] 항목에 모두 동의해주세요.');
+    authBusy = true; let data, error; try { ({ data, error } = await sb.auth.signUp({ email: e, password: p, options: { data: Object.assign({ gender: signupGender }, csMeta(c)), emailRedirectTo: location.origin + location.pathname } })); } finally { authBusy = false; }
     if (error) return showAlert('가입 실패', esc(error.message));
     if (data.user && data.user.identities && data.user.identities.length === 0) return showAlert('안내', '이미 가입된 이메일입니다. 로그인해주세요.');
     if (!data.session) { showAlert('인증 메일 발송 ✉️', `${esc(e)} 로 인증 메일을 보냈어요.<br>메일의 링크를 눌러 인증한 뒤 로그인해주세요.`); toggleAuthMode(); }
   } else {
-    const { error } = await sb.auth.signInWithPassword({ email: e, password: p });
-    if (error) showAlert('로그인 실패', /confirm/i.test(error.message) ? '이메일 인증이 아직 완료되지 않았어요. 메일함의 인증 링크를 눌러주세요.' : '이메일 또는 비밀번호가 올바르지 않습니다.');
+    if (!p) return showAlert('오류', '비밀번호를 입력해주세요.');
+    const L = lkGet(), now = Date.now();
+    if (L.until > now) return showAlert('잠시 후 다시 시도', `로그인을 5번 실패해서 잠시 막아뒀어요.<br>${Math.ceil((L.until - now) / 60000)}분 뒤에 다시 시도하거나 <b>비밀번호 찾기</b>를 이용해주세요.`);
+    authBusy = true; let error; try { ({ error } = await sb.auth.signInWithPassword({ email: e, password: p })); } finally { authBusy = false; }
+    if (!error) { lkSet({}); return; }
+    if (/confirm/i.test(error.message)) return showAlert('로그인 실패', '이메일 인증이 아직 완료되지 않았어요. 메일함의 인증 링크를 눌러주세요.');
+    if (error.status === 429 || /rate|many/i.test(error.message)) return showAlert('잠시 후 다시 시도', '시도가 너무 많아 서버가 잠시 막았어요. 몇 분 뒤에 다시 시도해주세요.');
+    const n = (L.n || 0) + 1;
+    if (n >= 5) { lkSet({ n: 0, until: now + 5 * 60000 }); return showAlert('로그인 실패', '5번 틀려서 5분 동안 로그인을 막아뒀어요.<br>비밀번호가 기억나지 않으면 <b>비밀번호 찾기</b>를 눌러주세요.'); }
+    lkSet({ n, until: 0 }); showAlert('로그인 실패', `이메일 또는 비밀번호가 올바르지 않습니다.<br><span style="color:#8B95A1;font-size:12px">${5 - n}번 더 틀리면 5분 동안 막혀요</span>`);
   }
 }
+let authBusy = false;
+const pwStrong = p => p.length >= 8 && /[A-Za-z]/.test(p) && /\d/.test(p);
+function lkGet() { try { return JSON.parse(localStorage.getItem('zt_lk') || '{}'); } catch (e) { return {}; } }
+function lkSet(o) { try { localStorage.setItem('zt_lk', JSON.stringify(o)); } catch (e) { } }
+/* 약관 동의 (필수·선택 따로) */
+const CONS = [['age', '만 14세 이상이에요', 1, ''], ['terms', '이용약관 동의', 1, 'terms.html'], ['priv', '개인정보 수집·이용 동의', 1, 'privacy.html'], ['loc', '위치정보 이용 동의 (집으로 가기 경로)', 0, 'privacy.html#loc']];
+function consentHTML(p) { return `<div class="cs"><label class="all"><input type="checkbox" id="${p}-all" onchange="csAll('${p}',this.checked)">전체 동의</label>${CONS.map(([k, t, r, u]) => `<label><input type="checkbox" id="${p}-${k}" onchange="csSync('${p}')"><span><b style="color:${r ? 'var(--mil-green)' : '#8B95A1'}">[${r ? '필수' : '선택'}]</b> ${t}</span>${u ? `<a href="${u}" target="_blank" rel="noopener">보기</a>` : ''}</label>`).join('')}</div>`; }
+function csAll(p, v) { CONS.forEach(([k]) => { q(p + '-' + k).checked = v; }); }
+function csSync(p) { q(p + '-all').checked = CONS.every(([k]) => q(p + '-' + k).checked); }
+function csGet(p) { const o = {}; CONS.forEach(([k]) => { const el = q(p + '-' + k); o[k] = !!(el && el.checked); }); o.ok = CONS.every(([k, , r]) => !r || o[k]); return o; }
+const csMeta = c => ({ agree_at: new Date().toISOString(), agree_ver: '2026-11-22', agree_loc: !!c.loc });
+const csDone = () => !!(session && session.user && session.user.user_metadata && session.user.user_metadata.agree_at);
+async function csWrite(c) { const { data, error } = await sb.auth.updateUser({ data: csMeta(c) }); if (!error && data && data.user) session.user = data.user; return !error; }
+function consentAsk() { if (csDone()) return; q('mc-box').innerHTML = consentHTML('mc'); openM('modal-consent'); }
+async function consentSave() { const c = csGet('mc'); if (!c.ok) return showAlert('알림', '[필수] 항목에 모두 동의해주세요.'); const b = q('mc-ok'); b.disabled = true; const ok = await csWrite(c); b.disabled = false; if (!ok) return showAlert('오류', '저장하지 못했어요. 다시 시도해주세요.'); closeModal('modal-consent'); }
+/* 비밀번호 찾기 · 바꾸기 */
+async function forgotPw() {
+  const e = q('auth-email').value.trim(); if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return showAlert('비밀번호 찾기', '위 칸에 가입한 이메일 주소를 먼저 적어주세요.');
+  const { error } = await sb.auth.resetPasswordForEmail(e, { redirectTo: location.origin + location.pathname });
+  if (error && (error.status === 429 || /rate|many/i.test(error.message))) return showAlert('잠시 후 다시 시도', '메일을 너무 자주 요청했어요. 잠시 뒤 다시 시도해주세요.');
+  showAlert('메일을 보냈어요 ✉️', `${esc(e)} 로 비밀번호 재설정 링크를 보냈어요.<br>메일의 링크를 누르면 새 비밀번호를 정할 수 있어요.`);
+}
+async function pwSave() {
+  const a = q('pw-new').value, b = q('pw-new2').value; if (!pwStrong(a)) return showAlert('오류', '8자 이상, 영문과 숫자를 함께 써주세요.'); if (a !== b) return showAlert('오류', '재확인이 일치하지 않아요.');
+  const bt = q('pw-ok'); bt.disabled = true; const { error } = await sb.auth.updateUser({ password: a }); bt.disabled = false;
+  if (error) return showAlert('오류', esc(error.message)); closeModal('modal-pw'); q('pw-new').value = q('pw-new2').value = ''; lkSet({}); showAlert('완료', '비밀번호를 바꿨어요.');
+}
+/* 회원 탈퇴 */
+async function deleteAccount() {
+  if (!confirm('정말 탈퇴할까요?\n프로필, 편지, 질문 답변, MY스타 기록이 모두 지워지고 되돌릴 수 없어요.')) return;
+  const v = prompt('확인을 위해 "탈퇴"라고 적어주세요'); if ((v || '').trim() !== '탈퇴') return;
+  const { error } = await sb.rpc('delete_my_account');
+  if (error) return showAlert('탈퇴 실패', '잠시 후 다시 시도해주세요.<br><span style="font-size:12px;color:#8B95A1">' + esc(error.message) + '</span><br>계속 안 되면 micbael11@naver.com 으로 요청해주세요.');
+  try { localStorage.clear(); } catch (e) { } await sb.auth.signOut().catch(() => { }); alert('탈퇴가 완료됐어요. 그동안 고마웠어요.'); location.reload();
+}
+/* 오류가 나도 하얀 화면 대신 다시 시도 화면 */
+function fatal(msg) { try { const f = q('fatal'); if (msg) q('fatal-msg').innerText = msg; f.classList.remove('hidden'); f.classList.add('flex'); const sp = document.getElementById('splash'); if (sp) sp.remove(); } catch (e) { } }
+async function fatalReset() { try { const rs = await navigator.serviceWorker.getRegistrations(); await Promise.all(rs.map(r => r.unregister())); const ks = await caches.keys(); await Promise.all(ks.map(k => caches.delete(k))); } catch (e) { } location.replace(location.pathname + '?v=' + Date.now()); }
 async function googleAuth() { if (needCfg()) return; const { error } = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname } }); if (error) showAlert('오류', esc(error.message)); }
 async function logout() { await sb.auth.signOut(); location.reload(); }
 
@@ -1049,7 +1123,11 @@ function subscribe() {
   sb.channel('rt-' + session.user.id).on('postgres_changes', { event: '*', schema: 'public' }, h).subscribe();
 }
 let bootP = null;
-function boot() { return bootP || (bootP = bootRun()); }
+function boot() {
+  if (bootP) return bootP;
+  const wd = setTimeout(() => { if (!window._ready) fatal('연결이 오래 걸리고 있어요.\n인터넷 연결을 확인하고 다시 시도해주세요.'); }, 25000);
+  return (bootP = bootRun().then(() => { window._ready = true; clearTimeout(wd); }, e => { clearTimeout(wd); console.error(e); fatal('앱을 여는 중에 오류가 났어요.\n다시 시도해주세요.'); }));
+}
 async function bootRun() {
   booted = true;
   q('auth-modal').classList.add('hidden');
@@ -1057,11 +1135,13 @@ async function bootRun() {
   if (!me) return;
   if (!me.onboarded) return showOnboarding();
   initUI(); render(true); subscribe(); flushPend(); deepLink();
+  if (!csDone()) setTimeout(consentAsk, 900);
 }
 
 /* ---------- 온보딩 ---------- */
 function showOnboarding() {
   q('onboarding-modal').classList.remove('hidden');
+  if (!csDone()) { q('ob-consent').innerHTML = consentHTML('ob'); q('ob-consent').classList.remove('hidden'); }
   obG = me.gender;
   q('ob-gender-box').classList.toggle('hidden', !!me.gender);
   q('ob-branches').innerHTML = Object.keys(BR).map(k => `<button onclick="obSetBranch('${k}')" id="ob-b-${k}" class="py-3 rounded-xl border-2 font-bold text-[14px]">${BR[k].n} (${BR[k].m}개월)</button>`).join('');
@@ -1071,7 +1151,8 @@ function obSetBranch(k) { obBranch = k; applyTheme(k); Object.keys(BR).forEach(b
 function obGender(g) { obG = g; ['M', 'F', 'S'].forEach(x => q('ob-g-' + x).className = 'flex-1 py-3 rounded-xl border-2 font-bold text-[13px] ' + (x === g ? 'border-[var(--mil-green)] bg-[var(--mil-green-light)] text-[var(--mil-green)]' : 'border-[#E5E8EB] bg-[#F5F6F8] text-[#8B95A1]')); obRefresh(); }
 function obRefresh() { q('ob-soldier-box').classList.toggle('hidden', obG !== 'M'); q('ob-f-note').classList.toggle('hidden', obG !== 'F'); q('ob-star-box').classList.toggle('hidden', obG !== 'S'); q('ob-title').innerText = obG === 'S' ? '기다릴 MY스타를 골라주세요 ⭐' : '시작하기 전에 알려주세요! 🪖'; }
 async function completeOnboarding() {
-  if (!obG) return showAlert('알림', '성별을 선택해주세요.');
+  if (!obG) return showAlert('알림', '회원 종류를 선택해주세요.');
+  if (!csDone()) { const c = csGet('ob'); if (!c.ok) return showAlert('알림', '[필수] 약관 항목에 모두 동의해주세요.'); if (!(await csWrite(c))) return showAlert('오류', '동의 내용을 저장하지 못했어요. 다시 시도해주세요.'); }
   const upd = { gender: obG, onboarded: true };
   if (obG === 'M') {
     const e = q('ob-enlist-date').value; if (!e) return showAlert('알림', '입대일을 선택해주세요.');
@@ -1213,14 +1294,14 @@ function render(full) {
   let rank = '훈련병';
   if (S && S.enlist_date) {
     rank = fillSoldier(S, now); const ri = { r: rank };
-    q('bf-img-container').innerHTML = S.avatar ? `<img src="${S.avatar}" class="w-full h-full object-cover">` : bfImg(S.bf_theme, ri.r);
+    q('bf-img-container').innerHTML = safeImg(S.avatar) ? `<img src="${safeImg(S.avatar)}" class="w-full h-full object-cover">` : bfImg(S.bf_theme, ri.r);
     const lk = 'lastRank_' + S.id, last = localStorage.getItem(lk); if (last && last !== ri.r) promoPop(S, ri.r, last); localStorage.setItem(lk, ri.r);
     if (full || !salT) startSal(S);
   } else { clearInterval(salT); clearInterval(rainT); salT = null; }
   if (G) {
     ['gf-box', 'gf-box2', 'gf-stats', 'gf-more'].forEach(i => q(i).classList.toggle('hidden', !S)); q('gf-nosoldier').classList.toggle('hidden', !!S);
     const gi = gfRank(rank); q('gf-rank-icon').innerText = gi[0]; q('gf-rank-name').innerText = gi[1];
-    q('gf-img-container').innerHTML = G.avatar ? `<img src="${G.avatar}" class="w-full h-full object-cover">` : `<img src="${G.gf_theme === 'cat' ? 'gf_cat.png' : 'gf_bear.png'}" class="w-full h-full object-cover transition-all duration-1000" style="transform:scale(${gi[2]})">`;
+    q('gf-img-container').innerHTML = safeImg(G.avatar) ? `<img src="${safeImg(G.avatar)}" class="w-full h-full object-cover">` : `<img src="${G.gf_theme === 'cat' ? 'gf_cat.png' : 'gf_bear.png'}" class="w-full h-full object-cover transition-all duration-1000" style="transform:scale(${gi[2]})">`;
     document.documentElement.style.setProperty('--halo-op', gi[3]);
     { const g = q('gf-name'); g.innerText = G.nickname || (G.id === me.id ? '✏️ 이름을 설정해보세요' : (G.gf_theme === 'cat' ? '꽃냥이' : '곰신 베어')); g.onclick = !G.nickname && G.id === me.id ? openProfileSet : null; }
     const inp = q('one-line-msg'); inp.readOnly = G.id !== me.id; inp.placeholder = G.id === me.id ? '상태 메시지 입력' : '상태 메시지 없음'; if (document.activeElement !== inp) inp.value = G.status_msg || '';
@@ -1263,7 +1344,8 @@ function renderSetRows() {
   q('set-rows').innerHTML = gap + row('✏️', '프로필 (이름·별명)', me.nickname || '미설정', "setGo('profile')") + row('⭐', 'MY스타', myStars.length ? myStars.map(r => (starK[r.id] || {}).n).join(', ') : '미등록', "closeModal('modal-settings');" + (myStars.length ? "openStar('my')" : 'starFlow()')) + row('💑', '사귄 날짜', me.love_date ? me.love_date.replace(/-/g, '.') : '미설정', "setGo('profile')") + row('💕', '커플 연동', me.partner_id ? '연동 중' : '미연동', "setGo('couple')") + row('👤', '계정', '', "setGo('account')") + gap
     + row('🪖', '복무 정보', isM ? (BR[me.branch] || BR.army).k : '군인 계정에서 설정', "setGo('service')") + row('📍', '자대 등록', (S && S.unit_name) || '미등록', "setGo('unit')") + row('🎭', '캐릭터 테마', th, "setGo('theme')") + gap
     + (me.is_admin ? row('🛠', '관리자', '회원 · 콘텐츠 · 점검', "closeModal('modal-settings');openAdmin()") + gap : '')
-    + row('🚪', '로그아웃', '', 'logout()', true);
+    + row('🚪', '로그아웃', '', 'logout()', true)
+    + `<div class="legal px-5 py-6 text-[11px] text-[#8B95A1] leading-relaxed"><a href="terms.html" target="_blank" rel="noopener">이용약관</a> · <a href="privacy.html" target="_blank" rel="noopener"><b>개인정보처리방침</b></a> · <a href="mailto:micbael11@naver.com">문의하기</a><br>짬타이거 · 개인 운영(비영리) · micbael11@naver.com</div>`;
 }
 function openSettings() {
   const isM = me.gender === 'M'; q('my-couple-code').innerText = me.code || '-'; const linked = !!me.partner_id;
@@ -1283,7 +1365,7 @@ async function saveNick() {
 }
 function openProfileSet() { openSettings(); setGo('profile'); }
 function myAvatarHTML() {
-  if (me.avatar) return `<img src="${me.avatar}" class="w-full h-full object-cover">`;
+  if (safeImg(me.avatar)) return `<img src="${safeImg(me.avatar)}" class="w-full h-full object-cover">`;
   return me.gender === 'M' ? bfImg(me.bf_theme, me.enlist_date ? rankOf(me, new Date()).r : '이병') : `<img src="${me.gf_theme === 'cat' ? 'gf_cat.png' : 'gf_bear.png'}" class="w-full h-full object-cover">`;
 }
 /* ---- 프로필 사진: 선택 → 자르기 → 저장 ---- */
@@ -1293,7 +1375,7 @@ function drawCrop() { const c = q('crop-cv').getContext('2d'); c.fillStyle = '#1
 function setCropScale(ns) { const cx = (CW / 2 - cs.x) / cs.s, cy = (CW / 2 - cs.y) / cs.s; cs.s = Math.min(cs.min * 4, Math.max(cs.min, ns)); cs.x = CW / 2 - cx * cs.s; cs.y = CW / 2 - cy * cs.s; cropClamp(); q('crop-zoom').value = Math.round(cs.s / cs.min * 100); drawCrop(); }
 function cropZoom(v) { setCropScale(cs.min * v / 100); }
 function pickAvatar(inp) {
-  const file = inp.files[0]; inp.value = ''; if (!file) return; if (!/^image\//.test(file.type)) return showAlert('알림', '이미지 파일을 선택해주세요.');
+  const file = inp.files[0]; inp.value = ''; if (!file) return; if (!fileOK(file, 'img')) return;
   const img = new Image(), url = URL.createObjectURL(file);
   img.onload = () => { cropImg = img; cs.min = Math.max(CW / img.width, CW / img.height); cs.s = cs.min; cs.x = (CW - img.width * cs.s) / 2; cs.y = (CW - img.height * cs.s) / 2; q('crop-zoom').value = 100; drawCrop(); openM('modal-crop'); URL.revokeObjectURL(url); };
   img.onerror = () => showAlert('오류', '사진을 열 수 없어요. JPG나 PNG 사진을 골라주세요.'); img.src = url;
@@ -1471,12 +1553,12 @@ async function submitPost() {
 /* ---------- 상세 보기 · 급여 전체화면 ---------- */
 function openSd() {
   const S = S_(); if (!S || !S.enlist_date) return; const rk = rankOf(S, new Date()).r, h = hoInfo(S, new Date());
-  q('sd-hero').innerHTML = S.avatar ? `<img src="${S.avatar}" class="w-[170px] h-[170px] rounded-full object-cover">` : (S.bf_theme === 'gamja' ? bfImg('gamja', rk) : `<img src="${rankFile(rk)}" alt="" class="h-[90%] object-contain">`);
+  q('sd-hero').innerHTML = safeImg(S.avatar) ? `<img src="${safeImg(S.avatar)}" class="w-[170px] h-[170px] rounded-full object-cover">` : (S.bf_theme === 'gamja' ? bfImg('gamja', rk) : `<img src="${rankFile(rk)}" alt="" class="h-[90%] object-contain">`);
   q('sd-rank').innerText = rk === '전역' ? '전역' : `${rk} ${h.n}호봉`; q('sd-name').innerText = S.nickname || '군인'; q('sd-letter').classList.toggle('hidden', !(partner && me && S.id !== me.id)); xpRun('modal-sd', q('soldier-card').querySelector('.pcard'));
 }
 function openGd() {
   const G = G_(); if (!G) return; const S = S_(), rk = S && S.enlist_date ? rankOf(S, new Date()).r : '훈련병', gi = gfRank(rk);
-  q('gd-hero').innerHTML = G.avatar ? `<img src="${G.avatar}" class="w-full h-full object-cover">` : `<img src="${G.gf_theme === 'cat' ? 'gf_cat.png' : 'gf_bear.png'}" class="w-full h-full object-cover">`;
+  q('gd-hero').innerHTML = safeImg(G.avatar) ? `<img src="${safeImg(G.avatar)}" class="w-full h-full object-cover">` : `<img src="${G.gf_theme === 'cat' ? 'gf_cat.png' : 'gf_bear.png'}" class="w-full h-full object-cover">`;
   q('gd-rank').innerHTML = `${gi[0]} 곰신 ${gi[1]}`; q('gd-name').innerText = G.nickname || (G.gf_theme === 'cat' ? '꽃냥이' : '곰신 베어'); q('gd-love').innerHTML = q('gf-love-days').innerHTML; q('gd-letter').classList.toggle('hidden', !(partner && me && G.id !== me.id)); xpRun('modal-gd', q('gf-profile-card').querySelector('.pcard'));
 }
 /* ---------- 카드 → 전체화면 확장 애니메이션 (토스 느낌) ---------- */
@@ -1692,13 +1774,13 @@ const myCards = () => (sav && Array.isArray(sav.cards) ? sav.cards : []).filter(
 function cardSection() {
   const ids = myCards();
   return `<div class="toss-card"><div class="flex justify-between items-center"><h2 class="text-[18px] font-extrabold">나의 나라사랑카드</h2><button onclick="openCardPick()" class="text-[12px] font-bold bg-[#F5F6F8] px-3 py-1.5 rounded-full">${ids.length ? '변경' : '설정하기'}</button></div>
-  ${ids.length ? `<div class="flex gap-3 overflow-x-auto no-scrollbar mt-2 -mx-6 px-6 py-4" style="scroll-snap-type:x mandatory">${ids.map((id, i) => { const c = NSC.find(x => x.id === id); return `<div class="shrink-0" style="width:${ids.length > 1 ? '78%' : '100%'};scroll-snap-align:center"><img id="nsc-img-${i}" src="${c.img}" alt="${esc(c.n)}" onclick="openCard(${i})" class="w-full block active:scale-[.98] transition" style="border-radius:14px;box-shadow:0 10px 26px rgba(0,0,0,.18)"></div>`; }).join('')}</div><p class="text-[11px] text-[#8B95A1] text-center mt-3">혜택을 보고 싶으면 카드를 터치하세요</p>`
+  ${ids.length ? `<div class="flex gap-3 overflow-x-auto no-scrollbar mt-2 -mx-6 px-6 py-4" style="scroll-snap-type:x mandatory">${ids.map((id, i) => { const c = NSC.find(x => x.id === id); return `<div class="shrink-0" style="width:${ids.length > 1 ? '78%' : '100%'};scroll-snap-align:center"><img id="nsc-img-${i}" src="${esc(c.img)}" alt="${esc(c.n)}" onclick="openCard(${i})" class="w-full block active:scale-[.98] transition" style="border-radius:14px;box-shadow:0 10px 26px rgba(0,0,0,.18)"></div>`; }).join('')}</div><p class="text-[11px] text-[#8B95A1] text-center mt-3">혜택을 보고 싶으면 카드를 터치하세요</p>`
    : `<button onclick="openCardPick()" class="w-full mt-4 rounded-2xl border-2 border-dashed border-[#D5D9DE] py-9 text-[13px] font-bold text-[#8B95A1]">${ico('card')} 나라사랑카드를 설정해보세요</button>`}</div>`;
 }
 let cpSel = [];
 function openCardPick() { cpSel = myCards().slice(); paintCardPick(); openM('modal-cardpick'); }
 function paintCardPick() {
-  q('cp-list').innerHTML = NSC.map(c => { const on = cpSel.includes(c.id); return `<button onclick="cpTog('${c.id}')" class="w-full flex items-center gap-3 p-3 rounded-2xl bg-white text-left ${on ? 'border-2 border-[var(--mil-green)]' : 'border border-[#E5E8EB]'}"><img src="${c.img}" alt="" class="w-[96px] shrink-0" style="border-radius:8px"><div class="flex-1 min-w-0"><div class="text-[14px] font-bold">${esc(c.n)}</div><div class="text-[11px] text-[#8B95A1] mt-0.5">${esc(c.tag)}</div></div><span class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${on ? 'text-white' : 'border-2 border-[#D5D9DE]'}" style="${on ? 'background:var(--mil-green)' : ''}">${on ? ico('checkc') : ''}</span></button>`; }).join('');
+  q('cp-list').innerHTML = NSC.map(c => { const on = cpSel.includes(c.id); return `<button onclick="cpTog('${c.id}')" class="w-full flex items-center gap-3 p-3 rounded-2xl bg-white text-left ${on ? 'border-2 border-[var(--mil-green)]' : 'border border-[#E5E8EB]'}"><img src="${esc(c.img)}" alt="" class="w-[96px] shrink-0" style="border-radius:8px"><div class="flex-1 min-w-0"><div class="text-[14px] font-bold">${esc(c.n)}</div><div class="text-[11px] text-[#8B95A1] mt-0.5">${esc(c.tag)}</div></div><span class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${on ? 'text-white' : 'border-2 border-[#D5D9DE]'}" style="${on ? 'background:var(--mil-green)' : ''}">${on ? ico('checkc') : ''}</span></button>`; }).join('');
 }
 function cpTog(id) { cpSel = cpSel.includes(id) ? cpSel.filter(x => x !== id) : cpSel.concat(id); paintCardPick(); }
 async function saveCards() {
@@ -1760,7 +1842,7 @@ let friends = [], frSel = null, frT = null, frH = null;
 async function loadFriends() { try { const { data, error } = await sb.rpc('friend_overview'); friends = error ? [] : (data || []); } catch (e) { friends = []; } updateFriendDot(); }
 function updateFriendDot() { const d = document.getElementById('friend-dot'); if (d) d.classList.toggle('hidden', !(friends.some(x => x.direction === 'in') || (typeof gm !== 'undefined' && me && gm.asks.some(a => a.recipient === me.id && !a.seen && friends.some(f => f.uid === a.sender))))); }
 function frAvatar(P) {
-  if (P.avatar) return `<img src="${P.avatar}" class="w-full h-full object-cover">`;
+  if (safeImg(P.avatar)) return `<img src="${safeImg(P.avatar)}" class="w-full h-full object-cover">`;
   if (P.gender === 'M') return bfImg(P.bf_theme, P.enlist_date ? rankOf(P, new Date()).r : '이병');
   return `<img src="${P.gf_theme === 'cat' ? 'gf_cat.png' : 'gf_bear.png'}" class="w-full h-full object-cover">`;
 }
@@ -2153,7 +2235,7 @@ async function adReports() {
   const b = q('ad-body'); b.innerHTML = `<div class="ad-card"><div class="text-[14px] font-extrabold">실시간 최신화</div><div class="text-[12px] text-[#8B95A1] mt-1 leading-relaxed">매일 아침 9시에 자동으로 하는 일을 지금 바로 실행해요. 끝난 혜택 정리 · 새 혜택 추가 · 적금/카드 내용 검증 · 새로 입대한 스타 추가 (2~4분). 바뀐 내용은 모든 사용자 앱에 바로 반영되고 메일로도 보내요.</div><button id="ad-run" class="ad-btn dark w-full mt-3" onclick="adRun()">지금 최신화</button><button id="ad-mail" class="ad-btn w-full mt-2" onclick="adMailTest()">테스트 메일 보내기</button><div class="text-[11px] text-[#8B95A1] mt-2">메일은 고쳐야 할 내용이나 새 혜택·새 스타가 있을 때만 와요.</div><div id="ad-runlog" class="text-[11px] text-[#8B95A1] mt-2"></div></div><div id="ad-rl" class="mt-3 space-y-2"><div class="py-10 text-center text-[13px] text-[#8B95A1]">불러오는 중…</div></div>`;
   const { data, error } = await sb.from('content_reports').select('*').order('created_at', { ascending: false }).limit(40);
   const rl = q('ad-rl'); if (error) { rl.innerHTML = `<div class="py-10 text-center text-[13px] text-[#8B95A1]">${adErr(error)}</div>`; return; }
-  rl.innerHTML = (data || []).length ? data.map(r => `<div class="ad-card ${r.status === 'done' ? 'opacity-50' : ''}"><div class="flex items-start justify-between gap-2"><b class="text-[14px]">${esc(r.title)}</b><button class="text-[11px] font-extrabold flex-shrink-0 ${r.status === 'done' ? 'text-[#8B95A1]' : 'text-[var(--mil-green)]'}" onclick="adDone(${r.id},'${r.status === 'done' ? 'new' : 'done'}')">${r.status === 'done' ? '되돌리기' : '처리 완료'}</button></div><div class="text-[11px] text-[#8B95A1]">${esc((r.created_at || '').slice(0, 16).replace('T', ' '))}</div>${(r.detail || []).map(i => i.fix ? `<div class="mt-2 text-[12px] leading-relaxed bg-[#F7F8FA] rounded-xl p-2.5"><b>${esc(i.item)}</b><br><span class="text-[#8B95A1]">앱:</span> ${esc(i.ours)}<br><span class="text-[#8B95A1]">검색:</span> ${esc(i.found)}<br><b class="text-[#D94867]">수정: ${esc(i.fix)}</b>${i.source ? ` <a href="${esc(i.source)}" target="_blank" rel="noopener" class="text-[var(--mil-green)] font-bold">근거</a>` : ''}</div>` : `<div class="mt-2 text-[12px] bg-[#F7F8FA] rounded-xl p-2.5"><b>${esc(i.title)}</b> · ${esc(i.start)} ~ ${esc(i.end)}<br>${esc(i.benefit)}</div>`).join('')}</div>`).join('') : '<div class="py-10 text-center text-[13px] text-[#8B95A1]">아직 점검 결과가 없어요</div>';
+  rl.innerHTML = (data || []).length ? data.map(r => `<div class="ad-card ${r.status === 'done' ? 'opacity-50' : ''}"><div class="flex items-start justify-between gap-2"><b class="text-[14px]">${esc(r.title)}</b><button class="text-[11px] font-extrabold flex-shrink-0 ${r.status === 'done' ? 'text-[#8B95A1]' : 'text-[var(--mil-green)]'}" onclick="adDone(${r.id},'${r.status === 'done' ? 'new' : 'done'}')">${r.status === 'done' ? '되돌리기' : '처리 완료'}</button></div><div class="text-[11px] text-[#8B95A1]">${esc((r.created_at || '').slice(0, 16).replace('T', ' '))}</div>${(r.detail || []).map(i => i.fix ? `<div class="mt-2 text-[12px] leading-relaxed bg-[#F7F8FA] rounded-xl p-2.5"><b>${esc(i.item)}</b><br><span class="text-[#8B95A1]">앱:</span> ${esc(i.ours)}<br><span class="text-[#8B95A1]">검색:</span> ${esc(i.found)}<br><b class="text-[#D94867]">수정: ${esc(i.fix)}</b>${i.source ? ` <a href="${safeUrl(i.source)}" target="_blank" rel="noopener" class="text-[var(--mil-green)] font-bold">근거</a>` : ''}</div>` : `<div class="mt-2 text-[12px] bg-[#F7F8FA] rounded-xl p-2.5"><b>${esc(i.title)}</b> · ${esc(i.start)} ~ ${esc(i.end)}<br>${esc(i.benefit)}</div>`).join('')}</div>`).join('') : '<div class="py-10 text-center text-[13px] text-[#8B95A1]">아직 점검 결과가 없어요</div>';
 }
 async function adDone(id, st) { await sb.from('content_reports').update({ status: st }).eq('id', id); adReports(); }
 async function fnErr(error) {
@@ -2269,9 +2351,9 @@ const STAR_TH = {
 const thVars = k => { const t = STAR_TH[k] || STAR_TH.black_gold; return ['bg', 'fg', 'sub', 'trk', 'bar', 'pt', 'pts', 'cb', 'cf', 'bd', 'ring', 'ring2', 'glow', 'sheen'].filter(x => t[x]).map(x => `--${x}:${t[x]}`).join(';'); };
 let STARL = [], starK = {};
 function rebuildStars() {
-  const base = (window.STARS || []).map(a => ({ id: a[0], n: a[1], g: a[2], c: a[3], e: a[4], d: a[5], t: a[6] }));
+  const base = (window.STARS || []).map(a => ({ id: a[0], n: a[1], g: a[2], c: a[3], e: a[4], d: a[5], t: a[6], k: a[7] || '' }));
   const all = (typeof CONTENT !== 'undefined' && CONTENT && Array.isArray(CONTENT.stars)) ? CONTENT.stars : [];
-  const extra = all.filter(x => x && x.id && x.n && x.e && x.d && !x.hidden).map(x => ({ id: x.id, n: x.n, g: x.g || '', c: x.c || 'idol', e: x.e, d: x.d, t: x.t || 'army', auto: !!x.auto }));
+  const extra = all.filter(x => x && x.id && x.n && x.e && x.d && !x.hidden).map(x => ({ id: x.id, n: x.n, g: x.g || '', c: x.c || 'idol', e: x.e, d: x.d, t: x.t || 'army', k: x.k || '', auto: !!x.auto }));
   const hide = new Set(all.filter(x => x && x.hidden).map(x => x.id));
   STARL = base.filter(x => !hide.has(x.id)).concat(extra.filter(x => !base.some(b => b.id === x.id))); starK = {}; STARL.forEach(x => starK[x.id] = x);
 }
@@ -2289,7 +2371,7 @@ async function loadMyStars() {
   try { const { data, error } = await sb.from('star_fans').select('*').eq('user_id', me.id).order('ord').order('created_at'); if (!error) rows = data || []; else stFansOK = false; } catch (e) { stFansOK = false; }
   const L = thLocal();
   if (!rows || (!rows.length && me.star_id)) rows = me.star_id ? [{ star_id: me.star_id, since: String(me.star_since || '').slice(0, 10) || ymd(new Date()), photo: me.star_photo || null, theme: L[me.star_id] || 'black_gold', _local: true }] : [];
-  myStars = rows.filter(r => starK[r.star_id]).map(r => { const th = stFansOK && !r._local ? r.theme : (L[r.star_id] || r.theme); return { id: r.star_id, since: String(r.since || '').slice(0, 10) || ymd(new Date()), photo: r.photo || '', theme: STAR_TH[th] ? th : 'black_gold' }; });
+  myStars = rows.filter(r => starK[r.star_id]).map(r => { const th = stFansOK && !r._local ? r.theme : (L[r.star_id] || r.theme); return { id: r.star_id, since: String(r.since || '').slice(0, 10) || ymd(new Date()), photo: r.photo || '', nick: r.nick || '', theme: STAR_TH[th] ? th : 'black_gold' }; });
   me.star_id = myStars[0] ? myStars[0].id : null;
   if (!stSel || !myStars.some(x => x.id === stSel)) stSel = myStars[0] ? myStars[0].id : null;
 }
@@ -2369,6 +2451,7 @@ function renderStarMy(anim) {
     <div><b>${I.total.toLocaleString()}</b><span>전체 복무일</span></div><div><b>${I.pre ? 0 : I.served.toLocaleString()}</b><span>현재 복무일</span></div><div><b>${(I.pre ? I.total : I.left).toLocaleString()}</b><span>남은 복무일</span></div>
     <div><b>${fanDays(s.id).toLocaleString()}</b><span>팬이 된 지</span></div><div><b>${N.fans.toLocaleString()}</b><span>함께 응원</span></div><div><b>${N.cheers_today.toLocaleString()}</b><span>오늘 응원</span></div></div></div>
    <div class="grid grid-cols-2 gap-2 mt-4 ${A}" style="--i:3"><button onclick="starBoard('${s.id}')" class="h-12 rounded-2xl bg-[#F2F3F5] text-[14px] font-bold">팬 게시판</button><button onclick="thSheet('${s.id}')" class="h-12 rounded-2xl bg-[#F2F3F5] text-[14px] font-bold">테마 변경</button><button onclick="starFlow('${s.id}')" class="h-12 rounded-2xl bg-[#F2F3F5] text-[14px] font-bold">사진 · 날짜 변경</button><button onclick="starFlow()" class="h-12 rounded-2xl bg-[#F2F3F5] text-[14px] font-bold">스타 추가</button></div>
+   <button onclick="starNick('${s.id}')" class="w-full mt-2 h-11 rounded-2xl border border-[#E5E8EB] text-[13px] font-bold text-[#4E5968] flex items-center justify-center gap-1.5 ${A}" style="--i:3">질문 속 이름 <b class="text-[#191F28]">${esc(starCall(s))}</b> · 바꾸기</button>
    <button onclick="starUnset('${s.id}')" class="w-full mt-3 h-12 rounded-2xl text-[14px] font-bold text-[#E5484D]">${esc(s.n)} MY스타 삭제</button>`;
 }
 function starFilter(t) {
@@ -2511,7 +2594,7 @@ async function sfLoadPhotos() {
 }
 function sfPick(i) { sfS.photo = sfS.photos[i]; sfRender(); }
 function sfUpload(inp) {
-  const f = inp.files && inp.files[0]; if (!f) return; const rd = new FileReader();
+  const f = inp.files && inp.files[0]; inp.value = ''; if (!f || !fileOK(f, 'img')) return; const rd = new FileReader();
   rd.onload = () => { const im = new Image(); im.onload = () => { const z = 360, c = document.createElement('canvas'); c.width = c.height = z; const m = Math.min(im.width, im.height), ctx = c.getContext('2d'); ctx.drawImage(im, (im.width - m) / 2, (im.height - m) / 2, m, m, 0, 0, z, z); const u = c.toDataURL('image/jpeg', .85); sfS.photos.unshift(u); sfS.photo = u; sfRender(); }; im.src = rd.result; };
   rd.readAsDataURL(f);
 }
@@ -2536,21 +2619,90 @@ async function starImgLoad() {
     stRefresh();
   } catch (e) { }
 }
-/* 팬 전용 Q&A */
-function renderStarQ() {
-  const s = myStar(), box = q('qna-star');
-  if (!s) { box.innerHTML = `<div class="toss-card text-center py-10"><div class="text-[16px] font-extrabold">MY스타를 먼저 등록해주세요</div><button onclick="starFlow()" class="mt-4 px-5 h-11 rounded-full text-[13px] font-extrabold text-white" style="background:var(--mil-dark)">MY스타 등록하기</button></div>`; return; }
-  const I = starInfo(s), day = Math.max(1, I.served), Q = window.STARQ || [], has = Q.length > 0, row = has ? Q[(day - 1) % Q.length] : null;
-  box.innerHTML = `<div class="stk text-center"><div class="relative z-[1]"><span class="lb">${esc(s.n)}을(를) 기다린 지 ${I.pre ? '입대 전' : day + '일째'}</span>
-   <h2 class="text-[18px] font-extrabold leading-snug mt-4">${has ? '“' + esc(row[0] || row) + '”' : 'MY스타 질문을 준비하고 있어요'}</h2>
-   <p class="text-[13px] opacity-70 mt-2">${has ? '나만 볼 수 있는 기다림 일기예요' : '곧 스타를 기다리는 마음을 담은 질문이 매일 열려요.<br>그동안 오늘의 응원을 보내보세요!'}</p></div></div>
-   ${has ? `<div class="toss-card mt-4"><textarea id="sq-in" rows="5" maxlength="1000" class="w-full outline-none text-[15px] leading-relaxed resize-none" placeholder="오늘의 마음을 적어보세요"></textarea><button id="sq-save" onclick="saveStarQ(${day})" class="w-full mt-3 h-12 rounded-2xl font-bold text-[14px] bg-[#E5E8EB] text-[#4E5968]">저장</button></div>` : `<button onclick="openStar()" class="w-full mt-4 h-12 rounded-2xl font-extrabold text-[14px]" style="background:#191F28;color:#fff">MY스타 보러가기</button>`}`;
-  if (has) sb.from('qna_answers').select('answer').eq('user_id', me.id).eq('day', 20000 + day).maybeSingle().then(({ data }) => { if (data && q('sq-in')) { q('sq-in').value = data.answer || ''; const b = q('sq-save'); b.className = 'w-full mt-3 h-12 rounded-2xl font-bold text-[14px] text-white'; b.style.background = 'var(--mil-dark)'; b.innerText = '저장됨'; } }).catch(() => { });
+/* 팬 전용 Q&A — 군별 하루 한 질문 (starq.js) */
+/* 부르는 이름: 차은우 → 은우, 강다니엘 → 다니엘, 원우 → 원우 (직접 바꿀 수도 있어요) */
+const SURN1 = '김이박최정강조윤장임한오서신권황안송전홍류유고문양손배백허남심노하곽성차주우구민진나지엄채원천방공현함변염여추소석선설길연위표명왕금옥육맹제모탁국';
+const SURN2 = ['남궁', '황보', '제갈', '선우', '독고', '사공', '서문'];
+const nkKey = () => 'zt_stnk:' + (me ? me.id : '');
+function nkLocal() { try { return JSON.parse(localStorage.getItem(nkKey()) || '{}'); } catch (e) { return {}; } }
+function starCall(s) {
+  if (!s) return '';
+  const r = myRow(s.id), own = (r && r.nick) || nkLocal()[s.id]; if (own) return own;
+  if (s.k) return s.k;
+  const n = String(s.n || '').replace(/\s+/g, ''), H = /^[가-힣]+$/.test(n);
+  if (!H) return n;
+  if (n.length === 4 && SURN2.includes(n.slice(0, 2))) return n.slice(2);
+  if ((n.length === 3 || n.length === 4) && SURN1.includes(n[0])) return n.slice(1);
+  return n;
 }
-async function saveStarQ(day) {
-  const v = q('sq-in').value.trim(); if (!v) return; const b = q('sq-save');
-  const { error } = await sb.from('qna_answers').upsert({ user_id: me.id, day: 20000 + day, answer: v, updated_at: new Date().toISOString() });
-  if (error) { b.innerText = '저장 실패 · 다시 시도'; return; } b.className = 'w-full mt-3 h-12 rounded-2xl font-bold text-[14px] text-white'; b.style.background = 'var(--mil-dark)'; b.innerText = '저장됨';
+/* 받침이 있으면 '이'를 붙여요: 은우가 / 정국이가 */
+function hasBat(w) {
+  const c = String(w || '').trim().slice(-1), k = c.charCodeAt(0);
+  if (k >= 0xAC00 && k <= 0xD7A3) return (k - 0xAC00) % 28 !== 0;
+  if (/[0-9]/.test(c)) return '0136780'.includes(c);
+  return /[lmnr]$/i.test(c);
+}
+const callAs = (nm, p) => (hasBat(nm) ? nm + '이' : nm) + (p || '');
+const sqText = (t, nm) => String(t || '').replace(/\{(에게|처럼|가|의|와|를|에|)\}/g, (_, p) => callAs(nm, p));
+let sqLoadP = null, sqSid = null; const sqView = {};
+function sqEnsure() {
+  if (window.STARQ && !Array.isArray(window.STARQ) && window.STARQ.army) return Promise.resolve();
+  return sqLoadP || (sqLoadP = new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = 'starq.js?v=1'; sc.onload = () => res(); sc.onerror = () => { sqLoadP = null; sc.remove(); rej(); }; document.head.appendChild(sc); }));
+}
+const sqBranch = s => ({ marine: 'marine', navy: 'navy', airforce: 'airforce' })[s.t] || 'army';
+/* 스타의 실제 복무일을 시트 길이에 맞춰요 (첫날 = 입대일, 마지막 = 전역일) */
+function sqMap(I, L) { const d = I.served; if (d <= 1) return 1; if (d >= I.total) return L; return Math.max(1, Math.min(L, 1 + Math.round((d - 1) * (L - 1) / Math.max(1, I.total - 1)))); }
+/* 스타마다 답을 따로 저장: 20000 + 스타번호*1000 + Day */
+function sqKey(s, d) { let h = 0; for (const c of String(s.id)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return 20000 + (1 + h % 79) * 1000 + d; }
+function sqStar() { const ids = myStars.map(x => x.id); if (!sqSid || !ids.includes(sqSid)) sqSid = ids.includes(stSel) ? stSel : ids[0]; return starK[sqSid] || myStar(); }
+function sqPick(id) { sqSid = id; renderStarQ(); }
+function sqGo(d) { const s = sqStar(); if (!s) return; sqView[s.id] = d; renderStarQ(); }
+function renderStarQ() {
+  const s = sqStar(), box = q('qna-star');
+  if (!s) { box.innerHTML = `<div class="toss-card text-center py-10"><div class="text-[16px] font-extrabold">MY스타를 먼저 등록해주세요</div><button onclick="starFlow()" class="mt-4 px-5 h-11 rounded-full text-[13px] font-extrabold text-white" style="background:var(--mil-dark)">MY스타 등록하기</button></div>`; return; }
+  if (!(window.STARQ && window.STARQ.army)) {
+    box.innerHTML = `<div class="toss-card text-center py-10 text-[14px] text-[#8B95A1]">오늘의 질문을 불러오는 중…</div>`;
+    sqEnsure().then(renderStarQ).catch(() => { box.innerHTML = `<div class="toss-card text-center py-10"><div class="text-[14px] text-[#4E5968]">질문을 불러오지 못했어요</div><button onclick="renderStarQ()" class="mt-4 px-5 h-11 rounded-full text-[13px] font-extrabold text-white" style="background:var(--mil-dark)">다시 시도</button></div>`; });
+    return;
+  }
+  const I = starInfo(s), Q = window.STARQ[sqBranch(s)] || window.STARQ.army, L = Q.length, nm = starCall(s), r = myRow(s.id), th = r ? r.theme : 'black_gold', TH = STAR_TH[th] || {};
+  const chips = myStars.length > 1 ? `<div class="flex gap-2 overflow-x-auto no-scrollbar mb-3">${myStars.map(x => { const t = starK[x.id]; if (!t) return ''; const on = x.id === s.id; return `<button onclick="sqPick('${x.id}')" class="shrink-0 h-9 px-4 rounded-full text-[13px] font-bold ${on ? 'text-white' : 'bg-white border border-[#E5E8EB] text-[#4E5968]'}" ${on ? 'style="background:#191F28"' : ''}>${esc(t.n)}</button>`; }).join('')}</div>` : '';
+  if (I.pre) {
+    box.innerHTML = chips + `<div class="stk ${TH.m ? 'mt' : ''} text-center" style="${thVars(th)}"><div class="relative z-[1]"><span class="lb">${esc(callAs(nm, '의'))} 입대까지 D-${I.toEnlist}</span>
+     <h2 class="text-[18px] font-extrabold leading-snug mt-4">입대하는 날부터<br>하루 한 질문이 열려요</h2><p class="text-[13px] opacity-70 mt-2">${esc(callAs(nm, '를'))} 기다리는 마음을 매일 기록할 수 있어요</p></div></div>`;
+    return;
+  }
+  const today = sqMap(I, L); let d = sqView[s.id] || today; if (d > today) d = today; if (d < 1) d = 1;
+  const row = Q[d - 1] || [], qt = sqText(row[0], nm), sp = row[2] || '', rk = row[3] || '', key = sqKey(s, d);
+  const nb = (on, act, lbl) => `<button ${on ? `onclick="${act}"` : 'disabled'} class="w-10 h-10 rounded-full flex items-center justify-center text-[18px] font-bold ${on ? 'bg-white border border-[#E5E8EB] text-[#191F28]' : 'text-[#D1D6DB]'}" aria-label="${lbl}">${lbl === '이전' ? '‹' : '›'}</button>`;
+  box.innerHTML = chips + `<div class="stk ${TH.m ? 'mt' : ''} text-center" style="${thVars(th)}"><div class="relative z-[1]">
+   <span class="lb">${I.done ? esc(callAs(nm, '의')) + ' 전역을 축하해요 · 지난 질문 다시 보기' : esc(callAs(nm, '를')) + ' 기다린 지 ' + I.served + '일째'}</span>
+   <div class="flex items-center justify-center gap-1.5 mt-3 flex-wrap">${sp ? `<span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold" style="background:var(--fg,#fff);color:var(--bg,#111)">${esc(sp)}</span>` : ''}<span class="px-2.5 py-1 rounded-full text-[11px] font-bold" style="background:rgba(127,127,127,.2)">Day ${d} / ${L}</span>${rk ? `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold" style="background:rgba(127,127,127,.2)">${esc(rk)}</span>` : ''}</div>
+   <h2 class="text-[18px] font-extrabold leading-snug mt-3 break-keep">“${esc(qt)}”</h2>
+   <p class="text-[12px] opacity-60 mt-2">${esc(row[1] || '')}${row[1] ? ' · ' : ''}나만 볼 수 있는 기다림 일기예요</p></div></div>
+   <div class="flex items-center justify-between mt-3">${nb(d > 1, `sqGo(${d - 1})`, '이전')}${d < today ? `<button onclick="sqGo(${today})" class="h-9 px-4 rounded-full text-[12px] font-bold bg-white border border-[#E5E8EB] text-[#4E5968]">오늘 질문으로</button>` : `<span class="text-[12px] font-bold text-[#8B95A1]">오늘의 질문</span>`}${nb(d < today, `sqGo(${d + 1})`, '다음')}</div>
+   <div class="toss-card mt-3"><textarea id="sq-in" rows="5" maxlength="1000" class="w-full outline-none text-[15px] leading-relaxed resize-none" placeholder="오늘의 마음을 적어보세요"></textarea><button id="sq-save" onclick="saveStarQ(${key})" class="w-full mt-3 h-12 rounded-2xl font-bold text-[14px] bg-[#E5E8EB] text-[#4E5968]">저장</button></div>`;
+  sb.from('qna_answers').select('answer').eq('user_id', me.id).eq('day', key).maybeSingle().then(({ data }) => { const t = q('sq-in'); if (data && t && t.dataset.k !== 'typed') { t.value = data.answer || ''; const b = q('sq-save'); b.className = 'w-full mt-3 h-12 rounded-2xl font-bold text-[14px] text-white'; b.style.background = 'var(--mil-dark)'; b.innerText = '저장됨'; } }).catch(() => { });
+  const t = q('sq-in'); if (t) t.oninput = () => { t.dataset.k = 'typed'; const b = q('sq-save'); b.className = 'w-full mt-3 h-12 rounded-2xl font-bold text-[14px] text-white'; b.style.background = 'var(--mil-dark)'; b.innerText = '저장'; };
+}
+let sqBusy = false;
+async function saveStarQ(key) {
+  if (sqBusy) return; const v = q('sq-in').value.trim().slice(0, 1000); if (!v) return; const b = q('sq-save');
+  sqBusy = true; b.disabled = true; b.innerText = '저장 중…';
+  try {
+    const { error } = await sb.from('qna_answers').upsert({ user_id: me.id, day: key, answer: v, updated_at: new Date().toISOString() });
+    if (error) { b.innerText = '저장 실패 · 다시 시도'; return; } b.className = 'w-full mt-3 h-12 rounded-2xl font-bold text-[14px] text-white'; b.style.background = 'var(--mil-dark)'; b.innerText = '저장됨'; q('sq-in').dataset.k = '';
+  } finally { sqBusy = false; b.disabled = false; }
+}
+/* 부르는 이름 바꾸기 */
+async function starNick(id) {
+  const s = starK[id]; if (!s) return; const cur = starCall(s);
+  const v = prompt(`질문에 들어갈 이름을 적어주세요 (예: ${cur})\n비우면 자동으로 정해요`, cur); if (v === null) return;
+  const nk = v.replace(/[<>"'`{}]/g, '').trim().slice(0, 10);
+  try { const m = nkLocal(); if (nk) m[id] = nk; else delete m[id]; localStorage.setItem(nkKey(), JSON.stringify(m)); } catch (e) { }
+  const r = myRow(id); if (r) r.nick = nk;
+  try { await sb.from('star_fans').update({ nick: nk || null }).eq('user_id', me.id).eq('star_id', id); } catch (e) { }
+  stRefresh(); try { renderStarQ(); } catch (e) { }
 }
 
 /* 상대방 Q&A 답변 알림 */
@@ -3119,7 +3271,7 @@ function renderRoute() {
   <div class="grid gap-1 mb-1 rt-sum" style="grid-template-columns:1.35fr 1.15fr .65fr .85fr"><div><i>총 소요</i><b>${fmtM(x.min)}</b></div><div><i>총 비용</i><b>${W(x.cost)}</b></div><div><i>환승</i><b>${x.tr}회</b></div><div><i>도보</i><b>${x.walk ? fmtM(x.walk) : '없음'}</b></div></div>
   ${rtLine(x, b, i + 2)}
   <div class="text-[11px] text-[#4E5968] space-y-0.5 mb-2">${x.lines.map(l => `<div>· ${esc(l)}</div>`).join('')}</div>
-  <div class="flex flex-wrap gap-2">${x.links.map(l => `<a target="_blank" rel="noopener" href="${esc(l[1])}" class="text-[11px] font-bold bg-white border border-[#E5E8EB] rounded-lg px-3 py-1.5 text-[var(--mil-green)]">${l[0]}</a>`).join('')}</div></div>`).join('')}</div>
+  <div class="flex flex-wrap gap-2">${x.links.map(l => `<a target="_blank" rel="noopener" href="${safeUrl(l[1])}" class="text-[11px] font-bold bg-white border border-[#E5E8EB] rounded-lg px-3 py-1.5 text-[var(--mil-green)]">${l[0]}</a>`).join('')}</div></div>`).join('')}</div>
   <div class="grid grid-cols-2 gap-2 mt-3"><a target="_blank" rel="noopener" href="https://map.kakao.com/link/by/publictransit/${encodeURIComponent(a.name)},${a.lat},${a.lng}/${encodeURIComponent(b.name)},${b.lat},${b.lng}" class="block text-center bg-[#FEE500] text-[#191F28] rounded-xl py-3 text-[12px] font-bold">카카오맵에서 정확히 보기</a><a target="_blank" rel="noopener" href="${nv('transit')}" class="block text-center bg-[#03C75A] text-white rounded-xl py-3 text-[12px] font-bold">네이버지도에서 보기</a></div>
   <p class="text-[10px] text-[#8B95A1] mt-3">※ 구간별 시간·요금·환승 횟수는 거리 기반 추정이에요. 열차·버스 실제 출발 시각과 정확한 요금, 막차는 위 링크(코레일톡·SRT·고속버스·시외버스·지도 앱)에서 확인하세요.</p>`;
 }
@@ -3212,6 +3364,8 @@ function rlSpin(ov) {
 function rlReset(ov) { ov.style.transition = 'none'; ov.classList.remove('rl-out', 'hidden'); ov.classList.add('hidden'); ov.innerHTML = RL_HTML; void ov.offsetWidth; ov.style.transition = ''; }
 function getGPS() {
   if (!navigator.geolocation) return showAlert('알림', '위치 기능을 지원하지 않는 기기입니다.');
+  const md = (session && session.user && session.user.user_metadata) || {};
+  if (!md.agree_loc) { if (!confirm('[선택] 위치정보 이용에 동의할까요?\n집으로 가는 경로를 찾을 때 지금 위치만 쓰고, 서버에 저장하지 않아요.')) return; sb.auth.updateUser({ data: { agree_loc: true } }).then(({ data }) => { if (data && data.user) session.user = data.user; }).catch(() => { }); }
   q('route-start').value = '위치 확인 중...';
   navigator.geolocation.getCurrentPosition(async p => {
     const lat = p.coords.latitude, lng = p.coords.longitude; let label = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
@@ -3249,7 +3403,7 @@ function parseCSV(t) {
   if (f !== '' || r.length) { r.push(f); rows.push(r); } return rows;
 }
 async function importMenuCsv(inp) {
-  const file = inp.files[0]; if (!file) return; const buf = await file.arrayBuffer();
+  const file = inp.files[0]; if (!file) return; if (!fileOK(file, 'csv')) { inp.value = ''; return; } const buf = await file.arrayBuffer();
   let txt = new TextDecoder('utf-8').decode(buf); if (txt.includes('\uFFFD')) { try { txt = new TextDecoder('euc-kr').decode(buf); } catch (e) { } }
   inp.value = ''; const rows = parseCSV(txt.replace(/^\uFEFF/, '')); if (rows.length < 2) return showAlert('알림', '파일 내용을 읽지 못했어요.');
   const H = rows[0].map(x => x.trim()), idx = k => H.findIndex(h => h.includes(k) && !/열량|알레르기/.test(h)), di = H.findIndex(h => h.includes('날짜') || h.includes('일자')), bi = idx('조식'), li = idx('중식'), ni = idx('석식');
@@ -3304,7 +3458,7 @@ async function renderBenefits() {
   q('tab-benefits').innerHTML = cardSection() + `<div class="toss-card"><div class="flex justify-between items-center mb-1"><h2 class="text-[18px] font-extrabold">🎁 지금 진행 중인 이벤트</h2><button onclick="showEnded=!showEnded;renderBenefits()" class="text-[11px] font-bold bg-[#F5F6F8] px-3 py-1.5 rounded-full">${showEnded ? '종료 숨기기' : '종료 보기'}</button></div>
    <p class="text-[11px] text-[#8B95A1] mb-4">마지막 업데이트 ${esc(EVT.updated || '-')} · ${esc(EVT.note || '')}</p><div class="space-y-3">${evs.length ? evs.map(({ e, i }) => `<div class="bg-[#F5F6F8] rounded-2xl p-4 border border-[#E5E8EB] ${i.k === 'ended' ? 'opacity-60' : ''}"><div class="flex justify-between items-start gap-2 mb-1"><div class="text-[14px] font-extrabold leading-snug">${esc(e.title)}</div><span class="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${col[i.k]}">${i.label}</span></div>
    <div class="text-[11px] text-[#8B95A1] mb-2">${esc(e.org)}</div><div class="text-[12px] font-bold mb-1">${esc(e.benefit)}</div><div class="text-[11px] text-[#4E5968] space-y-0.5"><div>📅 ${e.start ? esc(e.start) : '상시'} ~ ${e.end ? esc(e.end) : '미정'} ${i.d ? `<b class="text-[var(--pink-main)]">(${i.d})</b>` : ''}</div><div>👤 ${esc(e.target)}</div>${e.note ? `<div>ℹ️ ${esc(e.note)}</div>` : ''}</div>
-   <a target="_blank" rel="noopener" href="${esc(e.url)}" class="inline-block mt-2 text-[11px] font-bold text-[var(--mil-green)]">출처 보기 ▶</a></div>`).join('') : '<div class="text-center text-[12px] text-[#8B95A1] py-4">진행 중인 이벤트가 없어요.</div>'}</div></div>
+   <a target="_blank" rel="noopener" href="${safeUrl(e.url)}" class="inline-block mt-2 text-[11px] font-bold text-[var(--mil-green)]">출처 보기 ▶</a></div>`).join('') : '<div class="text-center text-[12px] text-[#8B95A1] py-4">진행 중인 이벤트가 없어요.</div>'}</div></div>
    <div class="toss-card"><h2 class="text-[18px] font-extrabold mb-1">군인 특별 혜택 (2026)</h2><p class="text-[11px] text-[#8B95A1] mb-4">시기·업체 정책에 따라 바뀔 수 있으니 이용 전 확인하세요.</p><div class="space-y-4">${BEN.map(b => `<div><div class="text-[14px] font-extrabold mb-1.5">${b[0]} ${b[1]}</div><div class="bg-[#F5F6F8] rounded-xl p-3 space-y-1.5">${b[2].map(t => `<div class="text-[12px] text-[#4E5968] leading-relaxed">· ${esc(t)}</div>`).join('')}</div></div>`).join('')}</div></div>`;
 }
 
@@ -3315,7 +3469,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-work
 if (!configured) hideSplash();
 if (configured) {
   sb.auth.getSession().then(({ data }) => { if (data.session) { session = data.session; introClose(true); boot().finally(hideSplash); } else hideSplash(); }).catch(hideSplash);
-  sb.auth.onAuthStateChange((ev, s) => { if (ev === 'SIGNED_IN' && s && !booted) { session = s; introClose(true); boot(); } if (ev === 'SIGNED_OUT') location.reload(); });
+  sb.auth.onAuthStateChange((ev, s) => { if (ev === 'SIGNED_IN' && s && !booted) { session = s; introClose(true); boot(); } if (ev === 'SIGNED_OUT') location.reload(); if (ev === 'PASSWORD_RECOVERY') setTimeout(() => openM('modal-pw'), 600); });
 }
 </script>
 </body>
