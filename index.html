@@ -73,6 +73,16 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 .cs input{width:20px;height:20px;accent-color:var(--mil-green);flex-shrink:0}
 .cs a{margin-left:auto;font-size:12px;color:#8B95A1;text-decoration:underline;flex-shrink:0;padding-left:6px}
 .legal a{text-decoration:underline}
+.zdlg{position:fixed;inset:0;z-index:400;background:rgba(17,20,26,.42);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;animation:zdIn .18s ease}
+.zdlg.out{animation:zdOut .17s ease forwards}.zdlg.out .zdlg-box{transform:scale(.96);transition:transform .17s}
+.zdlg-box{width:100%;max-width:320px;background:#fff;border-radius:26px;padding:26px 20px 16px;box-shadow:0 24px 60px rgba(17,20,26,.22);animation:zdPop .28s cubic-bezier(.2,1.3,.4,1);text-align:center}
+.zdlg-box h3{font-size:17px;font-weight:800;color:#191F28;line-height:1.4;letter-spacing:-.3px;word-break:keep-all}
+.zdlg-msg{margin-top:8px;font-size:14px;color:#6B7684;line-height:1.6;max-height:55vh;overflow-y:auto;word-break:keep-all}
+.zdlg-in{margin-top:16px;text-align:center}
+.zdlg-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:22px}.zdlg-btns.one{grid-template-columns:1fr}
+.zdlg-btns button{height:50px;border-radius:16px;font-size:15px;font-weight:800;transition:transform .1s}.zdlg-btns button:active{transform:scale(.97)}
+.zdlg-btns .c{background:#F2F3F5;color:#4E5968}.zdlg-btns .o{background:#191F28;color:#fff}.zdlg-btns .o.d{background:#E5484D}
+@keyframes zdIn{from{opacity:0}}@keyframes zdOut{to{opacity:0}}@keyframes zdPop{from{transform:scale(.9);opacity:0}}
 </style>
 <style>
 .swp{position:absolute;inset:0;display:flex;flex-direction:column;background:#fff}
@@ -686,7 +696,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
   </section>
  </main>
 
- <nav class="bg-white/95 backdrop-blur-md px-1 pt-2.5 pb-safe grid grid-cols-6 items-center z-40 border-t border-[#F2F3F5] shrink-0 absolute bottom-0 left-0 right-0" id="bottom-nav"></nav>
+ <nav class="bg-white/95 backdrop-blur-md px-1 pt-2.5 pb-safe grid grid-cols-6 items-center z-40 border-t border-[#F2F3F5] shrink-0" style="position:fixed;left:0;right:0;bottom:0;margin:0 auto;width:100%;max-width:28rem" id="bottom-nav"></nav>
 
  <!-- 설정 -->
  <div id="modal-settings" class="fixed inset-0 z-50 bg-white hidden flex-col">
@@ -694,9 +704,9 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
    <div class="flex items-center justify-between px-4 py-3"><button onclick="setBack()" class="w-10 h-10 rounded-full bg-[#F5F6F8] text-xl font-bold">‹</button><div id="set-title" class="font-bold text-[17px]">설정</div><div class="w-10"></div></div>
    <div class="flex-1 overflow-y-auto no-scrollbar pb-12">
     <div id="set-p-main"><div class="flex items-center gap-4 px-5 py-4"><div id="set-avatar" class="w-16 h-16 rounded-full bg-[#E1E1E1] overflow-hidden flex items-center justify-center flex-shrink-0"></div><div class="flex-1 min-w-0"><div id="set-name" class="font-extrabold text-[18px]"></div><div id="set-email" class="text-[13px] text-[#8B95A1] truncate"></div></div><button onclick="setGo('profile')" class="border border-[#E5E8EB] rounded-full px-3.5 py-1.5 text-[12px] font-bold">관리</button></div><div id="set-rows"></div></div>
-    <div id="set-p-profile" class="hidden px-5 pt-2"><div class="flex items-center gap-4 mb-6"><div id="set-ava2" class="w-20 h-20 rounded-full bg-[#E1E1E1] overflow-hidden flex items-center justify-center flex-shrink-0"></div><div class="space-y-2"><label class="inline-block bg-[#191F28] text-white rounded-xl px-4 py-2.5 text-[13px] font-bold cursor-pointer">📷 사진 선택<input type="file" accept="image/*" class="hidden" onchange="pickAvatar(this)"></label><button onclick="removeAvatar()" class="block text-[12px] text-[#8B95A1] underline">기본 캐릭터로 되돌리기</button></div></div><label class="text-[12px] font-bold text-[#4E5968] block mb-2">이름 또는 별명</label><input id="set-nick" maxlength="12" placeholder="예) 백충인, 감자돌이" class="inp mb-2"><p class="text-[11px] text-[#8B95A1] mb-5">홈 화면 프로필에 표시되고, 연동된 상대에게도 보여요. (최대 12자)</p><label class="text-[12px] font-bold text-[#4E5968] block mb-2">사귄 날짜 💑</label><input type="date" id="set-love" class="inp mb-2"><p class="text-[11px] text-[#8B95A1] mb-5">둘 중 한 명이 설정하면 홈에 사귄 지 며칠째인지 보여요. 각자 다르게 입력하면 자기 화면에는 자기가 입력한 날짜가 보여요.</p><button onclick="saveNick()" class="w-full bg-[#191F28] text-white py-3.5 rounded-xl font-bold text-[15px]">저장</button></div>
+    <div id="set-p-profile" class="hidden px-5 pt-2"><div class="flex items-center gap-4 mb-6"><div id="set-ava2" class="w-20 h-20 rounded-full bg-[#E1E1E1] overflow-hidden flex items-center justify-center flex-shrink-0"></div><div class="space-y-2"><label class="inline-block bg-[#191F28] text-white rounded-xl px-4 py-2.5 text-[13px] font-bold cursor-pointer">📷 사진 선택<input type="file" accept="image/*" class="hidden" onchange="pickAvatar(this)"></label><button onclick="removeAvatar()" class="block text-[12px] text-[#8B95A1] underline">기본 캐릭터로 되돌리기</button></div></div><label class="text-[12px] font-bold text-[#4E5968] block mb-2">이름 또는 별명</label><input id="set-nick" maxlength="12" placeholder="예) 백충인, 감자돌이" class="inp mb-2"><p class="text-[11px] text-[#8B95A1] mb-5">홈 화면 프로필에 표시되고, 연동된 상대에게도 보여요. (최대 12자)</p><button onclick="saveNick()" class="w-full bg-[#191F28] text-white py-3.5 rounded-xl font-bold text-[15px]">저장</button></div>
     <div id="set-p-couple" class="hidden px-5 pt-2"><div id="couple-link-ui"><div class="bg-[#FFF0F3] p-4 rounded-xl flex justify-between items-center mb-3"><span class="text-[13px] font-semibold text-[#D94867]">나의 연결 코드</span><span id="my-couple-code" class="font-black text-[#D94867] tracking-widest text-[16px] select-text">-</span></div><p class="text-[12px] text-[#8B95A1] mb-3">내 코드를 연인에게 알려주거나, 연인의 코드를 아래에 입력하면 연동돼요.</p><div class="flex gap-2"><input id="partner-code-input" maxlength="6" placeholder="상대방 코드 6자리" class="flex-1 bg-white border border-[#E5E8EB] rounded-xl px-3 py-3 text-[14px] outline-none uppercase"><button onclick="linkC()" class="bg-[#191F28] text-white px-5 rounded-xl font-bold text-[13px]">연결</button></div></div>
-     <div id="couple-linked-ui" class="hidden bg-[var(--mil-green-light)] p-5 rounded-xl text-center border border-[var(--mil-border)]"><div class="text-[15px] font-bold text-[var(--mil-green)]">✅ 연동 중이에요</div><button onclick="unlinkC()" class="text-[12px] text-[#8B95A1] underline mt-2">연동 해제</button></div></div>
+     <div id="couple-linked-ui" class="hidden bg-[var(--mil-green-light)] p-5 rounded-xl text-center border border-[var(--mil-border)]"><div class="text-[15px] font-bold text-[var(--mil-green)]">✅ 연동 중이에요</div><button onclick="unlinkC()" class="text-[12px] text-[#8B95A1] underline mt-2">연동 해제</button></div><div id="love-box" class="hidden mt-6"><label class="text-[12px] font-bold text-[#4E5968] block mb-2">사귄 날짜 💑</label><input type="date" id="set-love" class="inp mb-2"><p class="text-[11px] text-[#8B95A1] mb-4">둘 중 한 명이 설정하면 홈에 사귄 지 며칠째인지 보여요. 각자 다르게 입력하면 자기 화면에는 자기가 입력한 날짜가 보여요.</p><button onclick="saveLove()" class="w-full bg-[#191F28] text-white py-3.5 rounded-xl font-bold text-[15px]">저장</button></div></div>
     <div id="set-p-service" class="hidden px-5 pt-2"><div id="set-service-note" class="hidden text-[13px] text-[#8B95A1] bg-[#F5F6F8] rounded-xl p-4">복무 정보는 군인 계정에서 설정해요. 연동하면 남자친구의 정보가 홈에 보여요.</div>
      <div id="set-service-form"><label class="text-[12px] font-bold text-[#4E5968] block mb-2">군종</label><div class="grid grid-cols-4 gap-1.5 mb-4" id="set-branches"></div><label class="text-[12px] font-bold text-[#4E5968] block mb-2">입대일 · 전역일</label><div class="flex gap-2 mb-1"><input type="date" id="set-enlist" class="flex-1 bg-[#F5F6F8] border border-[#E5E8EB] rounded-xl px-2 py-3 text-[13px] font-bold outline-none" onchange="autoD()"><input type="date" id="set-discharge" class="flex-1 bg-[#F5F6F8] border border-[#E5E8EB] rounded-xl px-2 py-3 text-[13px] font-bold outline-none"></div><p class="text-[11px] text-[#8B95A1] mb-5">입대일을 바꾸면 전역일이 군종에 맞춰 자동 계산돼요. (진급은 매월 1일 기준)</p><button onclick="saveS()" class="w-full bg-[#191F28] text-white py-3.5 rounded-xl font-bold text-[15px]">저장</button></div></div>
     <div id="set-p-unit" class="hidden px-5 pt-2"><div id="set-unit-note" class="hidden text-[13px] text-[#8B95A1] bg-[#F5F6F8] rounded-xl p-4">자대는 군인 계정에서 등록해요. 등록하면 연동된 곰신도 식단표를 볼 수 있어요.</div>
@@ -1007,7 +1017,25 @@ function fileOK(f, kind) {
   if (f.size > 15 * 1048576) { showAlert('알림', '15MB 이하 사진만 올릴 수 있어요.'); return false; }
   return true;
 }
-const showAlert = (t, m) => { q('alert-title').innerText = t; q('alert-message').innerHTML = m; openM('modal-alert'); };
+/* 통일된 알림·확인·입력 창 (브라우저 기본 창 대신) */
+function zDialog(o) {
+  return new Promise(res => {
+    const ov = document.createElement('div'); ov.className = 'zdlg'; const inp = o.input !== undefined;
+    let title = o.title, msg = o.msg;
+    if (!title && msg) { const i = msg.indexOf('\n'); title = i > 0 ? msg.slice(0, i) : msg; msg = i > 0 ? msg.slice(i + 1) : ''; }
+    const body = o.html !== undefined ? o.html : esc(msg || '').replace(/\n/g, '<br>');
+    ov.innerHTML = `<div class="zdlg-box" role="dialog" aria-modal="true">${title ? `<h3>${esc(title)}</h3>` : ''}${body ? `<div class="zdlg-msg">${body}</div>` : ''}${inp ? `<input class="inp zdlg-in" maxlength="${o.max || 40}" placeholder="${esc(o.ph || '')}" value="${esc(o.input)}">` : ''}<div class="zdlg-btns ${o.cancel === false ? 'one' : ''}">${o.cancel === false ? '' : `<button class="c">${esc(o.cancel || '취소')}</button>`}<button class="o ${o.danger ? 'd' : ''}">${esc(o.ok || '확인')}</button></div></div>`;
+    let fin = false; const done = v => { if (fin) return; fin = true; ov.classList.add('out'); setTimeout(() => ov.remove(), 170); res(v); };
+    ov.querySelector('.o').onclick = () => done(inp ? ov.querySelector('.zdlg-in').value : true);
+    const c = ov.querySelector('.c'); if (c) c.onclick = () => done(inp ? null : false);
+    ov.addEventListener('click', e => { if (e.target === ov) done(o.cancel === false ? true : inp ? null : false); });
+    if (inp) ov.querySelector('.zdlg-in').addEventListener('keydown', e => { if (e.key === 'Enter') ov.querySelector('.o').click(); });
+    document.body.appendChild(ov); if (inp) setTimeout(() => { try { ov.querySelector('.zdlg-in').focus(); } catch (e) { } }, 120);
+  });
+}
+const zConfirm = (msg, o) => zDialog(Object.assign({ msg }, o || {}));
+const zPrompt = (msg, def, o) => zDialog(Object.assign({ msg, input: def || '' }, o || {}));
+const showAlert = (t, m) => zDialog({ title: t, html: m, cancel: false });
 const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const pd = s => new Date(s + 'T00:00:00');
 const BR = { army: { n: '육군', m: 18, k: '육군' }, marine: { n: '해병대', m: 18, k: '해병대' }, navy: { n: '해군', m: 20, k: '해군' }, airforce: { n: '공군', m: 21, k: '공군' } };
@@ -1124,11 +1152,11 @@ async function pwSave() {
 }
 /* 회원 탈퇴 */
 async function deleteAccount() {
-  if (!confirm('정말 탈퇴할까요?\n프로필, 편지, 질문 답변, MY스타 기록이 모두 지워지고 되돌릴 수 없어요.')) return;
-  const v = prompt('확인을 위해 "탈퇴"라고 적어주세요'); if ((v || '').trim() !== '탈퇴') return;
+  if (!(await zConfirm('정말 탈퇴할까요?\n프로필, 편지, 질문 답변, MY스타 기록이 모두 지워지고 되돌릴 수 없어요.', { ok: '탈퇴하기', danger: true }))) return;
+  const v = await zPrompt('한 번 더 확인할게요\n아래 칸에 "탈퇴"라고 적어주세요', '', { ok: '탈퇴', danger: true, ph: '탈퇴' }); if ((v || '').trim() !== '탈퇴') return;
   const { error } = await sb.rpc('delete_my_account');
   if (error) return showAlert('탈퇴 실패', '잠시 후 다시 시도해주세요.<br><span style="font-size:12px;color:#8B95A1">' + esc(error.message) + '</span><br>계속 안 되면 micbael11@naver.com 으로 요청해주세요.');
-  try { localStorage.clear(); } catch (e) { } await sb.auth.signOut().catch(() => { }); alert('탈퇴가 완료됐어요. 그동안 고마웠어요.'); location.reload();
+  try { localStorage.clear(); } catch (e) { } await sb.auth.signOut().catch(() => { }); await zDialog({ title: '탈퇴가 완료됐어요', msg: '그동안 고마웠어요.', cancel: false }); location.reload();
 }
 /* 오류가 나도 하얀 화면 대신 다시 시도 화면 */
 function fatal(msg) { try { const f = q('fatal'); if (msg) q('fatal-msg').innerText = msg; f.classList.remove('hidden'); f.classList.add('flex'); const sp = document.getElementById('splash'); if (sp) sp.remove(); } catch (e) { } }
@@ -1250,7 +1278,7 @@ function layoutPager(S, G) {
 }
 function pagerDots() { const c = q('profile-container'), i = Math.round(c.scrollLeft / Math.max(1, c.clientWidth + 76)); ['dot0', 'dot1'].forEach((id, k) => q(id).className = 'block w-2 h-2 rounded-full ' + (k === i ? 'bg-[var(--mil-green)]' : 'bg-[#D5D9DE]')); }
 function pagerGo(i) { const c = q('profile-container'); c.scrollTo({ left: i * (c.clientWidth + 76), behavior: 'smooth' }); }
-function openLoveSet() { openSettings(); setGo('profile'); }
+function openLoveSet() { openSettings(); setGo('couple'); }
 function hoInfo(S, now) {
   const I = milInfo(S), r = rankOf(S, now); let rr = r;
   if (r.r === '훈련병') rr = { r: '이병', nD: I.d1, nN: '일병' };
@@ -1387,18 +1415,19 @@ function setGo(p) {
 }
 function setBack() { if (setPage !== 'main') setGo('main'); else closeModal('modal-settings'); }
 function renderSetRows() {
-  const S = S_(), isM = me.gender === 'M', th = isM ? (me.bf_theme === 'gamja' ? '감자돌이' : '짬타이거') : (me.gf_theme === 'cat' ? '꽃냥이' : '곰신 베어');
+  const S = S_(), isM = me.gender === 'M', isS = me.gender === 'S', th = isM ? (me.bf_theme === 'gamja' ? '감자돌이' : '짬타이거') : (me.gf_theme === 'cat' ? '꽃냥이' : '곰신 베어');
   const row = (ic, label, val, go, red) => `<button onclick="${go}" class="w-full flex items-center gap-4 px-5 py-4 border-b border-[#F2F3F5] active:bg-[#F5F6F8]"><span class="text-xl w-7">${ic}</span><span class="flex-1 text-left text-[15px] font-semibold ${red ? 'text-[#E5484D]' : ''}">${label}</span><span class="text-[13px] text-[#8B95A1] max-w-[45%] truncate">${esc(val || '')}</span><span class="text-[#B0B8C1]">›</span></button>`, gap = '<div class="h-2.5 bg-[#F5F6F8]"></div>';
   q('set-name').innerText = me.nickname || (isM ? '🪖 군인' : me.gender === 'S' ? '⭐ 팬' : '💕 곰신');
-  q('set-rows').innerHTML = gap + row('✏️', '프로필 (이름·별명)', me.nickname || '미설정', "setGo('profile')") + row('⭐', 'MY스타', myStars.length ? myStars.map(r => (starK[r.id] || {}).n).join(', ') : '미등록', "closeModal('modal-settings');" + (myStars.length ? "openStar('my')" : 'starFlow()')) + row('💑', '사귄 날짜', me.love_date ? me.love_date.replace(/-/g, '.') : '미설정', "setGo('profile')") + row('💕', '커플 연동', me.partner_id ? '연동 중' : '미연동', "setGo('couple')") + row('👤', '계정', '', "setGo('account')") + gap
-    + row('🪖', '복무 정보', isM ? (BR[me.branch] || BR.army).k : '군인 계정에서 설정', "setGo('service')") + row('📍', '자대 등록', (S && S.unit_name) || '미등록', "setGo('unit')") + row('🎭', '캐릭터 테마', th, "setGo('theme')") + gap
+  q('set-rows').innerHTML = gap + row('✏️', '프로필 (이름·별명)', me.nickname || '미설정', "setGo('profile')") + row('⭐', 'MY스타', myStars.length ? myStars.map(r => (starK[r.id] || {}).n).join(', ') : '미등록', "closeModal('modal-settings');" + (myStars.length ? "openStar('my')" : 'starFlow()')) + (isS ? '' : row('💕', '커플 연동', me.partner_id ? (me.love_date ? '연동 중 · ' + me.love_date.replace(/-/g, '.') : '연동 중') : '미연동', "setGo('couple')")) + row('👤', '계정', '', "setGo('account')") + gap
+    + (isS ? '' : row('🪖', '복무 정보', isM ? (BR[me.branch] || BR.army).k : '군인 계정에서 설정', "setGo('service')") + row('📍', '자대 등록', (S && S.unit_name) || '미등록', "setGo('unit')") + row('🎭', '캐릭터 테마', th, "setGo('theme')"))
+    + (typeof zpWxOn === 'function' ? row('☀', '날씨 표시', zpWxOn() ? '켜짐' : '꺼짐', 'zpWxToggle()') : '') + gap
     + (me.is_admin ? row('🛠', '관리자', '회원 · 콘텐츠 · 점검', "closeModal('modal-settings');openAdmin()") + gap : '')
     + row('🚪', '로그아웃', '', 'logout()', true)
     + `<div class="legal px-5 py-6 text-[11px] text-[#8B95A1] leading-relaxed"><a href="terms.html" target="_blank" rel="noopener">이용약관</a> · <a href="privacy.html" target="_blank" rel="noopener"><b>개인정보처리방침</b></a> · <a href="mailto:micbael11@naver.com">문의하기</a><br>짬타이거 · 개인 운영(비영리) · micbael11@naver.com</div>`;
 }
 function openSettings() {
   const isM = me.gender === 'M'; q('my-couple-code').innerText = me.code || '-'; const linked = !!me.partner_id;
-  q('couple-link-ui').classList.toggle('hidden', linked); q('couple-linked-ui').classList.toggle('hidden', !linked);
+  q('couple-link-ui').classList.toggle('hidden', linked); q('couple-linked-ui').classList.toggle('hidden', !linked); q('love-box').classList.toggle('hidden', !linked);
   ['set-service-form', 'set-unit-form'].forEach(i => q(i).classList.toggle('hidden', !isM)); ['set-service-note', 'set-unit-note'].forEach(i => q(i).classList.toggle('hidden', isM));
   if (isM) { q('set-enlist').value = me.enlist_date || ''; setBr(me.branch || 'army'); q('set-discharge').value = me.discharge_date || ''; q('set-unit-name').value = me.unit_name || ''; q('set-unit-addr').value = me.unit_addr || ''; picks.unit = me.unit_lat ? { label: me.unit_addr || '', name: me.unit_addr || '', lat: me.unit_lat, lng: me.unit_lng } : null; }
   q('settings-theme-bf').classList.toggle('hidden', !isM); q('settings-theme-gf').classList.toggle('hidden', isM);
@@ -1407,8 +1436,12 @@ function openSettings() {
   q('set-avatar').innerHTML = myAvatarHTML(); q('set-ava2').innerHTML = myAvatarHTML();
   setGo('main'); openM('modal-settings');
 }
+async function saveLove() {
+  const { error } = await sb.from('profiles').update({ love_date: q('set-love').value || null }).eq('id', me.id);
+  if (error) return showAlert('오류', esc(error.message)); await loadAll(false); render(true); showAlert('저장했어요', '홈 화면에 사귄 지 며칠째인지 보여요.'); setGo('main');
+}
 async function saveNick() {
-  const v = q('set-nick').value.trim().slice(0, 12), { error } = await sb.from('profiles').update({ nickname: v || null, love_date: q('set-love').value || null }).eq('id', me.id);
+  const v = q('set-nick').value.trim().slice(0, 12), { error } = await sb.from('profiles').update({ nickname: v || null }).eq('id', me.id);
   if (error) return showAlert('오류', esc(error.message) + '<br><br>schema_nickname.sql 과 schema_love.sql 을 실행했는지 확인하세요.');
   await loadAll(false); render(true); setGo('main');
 }
@@ -1582,8 +1615,8 @@ async function openPost(id, keep) {
 }
 async function likePost(id) { const { error } = await sb.rpc('community_like', { pid: id }); if (error) return showAlert('알림', esc(cmErr(error))); openPost(id, true); loadCommunity(); }
 async function sendComment() { const v = q('cm-in').value.trim(); if (!v || !cmCur) return; const { error } = await sb.rpc('community_comment', { pid: cmCur, b: v, a: cAnon }); if (error) return showAlert('알림', esc(cmErr(error))); q('cm-in').value = ''; await openPost(cmCur, true); loadCommunity(); const b = q('post-body'); b.scrollTop = b.scrollHeight; }
-async function delPost(id) { if (!confirm('이 글을 삭제할까요?')) return; await sb.rpc('community_delete', { kind: 'post', rid: id }); closeModal('modal-post'); loadCommunity(); }
-async function delComment(id) { if (!confirm('이 댓글을 삭제할까요?')) return; await sb.rpc('community_delete', { kind: 'comment', rid: id }); openPost(cmCur, true); loadCommunity(); }
+async function delPost(id) { if (!(await zConfirm('이 글을 삭제할까요?', { ok: '삭제', danger: true }))) return; await sb.rpc('community_delete', { kind: 'post', rid: id }); closeModal('modal-post'); loadCommunity(); }
+async function delComment(id) { if (!(await zConfirm('이 댓글을 삭제할까요?', { ok: '삭제', danger: true }))) return; await sb.rpc('community_delete', { kind: 'comment', rid: id }); openPost(cmCur, true); loadCommunity(); }
 function openWriteC() { q('w-title').value = ''; q('w-body').value = ''; wCat = CATS.some(c => c[0] === cmCat) && !['all', 'hot'].includes(cmCat) ? cmCat : 'free'; wAnon = true; paintWrite(); openM('modal-write'); }
 function setWAnon(v) { wAnon = v; paintWrite(); }
 function paintWrite() { syncStarCat();
@@ -2019,7 +2052,7 @@ function lEnvDone() {
 }
 function lEnvSkip() { lEnvDone(); }
 function lReply() { if (!lCur) return; closeModal('modal-lview'); openWrite(lCur.mine ? lCur.recipient : lCur.sender); }
-async function lDelete() { if (!lCur || !confirm('이 편지를 삭제할까요?')) return; const id = lCur.id; closeModal('modal-lview'); letters = letters.filter(x => x.id !== id); updateLetterDot(); renderLetters(); try { await sb.rpc('letter_delete', { lid: id }); } catch (e) { } }
+async function lDelete() { if (!lCur || !(await zConfirm('이 편지를 삭제할까요?', { ok: '삭제', danger: true }))) return; const id = lCur.id; closeModal('modal-lview'); letters = letters.filter(x => x.id !== id); updateLetterDot(); renderLetters(); try { await sb.rpc('letter_delete', { lid: id }); } catch (e) { } }
 function openWrite(u) {
   const fl = lRecips(); if (!fl.length) return showAlert('알림', '편지는 연인이나 친구에게 보낼 수 있어요.<br>먼저 친구를 추가해보세요!');
   lTo = u && fl.find(x => x.uid === u) ? u : (fl[0] && (lTo && fl.find(x => x.uid === lTo) ? lTo : fl[0].uid)); q('lw-title').value = ''; q('lw-body').value = ''; q('lw-cnt').innerText = '0 / 2000'; paintLw(); openM('modal-lwrite');
@@ -2068,7 +2101,7 @@ async function linkC() {
   const msg = { OK: '연동 완료! 💕 이제 서로의 프로필이 보여요.', NOT_FOUND: '존재하지 않는 코드입니다.', SELF: '내 코드는 입력할 수 없어요.', SAME_GENDER: '군인(남)과 곰신(여) 계정끼리만 연동돼요.', ALREADY: '이미 연동된 계정이 있어요.' }[data] || data;
   if (data === 'OK') closeModal('modal-settings'); showAlert(data === 'OK' ? '연동 성공' : '연동 실패', msg); await loadAll(false); render(true);
 }
-async function unlinkC() { if (!confirm('정말 연동을 해제할까요?')) return; await sb.rpc('unlink_couple'); await loadAll(false); render(true); setGo('main'); }
+async function unlinkC() { if (!(await zConfirm('정말 연동을 해제할까요?\n커플 질문과 홈 화면의 연동 정보가 사라져요.', { ok: '해제', danger: true }))) return; await sb.rpc('unlink_couple'); await loadAll(false); render(true); setGo('main'); }
 async function saveStatusMsg() { await sb.from('profiles').update({ status_msg: q('one-line-msg').value.slice(0, 40) }).eq('id', me.id); }
 
 /* ---------- 휴가/일정 ---------- */
@@ -2108,7 +2141,7 @@ async function saveVac() {
   if (error) return showAlert('오류', esc(error.message) + '<br><br>schema_vacation_kind.sql 을 실행했는지 확인하세요.');
   closeModal('modal-vac'); await loadAll(false); render(false);
 }
-async function delVac(id) { if (!confirm('이 일정을 삭제할까요?')) return; await sb.from('vacations').delete().eq('id', id); await loadAll(false); render(false); }
+async function delVac(id) { if (!(await zConfirm('이 일정을 삭제할까요?', { ok: '삭제', danger: true }))) return; await sb.from('vacations').delete().eq('id', id); await loadAll(false); render(false); }
 const cfDates = v => { const o = []; for (let d = pd(v.start_date), e = pd(v.end_date); d <= e; d.setDate(d.getDate() + 1)) o.push(ymd(d)); return o; };
 const vDay = k => k === 'out' ? '외출' : VK[k].n;
 function vacStats() {
@@ -2352,7 +2385,7 @@ function jfRender(v, path) {
 }
 function jfRef(path) { const parts = path.replace(/\[(\d+)\]/g, '.$1').split('.').filter(Boolean); let o = { root: adDraft }; let k = 'root'; for (const p of parts.slice(1)) { o = o[k]; k = p; } return [o, k]; }
 function jfSet(path, val) { const [o, k] = jfRef(path); o[k] = val; adDirty(); }
-function jfDel(path, i) { if (!confirm('이 항목을 삭제할까요?')) return; const [o, k] = jfRef(path); o[k].splice(i, 1); adDirty(); adForm(); }
+async function jfDel(path, i) { if (!(await zConfirm('이 항목을 삭제할까요?', { ok: '삭제', danger: true }))) return; const [o, k] = jfRef(path); o[k].splice(i, 1); adDirty(); adForm(); }
 function jfAdd(path) { const [o, k] = jfRef(path), arr = o[k], t = arr[0]; const blank = x => Array.isArray(x) ? x.map(blank) : x && typeof x === 'object' ? Object.fromEntries(Object.entries(x).filter(([kk]) => !['auto', 'closed', 'added'].includes(kk)).map(([kk, vv]) => [kk, Array.isArray(vv) ? [] : blank(vv)])) : typeof x === 'number' ? 0 : typeof x === 'boolean' ? false : ''; arr.push(t !== undefined ? blank(t) : (adCK === 'stars' ? { id: 'a_' + Date.now().toString(36), n: '', g: '', c: 'idol', e: '', d: '', t: 'army' } : '')); adDirty(); adForm(); }
 function adDirty() { const b = q('ac-save'); if (b) { b.innerText = '저장하기'; b.className = 'ad-btn dark flex-1'; } }
 async function adContent() {
@@ -2362,7 +2395,7 @@ async function adContent() {
   adForm();
 }
 function adForm() {
-  q('ac-form').innerHTML = `<div class="ad-card">${jfRender(adDraft, 'root')}</div><div class="sticky bottom-0 pt-3 pb-1 flex gap-2" style="background:var(--bg-main)"><button id="ac-save" class="ad-btn flex-1" onclick="adCSave()">저장됨</button><button class="ad-btn" onclick="if(confirm('저장 안 한 변경을 버릴까요?')){adDraft=null;adContent()}">되돌리기</button></div>`;
+  q('ac-form').innerHTML = `<div class="ad-card">${jfRender(adDraft, 'root')}</div><div class="sticky bottom-0 pt-3 pb-1 flex gap-2" style="background:var(--bg-main)"><button id="ac-save" class="ad-btn flex-1" onclick="adCSave()">저장됨</button><button class="ad-btn" onclick="zConfirm('저장 안 한 변경을 버릴까요?',{ok:'버리기',danger:true}).then(y=>{if(y){adDraft=null;adContent()}})">되돌리기</button></div>`;
 }
 async function adCSave() {
   const b = q('ac-save'); b.innerText = '저장 중…';
@@ -2554,7 +2587,7 @@ async function thSave() {
   if (old !== k) setTimeout(() => { if (q('star-sheet').classList.contains('show') && window._thId === id) stSheetClose(); }, 700);
 }
 async function starUnset(id) {
-  const s = starK[id]; if (!s || !confirm(`MY스타(${s.n})를 삭제할까요?\n팬이 된 날짜와 고른 사진·테마도 함께 지워져요.`)) return;
+  const s = starK[id]; if (!s || !(await zConfirm(`MY스타(${s.n})를 삭제할까요?\n팬이 된 날짜와 고른 사진·테마도 함께 지워져요.`, { ok: '삭제', danger: true }))) return;
   let error = null;
   ({ error } = await sb.from('star_fans').delete().eq('user_id', me.id).eq('star_id', id));
   if (error || !stFansOK) ({ error } = await sb.rpc('star_set', { sid: '', since: null, photo: null }));
@@ -2746,7 +2779,7 @@ async function saveStarQ(key) {
 /* 부르는 이름 바꾸기 */
 async function starNick(id) {
   const s = starK[id]; if (!s) return; const cur = starCall(s);
-  const v = prompt(`질문에 들어갈 이름을 적어주세요 (예: ${cur})\n비우면 자동으로 정해요`, cur); if (v === null) return;
+  const v = await zPrompt(`질문에 들어갈 이름\n질문 속 '스타' 자리에 들어가요. 비우면 자동으로 정해요.`, cur, { ok: '저장', max: 10, ph: cur }); if (v === null) return;
   const nk = v.replace(/[<>"'`{}]/g, '').trim().slice(0, 10);
   try { const m = nkLocal(); if (nk) m[id] = nk; else delete m[id]; localStorage.setItem(nkKey(), JSON.stringify(m)); } catch (e) { }
   const r = myRow(id); if (r) r.nick = nk;
@@ -3438,10 +3471,10 @@ function rlSpin(ov) {
   (function f(t) { if (id !== rlRun || ov.classList.contains('hidden')) return; const a = -(((t - t0) / 500) % 1) * 360; ws.forEach(w => { w.style.transform = 'rotate(' + a + 'deg)'; }); requestAnimationFrame(f); })(performance.now());
 }
 function rlReset(ov) { ov.style.transition = 'none'; ov.classList.remove('rl-out', 'hidden'); ov.classList.add('hidden'); ov.innerHTML = RL_HTML; void ov.offsetWidth; ov.style.transition = ''; }
-function getGPS() {
+async function getGPS() {
   if (!navigator.geolocation) return showAlert('알림', '위치 기능을 지원하지 않는 기기입니다.');
   const md = (session && session.user && session.user.user_metadata) || {};
-  if (!md.agree_loc) { if (!confirm('[선택] 위치정보 이용에 동의할까요?\n집으로 가는 경로를 찾을 때 지금 위치만 쓰고, 서버에 저장하지 않아요.')) return; sb.auth.updateUser({ data: { agree_loc: true } }).then(({ data }) => { if (data && data.user) session.user = data.user; }).catch(() => { }); }
+  if (!md.agree_loc) { if (!(await zConfirm('위치정보 이용에 동의할까요? (선택)\n집으로 가는 경로를 찾을 때 지금 위치만 쓰고, 서버에 저장하지 않아요.', { ok: '동의' }))) return; sb.auth.updateUser({ data: { agree_loc: true } }).then(({ data }) => { if (data && data.user) session.user = data.user; }).catch(() => { }); }
   q('route-start').value = '위치 확인 중...';
   navigator.geolocation.getCurrentPosition(async p => {
     const lat = p.coords.latitude, lng = p.coords.longitude; let label = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;

@@ -211,7 +211,31 @@ function zpRender() {
   if (fan) {
     if (!ph) { ph = document.createElement('div'); ph.id = 'zp-fan-home'; ph.className = 'space-y-4'; const sh = q('star-home'); sh.parentNode.insertBefore(ph, sh.nextSibling); }
     ph.innerHTML = `<div id="zp-wx-home"></div><div id="zp-pc-home"></div>`; zpWxHome(); zpPCHome();
-  } else if (ph) ph.remove();
+  } else { if (ph) ph.remove(); zpMilWx(); }
+}
+/* 군인·곰신: 자대 날씨 */
+function zpMilLine(S, w, mine) {
+  const nm = (S.nickname || '').trim(), k = zpKind(w.code), t = w.tc, who = mine ? '' : (nm ? callAs(nm, '가') + ' ' : '그 사람이 ');
+  const pick = a => a[(new Date().getDate()) % a.length];
+  if (k === 'snow') return mine ? pick(['자대에 눈 소식… 제설 작전 대비 단단히!', '눈 오는 날, 넉가래보다 핫팩 먼저 챙기기']) : pick([`${who}있는 곳에 눈이 와요. 제설 안 하길 바라며…`, `눈 오는 자대… ${nm ? callAs(nm, '는') : '그는'} 따뜻하게 있길`]);
+  if (k === 'rain' || k === 'storm') return mine ? '자대에 비가 와요. 우의 챙기고 미끄럼 조심!' : `${who}있는 곳은 비가 와요. 우산 챙겼으면`;
+  if (t <= -10) return mine ? `영하 ${-t}도! 깔깔이에 핫팩까지 풀장착` : `자대는 영하 ${-t}도… ${who}핫팩 꼭 챙겼길`;
+  if (t <= 0) return mine ? '쌀쌀한 날, 감기 조심하세요' : `영하권 날씨, ${who}감기 안 걸리길`;
+  if (t >= 30) return mine ? `${t}도 폭염, 물 많이 마시기!` : `${t}도 폭염… ${who}물 많이 마시길`;
+  if (k === 'fog') return '안개 낀 날, 오늘도 안전하게';
+  if (k === 'cloud') return mine ? '흐리지만 오늘 하루도 무탈하게' : `흐린 날이지만 ${who}하루는 맑기를`;
+  return mine ? '맑은 날! 오늘 하루도 화이팅' : `햇살 좋은 날, ${who}웃는 하루였으면`;
+}
+async function zpMilWx() {
+  let box = q('zp-mil-wx'); const S = (typeof S_ === 'function') ? S_() : null;
+  if (!zpWxOn() || zpFan() || !S) { if (box) box.remove(); zpWxAnim(null); return; }
+  if (!box) { box = document.createElement('div'); box.id = 'zp-mil-wx'; const ref = q('pager-dots') || q('profile-container'); ref.parentNode.insertBefore(box, ref.nextSibling); }
+  const mine = S.id === me.id;
+  if (!S.unit_lat || !S.unit_lng) { box.innerHTML = mine ? `<button class="zp-wx" onclick="openSettings();setGo('unit')"><span class="ic">${zpWxIcon('cloud', 1)}</span><div class="min-w-0"><div class="text-[14px] font-extrabold">자대 날씨</div><div class="text-[12px] text-[#8B95A1] mt-0.5">자대를 등록하면 매일 날씨를 알려드려요 ›</div></div></button>` : ''; zpWxAnim(null); return; }
+  const w = await zpWx('unit_' + S.id, [S.unit_lat, S.unit_lng]); if (!w || !q('zp-mil-wx')) return;
+  const k = zpKind(w.code);
+  box.innerHTML = `<div class="zp-wx"><span class="ic">${zpWxIcon(k, w.day)}</span><div class="min-w-0 flex-1"><div class="flex items-baseline gap-2"><span class="t">${w.tc}°</span><span class="text-[13px] font-bold text-[#4E5968]">자대 · ${ZP_KN[k]} · 최고 ${w.hi}° 최저 ${w.lo}°</span></div><div class="text-[12.5px] text-[#4E5968] mt-0.5 truncate">${esc(zpMilLine(S, w, mine))}</div></div></div>`;
+  zpWxAnim(k);
 }
 function zpHeader() {
   let row = q('zp-coin-row');
@@ -292,7 +316,7 @@ async function zpShopRender(el) {
 async function zpBuy(id) {
   const it = ZP_ITEMS[id], p = zp.price[id]; if (!it) return;
   if ((zp.bal || 0) < p) return showAlert('무궁화가 부족해요', `${esc(it.n)}은(는) 무궁화 <b>${zpFmt(p)}</b>개가 필요해요.<br>지금 ${zpFmt(zp.bal)}개 · 매일 출석체크로 모을 수 있어요.`);
-  if (!confirm(`${it.n}\n무궁화 ${p}개로 살까요?`)) return;
+  if (!(await zConfirm(`${it.n}${hasBat(it.n) ? "을" : "를"} 살까요?\n무궁화 ${p}개가 사용돼요.`, { ok: '구매하기' }))) return;
   const { data, error } = await sb.rpc('shop_buy', { item: id });
   if (error) return showAlert('구매 실패', /enough/.test(error.message) ? '무궁화가 부족해요.' : /owned/.test(error.message) ? '이미 가지고 있어요.' : '잠시 후 다시 시도해주세요.');
   zp.owned.add(id); zpSetBal(data.balance, true); zpToast(`${it.n} 구매 완료!`);
@@ -332,7 +356,7 @@ function zpPCView(id) {
   document.body.appendChild(ov);
 }
 async function zpPCDel(id, b) {
-  if (!confirm('이 포토카드를 삭제할까요?')) return;
+  if (!(await zConfirm('이 포토카드를 삭제할까요?', { ok: '삭제', danger: true }))) return;
   const { error } = await sb.from('photocards').delete().eq('id', id); if (error) return showAlert('오류', '삭제하지 못했어요.');
   zp.pcs = zp.pcs.filter(x => x.id !== id); b.closest('.zp-ov').remove(); zpPCHome();
 }
@@ -392,6 +416,11 @@ async function zpPCSave() {
   if (typeof curTab !== 'undefined' && curTab !== 'home') switchTab('home');
 }
 
+/* ---------- 날씨 켜기/끄기 (설정) ---------- */
+const zpWxKey = () => 'zt_wx_on:' + (me ? me.id : '');
+function zpWxOn() { try { return localStorage.getItem(zpWxKey()) !== '0'; } catch (e) { return true; } }
+function zpWxToggle() { const on = !zpWxOn(); try { localStorage.setItem(zpWxKey(), on ? '1' : '0'); } catch (e) { } if (typeof renderSetRows === 'function') renderSetRows(); zpToast(on ? '날씨 표시를 켰어요' : '날씨 표시를 껐어요'); zpRender(); }
+
 /* ---------- 최애 부대 날씨 ---------- */
 const ZP_REG = { 철원: [38.146, 127.313], 연천: [38.096, 127.075], 포천: [37.894, 127.2], 파주: [37.76, 126.78], 화천: [38.106, 127.708], 양구: [38.11, 127.99], 인제: [38.069, 128.17], '고성(강원)': [38.38, 128.468], 춘천: [37.881, 127.73], 홍천: [37.697, 127.889], 횡성: [37.491, 127.985], 원주: [37.342, 127.92], 가평: [37.831, 127.51], 양주: [37.785, 127.046], 동두천: [37.904, 127.061], 의정부: [37.738, 127.034], 김포: [37.615, 126.716], 강화: [37.747, 126.488], 서울: [37.566, 126.978], 용산: [37.532, 126.99], 수원: [37.264, 127.029], 화성: [37.2, 126.831], 오산: [37.15, 127.077], 평택: [36.992, 127.113], 이천: [37.272, 127.435], '논산(육군훈련소)': [36.187, 127.099], 계룡: [36.275, 127.249], 대전: [36.351, 127.385], 청주: [36.642, 127.489], 서산: [36.785, 126.45], 익산: [36.948, 126.957], 강릉: [37.751, 128.876], 속초: [38.207, 128.591], 상주: [36.41, 128.159], 예천: [36.658, 128.452], 대구: [35.871, 128.601], '포항(해병대)': [36.019, 129.343], '진해(해군)': [35.133, 128.71], 창원: [35.228, 128.681], 김해: [35.228, 128.889], 부산: [35.18, 129.076], 사천: [35.004, 128.065], 진주: [35.18, 128.107], 목포: [34.812, 126.392], 광주: [35.16, 126.851], 제주: [33.499, 126.531], 백령도: [37.959, 124.665], 연평도: [37.665, 125.7], 울릉도: [37.484, 130.905] };
 const zpRegKey = () => 'zt_wxreg:' + (me ? me.id : '');
@@ -403,8 +432,8 @@ async function zpSetReg(id, v) {
   zpWxTab(); zpWxHome();
 }
 const zpWxCache = {};
-async function zpWx(reg) {
-  const p = ZP_REG[reg]; if (!p) return null; const k = 'zt_wx:' + reg;
+async function zpWx(reg, ll) {
+  const p = ll || ZP_REG[reg]; if (!p) return null; const k = 'zt_wx:' + reg;
   if (zpWxCache[reg] && Date.now() - zpWxCache[reg].t < 20 * 60e3) return zpWxCache[reg];
   try { const c = JSON.parse(localStorage.getItem(k) || 'null'); if (c && Date.now() - c.t < 20 * 60e3) return (zpWxCache[reg] = c); } catch (e) { }
   try {
@@ -437,6 +466,7 @@ function zpWxLine(s, reg, w) {
 function zpWxStar() { const ids = myStars.map(r => r.id); const cur = (typeof stSel !== 'undefined' && ids.includes(stSel)) ? stSel : ids[0]; const order = [cur, ...ids.filter(x => x !== cur)]; return order.find(id => zpRegOf(id)) || null; }
 async function zpWxHome() {
   const box = q('zp-wx-home'); if (!box || !zpFan()) return;
+  if (!zpWxOn()) { box.innerHTML = ''; zpWxAnim(null); return; }
   if (!myStars.length) { box.innerHTML = ''; zpWxAnim(null); return; }
   const id = zpWxStar();
   if (!id) { box.innerHTML = `<button class="zp-wx" onclick="switchTab('weather')"><span class="ic">${zpWxIcon('cloud', 1)}</span><div class="min-w-0"><div class="text-[14px] font-extrabold">최애 부대 날씨</div><div class="text-[12px] text-[#8B95A1] mt-0.5">자대 지역을 정하면 매일 날씨를 알려드려요 ›</div></div></button>`; zpWxAnim(null); return; }
@@ -467,7 +497,7 @@ let zpAn = { k: null, raf: 0, parts: [], cap: [], flash: 0 };
 function zpWxAnim(k) {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) k = null;
   const onHome = typeof curTab === 'undefined' || curTab === 'home';
-  if (!k || !onHome || !zpFan()) { cancelAnimationFrame(zpAn.raf); zpAn.raf = 0; const c = q('zp-wxc'); if (c) c.remove(); zpAn.k = null; return; }
+  if (!k || !onHome || !zpWxOn()) { cancelAnimationFrame(zpAn.raf); zpAn.raf = 0; const c = q('zp-wxc'); if (c) c.remove(); zpAn.k = null; return; }
   let cv = q('zp-wxc'); if (!cv) { cv = document.createElement('canvas'); cv.id = 'zp-wxc'; document.body.appendChild(cv); }
   if (zpAn.k !== k) { zpAn.k = k; zpAn.parts = []; zpAn.cap = []; }
   if (!zpAn.raf) zpAn.raf = requestAnimationFrame(zpWxFrame);
@@ -478,7 +508,10 @@ function zpWxFrame() {
   const dpr = Math.min(2, window.devicePixelRatio || 1), W = innerWidth, H = innerHeight;
   if (cv.width !== W * dpr || cv.height !== H * dpr) { cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px'; zpAn.cap = []; }
   const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
-  const sh = q('star-home'), R = sh && !sh.classList.contains('hidden') ? sh.querySelector('.stk') : null, rc = R ? R.getBoundingClientRect() : null;
+  let R = null;
+  if (zpFan()) { const sh = q('star-home'); R = sh && !sh.classList.contains('hidden') ? sh.querySelector('.stk') : null; }
+  else { const cs = [...document.querySelectorAll('#profile-container .pg:not(.hidden) .pcard')]; R = cs.find(c => { const r = c.getBoundingClientRect(); return r.right > 20 && r.left < innerWidth - 20; }) || null; }
+  const rc = R ? R.getBoundingClientRect() : null;
   const k = zpAn.k, P = zpAn.parts, want = k === 'snow' ? 70 : k === 'sun' ? 22 : (k === 'cloud' || k === 'fog') ? 7 : 90;
   while (P.length < want) P.push(k === 'snow' ? { x: Math.random() * W, y: -Math.random() * H, r: 1.2 + Math.random() * 2.6, v: .5 + Math.random() * 1.1, w: Math.random() * 6.28 }
     : k === 'sun' ? { x: Math.random() * W, y: Math.random() * H, r: 1 + Math.random() * 2.2, v: .15 + Math.random() * .35, w: Math.random() * 6.28 }
@@ -542,7 +575,7 @@ function zpDropList(s) {
   const KN = { quote: '어록', stage: '무대', comfort: '위로' };
   el.innerHTML = L.length ? L.slice(0, 30).map(d => `<div class="zp-drop-row"><span class="text-[10px] font-extrabold px-2 py-1 rounded-full bg-[#F2F3F5] text-[#4E5968] flex-shrink-0">${KN[d.kind] || ''}</span><div class="flex-1 min-w-0"><div class="text-[14px] text-[#191F28] break-words">${esc(d.body)}</div>${d.url ? `<a href="${safeUrl(d.url)}" target="_blank" rel="noopener" class="text-[12px] font-bold text-[var(--mil-green)]">링크 열기 ›</a>` : ''}</div>${d.user_id === me.id || me.is_admin ? `<button onclick="zpDropDel(${d.id})" class="text-[11px] text-[#B0B8C1] flex-shrink-0">삭제</button>` : ''}</div>`).join('') : '<div class="py-4 text-center">아직 등록된 떡밥이 없어요. 첫 떡밥을 남겨주세요!</div>';
 }
-async function zpDropDel(id) { if (!confirm('이 떡밥을 삭제할까요?')) return; await sb.rpc('drop_delete', { did: id }); const s = zpDropStar(); await zpDropLoad(s); zpDropList(s); }
+async function zpDropDel(id) { if (!(await zConfirm('이 떡밥을 삭제할까요?', { ok: '삭제', danger: true }))) return; await sb.rpc('drop_delete', { did: id }); const s = zpDropStar(); await zpDropLoad(s); zpDropList(s); }
 function zpDropForm() {
   const s = zpDropStar(); if (!s) return;
   const ov = document.createElement('div'); ov.className = 'zp-ov'; ov.style.alignItems = 'stretch'; ov.onclick = e => { if (e.target === ov) ov.remove(); };
@@ -594,5 +627,5 @@ function zpFortune(p) {
 /* 탭이 바뀔 때 */
 function zpTab(t) {
   if (t === 'drops') zpDrops(); if (t === 'shop') zpShopTab(); if (t === 'weather') zpWxTab();
-  if (t === 'home') zpWxHome(); else zpWxAnim(null);
+  if (t === 'home') { if (zpFan()) zpWxHome(); else zpMilWx(); } else zpWxAnim(null);
 }
