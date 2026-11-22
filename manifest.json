@@ -2,7 +2,7 @@
   "id": "zzamtiger-app",
   "name": "짬타이거",
   "short_name": "짬타이거",
-  "description": "군인과 곰신을 위한 군생활 앱",
+  "description": "군인과 곰신, 그리고 군 복무 중인 스타를 기다리는 팬들을 위한 군생활 앱",
   "lang": "ko",
   "dir": "ltr",
   "start_url": "./",
@@ -93,31 +93,45 @@
       "sizes": "1080x1920",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "전역까지 한눈에"
+      "label": "MY스타 — 스타의 군백기를 함께"
     },
     {
       "src": "shot2.png",
       "sizes": "1080x1920",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "내 적금 계산"
+      "label": "곰신을 위한 기능"
     },
     {
       "src": "shot3.png",
       "sizes": "1080x1920",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "휴가·외박·외출 관리"
+      "label": "전역까지 한눈에"
     },
     {
       "src": "shot4.png",
       "sizes": "1080x1920",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "군생활 일기"
+      "label": "내 적금 계산"
     },
     {
       "src": "shot5.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "휴가·외박·외출 관리"
+    },
+    {
+      "src": "shot6.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "군생활 일기"
+    },
+    {
+      "src": "shot7.png",
       "sizes": "1080x1920",
       "type": "image/png",
       "form_factor": "narrow",
