@@ -24,8 +24,8 @@ const css = `
 .mnd-rk .ch{font-size:11px;font-weight:800;min-width:34px;text-align:right}
 .mnd-row{padding:12px 0;border-top:1px solid #F2F3F5}.mnd-row:first-child{border-top:0}
 .mnd-tel{display:inline-flex;align-items:center;white-space:nowrap;height:28px;padding:0 11px;border-radius:999px;background:#F2F4F6;font-size:12px;font-weight:700;color:#191F28}
-.mnd-tabs{display:flex;gap:6px;margin-top:12px}.mnd-tabs button{flex:1;height:36px;border-radius:10px;background:#F2F4F6;font-size:13px;font-weight:800;color:#8B95A1}.mnd-tabs button.on{background:#191F28;color:#fff}
-.mnd-pager{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;align-items:flex-start;margin-top:6px}.mnd-pager::-webkit-scrollbar{display:none}
+.mnd-tabs{display:flex;gap:6px;margin-top:12px}.mnd-tabs button{flex:1;min-width:0;white-space:nowrap;height:36px;border-radius:10px;background:#F2F4F6;font-size:12.5px;font-weight:800;color:#8B95A1}.mnd-tabs button.on{background:#191F28;color:#fff}
+.mnd-pager{display:flex;overflow-x:auto;overflow-y:hidden;transition:height .25s;scroll-snap-type:x mandatory;scrollbar-width:none;align-items:flex-start;margin-top:6px}.mnd-pager::-webkit-scrollbar{display:none}
 .mnd-page{flex:0 0 100%;min-width:0;scroll-snap-align:start;padding:12px 20px 0;box-sizing:border-box}.mnd-pager .mnd-h{font-size:15px}
 .mnd-in{width:100%;height:42px;border-radius:12px;background:#F5F6F8;padding:0 14px;font-size:14px;outline:none;margin-top:10px}
 .mnd-more{width:100%;height:42px;border-radius:12px;background:#F5F6F8;font-size:13px;font-weight:700;color:#4E5968;margin-top:8px}
@@ -90,9 +90,15 @@ const MB = { rg: '전체', q: '', lim: 8, tq: '', tlim: 6, near: null };
 MB.pg = 0;
 const IC = (d) => `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px">${d}</svg>`;
 const PIN = IC('<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>'), CLK = IC('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>');
-window.mndBenefitsHTML = () => `<div class="mnd-card" style="padding:16px 0 18px"><div class="px-5"><div class="text-[18px] font-extrabold">장병 생활 정보</div><div class="mnd-s">옆으로 넘겨서 할인 · TMO · 국군병원을 봐요</div><div class="mnd-tabs" id="mnd-tabs">${['할인 제휴처', 'TMO', '국군병원'].map((t, i) => `<button class="${i === MB.pg ? 'on' : ''}" onclick="mndPg(${i})">${t}</button>`).join('')}</div></div><div id="mnd-ben" class="mnd-pager" onscroll="mndPgSync(this)">${benInner()}</div></div>`;
-window.mndPg = i => { const p = $('mnd-ben'); if (p) p.scrollTo({ left: i * p.clientWidth, behavior: 'smooth' }); };
-window.mndPgSync = el => { const i = Math.round(el.scrollLeft / Math.max(1, el.clientWidth)); if (i === MB.pg) return; MB.pg = i; document.querySelectorAll('#mnd-tabs button').forEach((b, k) => b.classList.toggle('on', k === i)); };
+/* 군인 특별 혜택 카드 하나에서 옆으로 넘기면: 혜택 모음 → 할인 제휴처 → TMO → 국군병원 */
+window.mndBenefitsHTML = (first) => { MB.first = first || ''; const T = (MB.first ? ['혜택 모음'] : []).concat(['할인 제휴처', 'TMO', '국군병원']); if (MB.pg >= T.length) MB.pg = 0;
+  return `<div class="toss-card" style="padding-left:0;padding-right:0"><div class="px-5"><h2 class="text-[18px] font-extrabold mb-1">군인 특별 혜택 (2026)</h2><p class="text-[11px] text-[#8B95A1]">옆으로 넘기면 할인 제휴처 · TMO · 국군병원이 나와요</p><div class="mnd-tabs" id="mnd-tabs">${T.map((t, i) => `<button class="${i === MB.pg ? 'on' : ''}" onclick="mndPg(${i})">${t}</button>`).join('')}</div></div><div id="mnd-ben" class="mnd-pager" onscroll="mndPgSync(this)">${pages()}</div></div>`; };
+const pages = () => (MB.first ? `<div class="mnd-page">${MB.first}</div>` : '') + benInner();
+/* 지금 보는 쪽 높이에 맞춰서 짧은 쪽 아래가 비지 않게 */
+const fitH = () => { const p = $('mnd-ben'); if (!p) return; const pg = p.children[MB.pg]; if (pg) p.style.height = pg.offsetHeight + 'px'; };
+window.mndPg = i => { const p = $('mnd-ben'); if (!p) return; MB.pg = i; document.querySelectorAll('#mnd-tabs button').forEach((b, k) => b.classList.toggle('on', k === i)); fitH(); p.scrollTo({ left: i * p.clientWidth, behavior: 'smooth' }); };
+window.mndPgSync = el => { const i = Math.round(el.scrollLeft / Math.max(1, el.clientWidth)); if (i === MB.pg) return; MB.pg = i; document.querySelectorAll('#mnd-tabs button').forEach((b, k) => b.classList.toggle('on', k === i)); fitH(); };
+window.mndFitH = () => { const p = $('mnd-ben'); if (!p) return; p.scrollLeft = MB.pg * p.clientWidth; fitH(); };
 function benInner() {
   const today = new Date().toISOString().slice(0, 10);
   const all = D().dc.filter(d => !d[5] || d[5] >= today), rgs = ['전체'].concat([...new Set(all.map(d => d[0]))].sort());
@@ -114,7 +120,7 @@ function benInner() {
   return dc + tmo + hp;
 }
 function dist(a, b) { const R = 6371, r = x => x * Math.PI / 180, dl = r(b[0] - a[0]), dn = r(b[1] - a[1]); const s = Math.sin(dl / 2) ** 2 + Math.cos(r(a[0])) * Math.cos(r(b[0])) * Math.sin(dn / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(s)); }
-window.mndBen = (k, v) => { MB[k] = v; if (k === 'rg' || k === 'q') MB.lim = 8; const box = $('mnd-ben'); if (!box) return; const sl = box.scrollLeft; const f = document.activeElement, fi = f && f.classList.contains('mnd-in') ? [...box.querySelectorAll('.mnd-in')].indexOf(f) : -1, pos = f && f.selectionStart; box.innerHTML = benInner(); box.scrollLeft = sl; if (fi >= 0) { const n = box.querySelectorAll('.mnd-in')[fi]; n.focus(); try { n.setSelectionRange(pos, pos); } catch (e) { } } };
+window.mndBen = (k, v) => { MB[k] = v; if (k === 'rg' || k === 'q') MB.lim = 8; const box = $('mnd-ben'); if (!box) return; const sl = box.scrollLeft; const f = document.activeElement, fi = f && f.classList.contains('mnd-in') ? [...box.querySelectorAll('.mnd-in')].indexOf(f) : -1, pos = f && f.selectionStart; box.innerHTML = pages(); box.scrollLeft = sl; fitH(); if (fi >= 0) { const n = box.querySelectorAll('.mnd-in')[fi]; n.focus(); try { n.setSelectionRange(pos, pos); } catch (e) { } } };
 window.mndNear = () => {
   if (MB.near) { MB.near = null; mndBen('near', null); return; }
   const S = typeof S_ === 'function' ? S_() : null;
@@ -128,7 +134,7 @@ const ML = { days: {}, unit: null, units: {}, synced: false };
 const GENERIC = /^(밥|쌀밥|백미밥|잡곡밥|현미밥|흑미밥|보리밥|김치|배추김치|깍두기|총각김치|열무김치|우유|흰우유|저지방우유|맛김|조미김|김|요구르트|빵|식빵|잼|딸기잼|케찹|시리얼)$/;
 const mealUnit = () => { const S = typeof S_ === 'function' ? S_() : null; return (S && S.meal_unit) || (window.me && me.meal_unit) || null; };
 const ymdK = d => { const z = new Date(d.getTime() - d.getTimezoneOffset() * 6e4); return z.toISOString().slice(0, 10); };
-async function units() { if (Object.keys(ML.units).length) return ML.units; const { data } = await sb.from('meal_units').select('code,name').eq('active', true); (data || []).forEach(u => ML.units[u.code] = u.name); return ML.units; }
+async function units() { if (Object.keys(ML.units).length) return ML.units; let { data, error } = await sb.from('meal_units').select('code,name,days').eq('active', true); if (error) ({ data } = await sb.from('meal_units').select('code,name').eq('active', true)); /* 식단이 실제로 받아진 부대만 */ (data || []).filter(u => u.days == null || u.days > 0).forEach(u => ML.units[u.code] = u.name); return ML.units; }
 function sync() { if (ML.synced) return; ML.synced = true; try { sb.functions.invoke('mnd-meal', { body: { action: 'sync' } }).then(r => { if (r && r.data && r.data.units) { ML.days = {}; if (q('modal-menu').classList.contains('flex')) renderMenu(); } }).catch(() => { }); } catch (e) { } }
 async function loadUnit(u, d) {
   const k = u + '|' + d.slice(0, 7); if (ML.days[k]) return ML.days[k];
