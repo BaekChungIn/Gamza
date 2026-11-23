@@ -165,9 +165,9 @@ function zpToast(t) { const d = document.createElement('div'); d.className = 'zp
 .zp-item button{height:38px;border-radius:12px;font-size:13px;font-weight:800}
 .zp-item .pv{border:0;width:100%;cursor:pointer}.zp-pvl{position:absolute;right:8px;bottom:8px;font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.88);color:#191F28}
 .zp-lt .text-white{color:inherit!important}.zp-th .pbar{background:var(--ztrk)!important}.zp-th .pbar>div:first-child{background:var(--zbar)!important}
-.zp-th .bg-white\/10{background:var(--ztrk)!important}.zp-th .bg-white\/25{background:var(--zbar)!important;opacity:.75}
+.zp-th [class~="bg-white/10"]{background:var(--ztrk)!important}.zp-th [class~="bg-white/25"]{background:var(--zbar)!important;opacity:.85}
 .zp-pvs .pcard{text-align:left}
-.zp-patches{position:absolute;top:16px;right:16px;display:flex;flex-direction:column;align-items:flex-end;gap:5px;z-index:3;pointer-events:none}.zp-prow{display:flex;align-items:center;gap:4px}
+.zp-patches{position:absolute;top:16px;right:16px;display:flex;flex-direction:column;align-items:flex-end;gap:5px;z-index:3;pointer-events:none}.zp-prow{display:flex;align-items:center;gap:4px}.zp-patches.h{flex-direction:row;align-items:center;top:12px;gap:4px;max-width:calc(100% - 32px);flex-wrap:nowrap}.zp-patches.h .zp-prow{display:contents}.pcard.zp-hrow>div:first-child{margin-top:20px}.pcard.zp-hrow.zp-hasp>div:first-child .flex-1{padding-right:0}
 .pcard.zp-hasp>div:first-child .flex-1{padding-right:var(--pw,0)}
 .zp-patch svg{width:100%;height:100%;display:block}
 .zp-patch{display:block;filter:drop-shadow(0 3px 5px rgba(0,0,0,.3));animation:zpPatchIn .5s cubic-bezier(.2,1.5,.4,1)}
@@ -454,7 +454,7 @@ async function zpMilWx() {
   if (!S.unit_lat || !S.unit_lng) { box.innerHTML = mine ? `<button class="zp-wx" onclick="openSettings();setGo('unit')"><span class="ic">${zpWxIcon('cloud', 1)}</span><div class="min-w-0"><div class="text-[14px] font-extrabold">자대 날씨</div><div class="text-[12px] text-[#8B95A1] mt-0.5">자대를 등록하면 매일 날씨를 알려드려요 ›</div></div></button>` : ''; zpWxAnim(null); return; }
   const w = await zpWx('unit_' + S.id, [S.unit_lat, S.unit_lng]); if (!w || !q('zp-mil-wx')) return;
   const k = zpKind(w.code);
-  box.innerHTML = `<div class="zp-wx"><span class="ic">${zpWxIcon(k, w.day)}</span><div class="min-w-0 flex-1"><div class="flex items-baseline gap-2"><span class="t">${w.tc}°</span><span class="text-[13px] font-bold text-[#4E5968]">자대 · ${ZP_KN[k]} · 최고 ${w.hi}° 최저 ${w.lo}°</span></div><div class="text-[12.5px] text-[#4E5968] mt-0.5 truncate">${esc(zpMilLine(S, w, mine))}</div></div></div>`;
+  box.innerHTML = `<button class="zp-wx w-full text-left" onclick="zpMilWxOpen()"><span class="ic">${zpWxIcon(k, w.day)}</span><div class="min-w-0 flex-1"><div class="flex items-baseline gap-2"><span class="t">${w.tc}°</span><span class="text-[13px] font-bold text-[#4E5968]">자대 · ${ZP_KN[k]} · 최고 ${w.hi}° 최저 ${w.lo}°</span></div><div class="text-[12.5px] text-[#4E5968] mt-0.5 truncate">${esc(zpMilLine(S, w, mine))}</div></div></button>`;
   zpWxAnim(k);
 }
 function zpHeader() {
@@ -493,16 +493,17 @@ async function zpCheckin() {
 /* MY스타 테마 17가지를 군인·곰신 프로필 테마로도 (이름은 색 이름 그대로) */
 function zpEnsureSt() { if (zpEnsureSt.d || typeof STAR_TH === 'undefined') return; zpEnsureSt.d = 1; Object.keys(STAR_TH).forEach(k => { ZP_ITEMS['st_' + k] = { n: STAR_TH[k].n, k: 'theme', aud: 'mil', star: k }; }); }
 function zpLum(hex) { const m = /^#?([0-9a-f]{6})$/i.exec(String(hex || '').trim()); if (!m) return 1; const n = parseInt(m[1], 16); return (.299 * (n >> 16) + .587 * (n >> 8 & 255) + .114 * (n & 255)) / 255; }
+const ZP_THBAR = { th_night: ['linear-gradient(90deg,#8C7BE0,#D9CCFF)', 'rgba(255,255,255,.14)'], th_sakura: ['linear-gradient(90deg,#FFFFFF,#FFE3EC)', 'rgba(255,255,255,.32)'], th_camo: ['linear-gradient(90deg,#9AA86F,#D7DFAE)', 'rgba(0,0,0,.22)'], th_ocean: ['linear-gradient(90deg,#4FB3E8,#BDE9FF)', 'rgba(255,255,255,.16)'], th_gold: ['linear-gradient(90deg,#B98A2B,#F6DE8E)', 'rgba(0,0,0,.28)'] };
 function zpStyleCard(card, thId, ptId, nt) {
   zpEnsureSt(); if (card.dataset.bg0 === undefined) { card.dataset.bg0 = card.style.background; card.dataset.c0 = card.style.color; }
   card.classList.remove('zp-th', 'zp-lt'); card.style.removeProperty('--zbar'); card.style.removeProperty('--ztrk'); card.style.position = 'relative';
   const it = ZP_ITEMS[thId];
   if (it && it.star && STAR_TH[it.star]) { const t = STAR_TH[it.star]; card.style.background = t.bg; card.style.color = t.fg; card.classList.add('zp-th'); card.style.setProperty('--zbar', t.bar); card.style.setProperty('--ztrk', t.trk); if (zpLum(t.fg) < .5) card.classList.add('zp-lt'); }
-  else if (it && it.bg) { card.style.background = it.bg; card.style.color = card.dataset.c0 || ''; }
+  else if (it && it.bg) { card.style.background = it.bg; card.style.color = card.dataset.c0 || ''; const B = ZP_THBAR[thId]; if (B) { card.classList.add('zp-th'); card.style.setProperty('--zbar', B[0]); card.style.setProperty('--ztrk', B[1]); } }
   else { card.style.background = card.dataset.bg0; card.style.color = card.dataset.c0 || ''; }
   const all = (Array.isArray(ptId) ? ptId : ptId ? [ptId] : []).filter(x => ZP_ITEMS[x]), lng = all.filter(zpIsLong).slice(0, 3), sml = all.filter(x => !zpIsLong(x)).slice(0, 3), list = lng.concat(sml), sig = list.join(',');
   let box = card.querySelector('.zp-patches');
-  if (!list.length) { if (box) box.remove(); card.classList.remove('zp-hasp'); return; }
+  if (!list.length) { if (box) box.remove(); card.classList.remove('zp-hasp', 'zp-hrow'); return; }
   if (box && box.dataset.sig === sig + (zp.spr.b ? 'i' : '') + (zp.spr.c ? 'c' : '') + JSON.stringify(nt || '')) return;
   if (box) box.remove(); box = document.createElement('div'); box.className = 'zp-patches'; box.dataset.sig = sig + (zp.spr.b ? 'i' : '') + (zp.spr.c ? 'c' : '') + JSON.stringify(nt || '');
   /* 긴 패치(특급전사 · 특등사수)는 위에서부터 세로로, 방패 · 배지 패치는 그 아래 가로로 (각각 3개까지) */
@@ -510,6 +511,7 @@ function zpStyleCard(card, thId, ptId, nt) {
   const one = x => `<i class="zp-patch" title="${esc(ZP_ITEMS[x].n)}" style="height:${ph(x)}px;width:${pw(x)}px">${zpPatchArt(x, nt)}</i>`;
   box.innerHTML = lng.map(one).join('') + (sml.length ? `<div class="zp-prow">${sml.map(one).join('')}</div>` : '');
   const rowW = sml.reduce((t, x) => t + pw(x), 0) + Math.max(0, sml.length - 1) * 4;
+  if (card.closest('#gf-profile-card')) { box.classList.add('h'); card.classList.add('zp-hrow'); box.querySelectorAll('.zp-patch').forEach(e => { const w = parseFloat(e.style.width) / parseFloat(e.style.height); e.style.height = '20px'; e.style.width = Math.round(20 * w) + 'px'; }); } else card.classList.remove('zp-hrow');
   card.classList.add('zp-hasp'); card.style.setProperty('--pw', (Math.max(rowW, ...lng.map(pw), 0) + 8) + 'px');
   card.appendChild(box);
 }
@@ -823,13 +825,15 @@ async function zpSetReg(id, v) {
 }
 const zpWxCache = {};
 async function zpWx(reg, ll) {
-  const p = ll || ZP_REG[reg]; if (!p) return null; const k = 'zt_wx:' + reg;
+  const p = ll || ZP_REG[reg]; if (!p) return null; const k = 'zt_wx2:' + reg;
   if (zpWxCache[reg] && Date.now() - zpWxCache[reg].t < 20 * 60e3) return zpWxCache[reg];
   try { const c = JSON.parse(localStorage.getItem(k) || 'null'); if (c && Date.now() - c.t < 20 * 60e3) return (zpWxCache[reg] = c); } catch (e) { }
   try {
-    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${p[0]}&longitude=${p[1]}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,is_day&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code&timezone=Asia%2FSeoul&forecast_days=2`);
+    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${p[0]}&longitude=${p[1]}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,is_day&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code&hourly=temperature_2m,weather_code,precipitation_probability&timezone=Asia%2FSeoul&forecast_days=7`);
     const j = await r.json(); if (!j.current) return null;
     const d = { t: Date.now(), tc: Math.round(j.current.temperature_2m), fl: Math.round(j.current.apparent_temperature), code: j.current.weather_code, wind: Math.round(j.current.wind_speed_10m), day: j.current.is_day, hi: Math.round(j.daily.temperature_2m_max[0]), lo: Math.round(j.daily.temperature_2m_min[0]), pop: j.daily.precipitation_probability_max[0], tm: { hi: Math.round(j.daily.temperature_2m_max[1]), lo: Math.round(j.daily.temperature_2m_min[1]), code: j.daily.weather_code[1] } };
+    d.wk = j.daily.time.map((t, n) => ({ d: t, hi: Math.round(j.daily.temperature_2m_max[n]), lo: Math.round(j.daily.temperature_2m_min[n]), code: j.daily.weather_code[n], pop: j.daily.precipitation_probability_max[n] }));
+    try { const h0 = new Date(); const H = j.hourly; d.hr = H.time.map((t, n) => ({ t, tc: Math.round(H.temperature_2m[n]), code: H.weather_code[n], pop: H.precipitation_probability[n] })).filter(x => new Date(x.t.replace(' ', 'T') + ':00+09:00') >= new Date(h0.getTime() - 3600e3)).slice(0, 24); } catch (e) { d.hr = []; }
     try { localStorage.setItem(k, JSON.stringify(d)); } catch (e) { } return (zpWxCache[reg] = d);
   } catch (e) { return null; }
 }
@@ -865,6 +869,27 @@ async function zpWxHome() {
   box.innerHTML = `<button class="zp-wx" onclick="zpWxOpen()"><span class="ic">${zpWxIcon(k, w.day)}</span><div class="min-w-0 flex-1"><div class="flex items-baseline gap-2"><span class="t">${w.tc}°</span><span class="text-[13px] font-bold text-[#4E5968]">${esc(reg.replace(/\(.*\)/, ''))} · ${ZP_KN[k]}</span></div><div class="text-[12.5px] text-[#4E5968] mt-0.5 truncate">${esc(zpWxLine(s, reg, w))}</div></div></button>`;
   zpWxAnim(k);
 }
+/* 시간별 · 이번 주 날씨 */
+function zpWeekHTML(w) {
+  if (!w || !w.wk) return '';
+  const DN = ['일', '월', '화', '수', '목', '금', '토'], all = w.wk.map(x => [x.lo, x.hi]).flat(), mn = Math.min(...all), mx = Math.max(...all), rg = Math.max(1, mx - mn);
+  const hr = (w.hr || []).length ? `<div class="mt-4"><div class="text-[13px] font-extrabold mb-2">시간별</div><div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">${w.hr.map((h, n) => `<div class="shrink-0 w-[54px] rounded-2xl bg-[#F5F6F8] py-2.5 flex flex-col items-center gap-1"><span class="text-[11px] font-bold text-[#8B95A1]">${n === 0 ? '지금' : (+h.t.slice(11, 13)) + '시'}</span><span style="width:26px;height:26px">${zpWxIcon(zpKind(h.code), +h.t.slice(11, 13) >= 6 && +h.t.slice(11, 13) < 19 ? 1 : 0)}</span><b class="text-[13px]">${h.tc}°</b>${h.pop ? `<span class="text-[10px] font-bold text-[#3D7BE0]">${h.pop}%</span>` : '<span class="text-[10px]">&nbsp;</span>'}</div>`).join('')}</div></div>` : '';
+  return hr + `<div class="mt-4"><div class="text-[13px] font-extrabold mb-1">이번 주</div>${w.wk.map((x, n) => { const dt = new Date(x.d + 'T00:00:00+09:00'), k = zpKind(x.code), l = (x.lo - mn) / rg * 100, r = (x.hi - mn) / rg * 100;
+    return `<div class="flex items-center gap-3 py-2.5 ${n ? 'border-t border-[#F2F3F5]' : ''}"><span class="w-12 text-[13px] font-bold">${n === 0 ? '오늘' : n === 1 ? '내일' : DN[dt.getDay()] + '요일'}</span><span style="width:24px;height:24px">${zpWxIcon(k, 1)}</span><span class="w-9 text-[11px] font-bold text-[#3D7BE0]">${x.pop ? x.pop + '%' : ''}</span><span class="w-8 text-right text-[13px] text-[#8B95A1] tabular-nums">${x.lo}°</span><span class="flex-1 h-1.5 rounded-full bg-[#EEF0F3] relative"><i style="position:absolute;top:0;bottom:0;left:${l}%;right:${100 - r}%;border-radius:99px;background:linear-gradient(90deg,#7FB6E8,#F2BA49)"></i></span><span class="w-8 text-[13px] font-bold tabular-nums">${x.hi}°</span></div>`; }).join('')}</div>`;
+}
+/* 군인 · 곰신: 자대 날씨 전체 화면 */
+async function zpMilWxOpen() {
+  const S = (typeof S_ === 'function') ? S_() : null; if (!S || !S.unit_lat) return;
+  let m = q('zp-wxm');
+  if (!m) { m = document.createElement('div'); m.id = 'zp-wxm'; m.className = 'fixed inset-0 hidden flex-col'; m.style.cssText = 'z-index:80;background:var(--bg-main)'; document.body.appendChild(m); }
+  m.innerHTML = `<div class="flex items-center justify-between px-4 pb-2" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeModal('zp-wxm')" class="w-10 h-10 rounded-full bg-white border border-[#E5E8EB] font-bold text-[18px]">‹</button><div class="font-extrabold text-[17px]">자대 날씨</div><span class="w-10"></span></div><div id="zp-wxm-b" class="flex-1 overflow-y-auto px-5" style="padding-bottom:max(24px,env(safe-area-inset-bottom))"><div class="zp-card text-center py-10 text-[13px] text-[#8B95A1]">날씨를 불러오는 중…</div></div>`;
+  openM('zp-wxm');
+  const w = await zpWx('unit_' + S.id, [S.unit_lat, S.unit_lng]), b = q('zp-wxm-b'); if (!b) return;
+  if (!w) { b.innerHTML = '<div class="zp-card text-center py-10 text-[13px] text-[#8B95A1]">날씨를 불러오지 못했어요</div>'; return; }
+  const k = zpKind(w.code), mine = S.id === me.id;
+  b.innerHTML = `<div class="zp-card mt-2"><div class="text-[16px] font-extrabold">${esc(S.unit_name || '자대')}</div><div class="mt-3 flex items-center gap-3"><span style="width:56px;height:56px">${zpWxIcon(k, w.day)}</span><div><div class="flex items-baseline gap-2"><span class="text-[34px] font-black tracking-tight">${w.tc}°</span><span class="text-[14px] font-bold text-[#4E5968]">${ZP_KN[k]}</span></div><div class="text-[12px] text-[#8B95A1]">체감 ${w.fl}° · 최고 ${w.hi}° / 최저 ${w.lo}° · 강수 ${w.pop ?? 0}% · 바람 ${w.wind}km/h</div></div></div>
+   <div class="mt-3 rounded-2xl bg-[#F5F6F8] px-4 py-3 text-[14px] font-bold leading-relaxed">${esc(zpMilLine(S, w, mine))}</div>${zpWeekHTML(w)}</div><p class="text-[11px] text-[#B0B8C1] text-center mt-3 mb-6">날씨 정보: Open-Meteo</p>`;
+}
 /* 최애 부대 날씨 — 홈 날씨 카드를 누르면 전체 화면으로 열려요 */
 function zpWxOpen() {
   let m = q('zp-wxm');
@@ -884,7 +909,7 @@ async function zpWxTab() {
     const k = zpKind(w.code), tk = zpKind(w.tm.code);
     b.outerHTML = `<div class="mt-3 flex items-center gap-3"><span style="width:56px;height:56px">${zpWxIcon(k, w.day)}</span><div><div class="flex items-baseline gap-2"><span class="text-[34px] font-black tracking-tight">${w.tc}°</span><span class="text-[14px] font-bold text-[#4E5968]">${ZP_KN[k]}</span></div><div class="text-[12px] text-[#8B95A1]">체감 ${w.fl}° · 최고 ${w.hi}° / 최저 ${w.lo}° · 강수 ${w.pop ?? 0}% · 바람 ${w.wind}km/h</div></div></div>
      <div class="mt-3 rounded-2xl bg-[#F5F6F8] px-4 py-3 text-[14px] font-bold leading-relaxed">${esc(zpWxLine(s, reg, w))}</div>
-     <div class="mt-2 text-[12px] text-[#8B95A1] flex items-center gap-1.5"><span style="width:18px;height:18px">${zpWxIcon(tk, 1)}</span>내일 ${ZP_KN[tk]} · ${w.tm.hi}° / ${w.tm.lo}°</div>`;
+     ${zpWeekHTML(w)}`;
   }
   const cr = document.createElement('p'); cr.className = 'text-[11px] text-[#B0B8C1] text-center mt-2 mb-6'; cr.textContent = '날씨 정보: Open-Meteo'; el.appendChild(cr);
 }
