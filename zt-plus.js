@@ -74,11 +74,10 @@ const ZP_ITEMS = {
 const ZP_CATS = { fan: [['frame', '포토카드 틀'], ['sticker', '스티커']], mil: [['theme', '프로필 테마'], ['patch', '패치 · 배지']] };
 const ZP_FAN_TABS = [
   ['home', '홈', '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>'],
-  ['drops', '떡밥', '<circle cx="12" cy="9" r="6.5"/><path d="M5.5 9h13"/><path d="M9 15.5V21h6v-5.5"/>'],
-  ['shop', '상점', '<path d="M5 7h14l-1.2 13H6.2z"/><path d="M9 7a3 3 0 0 1 6 0"/>'],
+  ['drops', '떡밥', '<path d="M4 11a8 8 0 0 1 16 0"/><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="16" r="2.5"/><line x1="9" y1="6" x2="10.5" y2="7.5"/>'],
+  ['shop', '상점', '<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>'],
   ['qna', 'Q&A', '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>'],
-  ['community', '커뮤니티', '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'],
-  ['weather', '부대날씨', '<path d="M17.5 19H8a5 5 0 1 1 .9-9.9A6 6 0 0 1 20 11.5 3.75 3.75 0 0 1 17.5 19z"/>']
+  ['community', '커뮤니티', '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>']
 ];
 
 /* ---------- 상태 ---------- */
@@ -784,17 +783,24 @@ async function zpWxHome() {
   if (!zpWxOn()) { box.innerHTML = ''; zpWxAnim(null); return; }
   if (!myStars.length) { box.innerHTML = ''; zpWxAnim(null); return; }
   const id = zpWxStar();
-  if (!id) { box.innerHTML = `<button class="zp-wx" onclick="switchTab('weather')"><span class="ic">${zpWxIcon('cloud', 1)}</span><div class="min-w-0"><div class="text-[14px] font-extrabold">최애 부대 날씨</div><div class="text-[12px] text-[#8B95A1] mt-0.5">자대 지역을 정하면 매일 날씨를 알려드려요 ›</div></div></button>`; zpWxAnim(null); return; }
+  if (!id) { box.innerHTML = `<button class="zp-wx" onclick="zpWxOpen()"><span class="ic">${zpWxIcon('cloud', 1)}</span><div class="min-w-0"><div class="text-[14px] font-extrabold">최애 부대 날씨</div><div class="text-[12px] text-[#8B95A1] mt-0.5">자대 지역을 정하면 매일 날씨를 알려드려요 ›</div></div></button>`; zpWxAnim(null); return; }
   const s = starK[id], reg = zpRegOf(id), w = await zpWx(reg); if (!w || !q('zp-wx-home')) return;
   const k = zpKind(w.code);
-  box.innerHTML = `<button class="zp-wx" onclick="switchTab('weather')"><span class="ic">${zpWxIcon(k, w.day)}</span><div class="min-w-0 flex-1"><div class="flex items-baseline gap-2"><span class="t">${w.tc}°</span><span class="text-[13px] font-bold text-[#4E5968]">${esc(reg.replace(/\(.*\)/, ''))} · ${ZP_KN[k]}</span></div><div class="text-[12.5px] text-[#4E5968] mt-0.5 truncate">${esc(zpWxLine(s, reg, w))}</div></div></button>`;
+  box.innerHTML = `<button class="zp-wx" onclick="zpWxOpen()"><span class="ic">${zpWxIcon(k, w.day)}</span><div class="min-w-0 flex-1"><div class="flex items-baseline gap-2"><span class="t">${w.tc}°</span><span class="text-[13px] font-bold text-[#4E5968]">${esc(reg.replace(/\(.*\)/, ''))} · ${ZP_KN[k]}</span></div><div class="text-[12.5px] text-[#4E5968] mt-0.5 truncate">${esc(zpWxLine(s, reg, w))}</div></div></button>`;
   zpWxAnim(k);
 }
+/* 최애 부대 날씨 — 홈 날씨 카드를 누르면 전체 화면으로 열려요 */
+function zpWxOpen() {
+  let m = q('zp-wxm');
+  if (!m) { m = document.createElement('div'); m.id = 'zp-wxm'; m.className = 'fixed inset-0 hidden flex-col'; m.style.cssText = 'z-index:80;background:var(--bg-main)'; document.body.appendChild(m); }
+  m.innerHTML = `<div class="flex items-center justify-between px-4 pb-2" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeModal('zp-wxm')" class="w-10 h-10 rounded-full bg-white border border-[#E5E8EB] font-bold text-[18px]">‹</button><div class="font-extrabold text-[17px]">최애 부대 날씨</div><span class="w-10"></span></div><div id="zp-wxm-b" class="flex-1 overflow-y-auto px-5" style="padding-bottom:max(24px,env(safe-area-inset-bottom))"></div>`;
+  openM('zp-wxm'); zpWxTab();
+}
 async function zpWxTab() {
-  const el = q('tab-weather'); if (!el) return;
+  const el = q('zp-wxm-b') || q('tab-weather'); if (!el) return;
   if (!myStars.length) { el.innerHTML = `<div class="zp-card text-center py-10 mt-2"><div class="text-[16px] font-extrabold">MY스타를 먼저 등록해주세요</div><button onclick="starFlow()" class="mt-4 px-5 h-11 rounded-full text-[13px] font-extrabold text-white" style="background:#191F28">MY스타 등록하기</button></div>`; return; }
   const regs = Object.keys(ZP_REG);
-  el.innerHTML = `<div class="px-1 mt-2 mb-3"><h2 class="text-[20px] font-extrabold">최애 부대 날씨</h2><p class="text-[12px] text-[#8B95A1] mt-1">최애의 자대 지역을 고르면 홈에 날씨와 한마디를 띄워줘요. 정확한 부대 위치는 공개되지 않으니 지역만 골라주세요.</p></div>` +
+  el.innerHTML = `<div class="px-1 mt-2 mb-3"><p class="text-[12px] text-[#8B95A1] mt-1">최애의 자대 지역을 고르면 홈에 날씨와 한마디를 띄워줘요. 정확한 부대 위치는 공개되지 않으니 지역만 골라주세요.</p></div>` +
     myStars.map(r => { const s = starK[r.id]; if (!s) return ''; const reg = zpRegOf(r.id); return `<div class="zp-card mb-3" id="zp-wxc-${r.id}"><div class="flex items-center justify-between gap-3"><div class="text-[16px] font-extrabold">${esc(s.n)}</div><select onchange="zpSetReg('${r.id}',this.value)" class="h-9 rounded-xl bg-[#F5F6F8] px-3 text-[13px] font-bold outline-none"><option value="">지역 선택</option>${regs.map(x => `<option ${x === reg ? 'selected' : ''}>${x}</option>`).join('')}</select></div><div class="zp-wxb mt-3 text-[13px] text-[#8B95A1]">${reg ? '날씨를 불러오는 중…' : '자대 지역을 골라주세요'}</div></div>`; }).join('');
   for (const r of myStars) {
     const reg = zpRegOf(r.id), s = starK[r.id]; if (!reg || !s) continue; const w = await zpWx(reg), b = document.querySelector('#zp-wxc-' + r.id + ' .zp-wxb'); if (!b) continue;
@@ -823,17 +829,19 @@ function zpWxFrame() {
   const dpr = Math.min(2, window.devicePixelRatio || 1), W = innerWidth, H = innerHeight;
   if (cv.width !== W * dpr || cv.height !== H * dpr) { cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px'; zpAn.cap = []; }
   const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
-  let R = null;
+  let R = null; const ex = [];
   if (zpFan()) { const sh = q('star-home'); R = sh && !sh.classList.contains('hidden') ? sh.querySelector('.stk') : null; }
   else { const cs = [...document.querySelectorAll('#profile-container .pg:not(.hidden) .pcard')]; R = cs.find(c => { const r = c.getBoundingClientRect(); return r.right > 20 && r.left < innerWidth - 20; }) || null; }
-  const rc = R ? R.getBoundingClientRect() : null;
+  const rc = R ? R.getBoundingClientRect() : null; if (rc) ex.push(rc);
+  /* 홈 아래 포토카드 · 오늘의 질문 카드 위에도 그리지 않아요 */
+  [document.querySelector('#zp-pc-home .cw'), document.querySelector('#zp-pc-home .zp-pc-add'), document.querySelector('#zp-q-home .stk'), document.querySelector('#zp-q-home .zp-pc-add')].forEach(el => { if (el) { const r = el.getBoundingClientRect(); if (r.bottom > 0 && r.top < H) ex.push(r); } });
   const k = zpAn.k, P = zpAn.parts, want = k === 'snow' ? 70 : k === 'sun' ? 22 : (k === 'cloud' || k === 'fog') ? 7 : 90;
   while (P.length < want) P.push(k === 'snow' ? { x: Math.random() * W, y: -Math.random() * H, r: 1.2 + Math.random() * 2.6, v: .5 + Math.random() * 1.1, w: Math.random() * 6.28 }
     : k === 'sun' ? { x: Math.random() * W, y: Math.random() * H, r: 1 + Math.random() * 2.2, v: .15 + Math.random() * .35, w: Math.random() * 6.28 }
     : (k === 'cloud' || k === 'fog') ? { x: Math.random() * W, y: (k === 'fog' ? .25 + Math.random() * .6 : Math.random() * .3) * H, rw: 90 + Math.random() * 120, rh: 26 + Math.random() * 26, v: .12 + Math.random() * .25 }
     : { x: Math.random() * W * 1.2, y: -Math.random() * H, l: 10 + Math.random() * 14, v: 9 + Math.random() * 7 });
   g.save();
-  if (rc) { g.beginPath(); g.rect(0, 0, W, H); g.rect(rc.left - 2, rc.top - 2, rc.width + 4, rc.height + 4); g.clip('evenodd'); }
+  if (ex.length) { g.beginPath(); g.rect(0, 0, W, H); ex.forEach(r => { const p = 3, x0 = r.left - p, y0 = r.top - p, x1 = r.right + p, y1 = r.bottom + p; g.moveTo(x0, y0); g.lineTo(x0, y1); g.lineTo(x1, y1); g.lineTo(x1, y0); g.closePath(); }); g.clip('nonzero'); }
   if (k === 'snow') {
     g.fillStyle = 'rgba(255,255,255,.98)'; g.shadowColor = 'rgba(80,100,135,.75)'; g.shadowBlur = 5;
     for (const p of P) {
