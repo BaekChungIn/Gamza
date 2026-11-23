@@ -354,10 +354,13 @@ const zpIsLong = id => zpPAsp(id) > 2.2;
 const zpPAsp = id => { const r = ZP_SPR.c.m[id] || ZP_SPR.b.m[id]; return r ? r[2] / r[3] : (ZP_ITEMS[id] && ZP_ITEMS[id].w || 34) / 40; };
 /* 이름표: 바탕은 그림, 이름은 실 느낌 글자로 위에 얹어요 */
 function zpNtArt(id, nt) {
-  const g = id === 'gs_name', o = nt || {}, ko = String(o.ko || '').slice(0, 5) || '이름', en = g ? String(o.en || '').toUpperCase().slice(0, 12) : '';
-  const fg = g ? '#F2559C' : '#16181B', hi = g ? '#FFC2DD' : '#4A4E44', pid = 'zpnt' + (g ? 'g' : 'a');
-  const fs = ko.length >= 4 ? 52 : 60;
-  return `<span style="position:relative;display:block;width:100%;height:100%">${zpSpr('c', id, 'width:100%;height:100%')}<svg viewBox="0 0 432 120" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible"><defs><pattern id="${pid}" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(${g ? 70 : 80})"><rect width="5" height="5" fill="${fg}"/><rect width="1.4" height="5" fill="${hi}" opacity=".55"/></pattern><filter id="${pid}f"><feDropShadow dx="0.8" dy="1.2" stdDeviation="0.8" flood-opacity=".55"/></filter></defs><text x="${en ? 150 : 216}" y="80" text-anchor="middle" font-size="${fs}" font-weight="900" font-family="'Pretendard','Apple SD Gothic Neo','Noto Sans KR',sans-serif" fill="url(#${pid})" stroke="${fg}" stroke-width="1" filter="url(#${pid}f)" letter-spacing="${ko.length <= 3 ? 8 : 2}">${esc(ko)}</text>${en ? `<text x="${150 + ko.length * 34 + 30}" y="80" font-size="30" font-weight="900" font-family="'Pretendard',sans-serif" fill="url(#${pid})" stroke="${fg}" stroke-width=".6" filter="url(#${pid}f)" letter-spacing="2">${esc(en)}</text>` : ''}</svg></span>`;
+  const g = id === 'gs_name', o = nt || {}, ko = [...String(o.ko || '').slice(0, 5)], en = String(o.en || '').toUpperCase().slice(0, 12);
+  const K = ko.length ? ko : ['이', '름'], fg = g ? '#F2559C' : '#16181B', hi = g ? '#FFC2DD' : '#4A4E44', pid = 'zpnt' + (g ? 'g' : 'a');
+  /* 실제 이름표처럼 한글은 칸 전체에 고르게 띄우고, 영문 성은 아래 가운데 */
+  const L = 62, R = 370, ky = en ? 70 : 82, kf = en ? 58 : 66, xs = K.length === 1 ? [216] : K.map((_, n) => L + (R - L) * n / (K.length - 1));
+  const T = (x, y, t, fs, fam, sw) => `<text x="${x}" y="${y}" text-anchor="middle" font-size="${fs}" font-weight="900" font-family="${fam}" fill="url(#${pid})" stroke="${fg}" stroke-width="${sw}" filter="url(#${pid}f)">${esc(t)}</text>`;
+  const kfam = "'Apple SD Gothic Neo','Noto Sans KR','Noto Sans CJK KR',sans-serif", efam = "'Times New Roman','Noto Serif',serif";
+  return `<span style="position:relative;display:block;width:100%;height:100%">${zpSpr('c', id, 'width:100%;height:100%')}<svg viewBox="0 0 432 120" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible"><defs><pattern id="${pid}" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(${g ? 70 : 80})"><rect width="4" height="4" fill="${fg}"/><rect width="1.1" height="4" fill="${hi}" opacity=".5"/></pattern><filter id="${pid}f"><feDropShadow dx="0.7" dy="1" stdDeviation="0.7" flood-opacity=".5"/></filter></defs>${K.map((c, n) => T(xs[n].toFixed(1), ky, c, kf, kfam, 1)).join('')}${en ? T(216, 110, en, 36, efam, .7) : ''}</svg></span>`;
 }
 const zpPatchArt = (id, nt) => (ZP_ITEMS[id] && ZP_ITEMS[id].nt && zp.spr.c) ? zpNtArt(id, nt || (me && me.equip && me.equip.nt)) : zpSpr('c', id, 'width:100%;height:100%') || zpSpr('b', id, 'width:100%;height:100%') || (ZP_ITEMS[id] && ZP_ITEMS[id].spr2 ? '<span style="display:block;width:100%;height:100%"></span>' : zpPatchSVG(id));
 /* ---------- 데이터 ---------- */
@@ -595,7 +598,7 @@ function zpUseTh() { const id = (typeof stSel !== 'undefined' && myRow(stSel)) ?
 /* 이름표 이름 정하기 */
 async function zpNtEdit(id, afterBuy) {
   const g = id === 'gs_name', cur = (me.equip && me.equip.nt) || {};
-  const html = `<div class="text-left mt-1"><label class="text-[12px] font-bold text-[#4E5968]">한글 이름 (1~5자)</label><input id="zp-nt-ko" class="inp mt-1" maxlength="5" placeholder="예) 홍길동" value="${esc(cur.ko || '')}">${g ? `<label class="text-[12px] font-bold text-[#4E5968] block mt-3">영문 (선택 · 12자까지)</label><input id="zp-nt-en" class="inp mt-1" maxlength="12" placeholder="예) HONG" value="${esc(cur.en || '')}" style="text-transform:uppercase">` : ''}<p class="text-[11px] text-[#8B95A1] mt-2">이름표에 실로 수놓아져요. 나중에 보관함에서 바꿀 수 있어요.</p></div>`;
+  const html = `<div class="text-left mt-1" style="padding:2px 4px 4px"><label class="text-[12px] font-bold text-[#4E5968]">한글 이름 (1~5자)</label><input id="zp-nt-ko" class="inp mt-1" maxlength="5" placeholder="예) 홍길동" value="${esc(cur.ko || '')}"><label class="text-[12px] font-bold text-[#4E5968] block mt-3">영문 성 (선택 · 12자까지)</label><input id="zp-nt-en" class="inp mt-1" maxlength="12" placeholder="예) KIM" value="${esc(cur.en || '')}" autocapitalize="characters" style="text-transform:uppercase"><p class="text-[11px] text-[#8B95A1] mt-2">이름표에 실로 수놓아져요. 나중에 보관함에서 바꿀 수 있어요.</p></div>`;
   for (;;) {
     const p = zDialog({ title: afterBuy ? '이름표에 넣을 이름' : '이름표 이름 바꾸기', html, ok: '저장' });
     let ko = '', en = ''; const grab = () => { const a = q('zp-nt-ko'), b = q('zp-nt-en'); if (a) ko = a.value.trim(); if (b) en = b.value.trim(); };
@@ -963,7 +966,7 @@ function zpWxFrame() {
     : (k === 'cloud' || k === 'fog') ? { x: Math.random() * W, y: (k === 'fog' ? .25 + Math.random() * .6 : Math.random() * .3) * H, rw: 90 + Math.random() * 120, rh: 26 + Math.random() * 26, v: .12 + Math.random() * .25 }
     : { x: Math.random() * W * 1.2, y: -Math.random() * H, l: 10 + Math.random() * 14, v: 9 + Math.random() * 7 });
   g.save();
-  if (ex.length) { g.beginPath(); g.rect(0, 0, W, H); ex.forEach(r => { const p = 3, x0 = r.left - p, y0 = r.top - p, x1 = r.right + p, y1 = r.bottom + p; g.moveTo(x0, y0); g.lineTo(x0, y1); g.lineTo(x1, y1); g.lineTo(x1, y0); g.closePath(); }); g.clip('nonzero'); }
+
   if (k === 'snow') {
     g.fillStyle = 'rgba(255,255,255,.98)'; g.shadowColor = 'rgba(80,100,135,.75)'; g.shadowBlur = 5;
     for (const p of P) {
@@ -983,6 +986,8 @@ function zpWxFrame() {
     if (k === 'storm') { if (Math.random() < .004) zpAn.flash = 1; if (zpAn.flash > 0) { g.fillStyle = `rgba(255,255,255,${zpAn.flash * .35})`; g.fillRect(0, 0, W, H); zpAn.flash -= .06; } }
   }
   g.restore();
+  /* 카드 · 창 위에 그려진 건 지워요 (겹치는 카드가 있어도 확실하게) */
+  ex.forEach(r => g.clearRect(r.left - 3, r.top - 3, r.width + 6, r.height + 6));
   if (k === 'snow' && rc) {   // 프로필 카드 윗면에 쌓이는 눈 (카드 밖, 위쪽에만)
     g.fillStyle = '#fff'; g.shadowColor = 'rgba(120,140,170,.35)'; g.shadowBlur = 4; g.beginPath(); g.moveTo(rc.left + 14, rc.top);
     const n = Math.ceil(rc.width / 4);
