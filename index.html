@@ -2080,11 +2080,13 @@ async function addFriend() {
 async function respondFriend(fid, ok) { const { error } = await sb.rpc('respond_friend', { fid, ok }); if (error) return showAlert('오류', esc(error.message)); await loadFriends(); renderFriends(); }
 async function removeFriend(fid, silent) { if (!silent && !(await zConfirm('이 친구를 삭제할까요?', { ok: '삭제', danger: true }))) return; const { error } = await sb.rpc('remove_friend', { fid }); if (error) return showAlert('오류', esc(error.message)); await loadFriends(); renderFriends(); }
 async function saveUnit() {
-  const name = q('set-unit-name').value.trim(), addr = q('set-unit-addr').value.trim(), p = picks.unit && picks.unit.label === addr ? picks.unit : null;
+  const name = q('set-unit-name').value.trim(), addr = q('set-unit-addr').value.trim(); let p = picks.unit && picks.unit.label === addr ? picks.unit : null;
   if (!name) return showAlert('알림', '부대명을 입력해주세요.');
+  /* 목록에서 안 고르고 주소만 적었어도 위치(좌표)를 찾아 저장해요 — 날씨 · 집으로가기에 쓰여요 */
+  if (addr && !p) { try { p = await resolvePlace('unit'); } catch (e) { p = null; } }
   const { error } = await sb.from('profiles').update({ unit_name: name, unit_addr: addr || null, unit_lat: p ? p.lat : null, unit_lng: p ? p.lng : null }).eq('id', me.id);
   if (error) return showAlert('오류', esc(error.message) + '<br><br>schema_update.sql 을 실행했는지 확인하세요.');
-  await loadAll(false); render(true); setGo('main'); showAlert('등록 완료', `자대 '${esc(name)}' 가 등록됐어요. 식단표에서 날짜별 식단을 확인·입력할 수 있어요.`);
+  await loadAll(false); render(true); setGo('main'); showAlert('등록 완료', `자대 '${esc(name)}' 가 등록됐어요. 식단표에서 날짜별 식단을 확인·입력할 수 있어요.` + (addr && !p ? '<br><br>부대 위치를 지도에서 찾지 못했어요. 위치 칸에 시·군·면까지 적고 목록에서 골라주면 자대 날씨가 떠요.' : ''));
 }
 
 function cTh(role, th, noSave) {

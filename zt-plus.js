@@ -396,6 +396,12 @@ async function zpMilWx() {
   if (!zpWxOn() || zpFan() || !S) { if (box) box.remove(); zpWxAnim(null); return; }
   if (!box) { box = document.createElement('div'); box.id = 'zp-mil-wx'; const ref = q('pager-dots') || q('profile-container'); ref.parentNode.insertBefore(box, ref.nextSibling); }
   const mine = S.id === me.id;
+  /* 주소만 있고 좌표가 없으면 한 번 찾아서 채워요 (예전에 목록에서 안 고르고 저장한 경우) */
+  if ((!S.unit_lat || !S.unit_lng) && S.unit_addr && typeof searchPlaces === 'function' && !zp.geoTried) {
+    zp.geoTried = true;
+    try { const r = await searchPlaces(S.unit_addr); if (r && r[0]) { S.unit_lat = r[0].lat; S.unit_lng = r[0].lng; if (mine) { try { await sb.from('profiles').update({ unit_lat: r[0].lat, unit_lng: r[0].lng }).eq('id', me.id); } catch (e) { } } } } catch (e) { }
+    if (!q('zp-mil-wx')) return;
+  }
   if (!S.unit_lat || !S.unit_lng) { box.innerHTML = mine ? `<button class="zp-wx" onclick="openSettings();setGo('unit')"><span class="ic">${zpWxIcon('cloud', 1)}</span><div class="min-w-0"><div class="text-[14px] font-extrabold">자대 날씨</div><div class="text-[12px] text-[#8B95A1] mt-0.5">자대를 등록하면 매일 날씨를 알려드려요 ›</div></div></button>` : ''; zpWxAnim(null); return; }
   const w = await zpWx('unit_' + S.id, [S.unit_lat, S.unit_lng]); if (!w || !q('zp-mil-wx')) return;
   const k = zpKind(w.code);
