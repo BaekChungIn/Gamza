@@ -23,7 +23,10 @@ const css = `
 .mnd-rk .nm{flex:1;min-width:0;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mnd-rk .ch{font-size:11px;font-weight:800;min-width:34px;text-align:right}
 .mnd-row{padding:12px 0;border-top:1px solid #F2F3F5}.mnd-row:first-child{border-top:0}
-.mnd-tel{display:inline-flex;align-items:center;height:28px;padding:0 11px;border-radius:999px;background:#F2F4F6;font-size:12px;font-weight:700;color:#191F28}
+.mnd-tel{display:inline-flex;align-items:center;white-space:nowrap;height:28px;padding:0 11px;border-radius:999px;background:#F2F4F6;font-size:12px;font-weight:700;color:#191F28}
+.mnd-tabs{display:flex;gap:6px;margin-top:12px}.mnd-tabs button{flex:1;height:36px;border-radius:10px;background:#F2F4F6;font-size:13px;font-weight:800;color:#8B95A1}.mnd-tabs button.on{background:#191F28;color:#fff}
+.mnd-pager{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;align-items:flex-start;margin-top:6px}.mnd-pager::-webkit-scrollbar{display:none}
+.mnd-page{flex:0 0 100%;min-width:0;scroll-snap-align:start;padding:12px 20px 0;box-sizing:border-box}.mnd-pager .mnd-h{font-size:15px}
 .mnd-in{width:100%;height:42px;border-radius:12px;background:#F5F6F8;padding:0 14px;font-size:14px;outline:none;margin-top:10px}
 .mnd-more{width:100%;height:42px;border-radius:12px;background:#F5F6F8;font-size:13px;font-weight:700;color:#4E5968;margin-top:8px}
 .mf{position:fixed;inset:0;z-index:110;background:#fff;display:flex;flex-direction:column}
@@ -60,29 +63,34 @@ window.mndPxSet = (m, s) => { if (m) PX.m = m; if (s) PX.s = s; mndPxRank(); };
 
 /* ================= 혜택: 장병 할인 · TMO · 군병원 ================= */
 const MB = { rg: '전체', q: '', lim: 8, tq: '', tlim: 6, near: null };
-window.mndBenefitsHTML = () => `<div id="mnd-ben" class="space-y-4">${benInner()}</div>`;
+MB.pg = 0;
+const IC = (d) => `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px">${d}</svg>`;
+const PIN = IC('<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>'), CLK = IC('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>');
+window.mndBenefitsHTML = () => `<div class="mnd-card" style="padding:16px 0 18px"><div class="px-5"><div class="text-[18px] font-extrabold">장병 생활 정보</div><div class="mnd-s">옆으로 넘겨서 할인 · TMO · 국군병원을 봐요</div><div class="mnd-tabs" id="mnd-tabs">${['할인 제휴처', 'TMO', '국군병원'].map((t, i) => `<button class="${i === MB.pg ? 'on' : ''}" onclick="mndPg(${i})">${t}</button>`).join('')}</div></div><div id="mnd-ben" class="mnd-pager" onscroll="mndPgSync(this)">${benInner()}</div></div>`;
+window.mndPg = i => { const p = $('mnd-ben'); if (p) p.scrollTo({ left: i * p.clientWidth, behavior: 'smooth' }); };
+window.mndPgSync = el => { const i = Math.round(el.scrollLeft / Math.max(1, el.clientWidth)); if (i === MB.pg) return; MB.pg = i; document.querySelectorAll('#mnd-tabs button').forEach((b, k) => b.classList.toggle('on', k === i)); };
 function benInner() {
   const today = new Date().toISOString().slice(0, 10);
   const all = D().dc.filter(d => !d[5] || d[5] >= today), rgs = ['전체'].concat([...new Set(all.map(d => d[0]))].sort());
   const q = MB.q.trim().replace(/\s/g, ''), L = all.filter(d => (MB.rg === '전체' || d[0] === MB.rg) && (!q || (d[1] + d[2] + d[3]).replace(/\s/g, '').includes(q)));
-  const dc = `<div class="mnd-card"><div class="mnd-h"><span>장병 할인 제휴처</span><span class="text-[12px] text-[#8B95A1] font-bold">${L.length}곳</span></div><div class="mnd-s">국방부 공공데이터 · 현역 장병 · 군 가족 할인 (이용 전 조건 확인)</div>
+  const dc = `<div class="mnd-page"><div class="mnd-h"><span>장병 할인 제휴처</span><span class="text-[12px] text-[#8B95A1] font-bold">${L.length}곳</span></div><div class="mnd-s">국방부 공공데이터 · 현역 장병 · 군 가족 할인 (이용 전 조건 확인)</div>
    <input class="mnd-in" placeholder="호텔, 영화관, 렌터카…" value="${E(MB.q)}" oninput="mndBen('q',this.value)">
    <div class="mnd-chips">${rgs.map(r => `<button class="mnd-chip ${r === MB.rg ? 'on' : ''}" onclick="mndBen('rg','${E(r)}')">${E(r)}</button>`).join('')}</div>
    <div>${L.slice(0, MB.lim).map(d => `<div class="mnd-row"><div class="flex items-start justify-between gap-2"><div class="min-w-0"><div class="text-[11px] font-bold text-[#8B95A1]">${E(d[0])} · ${E(d[2])}</div><div class="text-[15px] font-extrabold leading-snug mt-0.5">${E(d[1])}</div></div>${d[5] ? `<span class="text-[10px] font-bold text-[#F04452] whitespace-nowrap">~${E(d[5].slice(2).replace(/-/g, '.'))}</span>` : ''}</div><div class="text-[13px] text-[#4E5968] mt-1 leading-relaxed">${E(d[3])}</div><div class="flex gap-1.5 mt-2">${tel(d[4])}${d[6] ? `<a class="mnd-tel" target="_blank" rel="noopener" href="${E(d[6])}">복지포털</a>` : ''}</div></div>`).join('') || '<div class="text-center text-[13px] text-[#8B95A1] py-6">조건에 맞는 곳이 없어요</div>'}</div>
    ${L.length > MB.lim ? `<button class="mnd-more" onclick="mndBen('lim',${MB.lim + 10})">더보기 (${L.length - MB.lim}곳)</button>` : ''}</div>`;
   const tq = MB.tq.trim(), T = D().tmo.filter(t => !tq || t[0].includes(tq) || t[4].includes(tq));
-  const tmo = `<div class="mnd-card"><div class="mnd-h"><span>TMO 위치 · 운영시간</span><span class="text-[12px] text-[#8B95A1] font-bold">${D().tmo.length}곳</span></div><div class="mnd-s">휴가 · 출장 때 역 · 터미널의 국군 여행장병 안내소</div>
+  const tmo = `<div class="mnd-page"><div class="mnd-h"><span>TMO 위치 · 운영시간</span><span class="text-[12px] text-[#8B95A1] font-bold">${D().tmo.length}곳</span></div><div class="mnd-s">휴가 · 출장 때 역 · 터미널의 국군 여행장병 안내소</div>
    <input class="mnd-in" placeholder="역 이름으로 찾기 (예: 서울, 동대구)" value="${E(MB.tq)}" oninput="mndBen('tq',this.value)">
-   <div class="mt-1">${T.slice(0, tq ? 99 : MB.tlim).map(t => `<div class="mnd-row"><div class="flex items-center justify-between gap-2"><div class="text-[15px] font-extrabold">${E(t[0])} TMO</div>${tel(t[1])}</div><div class="text-[12.5px] text-[#4E5968] mt-1">📍 ${E(t[4])}</div>${t[2] || t[3] ? `<div class="text-[12.5px] text-[#4E5968] mt-0.5">🕘 ${t[2] ? '평일 ' + E(t[2]) : ''}${t[2] && t[3] ? ' · ' : ''}${t[3] ? '주말 ' + E(t[3]) : ''}</div>` : ''}${t[5] ? `<div class="text-[12px] text-[#8B95A1] mt-0.5">${E(t[5])}</div>` : ''}</div>`).join('') || '<div class="text-center text-[13px] text-[#8B95A1] py-6">찾는 TMO가 없어요</div>'}</div>
+   <div class="mt-1">${T.slice(0, tq ? 99 : MB.tlim).map(t => `<div class="mnd-row"><div class="flex items-center justify-between gap-2"><div class="text-[15px] font-extrabold">${E(t[0])} TMO</div>${tel(t[1])}</div><div class="text-[12.5px] text-[#4E5968] mt-1 flex gap-1.5">${PIN}<span>${E(t[4])}</span></div>${t[2] || t[3] ? `<div class="text-[12.5px] text-[#4E5968] mt-0.5 flex gap-1.5">${CLK}<span>${t[2] ? '평일 ' + E(t[2]) : ''}${t[2] && t[3] ? ' · ' : ''}${t[3] ? '주말 ' + E(t[3]) : ''}</span></div>` : ''}${t[5] ? `<div class="text-[12px] text-[#8B95A1] mt-0.5 flex gap-1.5">${t[2] || t[3] ? '<span style="width:14px;flex-shrink:0"></span>' : CLK}<span>${E(t[5])}</span></div>` : ''}</div>`).join('') || '<div class="text-center text-[13px] text-[#8B95A1] py-6">찾는 TMO가 없어요</div>'}</div>
    ${!tq && T.length > MB.tlim ? `<button class="mnd-more" onclick="mndBen('tlim',99)">전체 보기 (${T.length - MB.tlim}곳 더)</button>` : ''}</div>`;
   let H = D().hosp.map(h => ({ h, km: MB.near ? dist(MB.near, [h[3], h[4]]) : null }));
   if (MB.near) H.sort((a, b) => a.km - b.km);
-  const hp = `<div class="mnd-card"><div class="mnd-h"><span>국군병원</span><button onclick="mndNear()" class="mnd-tel">${MB.near ? '가까운 순 ✓' : '📍 가까운 순'}</button></div><div class="mnd-s">국방부 공공데이터 · 대표번호로 진료 예약 · 문의</div>
-   <div class="mt-2">${H.map(({ h, km }) => `<div class="mnd-row"><div class="flex items-center justify-between gap-2"><div class="text-[15px] font-extrabold">${E(h[0])}${km != null ? ` <span class="text-[12px] font-bold text-[#3DB37D]">${km < 10 ? km.toFixed(1) : Math.round(km)}km</span>` : ''}</div>${tel(h[2])}</div><div class="text-[12.5px] text-[#4E5968] mt-1">${E(h[1])}</div><a class="text-[12px] font-bold text-[var(--mil-green,#4E5B3A)] mt-1 inline-block" target="_blank" rel="noopener" href="https://map.kakao.com/link/map/${encodeURIComponent(h[0])},${h[3]},${h[4]}">지도에서 보기 ›</a></div>`).join('')}</div></div>`;
+  const hp = `<div class="mnd-page"><div class="mnd-h"><span>국군병원</span><button onclick="mndNear()" class="mnd-tel">${MB.near ? '가까운 순 ✓' : PIN + '<span style="margin-left:4px">가까운 순</span>'}</button></div><div class="mnd-s">국방부 공공데이터 · 대표번호로 진료 예약 · 문의</div>
+   <div class="mt-2">${H.map(({ h, km }) => `<div class="mnd-row"><div class="flex items-center justify-between gap-2"><div class="text-[15px] font-extrabold">${E(h[0])}${km != null ? ` <span class="text-[12px] font-bold text-[#3DB37D]">${km < 10 ? km.toFixed(1) : Math.round(km)}km</span>` : ''}</div>${tel(h[2])}</div><div class="text-[12.5px] text-[#4E5968] mt-1 flex gap-1.5">${PIN}<span>${E(h[1])}</span></div><a class="text-[12px] font-bold text-[var(--mil-green,#4E5B3A)] mt-1 inline-block" target="_blank" rel="noopener" href="https://map.kakao.com/link/map/${encodeURIComponent(h[0])},${h[3]},${h[4]}">지도에서 보기 ›</a></div>`).join('')}</div></div>`;
   return dc + tmo + hp;
 }
 function dist(a, b) { const R = 6371, r = x => x * Math.PI / 180, dl = r(b[0] - a[0]), dn = r(b[1] - a[1]); const s = Math.sin(dl / 2) ** 2 + Math.cos(r(a[0])) * Math.cos(r(b[0])) * Math.sin(dn / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(s)); }
-window.mndBen = (k, v) => { MB[k] = v; if (k === 'rg' || k === 'q') MB.lim = 8; const box = $('mnd-ben'); if (!box) return; const f = document.activeElement, fi = f && f.classList.contains('mnd-in') ? [...box.querySelectorAll('.mnd-in')].indexOf(f) : -1, pos = f && f.selectionStart; box.innerHTML = benInner(); if (fi >= 0) { const n = box.querySelectorAll('.mnd-in')[fi]; n.focus(); try { n.setSelectionRange(pos, pos); } catch (e) { } } };
+window.mndBen = (k, v) => { MB[k] = v; if (k === 'rg' || k === 'q') MB.lim = 8; const box = $('mnd-ben'); if (!box) return; const sl = box.scrollLeft; const f = document.activeElement, fi = f && f.classList.contains('mnd-in') ? [...box.querySelectorAll('.mnd-in')].indexOf(f) : -1, pos = f && f.selectionStart; box.innerHTML = benInner(); box.scrollLeft = sl; if (fi >= 0) { const n = box.querySelectorAll('.mnd-in')[fi]; n.focus(); try { n.setSelectionRange(pos, pos); } catch (e) { } } };
 window.mndNear = () => {
   if (MB.near) { MB.near = null; mndBen('near', null); return; }
   const S = typeof S_ === 'function' ? S_() : null;
@@ -112,7 +120,7 @@ window.mndMenuPatch = async function () {
     return;
   }
   const date = q('menu-date-input').value, m = await loadUnit(u, date), r = m[date], U = await units();
-  ub.innerHTML = `📍 ${E(U[u] || ('제' + u + '부대'))} · 국방부 공공데이터 <button onclick="mealFind()" class="font-bold text-[#3DB37D] ml-1">부대 바꾸기</button>`;
+  ub.innerHTML = `<span class="inline-flex gap-1 items-start">${PIN}<span>${E(U[u] || ('제' + u + '부대'))} · 국방부 공공데이터 <button onclick="mealFind()" class="font-bold text-[#3DB37D] ml-1">부대 바꾸기</button></span></span>`;
   if (!r) { cards.insertAdjacentHTML('afterbegin', `<div class="text-[12px] text-[#8B95A1] bg-white rounded-2xl px-4 py-3">이 날짜의 공공데이터 식단이 아직 없어요. 직접 입력한 식단이 있으면 아래에 보여요.</div>`); return; }
   cards.innerHTML = [['🌅', '조식', r.b], ['☀️', '중식', r.l], ['🌙', '석식', r.n]].map(([i, t, v]) => `<div class="toss-card !p-5"><div class="text-[14px] font-extrabold mb-2">${i} ${t}</div>${v && v.length ? items(v) : '<div class="text-[12px] text-[#8B95A1]">식단 정보가 없어요</div>'}</div>`).join('') + (r.sp && r.sp.length ? `<div class="toss-card !p-5"><div class="text-[14px] font-extrabold mb-2">🎉 특식</div>${items(r.sp)}</div>` : '');
 };
