@@ -589,7 +589,7 @@ function zpPV(id, it, big) {
   if (it.k === 'patch' && ((zp.spr.c && ZP_SPR.c.m[id]) || (zp.spr.b && ZP_SPR.b.m[id]))) { const a = zpPAsp(id), h = Math.min(a > 1.5 ? 56 : 84, 140 / a); return `<div style="height:${Math.round(h)}px;width:${Math.round(h * a)}px">${zpPatchArt(id)}</div>`; }
   if (it.k === 'theme') { if (it.star || it.fg) { const t = it.fg ? it : STAR_TH[it.star]; return `<div style="position:absolute;inset:0;background:${t.bg}"></div><div class="relative" style="width:${big ? 86 : 78}%"><div class="text-[11px] font-extrabold" style="color:${t.fg}">${esc(t.n)}</div><div class="mt-2 rounded-full overflow-hidden" style="height:12px;background:${t.trk}"><i class="block h-full" style="width:64%;background:${t.bar}"></i></div></div>`; } return `<div style="position:absolute;inset:0;background:${it.bg}"></div><div class="relative text-white text-[12px] font-extrabold" style="text-shadow:0 1px 3px rgba(0,0,0,.4)">${esc(it.n)}</div>`; }
   if (it.k === 'patch') return `<div style="width:58px;height:70px">${zpPatchArt(id)}</div>`;
-  if (it.k === 'frame') return `<div style="width:70px">${zpPCHTML({ frame: id, photo: null, deco: { cap: '' } }, true)}</div>`;
+  if (it.k === 'frame') return `<div style="width:54px;margin-bottom:14px">${zpPCHTML({ frame: id, photo: null, deco: { cap: '' } }, true)}</div>`;
   return `<div class="flex flex-wrap gap-1 justify-center" style="width:100px">${Object.keys(ZP_STK).filter(k => ZP_STK[k].p === id).map(k => `<span style="width:30px;height:30px;display:inline-block">${zpStkSVG(k)}</span>`).join('')}</div>`;
 }
 async function zpShopRender(el) {

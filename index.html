@@ -755,7 +755,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
    <div id="pop-name" class="text-[15px] font-bold text-[#8B95A1]"></div>
    <div id="pop-title" class="mt-2 text-[32px] font-black leading-tight tracking-tight"></div>
    <div id="pop-sub" class="mt-2 text-[14px] text-[#8B95A1]"></div>
-   <div class="relative flex-1 min-h-0 w-full flex items-center justify-center py-4"><img id="pop-img" src="tiger_bj.png" alt="" class="max-h-full max-w-full object-contain relative z-10"><div id="pop-badge" class="absolute z-20 bottom-3 px-6 py-2 rounded-full text-[20px] font-black text-white" style="background:var(--mil-green)"></div></div>
+   <div class="relative flex-1 min-h-0 w-full flex items-center justify-center py-4"><img id="pop-img" src="tiger_bj.png" alt="" class="max-h-full max-w-full object-contain relative z-10"><div id="pop-ava" class="hidden relative z-10 rounded-full overflow-hidden flex items-center justify-center font-black text-white" style="width:min(62vw,250px);height:min(62vw,250px);background:#191F28;box-shadow:0 0 0 6px #fff,0 0 0 9px var(--pop-ring,#E3C77E),0 20px 40px rgba(0,0,0,.18)"></div><div id="pop-badge" class="absolute z-20 bottom-3 px-6 py-2 rounded-full text-[20px] font-black text-white" style="background:var(--mil-green)"></div></div>
    <div class="w-full pb-safe pt-2 space-y-2" style="padding-bottom:max(22px,env(safe-area-inset-bottom))"><button id="pop-share" onclick="popShare()" class="hidden w-full py-4 rounded-2xl text-white font-bold text-[15px]" style="background:var(--mil-green)">지인에게 공유하기</button><button onclick="popClose()" class="w-full py-4 rounded-2xl bg-[#191F28] text-white font-bold text-[15px]">확인</button></div>
   </div></div>
 
@@ -1430,6 +1430,7 @@ const TABS_DEF = [['home', '홈', '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 
 let TABS = TABS_DEF;
 function initUI() {
   TABS = (me && me.gender === 'S' && typeof ZP_FAN_TABS !== 'undefined') ? ZP_FAN_TABS : TABS_DEF;
+  q('bottom-nav').style.gridTemplateColumns = `repeat(${TABS.length},minmax(0,1fr))`;
   q('bottom-nav').innerHTML = TABS.map(t => `<button onclick="switchTab('${t[0]}')" id="nav-btn-${t[0]}" class="flex flex-col items-center gap-1"><svg class="w-6 h-6 sf-icon" viewBox="0 0 24 24">${t[2]}</svg><span class="text-[10px] font-bold">${t[1]}</span></button>`).join('');
   q('set-branches').innerHTML = Object.keys(BR).map(k => `<button onclick="setBr('${k}')" id="sb-${k}" class="py-2 rounded-lg border-2 font-bold text-[11px]">${BR[k].k}</button>`).join('');
   switchTab('home');
@@ -1530,7 +1531,11 @@ const rankFile = r => ({ '훈련병': 'tiger_ib.png', '이병': 'tiger_ib.png', 
 function popNext() {
   const o = popQ.shift(); if (!o) { popBusy = false; return; } popBusy = true; popCur = o;
   q('pop-name').innerText = o.name || ''; q('pop-title').innerText = o.title; q('pop-sub').innerText = o.sub || ''; q('pop-badge').innerText = o.badge || ''; q('pop-badge').classList.toggle('hidden', !o.badge);
-  q('pop-share').classList.toggle('hidden', !o.share); q('pop-img').src = rankFile(o.rk || o.badge);
+  q('pop-share').classList.toggle('hidden', !o.share);
+  const av = q('pop-ava'), im = q('pop-img'); av.classList.toggle('hidden', !o.ava); im.classList.toggle('hidden', !!o.ava);
+  if (o.ava) { av.style.setProperty('--pop-ring', o.ring || '#E3C77E'); av.innerHTML = o.ava.img ? `<img src="${esc(o.ava.img)}" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover" onerror="this.remove()">` : ''; if (!o.ava.img) { av.style.fontSize = '64px'; av.innerText = o.ava.txt || ''; } } else { im.src = o.img || rankFile(o.rk || o.badge); im.style.mixBlendMode = o.img ? 'multiply' : ''; }
+  q('pop-share').style.background = o.bc && o.bc !== '#191F28' ? o.bc : 'var(--mil-green)';
+  q('pop-badge').style.background = o.bc || 'var(--mil-green)';
   const cf = q('pop-cf'); cf.innerHTML = ''; const cols = ['#F28C9F', '#F2BA49', '#6BC4A6', '#7FA8E8', '#B79CE8', '#F2878F'];
   for (let i = 0; i < 26; i++) { const d = document.createElement('i'); d.style.cssText = `position:absolute;top:0;left:${Math.random() * 100}%;width:${6 + Math.random() * 6}px;height:${10 + Math.random() * 8}px;background:${cols[i % cols.length]};border-radius:2px;opacity:0;animation:cf ${2.2 + Math.random() * 1.8}s ${Math.random() * 1.2}s ease-in infinite`; cf.appendChild(d); }
   openM('modal-pop');
@@ -1547,7 +1552,27 @@ function checkDday(S) {
   const I = milInfo(S), T0 = new Date(); T0.setHours(0, 0, 0, 0), N = Math.round((I.dis - T0) / 864e5);
   if (N <= 0 || !(N % 100 === 0 || [50, 30, 10, 7].includes(N))) return;
   const k = `dpop:${S.id}:${N}`; if (localStorage.getItem(k)) return; localStorage.setItem(k, '1');
+  if (me && me.gender === 'F' && S.id !== me.id) {
+    const msg = N >= 100 ? '함께 기다린 시간이 벌써 이만큼 쌓였어요\n오늘도 꽃신 신는 날을 향해 한 걸음 더!' : N >= 30 ? '조금만 더 버티면 꽃신 신는 날이 와요\n지금까지 정말 잘 기다려왔어요' : '곧 다시 만나요! 꽃신 신을 준비 됐나요?\n마지막까지 서로 힘이 되어줘요';
+    return popPush({ name: (me.nickname || '곰신') + '님', title: `남자친구 전역까지 D-${N}!`, sub: msg, badge: `D-${N}`, bc: '#E86F95', img: me.gf_theme === 'cat' ? 'gf_cat.png' : 'gf_bear.png', share: `남자친구 전역까지 D-${N}! 꽃신 신을 날을 기다려요 · 짬타이거` });
+  }
   popPush({ name: (S.nickname || '군인') + '님', title: `전역까지 ${N}일 남았어요!`, sub: N >= 100 ? '여기까지 오느라 고생 많았어요' : '조금만 더 힘내요, 거의 다 왔어요', badge: `D-${N}`, rk: rankOf(S, new Date()).r, share: `전역까지 D-${N}! 짬타이거` });
+}
+/* MY스타: 프로필 사진을 누르면 지금 계급 · 응원 한마디 */
+const STAR_CHEER = { '입대 예정': '건강하게 잘 다녀오길, 팬들이 늘 응원하고 있어요', '훈련병': '낯선 곳에서의 첫걸음, 누구보다 멋지게 해낼 거예요', '이병': '모든 게 처음이라 힘들 텐데, 매일 응원이 쌓이고 있어요', '일병': '조금씩 익숙해지는 중! 무대 위 모습이 벌써 그리워요', '상병': '벌써 반 넘게 왔어요. 남은 날도 건강하게!', '병장': '거의 다 왔어요! 곧 무대에서 다시 만나요', '사회복무요원': '묵묵히 복무하는 모습, 늘 자랑스러워요', '전역': '그동안 정말 고생 많았어요. 다시 만나서 행복해요' };
+const yeyo = w => { const c = (w || '').charCodeAt(w.length - 1) - 0xAC00; return c >= 0 && c <= 11171 && c % 28 ? '이에요' : '예요'; };
+function starPop(id) {
+  const s = starK[id]; if (!s) return; const I = starInfo(s), nm = starCall(s), r = myRow(id), TH = STAR_TH[(r && r.theme) || 'black_gold'] || {};
+  const sub = I.done ? '' : I.pre ? `입대까지 D-${I.toEnlist}` : `전역까지 D-${I.dday} · 기다린 지 ${I.served}일째`;
+  popPush({ name: 'MY스타 · ' + s.g, title: I.done ? `${callAs(nm, '의')} 전역을 축하해요!` : `${nm}${hasBat(nm) ? '은' : '는'} ${I.rank}${yeyo(I.rank)}!`, sub: (sub ? sub + '\n' : '') + (STAR_CHEER[I.rank] || STAR_CHEER['일병']), badge: I.rank, bc: '#191F28', ava: { img: starPhoto(s), txt: s.n.slice(0, 2) }, ring: '#E3C77E', share: `${s.n} ${I.done ? '전역 축하해요!' : '전역까지 D-' + I.dday}! 함께 기다려요 · 짬타이거` });
+}
+/* MY스타: 전역 D-day 알림 (군인과 같은 날: 100일 단위 · 50 · 30 · 10 · 7일 전) */
+function checkStarDday() {
+  (myStars || []).forEach(r => { const s = starK[r.id]; if (!s) return; const I = starInfo(s), N = I.dday; if (I.pre || I.done || N <= 0 || !(N % 100 === 0 || [50, 30, 10, 7].includes(N))) return;
+    const k = `dpop:star:${s.id}:${N}`; try { if (localStorage.getItem(k)) return; localStorage.setItem(k, '1'); } catch (e) { return; }
+    const nm = starCall(s), msg = N >= 100 ? '함께 기다린 시간이 벌써 이만큼! 오늘도 응원을 보내요' : N >= 30 ? '조금만 더 기다리면 무대 위에서 다시 만나요' : '정말 얼마 안 남았어요! 다시 만날 준비 됐나요?';
+    popPush({ name: 'MY스타 · ' + s.g, title: `${callAs(nm, '의')} 전역까지 D-${N}!`, sub: msg, badge: `D-${N}`, bc: '#191F28', ava: { img: starPhoto(s), txt: s.n.slice(0, 2) }, share: `${s.n} 전역까지 D-${N}! 함께 기다려요 · 짬타이거` });
+  });
 }
 function evoPreview() {
   const S = S_(); if (!S || !S.enlist_date) return; const h = hoInfo(S, new Date()), rk = rankOf(S, new Date()).r, T0 = new Date(); T0.setHours(0, 0, 0, 0); const dd = Math.max(0, Math.ceil((h.end - T0) / 864e5));
@@ -2553,7 +2578,7 @@ function stkCard(s, big, anim) {
  const TH = STAR_TH[th] || {};
   return `<div class="stk ${TH.m ? 'mt' : ''} ${anim ? 'st-in' : ''}" data-stp="${s.id}" ${big ? '' : `onclick="openStar('my','${s.id}')"`} style="${thVars(th)};${big ? '' : 'cursor:pointer'}"><div class="relative z-[1]">
    <div class="flex items-center justify-between"><span class="lb">MY스타 · 팬이 된 지 ${fanDays(s.id)}일째</span><span class="lb">${esc(s.g)}</span></div>
-   <div class="flex ${big ? 'flex-col text-center' : ''} items-center gap-3.5 mt-3">${starAva(s, big ? 118 : 72, 'stk-ring')}<div class="flex-1 min-w-0 ${big ? 'mt-2' : ''}"><div class="lb">대한민국 ${esc(STAR_SVC[s.t] || '')}</div><div class="text-[13px] font-bold mt-0.5">${esc(I.rank)}</div><div class="${big ? 'text-[32px]' : 'text-[25px]'} font-extrabold leading-tight tracking-tight truncate">${esc(s.n)}</div></div></div>
+   <div class="flex ${big ? 'flex-col text-center' : ''} items-center gap-3.5 mt-3"><span onclick="event.stopPropagation();starPop('${s.id}')" style="cursor:pointer;flex-shrink:0">${starAva(s, big ? 118 : 72, 'stk-ring')}</span><div class="flex-1 min-w-0 ${big ? 'mt-2' : ''}"><div class="lb">대한민국 ${esc(STAR_SVC[s.t] || '')}</div><div class="text-[13px] font-bold mt-0.5">${esc(I.rank)}</div><div class="${big ? 'text-[32px]' : 'text-[25px]'} font-extrabold leading-tight tracking-tight truncate">${esc(s.n)}</div></div></div>
    <div class="flex justify-between items-end mt-4 mb-1.5 text-[12px]"><span class="truncate"><span class="op">입대</span> <b>${s.e.replace(/-/g, '.')}</b> <span class="op">· 전역</span> <b>${s.d.replace(/-/g, '.')}</b></span><b class="text-[16px] font-black">${stDdayTxt(I)}</b></div>
    <div class="pbar"><div class="stk-bar" style="width:${I.pct}%"></div><div class="stk-live relative px-3.5 h-full flex items-center text-[17px] font-black tabular-nums">${fmtPct(I.pct)}</div></div>
    <div class="flex items-center justify-between mt-3.5"><span class="st-ppl"><span class="st-hb">${MUG_SVG}</span><span><b>${N.fans.toLocaleString()}</b>명이 응원중</span></span><button class="stk-cheer ${on ? 'done' : ''}" onclick="event.stopPropagation();starCheer('${s.id}',this)">${CHEER_SVG}${on ? '오늘 응원 완료' : '응원하기'}</button></div>
@@ -2564,7 +2589,7 @@ function renderStarHome() {
   const box = q('star-home'), L = myStars.map(r => starK[r.id]).filter(Boolean); q('btn-star').classList.toggle('hidden', !L.length && me.gender !== 'S');
   if (!L.length) { box.classList.add('hidden'); box.innerHTML = ''; stHomeSig = ''; return; }
   if (!window._stImgTried) setTimeout(starImgLoad, 800);
-  box.classList.remove('hidden');
+  box.classList.remove('hidden'); if (!window._stDdayChk) { window._stDdayChk = 1; setTimeout(checkStarDday, 600); }
   const pg = box.querySelector('.st-pager'), keep = pg ? pg.scrollLeft : 0;
   box.innerHTML = L.length === 1 ? stkCard(L[0], false) : `<div class="st-clip"><div class="st-pager" onscroll="stDots(this)">${L.map(s => `<div>${stkCard(s, false)}</div>`).join('')}</div></div><div class="st-dots">${L.map((_, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('')}</div>`;
   const np = box.querySelector('.st-pager'); if (np && keep) { np.scrollLeft = keep; stDots(np); }
