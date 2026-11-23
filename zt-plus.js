@@ -126,7 +126,7 @@ function zpToast(t) { const d = document.createElement('div'); d.className = 'zp
 .zp-lt .text-white{color:inherit!important}.zp-th .pbar{background:var(--ztrk)!important}.zp-th .pbar>div:first-child{background:var(--zbar)!important}
 .zp-th .bg-white\/10{background:var(--ztrk)!important}.zp-th .bg-white\/25{background:var(--zbar)!important;opacity:.75}
 .zp-pvs .pcard{text-align:left}
-.zp-patches{position:absolute;top:16px;right:16px;display:flex;flex-direction:column;align-items:flex-end;gap:5px;z-index:3;pointer-events:none}
+.zp-patches{position:absolute;top:16px;right:16px;display:flex;flex-direction:column;align-items:flex-end;gap:5px;z-index:3;pointer-events:none}.zp-prow{display:flex;align-items:center;gap:4px}
 .pcard.zp-hasp>div:first-child .flex-1{padding-right:var(--pw,0)}
 .zp-patch svg{width:100%;height:100%;display:block}
 .zp-patch{display:block;filter:drop-shadow(0 3px 5px rgba(0,0,0,.3));animation:zpPatchIn .5s cubic-bezier(.2,1.5,.4,1)}
@@ -309,6 +309,7 @@ function zpSpr(k, id, css) {
   const [x, y, w, h] = r;
   return `<span class="zp-spr" style="display:block;aspect-ratio:${w}/${h};background-image:url(${S.src}?v=2);background-repeat:no-repeat;background-size:${(S.W / w * 100).toFixed(3)}% ${(S.H / h * 100).toFixed(3)}%;background-position:${(x / (S.W - w) * 100).toFixed(3)}% ${(y / (S.H - h) * 100).toFixed(3)}%;${css || ''}"></span>`;
 }
+const ZP_LONG = ['pt_elite', 'pt_shooter'], zpIsLong = id => ZP_LONG.includes(id);
 const zpPAsp = id => { const r = ZP_SPR.b.m[id]; return r ? r[2] / r[3] : (ZP_ITEMS[id] && ZP_ITEMS[id].w || 34) / 40; };
 const zpPatchArt = id => zpSpr('b', id, 'width:100%;height:100%') || zpPatchSVG(id);
 /* ---------- 데이터 ---------- */
@@ -451,16 +452,20 @@ function zpStyleCard(card, thId, ptId) {
   if (it && it.star && STAR_TH[it.star]) { const t = STAR_TH[it.star]; card.style.background = t.bg; card.style.color = t.fg; card.classList.add('zp-th'); card.style.setProperty('--zbar', t.bar); card.style.setProperty('--ztrk', t.trk); if (zpLum(t.fg) < .5) card.classList.add('zp-lt'); }
   else if (it && it.bg) { card.style.background = it.bg; card.style.color = card.dataset.c0 || ''; }
   else { card.style.background = card.dataset.bg0; card.style.color = card.dataset.c0 || ''; }
-  const list = (Array.isArray(ptId) ? ptId : ptId ? [ptId] : []).filter(x => ZP_ITEMS[x]).slice(0, 3), sig = list.join(',');
+  const all = (Array.isArray(ptId) ? ptId : ptId ? [ptId] : []).filter(x => ZP_ITEMS[x]), lng = all.filter(zpIsLong).slice(0, 3), sml = all.filter(x => !zpIsLong(x)).slice(0, 3), list = lng.concat(sml), sig = list.join(',');
   let box = card.querySelector('.zp-patches');
   if (!list.length) { if (box) box.remove(); card.classList.remove('zp-hasp'); return; }
   if (box && box.dataset.sig === sig + (zp.spr.b ? 'i' : '')) return;
   if (box) box.remove(); box = document.createElement('div'); box.className = 'zp-patches'; box.dataset.sig = sig + (zp.spr.b ? 'i' : '');
-  const ph = x => zpPAsp(x) > 1.8 ? 25 : 29; box.innerHTML = list.map(x => { const it = ZP_ITEMS[x], h = ph(x); return `<i class="zp-patch" title="${esc(it.n)}" style="height:${h}px;width:${Math.round(h * zpPAsp(x))}px">${zpPatchArt(x)}</i>`; }).join('');
-  card.classList.add('zp-hasp'); card.style.setProperty('--pw', (Math.max(...list.map(x => Math.round(ph(x) * zpPAsp(x)))) + 8) + 'px');
+  /* 긴 패치(특급전사 · 특등사수)는 위에서부터 세로로, 방패 · 배지 패치는 그 아래 가로로 (각각 3개까지) */
+  const ph = x => zpIsLong(x) ? 25 : zpPAsp(x) > 1.5 ? 20 : 27, pw = x => Math.round(ph(x) * zpPAsp(x));
+  const one = x => `<i class="zp-patch" title="${esc(ZP_ITEMS[x].n)}" style="height:${ph(x)}px;width:${pw(x)}px">${zpPatchArt(x)}</i>`;
+  box.innerHTML = lng.map(one).join('') + (sml.length ? `<div class="zp-prow">${sml.map(one).join('')}</div>` : '');
+  const rowW = sml.reduce((t, x) => t + pw(x), 0) + Math.max(0, sml.length - 1) * 4;
+  card.classList.add('zp-hasp'); card.style.setProperty('--pw', (Math.max(rowW, ...lng.map(pw), 0) + 8) + 'px');
   card.appendChild(box);
 }
-const zpPatches = eq => { eq = eq || {}; return Array.isArray(eq.patches) ? eq.patches.slice(0, 3) : eq.patch ? [eq.patch] : []; };
+const zpPatches = eq => { eq = eq || {}; return Array.isArray(eq.patches) ? eq.patches.slice(0, 6) : eq.patch ? [eq.patch] : []; };
 /* 자세히 보기(복무 현황 · 기다림 현황) 카드에도 같은 테마 · 패치 */
 function zpHero(which) {
   if (!me || zpFan()) return; const h = q(which === 'gd' ? 'gd-hero' : 'sd-hero'); if (!h) return;
@@ -552,8 +557,8 @@ async function zpBuy(id, quiet) {
   return true;
 }
 async function zpPatchToggle(id) {
-  const on = zpPatches(me.equip).includes(id);
-  if (!on && zpPatches(me.equip).length >= 3) return showAlert('패치는 3개까지', '프로필에는 패치·배지를 3개까지 달 수 있어요.<br>달려 있는 것 중 하나를 먼저 떼주세요.');
+  const cur = zpPatches(me.equip), on = cur.includes(id), L = zpIsLong(id);
+  if (!on && cur.filter(x => zpIsLong(x) === L).length >= 3) return showAlert(L ? '긴 패치는 3개까지' : '방패 · 배지 패치는 3개까지', L ? '특급전사 · 특등사수 같은 긴 패치는 3개까지 달 수 있어요.' : '방패 · 배지 패치는 긴 패치 아래에 가로로 3개까지 달 수 있어요.<br>달려 있는 것 중 하나를 먼저 떼주세요.');
   await zpEquip(on ? 'patch_off' : 'patch', id);
 }
 async function zpEquip(slot, id, quiet) {
