@@ -1112,7 +1112,11 @@ async function submitAuth() {
     if (!p) return showAlert('오류', '비밀번호를 입력해주세요.');
     const L = lkGet(), now = Date.now();
     if (L.until > now) return showAlert('잠시 후 다시 시도', `로그인을 5번 실패해서 잠시 막아뒀어요.<br>${Math.ceil((L.until - now) / 60000)}분 뒤에 다시 시도하거나 <b>비밀번호 찾기</b>를 이용해주세요.`);
-    authBusy = true; const cap = await tsRun(q('btn-auth-submit')); let error; try { ({ error } = await sb.auth.signInWithPassword({ email: e, password: p, options: cap })); } finally { authBusy = false; tsReset(); }
+    authBusy = true; zLoginAt = Date.now();
+    /* 예전에 남아 있던 만료된 로그인 정보를 먼저 정리해요 — 정리가 늦게 끝나면서 방금 한 로그인을 지워버리는 문제 방지 */
+    try { const { data: d0 } = await sb.auth.getSession(); if (!d0 || !d0.session) await sb.auth.signOut({ scope: 'local' }).catch(() => { }); } catch (x) { }
+    const cap = await tsRun(q('btn-auth-submit')); let error, data; try { ({ data, error } = await sb.auth.signInWithPassword({ email: e, password: p, options: cap })); } finally { authBusy = false; tsReset(); }
+    if (!error && data && data.session && !booted) { session = data.session; introClose(true); boot(); }
     if (isCaptchaErr(error)) return showAlert('확인 실패', '사람인지 확인이 만료됐어요. 다시 확인한 뒤 눌러주세요.');
     if (!error) { lkSet({}); return; }
     if (/confirm/i.test(error.message)) return showAlert('로그인 실패', '이메일 인증이 아직 완료되지 않았어요. 메일함의 인증 링크를 눌러주세요.');
@@ -1122,7 +1126,7 @@ async function submitAuth() {
     lkSet({ n, until: 0 }); showAlert('로그인 실패', `이메일 또는 비밀번호가 올바르지 않습니다.<br><span style="color:#8B95A1;font-size:12px">${5 - n}번 더 틀리면 5분 동안 막혀요</span>`);
   }
 }
-let authBusy = false;
+let authBusy = false, zLoginAt = 0;
 const pwStrong = p => p.length >= 8 && /[A-Za-z]/.test(p) && /\d/.test(p);
 function lkGet() { try { return JSON.parse(localStorage.getItem('zt_lk') || '{}'); } catch (e) { return {}; } }
 function lkSet(o) { try { localStorage.setItem('zt_lk', JSON.stringify(o)); } catch (e) { } }
@@ -3595,7 +3599,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-work
 if (!configured) hideSplash();
 if (configured) {
   sb.auth.getSession().then(({ data }) => { if (data.session) { session = data.session; introClose(true); boot().finally(hideSplash); } else hideSplash(); }).catch(hideSplash);
-  sb.auth.onAuthStateChange((ev, s) => { if (ev === 'SIGNED_IN' && s && !booted) { session = s; introClose(true); boot(); } if (ev === 'SIGNED_OUT') location.reload(); if (ev === 'PASSWORD_RECOVERY') setTimeout(() => openM('modal-pw'), 600); });
+  sb.auth.onAuthStateChange((ev, s) => { if (ev === 'SIGNED_IN' && s && !booted) { session = s; introClose(true); boot(); } if (ev === 'SIGNED_OUT') { if (authBusy) return; setTimeout(async () => { try { const { data } = await sb.auth.getSession(); if (data && data.session) return; } catch (x) { } if (booted) location.reload(); }, 400); } if (ev === 'PASSWORD_RECOVERY') setTimeout(() => openM('modal-pw'), 600); });
 }
 </script>
 </body>
