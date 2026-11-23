@@ -137,7 +137,7 @@ function zpToast(t) { const d = document.createElement('div'); d.className = 'zp
 .pc2 .lay{position:absolute;inset:0;pointer-events:none;z-index:3}
 .zp-slots{display:flex;flex-direction:column;gap:8px;margin-top:4px;text-align:left}
 .zp-slot{display:flex;align-items:center;gap:12px;text-align:left;padding:13px 14px;border-radius:14px;border:1.5px solid #E5E8EB;background:#fff;width:100%}
-.zp-slot .ic{font-size:22px}.zp-slot .tx{flex:1;display:flex;flex-direction:column}.zp-slot b{font-size:15px;color:#191F28}.zp-slot small{font-size:12px;color:#8B95A1;margin-top:2px}
+.zp-slot .ic{display:flex;color:#191F28}.zp-slot .ic svg{width:22px!important;height:22px!important}.zp-slot .tx{flex:1;display:flex;flex-direction:column}.zp-slot b{font-size:15px;color:#191F28}.zp-slot small{font-size:12px;color:#8B95A1;margin-top:2px}
 .zp-slot .ck{width:20px;height:20px;border-radius:50%;border:2px solid #D1D6DB}
 .zp-slot.on{border-color:#191F28;background:#F9FAFB}.zp-slot.on .ck{border:6px solid #191F28}
 .pc2 .fimg{position:absolute;inset:0;background:center/100% 100% no-repeat;pointer-events:none;z-index:2}
@@ -345,7 +345,8 @@ function zpSlot() { try { return localStorage.getItem(zpSlotKey()) === 'q' ? 'q'
 async function zpSlotPick() {
   let v = zpSlot();
   const opt = (k, ic, t, d) => `<button type="button" data-k="${k}" class="zp-slot ${v === k ? 'on' : ''}"><span class="ic">${ic}</span><span class="tx"><b>${t}</b><small>${d}</small></span><span class="ck"></span></button>`;
-  const html = `<div class="zp-slots">${opt('pc', '🖼', '포토카드', '꾸민 포토카드를 크게 보여줘요')}${opt('q', '💬', '오늘의 질문', 'MY스타 질문 카드를 보여줘요')}</div>`;
+  const svg = n => `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]}</svg>`;
+  const html = `<div class="zp-slots">${opt('pc', svg('image'), '포토카드', '꾸민 포토카드를 크게 보여줘요')}${opt('q', svg('msg'), '오늘의 질문', 'MY스타 질문 카드를 보여줘요')}</div>`;
   const p = zDialog({ title: '홈 화면 카드', html, ok: '저장' });
   setTimeout(() => document.querySelectorAll('.zp-slot').forEach(b => b.onclick = () => { v = b.dataset.k; document.querySelectorAll('.zp-slot').forEach(x => x.classList.toggle('on', x === b)); }), 0);
   if (!(await p)) return;
