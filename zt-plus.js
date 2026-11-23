@@ -830,11 +830,11 @@ function zpWxFrame() {
   if (cv.width !== W * dpr || cv.height !== H * dpr) { cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px'; zpAn.cap = []; }
   const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
   let R = null; const ex = [];
-  if (zpFan()) { const sh = q('star-home'); R = sh && !sh.classList.contains('hidden') ? sh.querySelector('.stk') : null; }
+  if (zpFan()) { const sh = q('star-home'); const cs = sh && !sh.classList.contains('hidden') ? [...sh.querySelectorAll('.stk')] : []; cs.forEach(c => { const r = c.getBoundingClientRect(); if (r.width && r.right > 0 && r.left < W && r.bottom > 0 && r.top < H) ex.push(r); }); R = cs.find(c => { const r = c.getBoundingClientRect(); return r.right > 20 && r.left < W - 20; }) || null; }
   else { const cs = [...document.querySelectorAll('#profile-container .pg:not(.hidden) .pcard')]; R = cs.find(c => { const r = c.getBoundingClientRect(); return r.right > 20 && r.left < innerWidth - 20; }) || null; }
-  const rc = R ? R.getBoundingClientRect() : null; if (rc) ex.push(rc);
+  const rc = R ? R.getBoundingClientRect() : null; if (rc && !zpFan()) ex.push(rc);
   /* 홈 아래 포토카드 · 오늘의 질문 카드 위에도 그리지 않아요 */
-  [document.querySelector('#zp-pc-home .cw'), document.querySelector('#zp-pc-home .zp-pc-add'), document.querySelector('#zp-q-home .stk'), document.querySelector('#zp-q-home .zp-pc-add')].forEach(el => { if (el) { const r = el.getBoundingClientRect(); if (r.bottom > 0 && r.top < H) ex.push(r); } });
+  [document.querySelector('#zp-pc-home .cw'), document.querySelector('#zp-pc-home .zp-pc-add'), document.querySelector('#zp-q-home .stk'), document.querySelector('#zp-q-home .zp-pc-add'), document.querySelector('#zp-wx-home .zp-wx'), document.querySelector('#zp-mil-wx .zp-wx')].forEach(el => { if (el) { const r = el.getBoundingClientRect(); if (r.bottom > 0 && r.top < H) ex.push(r); } });
   const k = zpAn.k, P = zpAn.parts, want = k === 'snow' ? 70 : k === 'sun' ? 22 : (k === 'cloud' || k === 'fog') ? 7 : 90;
   while (P.length < want) P.push(k === 'snow' ? { x: Math.random() * W, y: -Math.random() * H, r: 1.2 + Math.random() * 2.6, v: .5 + Math.random() * 1.1, w: Math.random() * 6.28 }
     : k === 'sun' ? { x: Math.random() * W, y: Math.random() * H, r: 1 + Math.random() * 2.2, v: .15 + Math.random() * .35, w: Math.random() * 6.28 }
