@@ -381,10 +381,10 @@ function zpSpr(k, id, css) {
 const ZP_TABV = [['army', '육군'], ['af', '공군'], ['navy', '해군'], ['mc', '해병대'], ['spec', '특수부대 흑복']];
 const ZP_VAR = {
   nt_army: [['army', '육군', 'ntb_olive', '#16181B', '#4A4E44'], ['af', '공군', 'ntb_olive', '#1F4FB8', '#7FA0E8'], ['navy', '해군', 'ntb_navy', '#F2C230', '#FFF0A8'], ['mc', '해병대', 'ntb_red', '#F6D23A', '#FFF2A0'], ['digi', '육군 디지털', 'ntb_digi', '#16181B', '#3A3E34'], ['spec', '특전사 · 707 흑복', 'ntb_black', '#6E7A52', '#9AA67C'], ['sdt', '군사경찰 SDT', 'ntb_black', '#8A8E94', '#C4C8CE'], ['udt', '해군 UDT · SSU', 'ntb_black', '#F2C230', '#FFF0A8'], ['vet', '전역 기념', 'ntb_olive', '#F4F4F0', '#FFFFFF']],
-  pt_elite: ZP_TABV, pt_shooter: ZP_TABV, rk_1: ZP_TABV, rk_2: ZP_TABV, rk_3: ZP_TABV, rk_4: ZP_TABV
+  pt_elite: [['base', '기본']].concat(ZP_TABV), pt_shooter: [['base', '기본']].concat(ZP_TABV), rk_1: ZP_TABV, rk_2: ZP_TABV, rk_3: ZP_TABV, rk_4: ZP_TABV
 };
 const ZP_BRV = { army: 'army', airforce: 'af', navy: 'navy', marine: 'mc' };
-const zpVar = (id, eq) => { const L = ZP_VAR[id]; if (!L) return null; const v = (eq && eq.pv && eq.pv[id]) || ZP_BRV[(eq && eq._br) || (me && me.gender === 'M' && me.branch)]; return L.find(x => x[0] === v) || L[0]; };
+const zpVar = (id, eq) => { const L = ZP_VAR[id]; if (!L) return null; const v = (eq && eq.pv && eq.pv[id]) || (/^rk_/.test(id) || id === 'nt_army') && ZP_BRV[(eq && eq._br) || (me && me.gender === 'M' && me.branch)]; return L.find(x => x[0] === v) || L[0]; };
 /* 그림 키: 군별 색상이 있으면 'pt_elite@navy' 같은 키 */
 const zpKey = (id, eq) => { const V = zpVar(id, eq); if (!V) return id; if (ZP_ITEMS[id] && ZP_ITEMS[id].nt) return V[2]; const k = id + '@' + V[0]; return ZP_SPR.c.m[k] && zp.spr.c ? k : id; };
 const zpNtOf = (id, eq) => { eq = eq || {}; return (eq.nts && eq.nts[id]) || eq.nt || {}; };
