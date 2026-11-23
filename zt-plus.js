@@ -141,7 +141,7 @@ function zpToast(t) { const d = document.createElement('div'); d.className = 'zp
 .zp-slot .ck{width:20px;height:20px;border-radius:50%;border:2px solid #D1D6DB}
 .zp-slot.on{border-color:#191F28;background:#F9FAFB}.zp-slot.on .ck{border:6px solid #191F28}
 .pc2 .fimg{position:absolute;inset:0;background:center/100% 100% no-repeat;pointer-events:none;z-index:2}
-.pc2.pfi{background:#F4F5F7}.pc2.pfi .cap{z-index:4}
+.pc2.pfi{background:#F4F5F7}.pc2.pfi.fit,.zp-pchome .face .pc2.pfi.fit,.zp-pcv .face .pc2.pfi.fit{background:transparent!important;box-shadow:none!important;border-radius:0}.pc2.pfi.fit .fimg{filter:drop-shadow(0 10px 18px rgba(17,20,26,.22))}.zp-pchome .face:has(.fit)::after,.zp-pcv .face:has(.fit)::after{display:none}.pc2.pfi .cap{z-index:4}
 .pc2 .gl{position:absolute;inset:0;pointer-events:none;z-index:2;-webkit-mask-size:100% 100%;mask-size:100% 100%;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.0) 40%,rgba(255,255,255,.85) 48%,rgba(210,240,255,.6) 50%,rgba(255,220,250,.5) 52%,transparent 62%);background-size:300% 100%;animation:zpGl 3.6s ease-in-out infinite;mix-blend-mode:screen}
 @keyframes zpGl{0%{background-position:120% 0}60%,100%{background-position:-60% 0}}
 .pc2 .tw{position:absolute;width:7cqw;height:7cqw;margin:-3.5cqw;pointer-events:none;z-index:3;background:radial-gradient(circle,#fff 0 7%,transparent 9%),linear-gradient(#fff,#fff) center/8% 100% no-repeat,linear-gradient(90deg,#fff,#fff) center/100% 8% no-repeat;-webkit-mask:radial-gradient(circle,#000 20%,transparent 70%);mask:radial-gradient(circle,#000 20%,transparent 70%);filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 5px rgba(200,230,255,.9));animation:zpTwk 2.2s ease-in-out infinite;opacity:0}
@@ -548,6 +548,7 @@ async function zpEquip(slot, id, quiet) {
 }
 
 /* ---------- 포토카드 ---------- */
+const ZP_INS = {"pf_amethyst": [11.3, 1.7, 6.2, 4.3], "pf_antique": [7.2, 2.3, 7.8, 0.7], "pf_blackcat": [6.9, 2.5, 6.2, 2.7], "pf_candy": [7.8, 3.0, 6.4, 1.8], "pf_clover": [4.3, 3.3, 5.0, 1.2], "pf_cookie": [7.4, 0.7, 5.9, 3.5], "pf_galaxy": [5.3, 0.7, 4.7, 1.8], "pf_gamer": [8.3, 4.7, 9.2, 5.0], "pf_gothic": [6.6, 2.2, 2.2, 1.8], "pf_ice": [20.4, 18.7, 7.6, 3.0], "pf_rainbow": [5.2, 0.5, 5.1, 0.0], "pf_ribbon": [6.8, 2.2, 5.8, 3.0], "pf_seashell": [5.4, 2.7, 6.4, 1.8], "pf_silver": [7.1, 3.2, 6.2, 4.8], "pf_silverfly": [10.3, 3.3, 5.0, 3.2], "pf_aqua": [5.7, 1.2, 6.1, 7.9], "pf_opal": [8.1, 2.2, 6.4, 4.6], "pf_aurora": [8.3, 2.2, 6.9, 3.8], "pf_mermaid": [4.7, 0.1, 3.9, 0.0], "pf_angelheart": [3.1, 0.9, 4.2, 0.0], "pf_mint": [8.1, 3.7, 4.9, 1.1]};
 const ZP_TW = [[9, 6], [88, 9], [94, 42], [6, 58], [90, 88], [14, 93], [50, 4], [52, 96]];
 function zpPCHTML(c, mini, edit) {
   const d = c.deco || {}, fr = ZP_ITEMS[c.frame] ? c.frame : 'pc_basic';
@@ -555,10 +556,10 @@ function zpPCHTML(c, mini, edit) {
   const sk = (d.st || []).map((s, i) => `<div class="sk ${edit && edit.sel === i ? 'sel' : ''}" data-i="${i}" style="left:${+s[1] || 50}%;top:${+s[2] || 50}%;--s:${Math.min(2.2, Math.max(.5, +s[3] || 1))}">${zpStkSVG(String(s[0]))}</div>`).join('');
   const it = ZP_ITEMS[fr]; let ov = '';
   if (it.img) {
-    const u = `${fr}.webp?v=1`; ov = `<i class="fimg" style="background-image:url('${u}')"></i>`;
+    const u = `${fr}.webp?v=3`; ov = `<i class="fimg" style="background-image:url('${u}')"></i>`;
     if (it.gem) ov += `<i class="gl" style="-webkit-mask-image:url('${u}');mask-image:url('${u}')"></i>` + ZP_TW.map(([x, y], i) => `<i class="tw" style="left:${x}%;top:${y}%;animation-delay:${(i * .37).toFixed(2)}s"></i>`).join('');
   }
-  return `<div class="pc2 pcf-${fr}${it.img ? ' pfi' : ''}">${fr === 'pc_army' ? '<i class="tag"></i>' : ''}<div class="ph ${photo ? '' : 'empty'}" ${photo ? `style="background-image:url('${photo}')"` : ''}>${photo ? '' : (mini ? '' : '사진을 넣어주세요')}</div>${ov}<div class="lay">${sk}</div>${d.cap ? `<div class="cap">${esc(String(d.cap).slice(0, 24))}</div>` : ''}</div>`;
+  return `<div class="pc2 pcf-${fr}${it.img ? ' pfi' : ''}${ZP_INS[fr] ? ' fit' : ''}">${fr === 'pc_army' ? '<i class="tag"></i>' : ''}<div class="ph ${photo ? '' : 'empty'}" style="${ZP_INS[fr] ? `inset:${ZP_INS[fr][0]}% ${ZP_INS[fr][1]}% ${ZP_INS[fr][2]}% ${ZP_INS[fr][3]}%;border-radius:4cqw;` : ''}${photo ? `background-image:url('${photo}')` : ''}">${photo ? '' : (mini ? '' : '사진을 넣어주세요')}</div>${ov}<div class="lay">${sk}</div>${d.cap ? `<div class="cap">${esc(String(d.cap).slice(0, 24))}</div>` : ''}</div>`;
 }
 function zpPCHome() {
   const box = q('zp-pc-home'); if (!box) return;
