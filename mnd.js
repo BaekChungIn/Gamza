@@ -47,19 +47,23 @@ const css = `
 const st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
 /* ================= PX 인기 TOP 10 ================= */
-const PX = { m: null, s: 'q' };
+const PX = { m: null, s: 'q', v: 'cos', p: 'all' };
 window.mndPxRank = function () {
-  const host = $('px-rank'); if (!host) return; const P = D().px, ks = Object.keys(P).sort(); if (!ks.length) { host.innerHTML = ''; return; }
+  const host = $('px-rank'); if (!host) return;
+  const tabs = `<div class="mnd-tabs" style="margin:0 0 12px"><button class="${PX.v === 'cos' ? 'on' : ''}" onclick="mndPxSet(null,null,'cos')">화장품 순위</button><button class="${PX.v === 'all' ? 'on' : ''}" onclick="mndPxSet(null,null,'all')">전체 인기</button></div>`;
+  if (PX.v === 'cos') { const C = (D().cos || {})[PX.p] || [], mx = Math.max(1, ...C.map(x => x[1]));
+    host.innerHTML = `<div class="mnd-card" style="margin:0 0 12px">${tabs}<div class="mnd-h"><span>PX 화장품 인기 순위</span></div><div class="mnd-s">국방부 PX 인기상품 월간 TOP 10에 오른 화장품을 모아 점수로 매긴 순위예요</div><div class="mnd-chips">${[['1y', '최근 1년'], ['2y', '최근 2년'], ['all', '전체 기간']].map(([k, t]) => `<button class="mnd-chip ${PX.p === k ? 'on' : ''}" onclick="mndPxSet(null,null,null,'${k}')">${t}</button>`).join('')}</div><div>${C.slice(0, 10).map((x, r) => `<div class="mnd-rk ${r < 3 ? 't3' : ''}"><b class="n">${r + 1}</b><div class="nm" style="white-space:normal"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${E(x[0])}</div><div style="height:4px;border-radius:2px;background:#F2F4F6;margin-top:5px"><i style="display:block;height:100%;width:${Math.round(x[1] / mx * 100)}%;border-radius:2px;background:linear-gradient(90deg,#F2B8C6,#E86F95)"></i></div></div><span class="ch" style="color:#8B95A1;min-width:60px">TOP10 ${x[3]}회</span></div>`).join('') || '<div class="text-center text-[13px] text-[#8B95A1] py-6">이 기간엔 순위에 오른 화장품이 없어요</div>'}</div></div>`; return; }
+  const P = D().px, ks = Object.keys(P).sort(); if (!ks.length) { host.innerHTML = ''; return; }
   if (!PX.m || !P[PX.m]) PX.m = ks[ks.length - 1];
   const i = ks.indexOf(PX.m), prev = i > 0 ? (P[ks[i - 1]] || {})[PX.s] || [] : null, L = (P[PX.m] || {})[PX.s] || [];
   const lbl = k => `${+k.slice(5)}월`, yy = PX.m.slice(0, 4);
   const ch = (n, r) => { if (!prev) return ''; const j = prev.indexOf(n); if (j < 0) return '<span class="ch" style="color:#F04452">NEW</span>'; const d = j - r; return d > 0 ? `<span class="ch" style="color:#F04452">▲${d}</span>` : d < 0 ? `<span class="ch" style="color:#3182F6">▼${-d}</span>` : '<span class="ch" style="color:#B0B8C1">-</span>'; };
-  host.innerHTML = `<div class="mnd-card" style="margin:0 0 12px"><div class="mnd-h"><span>PX 인기 TOP 10</span><div class="mnd-seg"><button class="${PX.s === 'q' ? 'on' : ''}" onclick="mndPxSet(null,'q')">판매량</button><button class="${PX.s === 'a' ? 'on' : ''}" onclick="mndPxSet(null,'a')">판매액</button></div></div>
+  host.innerHTML = `<div class="mnd-card" style="margin:0 0 12px">${tabs}<div class="mnd-h"><span>PX 인기 TOP 10</span><div class="mnd-seg"><button class="${PX.s === 'q' ? 'on' : ''}" onclick="mndPxSet(null,'q')">판매량</button><button class="${PX.s === 'a' ? 'on' : ''}" onclick="mndPxSet(null,'a')">판매액</button></div></div>
    <div class="mnd-s">국방부 공공데이터 · ${yy}년 ${lbl(PX.m)} 전군 PX 기준</div>
    <div class="mnd-chips">${ks.slice(-8).reverse().map(k => `<button class="mnd-chip ${k === PX.m ? 'on' : ''}" onclick="mndPxSet('${k}')">${k.slice(2, 4)}.${lbl(k)}</button>`).join('')}</div>
    <div>${L.map((n, r) => `<div class="mnd-rk ${r < 3 ? 't3' : ''}"><b class="n">${r + 1}</b><span class="nm">${E(n)}</span>${ch(n, r)}</div>`).join('')}</div></div>`;
 };
-window.mndPxSet = (m, s) => { if (m) PX.m = m; if (s) PX.s = s; mndPxRank(); };
+window.mndPxSet = (m, s, v, p) => { if (m) PX.m = m; if (s) PX.s = s; if (v) PX.v = v; if (p) PX.p = p; mndPxRank(); };
 
 /* ================= 혜택: 장병 할인 · TMO · 군병원 ================= */
 const MB = { rg: '전체', q: '', lim: 8, tq: '', tlim: 6, near: null };
