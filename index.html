@@ -94,6 +94,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 .zdlg-btns .c{background:#F2F3F5;color:#4E5968}.zdlg-btns .o{background:#191F28;color:#fff}.zdlg-btns .o.d{background:#E5484D}
 @keyframes zdIn{from{opacity:0}}@keyframes zdOut{to{opacity:0}}@keyframes zdPop{from{transform:scale(.9);opacity:0}}
 .th-lock{position:absolute;top:6px;right:6px;display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:800;padding:3px 7px 3px 4px;border-radius:999px;background:rgba(255,255,255,.92);color:#191F28;box-shadow:0 1px 4px rgba(0,0,0,.15)}.th-lock .zp-mug{width:13px;height:13px}
+@keyframes chIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:none}}
 </style>
 <style>
 .swp{position:absolute;inset:0;display:flex;flex-direction:column;background:#fff}
@@ -1268,10 +1269,30 @@ async function completeOnboarding() {
     const e = q('ob-enlist-date').value; if (!e) return showAlert('알림', '입대일을 선택해주세요.');
     upd.branch = obBranch; upd.enlist_date = e; upd.discharge_date = ymd(calcDischarge(pd(e), obBranch));
   }
+  let pick = null;
+  if (obG === 'M' || obG === 'F') { pick = await charPick(obG, obG === 'M' ? me.bf_theme : me.gf_theme); if (!pick) return; if (obG === 'M') upd.bf_theme = pick; else upd.gf_theme = pick; }
   const { error } = await sb.from('profiles').update(upd).eq('id', me.id);
   if (error) return showAlert('오류', esc(error.message));
   q('onboarding-modal').classList.add('hidden'); await loadAll(true); initUI(); render(true); subscribe();
+  if (pick) { const C = CHARS[obG].find(x => x[0] === pick); popPush({ name: C[1], title: `${C[1]}${hasBat(C[1]) ? '과' : '와'} 함께해요!`, sub: '선택한 캐릭터로 기본 프로필이 설정되어요\n설정 > 테마에서 언제든 바꿀 수 있어요', badge: C[1], bc: obG === 'F' ? '#E86F95' : 'var(--mil-green)', img: C[2] }); }
   if (obG === 'S' && !me.star_id) setTimeout(() => starFlow(), 350);
+}
+/* 캐릭터 고르기 (회원가입 직후) */
+const CHARS = { M: [['tiger', '짬타이거', 'tiger_ib.png', '듬직한 백호'], ['gamja', '감자돌이', 'gamja_ib.png', '포근한 감자']], F: [['gomsin', '곰신 베어', 'gf_bear.png', '편지 든 곰돌이'], ['cat', '꽃냥이', 'gf_cat.png', '꽃다발 든 냥이']] };
+function charPick(g, cur) {
+  return new Promise(res => {
+    const L = CHARS[g]; let sel = L.some(x => x[0] === cur) ? cur : L[0][0];
+    const pink = g === 'F', acc = pink ? '#E86F95' : 'var(--mil-green)';
+    const m = document.createElement('div'); m.className = 'fixed inset-0 flex flex-col items-center'; m.style.cssText = `z-index:130;background:linear-gradient(180deg,#fff 0%,${pink ? '#FFF0F4' : '#F2F5EE'} 100%)`;
+    const draw = () => { const C = L.find(x => x[0] === sel);
+      m.innerHTML = `<div class="relative w-full max-w-[430px] h-full px-6 flex flex-col items-center text-center" style="padding-top:max(34px,env(safe-area-inset-top));padding-bottom:max(22px,env(safe-area-inset-bottom))">
+       <div class="text-[15px] font-bold text-[#8B95A1]">캐릭터 고르기</div><div class="mt-2 font-black leading-tight tracking-tight" style="font-size:30px">나와 함께할<br>캐릭터를 골라주세요</div><div class="mt-2 text-[14px] text-[#8B95A1]">고른 캐릭터가 기본 프로필이 돼요</div>
+       <div class="relative flex-1 min-h-0 w-full flex items-center justify-center py-3"><img src="${C[2]}" alt="" class="max-h-full max-w-[86%] object-contain" style="filter:drop-shadow(0 14px 24px rgba(0,0,0,.12));animation:chIn .35s ease"><div class="absolute bottom-2 px-6 py-2 rounded-full text-[19px] font-black text-white" style="background:${acc}">${C[1]}</div></div>
+       <div class="w-full grid grid-cols-2 gap-3 mb-3">${L.map(x => `<button data-k="${x[0]}" class="rounded-2xl p-2.5 flex items-center gap-2.5 text-left bg-white" style="border:2px solid ${x[0] === sel ? acc : '#E5E8EB'};box-shadow:${x[0] === sel ? '0 6px 16px rgba(0,0,0,.08)' : 'none'}"><img src="${x[2]}" style="width:46px;height:46px;object-fit:contain"><span><b class="block text-[14px]">${x[1]}</b><small style="font-size:11px;color:#8B95A1;white-space:nowrap">${x[3]}</small></span></button>`).join('')}</div>
+       <button data-ok="1" class="w-full py-4 rounded-2xl text-white font-bold text-[15px]" style="background:#191F28">${C[1]}로 시작하기</button></div>`; };
+    draw(); document.body.appendChild(m);
+    m.onclick = e => { const b = e.target.closest('[data-k]'); if (b) { sel = b.dataset.k; draw(); return; } if (e.target.closest('[data-ok]')) { m.remove(); res(sel); } };
+  });
 }
 function calcDischarge(d, br) { const x = new Date(d); x.setMonth(x.getMonth() + BR[br].m); x.setDate(x.getDate() - 1); return x; }
 
@@ -1387,7 +1408,7 @@ function gamjaSVG(st) {
   return `<svg viewBox="0 0 100 100" class="w-full h-full"><ellipse cx="50" cy="56" rx="30" ry="34" fill="#E8C078" stroke="#8a6a35" stroke-width="2.5"/><circle cx="38" cy="50" r="2" fill="#C99A4B"/><circle cx="64" cy="66" r="2" fill="#C99A4B"/><circle cx="41" cy="55" r="3.5" fill="#2b1a14"/><circle cx="60" cy="55" r="3.5" fill="#2b1a14"/><circle cx="34" cy="63" r="5" fill="#F4A0A0" opacity=".6"/><circle cx="67" cy="63" r="5" fill="#F4A0A0" opacity=".6"/><path d="M45 66q5 5 10 0" stroke="#2b1a14" stroke-width="2" fill="none" stroke-linecap="round"/>${hair}${hat}</svg>`;
 }
 function bfImg(theme, r) {
-  if (theme === 'gamja') return gamjaSVG({ '훈련병': 0, '이병': 1, '일병': 2 }[r] ?? 3);
+  if (theme === 'gamja') return `<img src="${gamjaFile(r)}" alt="" class="w-[118%] h-[118%] object-contain">`;
   const f = { '훈련병': 'tiger_ib.png', '이병': 'tiger_ib.png', '일병': 'tiger_ilb.png', '상병': 'tiger_sb.png' }[r] || 'tiger_bj.png';
   return `<img src="${f}" alt="" class="w-[120%] h-[120%] object-contain">`;
 }
@@ -1527,13 +1548,14 @@ async function removeAvatar() {
 /* ---------- 축하/응원 팝업 (진급 · 전역 D-day) ---------- */
 let popQ = [], popBusy = false, popReady = false, popCur = null, popChecked = false;
 function popPush(o) { popQ.push(o); if (popReady && !popBusy) popNext(); }
-const rankFile = r => ({ '훈련병': 'tiger_ib.png', '이병': 'tiger_ib.png', '일병': 'tiger_ilb.png', '상병': 'tiger_sb.png' })[r] || 'tiger_bj.png';
+const gamjaFile = r => ({ '훈련병': 'gamja_ib.png', '이병': 'gamja_ib.png', '일병': 'gamja_ilb.png', '상병': 'gamja_sb.png' })[r] || 'gamja_bj.png';
+const rankFile = (r, th) => th === 'gamja' ? gamjaFile(r) : ({ '훈련병': 'tiger_ib.png', '이병': 'tiger_ib.png', '일병': 'tiger_ilb.png', '상병': 'tiger_sb.png' })[r] || 'tiger_bj.png';
 function popNext() {
   const o = popQ.shift(); if (!o) { popBusy = false; return; } popBusy = true; popCur = o;
   q('pop-name').innerText = o.name || ''; q('pop-title').innerText = o.title; q('pop-sub').innerText = o.sub || ''; q('pop-badge').innerText = o.badge || ''; q('pop-badge').classList.toggle('hidden', !o.badge);
   q('pop-share').classList.toggle('hidden', !o.share);
   const av = q('pop-ava'), im = q('pop-img'); av.classList.toggle('hidden', !o.ava); im.classList.toggle('hidden', !!o.ava);
-  if (o.ava) { av.style.setProperty('--pop-ring', o.ring || '#E3C77E'); av.innerHTML = o.ava.img ? `<img src="${esc(o.ava.img)}" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover" onerror="this.remove()">` : ''; if (!o.ava.img) { av.style.fontSize = '64px'; av.innerText = o.ava.txt || ''; } } else { im.src = o.img || rankFile(o.rk || o.badge); im.style.mixBlendMode = o.img ? 'multiply' : ''; }
+  if (o.ava) { av.style.setProperty('--pop-ring', o.ring || '#E3C77E'); av.innerHTML = o.ava.img ? `<img src="${esc(o.ava.img)}" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover" onerror="this.remove()">` : ''; if (!o.ava.img) { av.style.fontSize = '64px'; av.innerText = o.ava.txt || ''; } } else { const S0 = typeof S_ === 'function' ? S_() : null; im.src = o.img || rankFile(o.rk || o.badge, o.th || (S0 && S0.bf_theme) || (me && me.bf_theme)); im.style.mixBlendMode = o.img ? 'multiply' : ''; }
   q('pop-share').style.background = o.bc && o.bc !== '#191F28' ? o.bc : 'var(--mil-green)';
   q('pop-badge').style.background = o.bc || 'var(--mil-green)';
   const cf = q('pop-cf'); cf.innerHTML = ''; const cols = ['#F28C9F', '#F2BA49', '#6BC4A6', '#7FA8E8', '#B79CE8', '#F2878F'];
@@ -1559,7 +1581,7 @@ function checkDday(S) {
   popPush({ name: (S.nickname || '군인') + '님', title: `전역까지 ${N}일 남았어요!`, sub: N >= 100 ? '여기까지 오느라 고생 많았어요' : '조금만 더 힘내요, 거의 다 왔어요', badge: `D-${N}`, rk: rankOf(S, new Date()).r, share: `전역까지 D-${N}! 짬타이거` });
 }
 /* MY스타: 프로필 사진을 누르면 지금 계급 · 응원 한마디 */
-const STAR_CHEER = { '입대 예정': '건강하게 잘 다녀오길, 팬들이 늘 응원하고 있어요', '훈련병': '낯선 곳에서의 첫걸음, 누구보다 멋지게 해낼 거예요', '이병': '모든 게 처음이라 힘들 텐데, 매일 응원이 쌓이고 있어요', '일병': '조금씩 익숙해지는 중! 무대 위 모습이 벌써 그리워요', '상병': '벌써 반 넘게 왔어요. 남은 날도 건강하게!', '병장': '거의 다 왔어요! 곧 무대에서 다시 만나요', '사회복무요원': '묵묵히 복무하는 모습, 늘 자랑스러워요', '전역': '그동안 정말 고생 많았어요. 다시 만나서 행복해요' };
+const STAR_CHEER = { '입대 예정': '보내는 마음이 제일 힘든 거 알아요. 오늘부터 같이 세어봐요, 돌아오는 그날까지', '훈련병': '소식 없는 하루가 길게 느껴져도 괜찮아요. 기다리는 지금도 소중한 덕질이에요', '이병': '시간이 멈춘 것 같아도 하루하루 분명히 가까워지고 있어요. 오늘도 잘 버텼어요', '일병': '벌써 이만큼 왔어요! 지난 무대 꺼내 보며 조금만 더 힘내요', '상병': '반을 넘겼어요. 여기까지 기다린 당신이라면 남은 날도 충분히 해낼 수 있어요', '병장': '정말 얼마 안 남았어요. 다시 만나는 그날, 제일 먼저 반겨줄 사람은 바로 당신이에요', '사회복무요원': '가까이 있어도 보고 싶은 마음은 같죠. 함께 기다리는 팬들이 곁에 있어요', '전역': '기다린 모든 날이 헛되지 않았어요. 이제 다시 함께하는 날들만 남았어요' };
 const yeyo = w => { const c = (w || '').charCodeAt(w.length - 1) - 0xAC00; return c >= 0 && c <= 11171 && c % 28 ? '이에요' : '예요'; };
 function starPop(id) {
   const s = starK[id]; if (!s) return; const I = starInfo(s), nm = starCall(s), r = myRow(id), TH = STAR_TH[(r && r.theme) || 'black_gold'] || {};
@@ -1570,7 +1592,7 @@ function starPop(id) {
 function checkStarDday() {
   (myStars || []).forEach(r => { const s = starK[r.id]; if (!s) return; const I = starInfo(s), N = I.dday; if (I.pre || I.done || N <= 0 || !(N % 100 === 0 || [50, 30, 10, 7].includes(N))) return;
     const k = `dpop:star:${s.id}:${N}`; try { if (localStorage.getItem(k)) return; localStorage.setItem(k, '1'); } catch (e) { return; }
-    const nm = starCall(s), msg = N >= 100 ? '함께 기다린 시간이 벌써 이만큼! 오늘도 응원을 보내요' : N >= 30 ? '조금만 더 기다리면 무대 위에서 다시 만나요' : '정말 얼마 안 남았어요! 다시 만날 준비 됐나요?';
+    const nm = starCall(s), msg = N >= 100 ? '하루하루 기다린 마음이 쌓여 여기까지 왔어요\n지금처럼만 하면 돼요, 그날은 꼭 와요' : N >= 30 ? '조금만 더 버티면 다시 무대 위에서 만나요\n기다린 만큼 더 반가울 거예요' : '손꼽아 기다린 그날이 코앞이에요\n마지막까지 같이 버텨요, 거의 다 왔어요';
     popPush({ name: 'MY스타 · ' + s.g, title: `${callAs(nm, '의')} 전역까지 D-${N}!`, sub: msg, badge: `D-${N}`, bc: '#191F28', ava: { img: starPhoto(s), txt: s.n.slice(0, 2) }, share: `${s.n} 전역까지 D-${N}! 함께 기다려요 · 짬타이거` });
   });
 }
