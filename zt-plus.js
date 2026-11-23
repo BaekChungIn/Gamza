@@ -21,6 +21,7 @@ const ZP_ITEMS = {
   bd_triangle: { n: '삼각 삼성장', k: 'patch', aud: 'mil', d: 'tri', w: 42 },
   bd_anchor: { n: '닻과 별', k: 'patch', aud: 'mil', d: 'anchor' },
   bd_compass: { n: '화살 나침장', k: 'patch', aud: 'mil', d: 'compass', w: 40 },
+  pc_none: { n: '사진만 (틀 없음)', k: 'frame', aud: 'fan', free: 1 },
   pc_basic: { n: '기본 화이트', k: 'frame', aud: 'fan' },
   pc_polaroid: { n: '폴라로이드', k: 'frame', aud: 'fan' },
   pc_holo: { n: '홀로그램', k: 'frame', aud: 'fan' },
@@ -136,6 +137,15 @@ function zpToast(t) { const d = document.createElement('div'); d.className = 'zp
 .pc2 .ph{position:absolute;inset:0;background:#E9ECEF center/cover no-repeat}
 .pc2 .ph.empty{display:flex;align-items:center;justify-content:center;color:#B0B8C1;font-size:12px;font-weight:700}
 .pc2 .lay{position:absolute;inset:0;pointer-events:none;z-index:3}
+.zp-crop{position:fixed;inset:0;z-index:95;background:#0B0D10;display:flex;flex-direction:column;align-items:center;color:#fff;padding-top:max(12px,env(safe-area-inset-top));padding-bottom:max(16px,env(safe-area-inset-bottom))}
+.zp-crop .top{width:100%;display:flex;align-items:center;justify-content:space-between;padding:6px 16px 14px}.zp-crop .top b{font-size:16px}
+.zp-crop .b{height:38px;padding:0 14px;border-radius:999px;background:rgba(255,255,255,.12);font-size:14px;font-weight:700;color:#fff}.zp-crop .b.ok{background:#fff;color:#191F28}
+.zp-crop .vp{position:relative;overflow:hidden;border-radius:14px;touch-action:none;background:#222;margin-top:auto;box-shadow:0 0 0 2px rgba(255,255,255,.85)}
+.zp-crop .vp img{position:absolute;left:50%;top:50%;max-width:none;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.zp-crop .vp .g{position:absolute;inset:0;pointer-events:none;background:linear-gradient(rgba(255,255,255,.25),rgba(255,255,255,.25)) 33.33% 0/1px 100% no-repeat,linear-gradient(rgba(255,255,255,.25),rgba(255,255,255,.25)) 66.66% 0/1px 100% no-repeat,linear-gradient(90deg,rgba(255,255,255,.25),rgba(255,255,255,.25)) 0 33.33%/100% 1px no-repeat,linear-gradient(90deg,rgba(255,255,255,.25),rgba(255,255,255,.25)) 0 66.66%/100% 1px no-repeat}
+.zp-crop .ctl{display:flex;align-items:center;gap:12px;width:min(82vw,340px);margin-top:18px;font-weight:800;opacity:.9}.zp-crop .ctl input{flex:1;accent-color:#fff}
+.zp-crop .ctl2{display:flex;gap:8px;margin-top:12px}.zp-crop .ctl2 button{height:36px;padding:0 14px;border-radius:999px;background:rgba(255,255,255,.12);font-size:13px;font-weight:700;color:#fff}
+.zp-crop .hint{font-size:12px;opacity:.55;margin:12px 0 auto;padding:0 20px;text-align:center}
 .zp-slots{display:flex;flex-direction:column;gap:8px;margin-top:4px;text-align:left}
 .zp-slot{display:flex;align-items:center;gap:12px;text-align:left;padding:13px 14px;border-radius:14px;border:1.5px solid #E5E8EB;background:#fff;width:100%}
 .zp-slot .ic{display:flex;color:#191F28}.zp-slot .ic svg{width:22px!important;height:22px!important}.zp-slot .tx{flex:1;display:flex;flex-direction:column}.zp-slot b{font-size:15px;color:#191F28}.zp-slot small{font-size:12px;color:#8B95A1;margin-top:2px}
@@ -315,7 +325,7 @@ async function zpLoadItems() {
     const [a, b] = await Promise.all([sb.from('shop_items').select('id,price,active'), sb.from('user_items').select('item_id').eq('user_id', me.id)]);
     if (a.error) { zp.shopOK = false; return; }
     zp.price = {}; (a.data || []).forEach(r => { if (r.active) zp.price[r.id] = r.price; });
-    zp.owned = new Set((b.data || []).map(r => r.item_id));
+    zp.owned = new Set((b.data || []).map(r => r.item_id)); zp.owned.add('pc_none');
   } catch (e) { zp.shopOK = false; }
 }
 async function zpLoadPCs() {
@@ -486,7 +496,7 @@ async function zpShopRender(el) {
   const cats = ZP_CATS[zpAud()].concat([['inv', '보관함']]); if (!zp.cat || !cats.some(c => c[0] === zp.cat)) zp.cat = cats[0][0];
   const inv = zp.cat === 'inv', eq = (me && me.equip) || {};
   const list = Object.entries(ZP_ITEMS).filter(([id, it]) => it.aud === zpAud() && zp.price[id] !== undefined && (inv ? zp.owned.has(id) : it.k === zp.cat));
-  const cnt = Object.keys(ZP_ITEMS).filter(id => ZP_ITEMS[id].aud === zpAud() && zp.owned.has(id)).length;
+  const cnt = Object.keys(ZP_ITEMS).filter(id => ZP_ITEMS[id].aud === zpAud() && !ZP_ITEMS[id].free && zp.owned.has(id)).length;
   const note = inv ? '산 아이템은 모두 여기 있어요. 테마와 패치는 여기서 바꿔 끼울 수 있어요' : zp.cat === 'frame' ? '틀을 사면 홈에서 원하는 사진으로 포토카드를 만들 수 있어요' : zp.cat === 'sticker' ? '포토카드를 꾸밀 때 쓸 수 있는 스티커예요' : zp.cat === 'theme' ? '홈 프로필 카드의 색이 바뀌어요. 연인에게도 보여요 · 눌러서 미리보기' : '프로필 카드 오른쪽 위에 붙어요. 연인에게도 보여요 · 눌러서 미리보기';
   el.innerHTML = `<div class="zp-card mt-2 flex items-center gap-3" style="background:linear-gradient(135deg,#191F28,#2B3340);color:#fff;border:0">${zpMug('md')}<div><div class="text-[12px] opacity-70">내 무궁화</div><div class="text-[24px] font-black tabular-nums zp-bal2">${zpFmt(zp.bal)}</div></div><div class="ml-auto text-right text-[11px] opacity-70 leading-relaxed">매일 출석하면<br>1~30개 · 행운 100개</div></div>
    <div class="zp-chips mt-4">${cats.map(([k, n]) => `<button class="${k === zp.cat ? 'on' : ''}" onclick="zp.cat='${k}';zpShopRender(zpShopEl())">${n}${k === 'inv' && cnt ? ` ${cnt}` : ''}</button>`).join('')}</div>
@@ -549,7 +559,7 @@ async function zpEquip(slot, id, quiet) {
 }
 
 /* ---------- 포토카드 ---------- */
-const ZP_INS = {"pf_amethyst": [11.3, 1.7, 6.2, 4.3], "pf_antique": [7.2, 2.3, 7.8, 0.7], "pf_blackcat": [6.9, 2.5, 6.2, 2.7], "pf_candy": [7.8, 3.0, 6.4, 1.8], "pf_clover": [4.3, 3.3, 5.0, 1.2], "pf_cookie": [7.4, 0.7, 5.9, 3.5], "pf_galaxy": [5.3, 0.7, 4.7, 1.8], "pf_gamer": [8.3, 4.7, 9.2, 5.0], "pf_gothic": [6.6, 2.2, 2.2, 1.8], "pf_ice": [20.4, 18.7, 7.6, 3.0], "pf_rainbow": [5.2, 0.5, 5.1, 0.0], "pf_ribbon": [6.8, 2.2, 5.8, 3.0], "pf_seashell": [5.4, 2.7, 6.4, 1.8], "pf_silver": [7.1, 3.2, 6.2, 4.8], "pf_silverfly": [10.3, 3.3, 5.0, 3.2], "pf_aqua": [8.0, 3.0, 6.3, 3.2], "pf_opal": [10.9, 4.2, 7.8, 5.2], "pf_aurora": [10.7, 4.8, 6.8, 3.5], "pf_mermaid": [7.9, 2.3, 5.6, 2.7], "pf_angelheart": [8.2, 2.3, 5.1, 2.7], "pf_mint": [9.4, 2.8, 8.0, 2.7], "pf_icefly": [9.9, 11.3, 3.4, 3.2]};
+const ZP_INS = {"pf_amethyst": [9.8, 4.2, 9.8, 4.2], "pf_antique": [8.2, 2.3, 8.2, 2.3], "pf_blackcat": [6.6, 2.7, 6.6, 2.7], "pf_candy": [7.6, 3.0, 7.6, 3.0], "pf_clover": [5.6, 3.2, 5.6, 3.2], "pf_cookie": [7.8, 3.4, 7.8, 3.4], "pf_galaxy": [5.5, 1.8, 5.5, 1.8], "pf_gamer": [8.9, 5.0, 8.9, 5.0], "pf_gothic": [6.0, 3.7, 6.0, 3.7], "pf_ice": [18.9, 16.2, 18.9, 16.2], "pf_rainbow": [5.4, 0.5, 5.4, 0.5], "pf_ribbon": [6.6, 3.0, 6.6, 3.0], "pf_seashell": [6.3, 2.7, 6.3, 2.7], "pf_silver": [7.3, 4.7, 7.3, 4.7], "pf_silverfly": [7.7, 3.3, 7.7, 3.3], "pf_aqua": [7.2, 3.2, 7.2, 3.2], "pf_opal": [9.8, 5.1, 9.8, 5.1], "pf_aurora": [9.3, 4.7, 9.3, 4.7], "pf_mermaid": [6.9, 2.7, 6.9, 2.7], "pf_angelheart": [6.8, 2.7, 6.8, 2.7], "pf_mint": [8.7, 2.8, 8.7, 2.8], "pf_icefly": [9.9, 10.5, 9.9, 10.5]};
 const ZP_TW = [[9, 6], [88, 9], [94, 42], [6, 58], [90, 88], [14, 93], [50, 4], [52, 96]];
 function zpPCHTML(c, mini, edit) {
   const d = c.deco || {}, fr = ZP_ITEMS[c.frame] ? c.frame : 'pc_basic';
@@ -557,25 +567,24 @@ function zpPCHTML(c, mini, edit) {
   const sk = (d.st || []).map((s, i) => `<div class="sk ${edit && edit.sel === i ? 'sel' : ''}" data-i="${i}" style="left:${+s[1] || 50}%;top:${+s[2] || 50}%;--s:${Math.min(2.2, Math.max(.5, +s[3] || 1))}">${zpStkSVG(String(s[0]))}</div>`).join('');
   const it = ZP_ITEMS[fr]; let ov = '';
   if (it.img) {
-    const u = `${fr}.webp?v=4`; ov = `<i class="fimg" style="background-image:url('${u}')"></i>`;
+    const u = `${fr}.webp?v=5`; ov = `<i class="fimg" style="background-image:url('${u}')"></i>`;
     if (it.gem) ov += `<i class="gl" style="-webkit-mask-image:url('${u}');mask-image:url('${u}')"></i>` + ZP_TW.map(([x, y], i) => `<i class="tw" style="left:${x}%;top:${y}%;animation-delay:${(i * .37).toFixed(2)}s"></i>`).join('');
   }
   return `<div class="pc2 pcf-${fr}${it.img ? ' pfi' : ''}${ZP_INS[fr] ? ' fit' : ''}">${fr === 'pc_army' ? '<i class="tag"></i>' : ''}<div class="ph ${photo ? '' : 'empty'}" style="${ZP_INS[fr] ? `inset:${ZP_INS[fr][0]}% ${ZP_INS[fr][1]}% ${ZP_INS[fr][2]}% ${ZP_INS[fr][3]}%;border-radius:4cqw;` : ''}${photo ? `background-image:url('${photo}')` : ''}">${photo ? '' : (mini ? '' : '사진을 넣어주세요')}</div>${ov}<div class="lay">${sk}</div>${d.cap ? `<div class="cap">${esc(String(d.cap).slice(0, 24))}</div>` : ''}</div>`;
 }
 function zpPCHome() {
   const box = q('zp-pc-home'); if (!box) return;
-  if (!zp.pcs.length) { box.innerHTML = `<button class="zp-pc-add" style="min-height:236px" onclick="zpPCNew()"><span class="plus">+</span><b class="text-[15px] text-[#191F28]">무궁화를 모으고 포토카드를 만들어 추가하세요</b><span class="text-[12px]">상점에서 포토카드 틀을 사면 원하는 사진으로 꾸밀 수 있어요</span></button>`; return; }
+  if (!zp.pcs.length) { box.innerHTML = `<button class="zp-pc-add" style="min-height:236px" onclick="zpPCNew()"><span class="plus">+</span><b class="text-[15px] text-[#191F28]">포토카드를 만들어 추가하세요</b><span class="text-[12px]">사진만 올려도 되고, 상점에서 틀을 사면 더 예쁘게 꾸밀 수 있어요</span></button>`; return; }
   /* 큰 포토카드 한 장 · 옆으로 밀면 큐브처럼 돌아가요 (마지막 면은 새 포토카드 추가) */
   const W = Math.min(innerWidth * .74, 300), n = zp.pcs.length + 1;
   zp.pcIdx = Math.min(zp.pcIdx || 0, n - 1);
   box.innerHTML = `<div class="zp-pchome"><div class="cw" style="width:${W}px;height:${W * 1.5}px"><div class="cube"><div class="face f0"></div><div class="face f1"></div></div></div><div class="dots"></div></div>`;
-  const face = i => i < zp.pcs.length ? zpPCHTML(zp.pcs[i]) : `<div class="zp-pc-add" style="height:100%;border-radius:14px;padding:20px"><span class="plus">+</span><b class="text-[14px] text-[#191F28]">새 포토카드 만들기</b><span class="text-[11px]">상점에서 틀을 사면 원하는 사진으로 꾸밀 수 있어요</span></div>`;
+  const face = i => i < zp.pcs.length ? zpPCHTML(zp.pcs[i]) : `<div class="zp-pc-add" style="height:100%;border-radius:14px;padding:20px"><span class="plus">+</span><b class="text-[14px] text-[#191F28]">새 포토카드 만들기</b><span class="text-[11px]">사진만 올려도 돼요</span></div>`;
   zpCube(box.querySelector('.cw'), { n, idx: zp.pcIdx, face, onIndex: i => { zp.pcIdx = i; const d = box.querySelector('.dots'); if (d) d.innerHTML = n > 1 ? Array.from({ length: n }, (_, k) => `<i class="${k === i ? 'on' : ''} ${k === n - 1 ? 'add' : ''}"></i>`).join('') : ''; }, onTap: i => i < zp.pcs.length ? zpPCView(zp.pcs[i].id) : zpPCNew() });
 }
 function zpPCNew() {
-  const fr = Object.keys(ZP_ITEMS).filter(k => ZP_ITEMS[k].k === 'frame' && zp.owned.has(k));
-  if (!fr.length) { zpToast('먼저 상점에서 포토카드 틀을 골라주세요'); return zpOpenShop('frame'); }
-  zpPCEdit(null, fr[0]);
+  const fr = Object.keys(ZP_ITEMS).filter(k => ZP_ITEMS[k].k === 'frame' && k !== 'pc_none' && zp.owned.has(k));
+  zpPCEdit(null, fr[0] || 'pc_none');
 }
 /* 포토카드 크게 보기 — 옆으로 밀면 큐브처럼 돌아가며 다음 카드로 */
 /* 큐브 넘기기 (홈 · 크게 보기 공용) */
@@ -639,7 +648,7 @@ function zpPCERender() {
   <div class="flex-1 overflow-y-auto px-5" style="padding-bottom:max(24px,env(safe-area-inset-bottom))">
    <div id="zp-pce-card" style="width:min(62vw,250px);margin:8px auto 0">${zpPCHTML(E, false, E)}</div>
    <p class="text-center text-[11px] text-[#8B95A1] mt-2">스티커를 끌어서 옮기고, 눌러서 고를 수 있어요</p>
-   <label class="block mt-4 h-12 rounded-2xl bg-white border border-[#E5E8EB] text-[14px] font-bold flex items-center justify-center gap-2 cursor-pointer"><input type="file" accept="image/*" class="hidden" onchange="zpPCPhoto(this)">${E.photo ? '사진 바꾸기' : '사진 넣기'}</label>
+   <div class="flex gap-2 mt-4"><label class="flex-1 h-12 rounded-2xl bg-white border border-[#E5E8EB] text-[14px] font-bold flex items-center justify-center gap-2 cursor-pointer"><input type="file" accept="image/*" class="hidden" onchange="zpPCPhoto(this)">${E.photo ? '사진 바꾸기' : '사진 넣기'}</label>${E.photo ? `<button onclick="zpCrop()" class="flex-1 h-12 rounded-2xl bg-white border border-[#E5E8EB] text-[14px] font-bold">자르기 · 크기 조절</button>` : ''}</div>
    <div class="text-[13px] font-extrabold mt-5 mb-2">틀</div>
    <div class="zp-chips">${frames.map(k => { const own = zp.owned.has(k); return `<button class="${E.frame === k ? 'on' : ''}" onclick="${own ? `zpE.frame='${k}';zpPCERender()` : `zpOpenShop('frame')`}">${esc(ZP_ITEMS[k].n)}${own ? '' : ' · 잠김'}</button>`; }).join('')}</div>
    <div class="text-[13px] font-extrabold mt-5 mb-2">문구</div>
@@ -650,6 +659,48 @@ function zpPCERender() {
    ${E.id ? `<button onclick="zpPCDel(${E.id},{closest:()=>({remove(){closeModal('zp-pce')}})})" class="w-full mt-6 text-[13px] text-[#8B95A1] underline">이 포토카드 삭제</button>` : ''}
   </div>`;
   zpPCEBind();
+}
+/* 사진 자르기 · 크기 조절 (끌어서 옮기고, 두 손가락이나 막대로 확대) */
+function zpCrop() {
+  let im = zpE.src;
+  if (!im) { if (!zpE.photo) return; im = new Image(); im.onload = () => { zpE.src = im; zpE.crop = null; zpCrop(); }; im.src = zpE.photo; return; }
+  let m = q('zp-crop'); if (!m) { m = document.createElement('div'); m.id = 'zp-crop'; document.body.appendChild(m); }
+  const VW = Math.min(innerWidth * .82, 340), VH = VW * 1.5, base = Math.max(VW / im.naturalWidth, VH / im.naturalHeight);
+  let st = zpE.crop ? { ...zpE.crop } : { z: 1, x: 0, y: 0, r: 0 };
+  m.className = 'zp-crop';
+  m.innerHTML = `<div class="top"><button class="b" data-a="x">취소</button><b>자르기 · 크기 조절</b><button class="b ok" data-a="ok">완료</button></div>
+   <div class="vp" style="width:${VW}px;height:${VH}px"><img src="${im.src}" draggable="false"><i class="g"></i></div>
+   <div class="ctl"><span>－</span><input type="range" min="1" max="4" step="0.01" value="${st.z}"><span>＋</span></div>
+   <div class="ctl2"><button data-a="rot">↻ 90° 돌리기</button><button data-a="reset">처음대로</button></div>
+   <p class="hint">사진을 끌어서 옮기고, 두 손가락으로 벌려 크기를 바꿀 수 있어요</p>`;
+  const vp = m.querySelector('.vp'), img = m.querySelector('img'), rng = m.querySelector('input');
+  const dims = () => { const rot = st.r % 180 !== 0, iw = rot ? im.naturalHeight : im.naturalWidth, ih = rot ? im.naturalWidth : im.naturalHeight, b = Math.max(VW / iw, VH / ih); return { iw, ih, b }; };
+  const clamp = () => { const { iw, ih, b } = dims(), s = b * st.z, mx = Math.max(0, (iw * s - VW) / 2), my = Math.max(0, (ih * s - VH) / 2); st.x = Math.max(-mx, Math.min(mx, st.x)); st.y = Math.max(-my, Math.min(my, st.y)); };
+  const draw = () => { clamp(); const { b } = dims(), s = b * st.z; img.style.width = im.naturalWidth * s + 'px'; img.style.height = im.naturalHeight * s + 'px'; img.style.transform = `translate(-50%,-50%) translate(${st.x}px,${st.y}px) rotate(${st.r}deg)`; rng.value = st.z; };
+  draw();
+  const pts = new Map(); let last = null;
+  vp.onpointerdown = e => { vp.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]); last = null; };
+  vp.onpointermove = e => {
+    if (!pts.has(e.pointerId)) return; const prev = pts.get(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]);
+    if (pts.size === 1) { st.x += e.clientX - prev[0]; st.y += e.clientY - prev[1]; }
+    else { const [a, b2] = [...pts.values()], d = Math.hypot(a[0] - b2[0], a[1] - b2[1]); if (last) { const nz = Math.max(1, Math.min(4, st.z * d / last)); st.x *= nz / st.z; st.y *= nz / st.z; st.z = nz; } last = d; }
+    draw();
+  };
+  vp.onpointerup = vp.onpointercancel = e => { pts.delete(e.pointerId); last = null; };
+  vp.addEventListener('wheel', e => { e.preventDefault(); const nz = Math.max(1, Math.min(4, st.z * (e.deltaY < 0 ? 1.08 : .92))); st.x *= nz / st.z; st.y *= nz / st.z; st.z = nz; draw(); }, { passive: false });
+  rng.oninput = () => { const nz = +rng.value; st.x *= nz / st.z; st.y *= nz / st.z; st.z = nz; draw(); };
+  m.onclick = e => {
+    const a = e.target.closest('[data-a]'); if (!a) return; const k = a.dataset.a;
+    if (k === 'x') { m.className = 'hidden'; m.innerHTML = ''; if (!zpE.photo) zpE.src = null; return; }
+    if (k === 'rot') { st.r = (st.r + 90) % 360; st.x = st.y = 0; draw(); return; }
+    if (k === 'reset') { st = { z: 1, x: 0, y: 0, r: 0 }; draw(); return; }
+    if (k === 'ok') {
+      const W = 600, H = 900, k2 = W / VW, c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d'), { b } = dims(), s = b * st.z * k2;
+      g.fillStyle = '#fff'; g.fillRect(0, 0, W, H); g.translate(W / 2 + st.x * k2, H / 2 + st.y * k2); g.rotate(st.r * Math.PI / 180); g.drawImage(im, -im.naturalWidth * s / 2, -im.naturalHeight * s / 2, im.naturalWidth * s, im.naturalHeight * s);
+      let u = c.toDataURL('image/jpeg', .82); if (u.length > 560000) u = c.toDataURL('image/jpeg', .6);
+      zpE.photo = u; zpE.crop = st; m.className = 'hidden'; m.innerHTML = ''; zpPCERender();
+    }
+  };
 }
 function zpPCECard() { const c = q('zp-pce-card'); if (c) { c.innerHTML = zpPCHTML(zpE, false, zpE); zpPCEBind(); } }
 function zpStkAdd(k) { if (zpE.deco.st.length >= 12) return zpToast('스티커는 12개까지 붙일 수 있어요'); zpE.deco.st.push([k, 30 + Math.random() * 40, 25 + Math.random() * 45, 1]); zpE.sel = zpE.deco.st.length - 1; zpPCERender(); }
@@ -667,7 +718,7 @@ function zpPCEBind() {
 function zpPCPhoto(inp) {
   const f = inp.files && inp.files[0]; inp.value = ''; if (!f || (typeof fileOK === 'function' && !fileOK(f, 'img'))) return;
   const url = URL.createObjectURL(f), im = new Image();
-  im.onload = () => { const W = 600, H = 900, c = document.createElement('canvas'); c.width = W; c.height = H; const s = Math.max(W / im.width, H / im.height), w = im.width * s, h = im.height * s; c.getContext('2d').drawImage(im, (W - w) / 2, (H - h) / 2, w, h); let u = c.toDataURL('image/jpeg', .82); if (u.length > 560000) u = c.toDataURL('image/jpeg', .6); zpE.photo = u; URL.revokeObjectURL(url); zpPCERender(); };
+  im.onload = () => { zpE.src = im; zpE.crop = null; zpCrop(); };
   im.onerror = () => showAlert('알림', '사진을 열 수 없어요. 다른 사진을 골라주세요.'); im.src = url;
 }
 async function zpPCSave() {
