@@ -46,10 +46,30 @@ const css = `
 `;
 const st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
-/* ================= PX 인기 TOP 10 ================= */
+/* ================= PX 화장품 인기 → 굿맨 제품에 순위 표시 ================= */
+const COS = /크림|스네일|블레미쉬|블래미쉬|닥터지|Dr\.G|메디힐|앰플|마스크|선크림|울트라선|토너|플루이드|로션|리들샷|마데카|센텔리안|라운드랩|가히|멀티밤|카라콜|자민경|위네이지|리페어|듀이트리|참존|마유|에스앤피|기프트세트|세럼|패드|클렌|선스틱/, NOTC = /보건용|KF94|케이크|케익/;
+const nz = t => String(t || '').toLowerCase().replace(/dr\.?g/g, '닥터지').replace(/블래미쉬/g, '블레미쉬').replace(/^터지/, '닥터지').replace(/_?\d+m+l+.*$/i, '').replace(/[^0-9a-z가-힣]/g, '');
+/* PX 월간 TOP10(판매량·판매액)에 든 화장품에 점수 (1위 10점 … 10위 1점 · 최근 2년은 3배) */
+window.mndCosRank = function () {
+  const P = D().px || {}, ks = Object.keys(P).sort(), from = ks.length ? ks[Math.max(0, ks.length - 24)] : '', S = {};
+  ks.forEach(k => { const w = k >= from ? 3 : 1; ['q', 'a'].forEach(t => (P[k][t] || []).slice(0, 10).forEach((n, r) => { if (!COS.test(n) || NOTC.test(n)) return; const z = nz(n); S[z] = (S[z] || 0) + (10 - r) * w; })); });
+  return Object.entries(S).sort((a, b) => b[1] - a[1]);
+};
+/* 굿맨 제품과 이름 맞추기: 브랜드가 같고 제품명 글자쌍이 70% 이상 겹치면 같은 제품 */
+const bi = t => { const o = new Set(); for (let i = 0; i < t.length - 1; i++) o.add(t.slice(i, i + 2)); return o; };
+window.mndPxRanks = function () {
+  if (window._pxRk) return window._pxRk; const out = {}; if (typeof pxI === 'undefined') return out; let rk = 0;
+  window.mndCosRank().forEach(([z]) => {
+    let best = null, bs = 0; /* 70% 가까이 겹치는 것 중 가장 많이 겹치는 제품 */
+    pxI.forEach(x => { const b = nz(x.b); if (!z.includes(b)) return; const n = bi(nz(x.n)); if (!n.size) return; let h = 0; n.forEach(g => { if (z.includes(g)) h++; }); if (out[x.k] || h / n.size < .65) return; if (h > bs) { bs = h; best = x; } });
+    if (best) out[best.k] = ++rk;
+  });
+  return (window._pxRk = out);
+};
+/* ================= PX 인기 TOP 10 (지금은 숨김 · 순위 계산에만 사용) ================= */
 const PX = { m: null, s: 'q', v: 'cos', p: 'all' };
 window.mndPxRank = function () {
-  const host = $('px-rank'); if (!host) return;
+  const host = $('px-rank'); if (host) host.innerHTML = ''; return;
   const tabs = `<div class="mnd-tabs" style="margin:0 0 12px"><button class="${PX.v === 'cos' ? 'on' : ''}" onclick="mndPxSet(null,null,'cos')">화장품 순위</button><button class="${PX.v === 'all' ? 'on' : ''}" onclick="mndPxSet(null,null,'all')">전체 인기</button></div>`;
   if (PX.v === 'cos') { const C = (D().cos || {})[PX.p] || [], mx = Math.max(1, ...C.map(x => x[1]));
     host.innerHTML = `<div class="mnd-card" style="margin:0 0 12px">${tabs}<div class="mnd-h"><span>PX 화장품 인기 순위</span></div><div class="mnd-s">국방부 PX 인기상품 월간 TOP 10에 오른 화장품을 모아 점수로 매긴 순위예요</div><div class="mnd-chips">${[['1y', '최근 1년'], ['2y', '최근 2년'], ['all', '전체 기간']].map(([k, t]) => `<button class="mnd-chip ${PX.p === k ? 'on' : ''}" onclick="mndPxSet(null,null,null,'${k}')">${t}</button>`).join('')}</div><div>${C.slice(0, 10).map((x, r) => `<div class="mnd-rk ${r < 3 ? 't3' : ''}"><b class="n">${r + 1}</b><div class="nm" style="white-space:normal"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${E(x[0])}</div><div style="height:4px;border-radius:2px;background:#F2F4F6;margin-top:5px"><i style="display:block;height:100%;width:${Math.round(x[1] / mx * 100)}%;border-radius:2px;background:linear-gradient(90deg,#F2B8C6,#E86F95)"></i></div></div><span class="ch" style="color:#8B95A1;min-width:60px">TOP10 ${x[3]}회</span></div>`).join('') || '<div class="text-center text-[13px] text-[#8B95A1] py-6">이 기간엔 순위에 오른 화장품이 없어요</div>'}</div></div>`; return; }
@@ -216,3 +236,27 @@ window.mealAdminImport = async function (inp) {
   ML.days = {}; ML.units = {}; showAlert('식단 파일 올리기', `${ok}개 부대 식단을 올렸어요.${bad.length ? '<br><br>못 읽은 파일: ' + bad.map(E).join(', ') : ''}`);
 };
 })();
+
+/* ================= 국방부 공공데이터 자동 최신화 ================= */
+(function () {
+  const go = async () => {
+    if (!window.sb || !window.me) return setTimeout(go, 1500);
+    try {
+      const { data } = await sb.from('mnd_cache').select('kind,data,at');
+      let ch = false; (data || []).forEach(r => { if (r.data && (Array.isArray(r.data) ? r.data.length : Object.keys(r.data).length)) { window.MND[r.kind] = r.data; ch = true; } });
+      if (ch) { window._pxRk = null; try { if (typeof renderPX === 'function' && !document.getElementById('tab-goodman').classList.contains('hidden')) renderPX(); } catch (e) { } try { mndBen('lim', 8); } catch (e) { } }
+      sb.functions.invoke('mnd-meal', { body: { action: 'data' } }).catch(() => { });
+    } catch (e) { }
+  };
+  setTimeout(go, 2500);
+})();
+/* 관리자: 공공데이터 서비스 이름 적기 */
+window.mndAdminSrc = async function () {
+  const { data } = await sb.from('mnd_sources').select('kind,svc,label').order('kind');
+  const L = data || [];
+  const html = `<div class="text-left text-[12px] text-[#4E5968] leading-relaxed mb-2">국방부 공공데이터 포털에서 각 데이터의 <b>Open API 서비스 이름</b>(예: DS_TB_…)을 적어 주세요. 하루 한 번 자동으로 최신 자료로 바뀌어요.</div>${L.map(r => `<label class="block text-left text-[12px] font-bold mt-2">${E(r.label || r.kind)}</label><input data-k="${r.kind}" class="inp mt-1 mnd-src" placeholder="서비스 이름" value="${E(r.svc || '')}" autocapitalize="characters">`).join('')}`;
+  if (!(await zDialog({ title: '공공데이터 자동 최신화', html, ok: '저장하고 지금 불러오기' }))) return;
+  for (const i of document.querySelectorAll('.mnd-src')) { const v = i.value.trim(); await sb.from('mnd_sources').update({ svc: v || null }).eq('kind', i.dataset.k); }
+  const r = await sb.functions.invoke('mnd-meal', { body: { action: 'data', force: true } });
+  const d = r && r.data && r.data.data; showAlert('불러오기 결과', d ? Object.entries(d).map(([k, v]) => `${E(k)} : ${E(String(v))}`).join('<br>') || '서비스 이름을 먼저 적어주세요' : '함수를 부르지 못했어요. mnd-meal 함수를 다시 배포했는지 확인해주세요.');
+};

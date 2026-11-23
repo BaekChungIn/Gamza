@@ -158,7 +158,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 .gm-bpill{position:absolute;left:9px;bottom:9px;height:20px;padding:0 8px;border-radius:999px;background:rgba(255,255,255,.82);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#4E5968;font-size:10px;font-weight:800;display:flex;align-items:center}
 .gm-tile .gb{font-size:19px;font-weight:900;letter-spacing:-.6px;line-height:1.15;word-break:keep-all}
 .gm-tile .gc{margin-top:6px;font-size:10.5px;font-weight:700;opacity:.7;letter-spacing:.2px}
-.gm-pop{z-index:2;position:absolute;left:9px;top:9px;height:20px;padding:0 8px;border-radius:999px;background:#191F28;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center}
+.gm-rank{background:linear-gradient(90deg,#E86F95,#F29BB4)!important}.gm-pop{z-index:2;position:absolute;left:9px;top:9px;height:20px;padding:0 8px;border-radius:999px;background:#191F28;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center}
 .gm-heart{z-index:2;position:absolute;right:6px;top:6px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:rgba(25,31,40,.38)}
 .gm-heart svg{width:21px;height:21px;fill:rgba(255,255,255,.55);stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s cubic-bezier(.3,1.6,.5,1)}
 .gm-heart.on{color:#E8647C}.gm-heart.on svg{fill:#E8647C;transform:scale(1.12)}
@@ -1484,7 +1484,7 @@ function renderSetRows() {
     + (isS ? '' : row('🪖', '복무 정보', isM ? (BR[me.branch] || BR.army).k : '군인 계정에서 설정', "setGo('service')") + row('📍', '자대 등록', (S && S.unit_name) || '미등록', "setGo('unit')") + row('🎭', '캐릭터 테마', th, "setGo('theme')"))
     + (isS && typeof zpSlot === 'function' ? row('🖼', '홈 화면 카드', zpSlot() === 'q' ? '오늘의 질문' : '포토카드', 'zpSlotPick()') : '')
     + (typeof zpWxOn === 'function' ? row('☀', '날씨 표시', zpWxOn() ? '켜짐' : '꺼짐', 'zpWxToggle()') : '') + gap
-    + (me.is_admin ? row('🛠', '관리자', '회원 · 콘텐츠 · 점검', "closeModal('modal-settings');openAdmin()") + gap : '')
+    + (me.is_admin ? row('🛠', '관리자', '회원 · 콘텐츠 · 점검', "closeModal('modal-settings');openAdmin()") + row('🔄', '공공데이터 최신화', 'PX · TMO · 병원 · 할인', "mndAdminSrc()") + gap : '')
     + row('🚪', '로그아웃', '', 'logout()', true)
     + `<div class="legal px-5 py-6 text-[11px] text-[#8B95A1] leading-relaxed"><a href="terms.html" target="_blank" rel="noopener">이용약관</a> · <a href="privacy.html" target="_blank" rel="noopener"><b>개인정보처리방침</b></a> · <a href="mailto:micbael11@naver.com">문의하기</a><br>짬타이거 · 개인 운영(비영리) · micbael11@naver.com</div>`;
 }
@@ -1658,7 +1658,7 @@ const ICONS = {
  trash:'<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>'
 };
 const ico = (n, ex = '') => `<svg class="ic" viewBox="0 0 24 24" ${ex}>${ICONS[n] || ''}</svg>`;
-const EMO = { '🛠':'tool','💕':'heart','❤':'heart','💑':'users','💌':'mail','✉':'mail','🛒':'bag','🌙':'moon','✨':'sparkle','🎉':'sparkle','🔒':'lock','🪖':'shield','🛡':'shield','🌱':'sprout','🌿':'leaf','🌷':'flower','🌸':'flower','💐':'award','🏖':'umbrella','📍':'pin','📌':'pin','🚶':'walk','☀':'sun','✏':'pencil','🚆':'train','🚇':'train','🍚':'utensils','⚡':'zap','🌅':'sunrise','👤':'user','🥔':'user','🐯':'user','🐻':'user','🐈‍⬛':'user','🐈':'user','🚌':'bus','💰':'wallet','💬':'msg','💳':'card','🏠':'home','📓':'book','📚':'book','📷':'camera','🖼':'image','✅':'checkc','🔄':'refresh','📥':'download','🎭':'smile','🚪':'logout','🔥':'flame','💧':'drop','🫧':'drop','🚗':'car','🚕':'car','🎢':'ticket','📱':'phone','🪪':'idcard','🎁':'gift','📅':'cal','ℹ':'info','▶':'chev','⚠':'info','⭐':'star','★':'star','⏳':'clock','👁':'eye','♡':'heart' };
+const EMO = { '🛠':'tool','🔄':'refresh','💕':'heart','❤':'heart','💑':'users','💌':'mail','✉':'mail','🛒':'bag','🌙':'moon','✨':'sparkle','🎉':'sparkle','🔒':'lock','🪖':'shield','🛡':'shield','🌱':'sprout','🌿':'leaf','🌷':'flower','🌸':'flower','💐':'award','🏖':'umbrella','📍':'pin','📌':'pin','🚶':'walk','☀':'sun','✏':'pencil','🚆':'train','🚇':'train','🍚':'utensils','⚡':'zap','🌅':'sunrise','👤':'user','🥔':'user','🐯':'user','🐻':'user','🐈‍⬛':'user','🐈':'user','🚌':'bus','💰':'wallet','💬':'msg','💳':'card','🏠':'home','📓':'book','📚':'book','📷':'camera','🖼':'image','✅':'checkc','🔄':'refresh','📥':'download','🎭':'smile','🚪':'logout','🔥':'flame','💧':'drop','🫧':'drop','🚗':'car','🚕':'car','🎢':'ticket','📱':'phone','🪪':'idcard','🎁':'gift','📅':'cal','ℹ':'info','▶':'chev','⚠':'info','⭐':'star','★':'star','⏳':'clock','👁':'eye','♡':'heart' };
 const EMO_RE = new RegExp('(' + Object.keys(EMO).sort((a, b) => b.length - a.length).map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\uFE0F?', 'g');
 function emoSwap(root) {
   if (!root) return; if (root.nodeType === 3) root = root.parentNode; if (!root || !root.nodeType) return;
@@ -3088,11 +3088,12 @@ const HEART = '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 
 function gmList() {
   const t = gm.q.trim().toLowerCase().replace(/\s+/g, '');
   const L = pxI.filter(x => (gm.cat === '전체' || x.c === gm.cat) && (gm.seg === 'all' || (gm.seg === 'wish' ? gm.wish.includes(x.k) : gm.cart.includes(x.k))) && (!t || (x.k + x.c).toLowerCase().replace(/\s+/g, '').includes(t)));
-  return t || gm.seg !== 'all' || gm.cat !== '전체' ? L : L.slice().sort((a, b) => b.p - a.p);
+  const R = typeof mndPxRanks === 'function' ? mndPxRanks() : {}, rk = x => R[x.k] || 999;
+  return t || gm.seg !== 'all' ? L : L.slice().sort((a, b) => rk(a) - rk(b) || b.p - a.p);
 }
 function gmCard(x) {
   const T = GT[x.c] || ['#F2F4F6', '#4E5968'], w = gm.wish.includes(x.k), c = gm.cart.includes(x.k);
-  return `<div class="gm-card" data-gi="${x.i}"><div class="gm-tile${pxImg[x.k] ? ' gm-real' : ''}"><img src="${pxImg[x.k] || gmImg(x.c)}" alt="${esc(x.c)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${gmImg(x.c)}';this.parentNode.classList.remove('gm-real')">${x.p ? '<span class="gm-pop">인기</span>' : ''}<button class="gm-heart ${w ? 'on' : ''}" onclick="gmWish(${x.i})" aria-label="찜">${HEART}</button><span class="gm-bpill">${esc(x.c)}</span></div><div class="gm-info"><div class="gm-b">${esc(x.b)}</div><div class="gm-n">${esc(x.n)}</div><button class="gm-add ${c ? 'on' : ''}" onclick="gmCart(${x.i})">${c ? CHK + '담김' : BAGI + '담기'}</button></div></div>`;
+  return `<div class="gm-card" data-gi="${x.i}"><div class="gm-tile${pxImg[x.k] ? ' gm-real' : ''}"><img src="${pxImg[x.k] || gmImg(x.c)}" alt="${esc(x.c)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${gmImg(x.c)}';this.parentNode.classList.remove('gm-real')">${(typeof mndPxRanks === 'function' && mndPxRanks()[x.k]) ? `<span class="gm-pop gm-rank">PX ${mndPxRanks()[x.k]}위</span>` : x.p ? '<span class="gm-pop">인기</span>' : ''}<button class="gm-heart ${w ? 'on' : ''}" onclick="gmWish(${x.i})" aria-label="찜">${HEART}</button><span class="gm-bpill">${esc(x.c)}</span></div><div class="gm-info"><div class="gm-b">${esc(x.b)}</div><div class="gm-n">${esc(x.n)}</div><button class="gm-add ${c ? 'on' : ''}" onclick="gmCart(${x.i})">${c ? CHK + '담김' : BAGI + '담기'}</button></div></div>`;
 }
 function gmGrid() {
   const L = gmList(), box = q('gm-list');
