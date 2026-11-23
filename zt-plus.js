@@ -167,7 +167,7 @@ function zpToast(t) { const d = document.createElement('div'); d.className = 'zp
 .zp-lt .text-white{color:inherit!important}.zp-th .pbar{background:var(--ztrk)!important}.zp-th .pbar>div:first-child{background:var(--zbar)!important}
 .zp-th [class~="bg-white/10"]{background:var(--ztrk)!important}.zp-th [class~="bg-white/25"]{background:var(--zbar)!important;opacity:.85}
 .zp-pvs .pcard{text-align:left}
-.zp-patches{position:absolute;top:16px;right:16px;display:flex;flex-direction:column;align-items:flex-end;gap:5px;z-index:3;pointer-events:none}.zp-prow{display:flex;align-items:center;gap:4px}.zp-patches.h{flex-direction:row;align-items:center;top:12px;gap:4px;max-width:calc(100% - 32px);flex-wrap:nowrap}.zp-patches.h .zp-prow{display:contents}.pcard.zp-hrow>div:first-child{margin-top:20px}.pcard.zp-hrow.zp-hasp>div:first-child .flex-1{padding-right:0}
+.zp-patches{position:absolute;top:16px;right:16px;display:flex;flex-direction:column;align-items:flex-end;gap:5px;z-index:3;pointer-events:none}.zp-prow{display:flex;align-items:center;gap:4px}.zp-vnav{display:flex;align-items:center;gap:14px;margin-top:14px}.zp-vnav>button{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;font-size:22px;font-weight:800}.zp-vnav>div{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:150px}.zp-vnav b{font-size:15px}.zp-vnav span{display:flex;gap:5px}.zp-vnav i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.35)}.zp-vnav i.on{background:#fff;width:16px;border-radius:3px}.zp-patches.h{flex-direction:row;align-items:center;top:12px;gap:4px;max-width:calc(100% - 32px);flex-wrap:nowrap}.zp-patches.h .zp-prow{display:contents}.pcard.zp-hrow>div:first-child{margin-top:20px}.pcard.zp-hrow.zp-hasp>div:first-child .flex-1{padding-right:0}
 .pcard.zp-hasp>div:first-child .flex-1{padding-right:var(--pw,0)}
 .zp-patch svg{width:100%;height:100%;display:block}
 .zp-patch{display:block;filter:drop-shadow(0 3px 5px rgba(0,0,0,.3));animation:zpPatchIn .5s cubic-bezier(.2,1.5,.4,1)}
@@ -341,7 +341,7 @@ const ZP_STK = {
 };
 const zpStkSVG = k => k === 'mug' ? MUG_SVG.replace('<svg', '<svg') : `<svg viewBox="0 0 24 24">${(ZP_STK[k] || {}).s || ''}</svg>`;
 
-const ZP_SPR = { c: { src: 'shop_patch3.webp', v: 3, W: 1700, H: 1685, m: {"pt_flag": [0, 0, 200, 233], "pt_flag2": [206, 0, 300, 200], "br_driver": [512, 0, 210, 210], "br_adjutant": [728, 0, 210, 210], "br_qm": [944, 0, 210, 210], "br_infantry": [1160, 0, 210, 210], "br_engineer": [1376, 0, 210, 210], "br_legal": [0, 239, 210, 210], "br_medadmin": [216, 239, 210, 210], "br_mp": [432, 239, 210, 210], "br_artillery": [648, 239, 210, 210], "br_vet": [864, 239, 210, 210], "br_dental": [1080, 239, 210, 210], "br_signal": [1296, 239, 210, 210], "br_finance": [0, 455, 210, 210], "br_aviation": [216, 455, 210, 210], "br_nurse": [432, 455, 210, 210], "br_medic": [648, 455, 210, 210], "br_ordnance": [864, 455, 210, 210], "br_armor": [1080, 455, 210, 210], "br_intel": [1296, 455, 210, 210], "br_chem": [0, 671, 210, 210], "br_pi": [216, 671, 210, 210], "br_inspect": [432, 671, 210, 210], "br_band": [648, 671, 210, 210], "br_chap_pr": [864, 671, 210, 210], "br_chap_ca": [1080, 671, 210, 210], "br_chap_bu": [1296, 671, 210, 210], "br_chap_wb": [0, 887, 210, 210], "gs_kr_army": [216, 887, 480, 120], "gs_kr_af": [702, 887, 480, 120], "gs_kr_navy": [1188, 887, 480, 120], "gs_kr_mc": [0, 1103, 480, 120], "gs_kkot": [486, 1103, 400, 120], "gs_tab1": [892, 1103, 450, 150], "gs_tab2": [0, 1259, 450, 150], "gs_name": [456, 1259, 432, 120], "nt_army": [894, 1259, 432, 120], "gs_rank": [1332, 1259, 210, 210], "gs_blossom": [0, 1475, 210, 210], "gs_flag": [216, 1475, 315, 210], "gs_wings": [537, 1475, 320, 200]} }, b: { src: 'shop_badges.png', W: 1280, H: 768, m: {"pt_elite":[18,86,220,84],"pt_shooter":[274,86,220,84],"pt_flag":[549,18,182,220],"pt_tiger":[805,18,182,220],"pt_heart":[1061,18,182,220],"bd_wings":[18,327,220,114],"bd_bolt":[293,274,182,220],"bd_eagle":[530,274,220,220],"bd_tiger":[805,274,182,220],"bd_trefoil":[1042,279,220,211],"bd_triangle":[18,539,220,202],"bd_anchor":[293,530,182,220],"bd_compass":[530,530,220,220]} }, t: { src: 'shop_themes.png', W: 1440, H: 1392, m: {"th_night":[12,12,336,208],"th_sakura":[372,12,336,208],"th_camo":[732,12,336,208],"th_ocean":[1092,12,336,208],"th_gold":[12,244,336,208],"st_black_gold":[372,244,336,208],"st_black_silver":[732,244,336,208],"st_white_gold":[1092,244,336,208],"st_white_silver":[12,476,336,208],"st_khaki_gold":[372,476,336,208],"st_navy_silver":[732,476,336,208],"st_ivory_rose":[1092,476,336,208],"st_carbon_gold":[12,708,336,208],"st_matte_black":[372,708,336,208],"st_matte_white":[732,708,336,208],"st_army_dress":[1092,708,336,208],"st_airforce_dress":[12,940,336,208],"st_navy_dress":[372,940,336,208],"st_navy_summer":[732,940,336,208],"st_honor_guard":[1092,940,336,208],"st_ceremony_grey":[12,1172,336,208],"st_general_green":[372,1172,336,208]} } };
+const ZP_SPR = { c: { src: 'shop_patch3.webp', v: 4, W: 1700, H: 1985, m: {"pt_flag": [0, 0, 200, 233], "pt_flag2": [206, 0, 300, 200], "br_driver": [512, 0, 210, 210], "br_adjutant": [728, 0, 210, 210], "br_qm": [944, 0, 210, 210], "br_infantry": [1160, 0, 210, 210], "br_engineer": [1376, 0, 210, 210], "br_legal": [0, 239, 210, 210], "br_medadmin": [216, 239, 210, 210], "br_mp": [432, 239, 210, 210], "br_artillery": [648, 239, 210, 210], "br_vet": [864, 239, 210, 210], "br_dental": [1080, 239, 210, 210], "br_signal": [1296, 239, 210, 210], "br_finance": [0, 455, 210, 210], "br_aviation": [216, 455, 210, 210], "br_nurse": [432, 455, 210, 210], "br_medic": [648, 455, 210, 210], "br_ordnance": [864, 455, 210, 210], "br_armor": [1080, 455, 210, 210], "br_intel": [1296, 455, 210, 210], "br_chem": [0, 671, 210, 210], "br_pi": [216, 671, 210, 210], "br_inspect": [432, 671, 210, 210], "br_band": [648, 671, 210, 210], "br_chap_pr": [864, 671, 210, 210], "br_chap_ca": [1080, 671, 210, 210], "br_chap_bu": [1296, 671, 210, 210], "br_chap_wb": [0, 887, 210, 210], "gs_kr_army": [216, 887, 480, 120], "gs_kr_af": [702, 887, 480, 120], "gs_kr_navy": [1188, 887, 480, 120], "gs_kr_mc": [0, 1103, 480, 120], "gs_kkot": [486, 1103, 400, 120], "gs_tab1": [892, 1103, 450, 150], "gs_tab2": [0, 1259, 450, 150], "gs_name": [456, 1259, 432, 120], "nt_army": [894, 1259, 432, 120], "gs_rank": [1332, 1259, 210, 210], "gs_blossom": [0, 1475, 210, 210], "gs_flag": [216, 1475, 315, 210], "gs_wings": [537, 1475, 320, 200], "ntb_red": [0, 1691, 432, 120], "ntb_navy": [438, 1691, 432, 120], "ntb_digi": [876, 1691, 432, 120], "ntb_olive": [894, 1259, 432, 120], "ntb_black": [456, 1259, 432, 120], "pt_elite@af": [0, 1817, 300, 82], "pt_elite@army": [306, 1817, 300, 82], "pt_elite@mc": [612, 1817, 300, 82], "pt_elite@navy": [918, 1817, 300, 82], "pt_elite@spec": [1224, 1817, 300, 82], "pt_shooter@af": [0, 1903, 300, 82], "pt_shooter@army": [306, 1903, 300, 82], "pt_shooter@mc": [612, 1903, 300, 82], "pt_shooter@navy": [918, 1903, 300, 82], "pt_shooter@spec": [1224, 1903, 300, 82]} }, b: { src: 'shop_badges.png', W: 1280, H: 768, m: {"pt_elite":[18,86,220,84],"pt_shooter":[274,86,220,84],"pt_flag":[549,18,182,220],"pt_tiger":[805,18,182,220],"pt_heart":[1061,18,182,220],"bd_wings":[18,327,220,114],"bd_bolt":[293,274,182,220],"bd_eagle":[530,274,220,220],"bd_tiger":[805,274,182,220],"bd_trefoil":[1042,279,220,211],"bd_triangle":[18,539,220,202],"bd_anchor":[293,530,182,220],"bd_compass":[530,530,220,220]} }, t: { src: 'shop_themes.png', W: 1440, H: 1392, m: {"th_night":[12,12,336,208],"th_sakura":[372,12,336,208],"th_camo":[732,12,336,208],"th_ocean":[1092,12,336,208],"th_gold":[12,244,336,208],"st_black_gold":[372,244,336,208],"st_black_silver":[732,244,336,208],"st_white_gold":[1092,244,336,208],"st_white_silver":[12,476,336,208],"st_khaki_gold":[372,476,336,208],"st_navy_silver":[732,476,336,208],"st_ivory_rose":[1092,476,336,208],"st_carbon_gold":[12,708,336,208],"st_matte_black":[372,708,336,208],"st_matte_white":[732,708,336,208],"st_army_dress":[1092,708,336,208],"st_airforce_dress":[12,940,336,208],"st_navy_dress":[372,940,336,208],"st_navy_summer":[732,940,336,208],"st_honor_guard":[1092,940,336,208],"st_ceremony_grey":[12,1172,336,208],"st_general_green":[372,1172,336,208]} } };
 /* 상점 그림(이미지) — 올라와 있으면 이미지로, 없으면 코드로 그린 그림으로 */
 zp.spr = {};
 ['c', 'b', 't'].forEach(k => { const im = new Image(); im.onload = () => { zp.spr[k] = true; try { zpApplyEquip(); const el = zpShopEl(); if (el && el.querySelector('.zp-grid')) zpShopRender(el); } catch (e) { } }; im.src = ZP_SPR[k].src + '?v=' + (ZP_SPR[k].v || 2); });
@@ -350,19 +350,29 @@ function zpSpr(k, id, css) {
   const [x, y, w, h] = r;
   return `<span class="zp-spr" style="display:block;aspect-ratio:${w}/${h};background-image:url(${S.src}?v=${S.v || 2});background-repeat:no-repeat;background-size:${(S.W / w * 100).toFixed(3)}% ${(S.H / h * 100).toFixed(3)}%;background-position:${(x / (S.W - w) * 100).toFixed(3)}% ${(y / (S.H - h) * 100).toFixed(3)}%;${css || ''}"></span>`;
 }
+/* 같은 패치의 군별 색상 (미리보기에서 넘기며 골라요) */
+const ZP_TABV = [['army', '육군'], ['af', '공군'], ['navy', '해군'], ['mc', '해병대'], ['spec', '특수부대 흑복']];
+const ZP_VAR = {
+  nt_army: [['army', '육군', 'ntb_olive', '#16181B', '#4A4E44'], ['af', '공군', 'ntb_olive', '#1F4FB8', '#7FA0E8'], ['navy', '해군', 'ntb_navy', '#F2C230', '#FFF0A8'], ['mc', '해병대', 'ntb_red', '#F6D23A', '#FFF2A0'], ['digi', '육군 디지털', 'ntb_digi', '#16181B', '#3A3E34'], ['spec', '특전사 · 707 흑복', 'ntb_black', '#6E7A52', '#9AA67C'], ['sdt', '군사경찰 SDT', 'ntb_black', '#8A8E94', '#C4C8CE'], ['udt', '해군 UDT · SSU', 'ntb_black', '#F2C230', '#FFF0A8'], ['vet', '전역 기념', 'ntb_olive', '#F4F4F0', '#FFFFFF']],
+  pt_elite: ZP_TABV, pt_shooter: ZP_TABV
+};
+const zpVar = (id, eq) => { const L = ZP_VAR[id]; if (!L) return null; const v = eq && eq.pv && eq.pv[id]; return L.find(x => x[0] === v) || L[0]; };
+/* 그림 키: 군별 색상이 있으면 'pt_elite@navy' 같은 키 */
+const zpKey = (id, eq) => { const V = zpVar(id, eq); if (!V) return id; if (ZP_ITEMS[id] && ZP_ITEMS[id].nt) return V[2]; const k = id + '@' + V[0]; return ZP_SPR.c.m[k] && zp.spr.c ? k : id; };
+const zpNtOf = (id, eq) => { eq = eq || {}; return (eq.nts && eq.nts[id]) || eq.nt || {}; };
 const zpIsLong = id => zpPAsp(id) > 2.2;
-const zpPAsp = id => { const r = ZP_SPR.c.m[id] || ZP_SPR.b.m[id]; return r ? r[2] / r[3] : (ZP_ITEMS[id] && ZP_ITEMS[id].w || 34) / 40; };
+const zpPAsp = (id, eq) => { const r = ZP_SPR.c.m[zpKey(id, eq)] || ZP_SPR.c.m[id] || ZP_SPR.b.m[id]; return r ? r[2] / r[3] : (ZP_ITEMS[id] && ZP_ITEMS[id].w || 34) / 40; };
 /* 이름표: 바탕은 그림, 이름은 실 느낌 글자로 위에 얹어요 */
-function zpNtArt(id, nt) {
-  const g = id === 'gs_name', o = nt || {}, ko = [...String(o.ko || '').slice(0, 5)], en = String(o.en || '').toUpperCase().slice(0, 12);
-  const K = ko.length ? ko : ['이', '름'], fg = g ? '#F2559C' : '#16181B', hi = g ? '#FFC2DD' : '#4A4E44', pid = 'zpnt' + (g ? 'g' : 'a');
+function zpNtArt(id, eq) {
+  const g = id === 'gs_name', o = zpNtOf(id, eq), V = zpVar(id, eq), ko = [...String(o.ko || '').slice(0, 5)], en = String(o.en || '').toUpperCase().slice(0, 12);
+  const K = ko.length ? ko : ['이', '름'], fg = g ? '#F2559C' : V ? V[3] : '#16181B', hi = g ? '#FFC2DD' : V ? V[4] : '#4A4E44', pid = 'zpnt' + fg.slice(1);
   /* 실제 이름표처럼 한글은 칸 전체에 고르게 띄우고, 영문 성은 아래 가운데 */
   const L = 62, R = 370, ky = en ? 70 : 82, kf = en ? 58 : 66, xs = K.length === 1 ? [216] : K.map((_, n) => L + (R - L) * n / (K.length - 1));
   const T = (x, y, t, fs, fam, sw) => `<text x="${x}" y="${y}" text-anchor="middle" font-size="${fs}" font-weight="900" font-family="${fam}" fill="url(#${pid})" stroke="${fg}" stroke-width="${sw}" filter="url(#${pid}f)">${esc(t)}</text>`;
   const kfam = "'Apple SD Gothic Neo','Noto Sans KR','Noto Sans CJK KR',sans-serif", efam = "'Times New Roman','Noto Serif',serif";
-  return `<span style="position:relative;display:block;width:100%;height:100%">${zpSpr('c', id, 'width:100%;height:100%')}<svg viewBox="0 0 432 120" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible"><defs><pattern id="${pid}" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(${g ? 70 : 80})"><rect width="4" height="4" fill="${fg}"/><rect width="1.1" height="4" fill="${hi}" opacity=".5"/></pattern><filter id="${pid}f"><feDropShadow dx="0.7" dy="1" stdDeviation="0.7" flood-opacity=".5"/></filter></defs>${K.map((c, n) => T(xs[n].toFixed(1), ky, c, kf, kfam, 1)).join('')}${en ? T(216, 110, en, 36, efam, .7) : ''}</svg></span>`;
+  return `<span style="position:relative;display:block;width:100%;height:100%">${zpSpr('c', zpKey(id, eq), 'width:100%;height:100%')}<svg viewBox="0 0 432 120" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible"><defs><pattern id="${pid}" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(${g ? 70 : 80})"><rect width="4" height="4" fill="${fg}"/><rect width="1.1" height="4" fill="${hi}" opacity=".5"/></pattern><filter id="${pid}f"><feDropShadow dx="0.7" dy="1" stdDeviation="0.7" flood-opacity=".5"/></filter></defs>${K.map((c, n) => T(xs[n].toFixed(1), ky, c, kf, kfam, 1)).join('')}${en ? T(216, 110, en, 36, efam, .7) : ''}</svg></span>`;
 }
-const zpPatchArt = (id, nt) => (ZP_ITEMS[id] && ZP_ITEMS[id].nt && zp.spr.c) ? zpNtArt(id, nt || (me && me.equip && me.equip.nt)) : zpSpr('c', id, 'width:100%;height:100%') || zpSpr('b', id, 'width:100%;height:100%') || (ZP_ITEMS[id] && ZP_ITEMS[id].spr2 ? '<span style="display:block;width:100%;height:100%"></span>' : zpPatchSVG(id));
+const zpPatchArt = (id, eq) => { eq = eq || (me && me.equip) || {}; return (ZP_ITEMS[id] && ZP_ITEMS[id].nt && zp.spr.c) ? zpNtArt(id, eq) : zpSpr('c', zpKey(id, eq), 'width:100%;height:100%') || zpSpr('b', id, 'width:100%;height:100%') || (ZP_ITEMS[id] && ZP_ITEMS[id].spr2 ? '<span style="display:block;width:100%;height:100%"></span>' : zpPatchSVG(id)); };
 /* ---------- 데이터 ---------- */
 async function zpLoadWallet() {
   try {
@@ -498,6 +508,7 @@ function zpEnsureSt() { if (zpEnsureSt.d || typeof STAR_TH === 'undefined') retu
 function zpLum(hex) { const m = /^#?([0-9a-f]{6})$/i.exec(String(hex || '').trim()); if (!m) return 1; const n = parseInt(m[1], 16); return (.299 * (n >> 16) + .587 * (n >> 8 & 255) + .114 * (n & 255)) / 255; }
 const ZP_THBAR = { th_night: ['linear-gradient(90deg,#8C7BE0,#D9CCFF)', 'rgba(255,255,255,.14)'], th_sakura: ['linear-gradient(90deg,#FFFFFF,#FFE3EC)', 'rgba(255,255,255,.32)'], th_camo: ['linear-gradient(90deg,#9AA86F,#D7DFAE)', 'rgba(0,0,0,.22)'], th_ocean: ['linear-gradient(90deg,#4FB3E8,#BDE9FF)', 'rgba(255,255,255,.16)'], th_gold: ['linear-gradient(90deg,#B98A2B,#F6DE8E)', 'rgba(0,0,0,.28)'] };
 function zpStyleCard(card, thId, ptId, nt) {
+  nt = nt && (nt.nt || nt.nts || nt.pv) ? { nt: nt.nt, nts: nt.nts, pv: nt.pv } : nt && nt.ko ? { nt } : {};
   zpEnsureSt(); if (card.dataset.bg0 === undefined) { card.dataset.bg0 = card.style.background; card.dataset.c0 = card.style.color; }
   card.classList.remove('zp-th', 'zp-lt'); card.style.removeProperty('--zbar'); card.style.removeProperty('--ztrk'); card.style.position = 'relative';
   const it = ZP_ITEMS[thId];
@@ -510,7 +521,7 @@ function zpStyleCard(card, thId, ptId, nt) {
   if (box && box.dataset.sig === sig + (zp.spr.b ? 'i' : '') + (zp.spr.c ? 'c' : '') + JSON.stringify(nt || '')) return;
   if (box) box.remove(); box = document.createElement('div'); box.className = 'zp-patches'; box.dataset.sig = sig + (zp.spr.b ? 'i' : '') + (zp.spr.c ? 'c' : '') + JSON.stringify(nt || '');
   /* 긴 패치(특급전사 · 특등사수)는 위에서부터 세로로, 방패 · 배지 패치는 그 아래 가로로 (각각 3개까지) */
-  const ph = x => zpIsLong(x) ? 25 : zpPAsp(x) > 1.5 ? 20 : 27, pw = x => Math.round(ph(x) * zpPAsp(x));
+  const ph = x => zpIsLong(x) ? 25 : zpPAsp(x, nt) > 1.5 ? 20 : 27, pw = x => Math.round(ph(x) * zpPAsp(x, nt));
   const one = x => `<i class="zp-patch" title="${esc(ZP_ITEMS[x].n)}" style="height:${ph(x)}px;width:${pw(x)}px">${zpPatchArt(x, nt)}</i>`;
   box.innerHTML = lng.map(one).join('') + (sml.length ? `<div class="zp-prow">${sml.map(one).join('')}</div>` : '');
   const rowW = sml.reduce((t, x) => t + pw(x), 0) + Math.max(0, sml.length - 1) * 4;
@@ -524,12 +535,12 @@ function zpHero(which) {
   if (!me || zpFan()) return; const h = q(which === 'gd' ? 'gd-hero' : 'sd-hero'); if (!h) return;
   const card = h.parentElement && h.parentElement.parentElement; if (!card) return;
   const P = which === 'gd' ? (typeof G_ === 'function' ? G_() : null) : (typeof S_ === 'function' ? S_() : null), eq = (P && P.equip) || {};
-  card.style.position = 'relative'; zpStyleCard(card, eq.theme, zpPatches(eq), eq.nt);
+  card.style.position = 'relative'; zpStyleCard(card, eq.theme, zpPatches(eq), eq);
 }
 function zpApplyEquip() {
   if (!me || zpFan()) return;
   const sol = me.gender === 'M' ? me : (partner && partner.gender === 'M' ? partner : null), gom = me.gender === 'F' ? me : (partner && partner.gender === 'F' ? partner : null);
-  [['soldier-card', sol], ['gf-profile-card', gom]].forEach(([id, P]) => { const card = document.querySelector('#' + id + ' .pcard'); if (!card) return; const eq = (P && P.equip) || {}; zpStyleCard(card, eq.theme, zpPatches(eq), eq.nt); });
+  [['soldier-card', sol], ['gf-profile-card', gom]].forEach(([id, P]) => { const card = document.querySelector('#' + id + ' .pcard'); if (!card) return; const eq = (P && P.equip) || {}; zpStyleCard(card, eq.theme, zpPatches(eq), eq); });
 }
 
 /* ---------- 상점 ---------- */
@@ -570,7 +581,7 @@ async function zpShopRender(el) {
     if (!inv) btn = own ? `<button disabled class="bg-[#F2F3F5] text-[#8B95A1]">구매 완료</button>` : `<button onclick="zpBuy('${id}')" class="text-white" style="background:#191F28">구매하기</button>`;
     else btn = it.k === 'patch' ? `<button onclick="zpPatchToggle('${id}')" class="${on ? 'bg-[#F2F3F5] text-[#4E5968]' : 'text-white'}" ${on ? '' : 'style="background:var(--mil-green,#4E5B3A)"'}>${on ? '떼기' : '달기'}</button>` : it.k === 'theme' ? `<button onclick="zpEquip('theme',${on ? 'null' : `'${id}'`})" class="${on ? 'bg-[#F2F3F5] text-[#4E5968]' : 'text-white'}" ${on ? '' : 'style="background:var(--mil-green,#4E5B3A)"'}>${on ? '착용 해제' : '착용하기'}</button>` : it.k === 'frame' ? `<button onclick="zpPCEdit(null,'${id}')" class="text-white" style="background:var(--mil-green,#4E5B3A)">포토카드 만들기</button>` : `<button disabled class="bg-[#F2F3F5] text-[#8B95A1]">꾸미기에서 사용</button>`;
     const tag = inv ? (on ? `<span class="text-[#3B8A5A]">${it.k === 'patch' ? '프로필에 다는 중' : '착용 중'}</span>` : '<span class="text-[#8B95A1]">보관 중</span>') : own ? '<span class="text-[#3B8A5A]">구매 완료</span>' : zpMug() + zpFmt(zp.price[id]);
-    return `<div class="zp-item"><button class="pv" onclick="zpPreview('${id}')">${zpPV(id, it)}<span class="zp-pvl">미리보기</span></button><div class="nm">${esc(it.n)}</div><div class="pr">${tag}</div>${btn}${it.nt && own ? `<a onclick="zpNtEdit('${id}')" style="display:block;text-align:center;margin-top:8px;font-size:12px;font-weight:700;color:#4E5968;text-decoration:underline;cursor:pointer">이름 바꾸기${(eq.nt && eq.nt.ko) ? ' · ' + esc(eq.nt.ko) : ''}</a>` : ''}</div>`;
+    return `<div class="zp-item"><button class="pv" onclick="zpPreview('${id}')">${zpPV(id, it)}<span class="zp-pvl">미리보기</span></button><div class="nm">${esc(it.n)}</div><div class="pr">${tag}</div>${btn}${it.nt && own ? `<a onclick="zpNtEdit('${id}')" style="display:block;text-align:center;margin-top:8px;font-size:12px;font-weight:700;color:#4E5968;text-decoration:underline;cursor:pointer">이름 바꾸기${zpNtOf(id, eq).ko ? ' · ' + esc(zpNtOf(id, eq).ko) : ''}</a>` : ''}${ZP_VAR[id] ? `<a onclick="zpPreview('${id}')" style="display:block;text-align:center;margin-top:6px;font-size:12px;font-weight:700;color:#4E5968;text-decoration:underline;cursor:pointer">색상 · ${esc(zpVar(id, eq)[1])} ›</a>` : ''}</div>`;
   }).join('') || `<div class="col-span-2 text-center text-[13px] text-[#8B95A1] py-10">${inv ? '아직 산 아이템이 없어요' : '곧 새 상품이 들어와요'}</div>`}</div><div class="h-6"></div>`;
 }
 /* 미리보기 */
@@ -586,18 +597,41 @@ function zpPreview(id) {
       if (src && src.offsetParent !== null) { card = src.cloneNode(true); card.querySelectorAll('[id]').forEach(e => e.removeAttribute('id')); card.querySelectorAll('button,input').forEach(e => { e.disabled = true; e.style.pointerEvents = 'none'; }); delete card.dataset.bg0; delete card.dataset.c0; card.style.background = src.dataset.bg0 !== undefined ? src.dataset.bg0 : src.style.background; card.style.color = src.dataset.c0 || ''; }
       else { card = document.createElement('div'); card.className = 'pcard'; card.style.background = 'linear-gradient(155deg,var(--mil-dark,#3B4630) 0%,var(--mil-dark2,#2C3424) 100%)'; card.innerHTML = `<div class="text-[11px] font-semibold" style="opacity:.7">대한민국 육군</div><div class="text-[25px] font-extrabold mt-1">${esc(me.nickname || '이름')}</div><div class="pbar mt-4"><div style="position:absolute;inset:0 40% 0 0;background:var(--mil-green,#6B7B5C)"></div><div class="relative px-3.5 h-full flex items-center text-[17px] font-black">60%</div></div>`; }
       card.style.height = 'auto'; card.style.minHeight = '200px'; box.appendChild(card);
-      const eq = (me && me.equip) || {}, pl = zpPatches(eq).filter(x => x !== id); if (it.k === 'patch') { const L = zpIsLong(id), same = pl.filter(x => zpIsLong(x) === L); if (same.length >= 3) pl.splice(pl.indexOf(same[same.length - 1]), 1); pl.push(id); } zpStyleCard(card, it.k === 'theme' ? id : eq.theme, pl, eq.nt);
+      const eq = (me && me.equip) || {}, pl = zpPatches(eq).filter(x => x !== id); if (it.k === 'patch') { const L = zpIsLong(id), same = pl.filter(x => zpIsLong(x) === L); if (same.length >= 3) pl.splice(pl.indexOf(same[same.length - 1]), 1); pl.push(id); }
+      const VL = ZP_VAR[id];
+      if (!VL) { zpStyleCard(card, it.k === 'theme' ? id : eq.theme, pl, eq); return; }
+      /* 군별 색상: 좌우로 넘기거나 ‹ › 로 골라요 */
+      let vi = Math.max(0, VL.indexOf(zpVar(id, eq)));
+      const nav = document.createElement('div'); nav.className = 'zp-vnav'; box.after(nav);
+      const paint = () => {
+        const e2 = Object.assign({}, eq, { pv: Object.assign({}, eq.pv || {}, { [id]: VL[vi][0] }) });
+        if (it.nt && !zpNtOf(id, e2).ko) e2.nts = Object.assign({}, e2.nts || {}, { [id]: { ko: (me.nickname || '홍길동').replace(/[^가-힣]/g, '').slice(0, 3) || '홍길동', en: 'KIM' } });
+        zpStyleCard(card, eq.theme, pl, e2); ov.dataset.v = VL[vi][0];
+        nav.innerHTML = `<button data-d="-1" aria-label="이전">‹</button><div><b>${esc(VL[vi][1])}</b><span>${VL.map((_, n) => `<i class="${n === vi ? 'on' : ''}"></i>`).join('')}</span></div><button data-d="1" aria-label="다음">›</button>`;
+        const sb2 = ov.querySelector('.zp-vset'); if (sb2) { const cur = zpVar(id, eq)[0] === VL[vi][0]; sb2.disabled = cur; sb2.textContent = cur ? '지금 다는 색상' : '이 색상으로 바꾸기'; sb2.style.opacity = cur ? .55 : 1; }
+      };
+      const step = d => { vi = (vi + d + VL.length) % VL.length; paint(); };
+      nav.onclick = e => { const b = e.target.closest('[data-d]'); if (b) step(+b.dataset.d); };
+      let sx = null; box.addEventListener('pointerdown', e => { sx = e.clientX; }); box.addEventListener('pointerup', e => { if (sx !== null && Math.abs(e.clientX - sx) > 40) step(e.clientX < sx ? 1 : -1); sx = null; });
+      paint();
     }, 0);
   } else if (it.k === 'frame') stage = `<div style="width:min(62vw,240px)">${zpPCHTML({ frame: id, photo: null, deco: { cap: '미리보기' } })}</div>`;
   else stage = `<div class="flex flex-wrap gap-4 justify-center" style="max-width:280px">${Object.keys(ZP_STK).filter(k => ZP_STK[k].p === id).map(k => `<span style="width:72px;height:72px;display:inline-block">${zpStkSVG(k)}</span>`).join('')}</div>`;
   ov.innerHTML = `<div class="text-[13px] font-bold opacity-70 mb-3">미리보기</div>${stage}<div class="text-[20px] font-extrabold mt-5">${esc(it.n)}</div><div class="flex items-center gap-1.5 mt-1 text-[14px] font-bold opacity-80">${own ? '구매 완료' : zpMug() + zpFmt(zp.price[id])}</div>
-   <div class="flex gap-2 mt-6">${own ? `<button class="ok" style="margin:0;padding:13px 30px;opacity:.55" disabled>구매 완료</button>` : `<button class="ok" style="margin:0;padding:13px 30px" onclick="this.closest('.zp-ov').remove();zpBuy('${id}')">구매하기</button>`}<button class="ok" style="margin:0;padding:13px 24px;background:rgba(255,255,255,.16);color:#fff" onclick="this.closest('.zp-ov').remove()">닫기</button></div>`;
+   <div class="flex gap-2 mt-6">${own ? (ZP_VAR[id] ? `<button class="ok zp-vset" style="margin:0;padding:13px 24px" onclick="const o=this.closest('.zp-ov');zpSetVar('${id}',o.dataset.v);o.remove()">이 색상으로 바꾸기</button>` : `<button class="ok" style="margin:0;padding:13px 30px;opacity:.55" disabled>구매 완료</button>`) : `<button class="ok" style="margin:0;padding:13px 30px" onclick="const o=this.closest('.zp-ov'),v=o.dataset.v;o.remove();zpBuy('${id}').then(ok=>{if(ok&&v)zpSetVar('${id}',v,true)})">구매하기</button>`}<button class="ok" style="margin:0;padding:13px 24px;background:rgba(255,255,255,.16);color:#fff" onclick="this.closest('.zp-ov').remove()">닫기</button></div>`;
   document.body.appendChild(ov);
 }
 function zpUseTh() { const id = (typeof stSel !== 'undefined' && myRow(stSel)) ? stSel : (myStars[0] && myStars[0].id); if (!id) return zpToast('MY스타를 먼저 등록해주세요'); thSheet(id); }
 /* 이름표 이름 정하기 */
+/* 패치 색상(군별) 저장 */
+async function zpSetVar(id, v, quiet) {
+  if (!v || !ZP_VAR[id]) return; if (zpVar(id, me.equip)[0] === v) { if (!quiet) zpToast('이미 이 색상이에요'); return; }
+  const { data, error } = await sb.rpc('set_patch_var', { item: id, v });
+  if (error) return showAlert('오류', '잠시 후 다시 시도해주세요.');
+  me.equip = data || me.equip; zpApplyEquip(); if (!quiet) zpToast(`${ZP_VAR[id].find(x => x[0] === v)[1]} 색상으로 바꿨어요`); const el = zpShopEl(); if (el && el.querySelector('.zp-grid')) zpShopRender(el);
+}
 async function zpNtEdit(id, afterBuy) {
-  const g = id === 'gs_name', cur = (me.equip && me.equip.nt) || {};
+  const g = id === 'gs_name', cur = zpNtOf(id, me.equip);
   const html = `<div class="text-left mt-1" style="padding:2px 4px 4px"><label class="text-[12px] font-bold text-[#4E5968]">한글 이름 (1~5자)</label><input id="zp-nt-ko" class="inp mt-1" maxlength="5" placeholder="예) 홍길동" value="${esc(cur.ko || '')}"><label class="text-[12px] font-bold text-[#4E5968] block mt-3">영문 성 (선택 · 12자까지)</label><input id="zp-nt-en" class="inp mt-1" maxlength="12" placeholder="예) KIM" value="${esc(cur.en || '')}" autocapitalize="characters" style="text-transform:uppercase"><p class="text-[11px] text-[#8B95A1] mt-2">이름표에 실로 수놓아져요. 나중에 보관함에서 바꿀 수 있어요.</p></div>`;
   for (;;) {
     const p = zDialog({ title: afterBuy ? '이름표에 넣을 이름' : '이름표 이름 바꾸기', html, ok: '저장' });
@@ -606,7 +640,7 @@ async function zpNtEdit(id, afterBuy) {
     const ok = await p; grab(); if (!ok) return false;
     ko = ko.replace(/\s/g, ''); en = en.toUpperCase().replace(/[^A-Z ]/g, '').trim();
     if (!/^[가-힣]{1,5}$/.test(ko)) { await zDialog({ title: '이름을 확인해주세요', msg: '한글 1~5자로 적어주세요.', cancel: false }); continue; }
-    const { data, error } = await sb.rpc('set_nametag', { ko, en: en || null });
+    const { data, error } = await sb.rpc('set_nametag2', { item: id, ko, en: en || null });
     if (error) { showAlert('오류', '잠시 후 다시 시도해주세요.'); return false; }
     me.equip = data || me.equip; zpApplyEquip(); zpToast('이름표에 이름을 넣었어요'); const el = zpShopEl(); if (el && el.querySelector('.zp-grid')) zpShopRender(el); return true;
   }
@@ -628,7 +662,7 @@ async function zpBuy(id, quiet) {
 async function zpPatchToggle(id) {
   const cur = zpPatches(me.equip), on = cur.includes(id), L = zpIsLong(id);
   if (!on && cur.filter(x => zpIsLong(x) === L).length >= 3) return showAlert(L ? '긴 패치는 3개까지' : '방패 · 배지 패치는 3개까지', L ? '이름표 · 특급전사 · 탭처럼 긴 패치는 3개까지 달 수 있어요.<br>달려 있는 것 중 하나를 먼저 떼주세요.' : '방패 · 배지 패치는 긴 패치 아래에 가로로 3개까지 달 수 있어요.<br>달려 있는 것 중 하나를 먼저 떼주세요.');
-  if (!on && ZP_ITEMS[id] && ZP_ITEMS[id].nt && !(me.equip && me.equip.nt && me.equip.nt.ko)) { if (!(await zpNtEdit(id, true))) return; }
+  if (!on && ZP_ITEMS[id] && ZP_ITEMS[id].nt && !zpNtOf(id, me.equip).ko) { if (!(await zpNtEdit(id, true))) return; }
   await zpEquip(on ? 'patch_off' : 'patch', id);
 }
 async function zpEquip(slot, id, quiet) {
