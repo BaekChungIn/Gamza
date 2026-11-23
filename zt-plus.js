@@ -45,6 +45,7 @@ const ZP_ITEMS = {
   pf_berry: { n: '딸기 케이크', k: 'frame', aud: 'fan', img: 1, gem: 1 },
   pf_holo: { n: '홀로 보석', k: 'frame', aud: 'fan', img: 1, gem: 1 },
   pf_ocean: { n: '오션 레진', k: 'frame', aud: 'fan', img: 1, gem: 1 },
+  pf_icefly: { n: '오로라 아이스 나비', k: 'frame', aud: 'fan', img: 1, gem: 1 },
   pf_amethyst: { n: '아메시스트 엔젤', k: 'frame', aud: 'fan', img: 1, gem: 1 },
   pf_gamer: { n: '게이머 펑크', k: 'frame', aud: 'fan', img: 1 },
   pf_antique: { n: '앤티크 골드', k: 'frame', aud: 'fan', img: 1, gem: 1 },
@@ -548,7 +549,7 @@ async function zpEquip(slot, id, quiet) {
 }
 
 /* ---------- 포토카드 ---------- */
-const ZP_INS = {"pf_amethyst": [11.3, 1.7, 6.2, 4.3], "pf_antique": [7.2, 2.3, 7.8, 0.7], "pf_blackcat": [6.9, 2.5, 6.2, 2.7], "pf_candy": [7.8, 3.0, 6.4, 1.8], "pf_clover": [4.3, 3.3, 5.0, 1.2], "pf_cookie": [7.4, 0.7, 5.9, 3.5], "pf_galaxy": [5.3, 0.7, 4.7, 1.8], "pf_gamer": [8.3, 4.7, 9.2, 5.0], "pf_gothic": [6.6, 2.2, 2.2, 1.8], "pf_ice": [20.4, 18.7, 7.6, 3.0], "pf_rainbow": [5.2, 0.5, 5.1, 0.0], "pf_ribbon": [6.8, 2.2, 5.8, 3.0], "pf_seashell": [5.4, 2.7, 6.4, 1.8], "pf_silver": [7.1, 3.2, 6.2, 4.8], "pf_silverfly": [10.3, 3.3, 5.0, 3.2], "pf_aqua": [5.7, 1.2, 6.1, 7.9], "pf_opal": [8.1, 2.2, 6.4, 4.6], "pf_aurora": [8.3, 2.2, 6.9, 3.8], "pf_mermaid": [4.7, 0.1, 3.9, 0.0], "pf_angelheart": [3.1, 0.9, 4.2, 0.0], "pf_mint": [8.1, 3.7, 4.9, 1.1]};
+const ZP_INS = {"pf_amethyst": [11.3, 1.7, 6.2, 4.3], "pf_antique": [7.2, 2.3, 7.8, 0.7], "pf_blackcat": [6.9, 2.5, 6.2, 2.7], "pf_candy": [7.8, 3.0, 6.4, 1.8], "pf_clover": [4.3, 3.3, 5.0, 1.2], "pf_cookie": [7.4, 0.7, 5.9, 3.5], "pf_galaxy": [5.3, 0.7, 4.7, 1.8], "pf_gamer": [8.3, 4.7, 9.2, 5.0], "pf_gothic": [6.6, 2.2, 2.2, 1.8], "pf_ice": [20.4, 18.7, 7.6, 3.0], "pf_rainbow": [5.2, 0.5, 5.1, 0.0], "pf_ribbon": [6.8, 2.2, 5.8, 3.0], "pf_seashell": [5.4, 2.7, 6.4, 1.8], "pf_silver": [7.1, 3.2, 6.2, 4.8], "pf_silverfly": [10.3, 3.3, 5.0, 3.2], "pf_aqua": [8.0, 3.0, 6.3, 3.2], "pf_opal": [10.9, 4.2, 7.8, 5.2], "pf_aurora": [10.7, 4.8, 6.8, 3.5], "pf_mermaid": [7.9, 2.3, 5.6, 2.7], "pf_angelheart": [8.2, 2.3, 5.1, 2.7], "pf_mint": [9.4, 2.8, 8.0, 2.7], "pf_icefly": [9.9, 11.3, 3.4, 3.2]};
 const ZP_TW = [[9, 6], [88, 9], [94, 42], [6, 58], [90, 88], [14, 93], [50, 4], [52, 96]];
 function zpPCHTML(c, mini, edit) {
   const d = c.deco || {}, fr = ZP_ITEMS[c.frame] ? c.frame : 'pc_basic';
@@ -556,7 +557,7 @@ function zpPCHTML(c, mini, edit) {
   const sk = (d.st || []).map((s, i) => `<div class="sk ${edit && edit.sel === i ? 'sel' : ''}" data-i="${i}" style="left:${+s[1] || 50}%;top:${+s[2] || 50}%;--s:${Math.min(2.2, Math.max(.5, +s[3] || 1))}">${zpStkSVG(String(s[0]))}</div>`).join('');
   const it = ZP_ITEMS[fr]; let ov = '';
   if (it.img) {
-    const u = `${fr}.webp?v=3`; ov = `<i class="fimg" style="background-image:url('${u}')"></i>`;
+    const u = `${fr}.webp?v=4`; ov = `<i class="fimg" style="background-image:url('${u}')"></i>`;
     if (it.gem) ov += `<i class="gl" style="-webkit-mask-image:url('${u}');mask-image:url('${u}')"></i>` + ZP_TW.map(([x, y], i) => `<i class="tw" style="left:${x}%;top:${y}%;animation-delay:${(i * .37).toFixed(2)}s"></i>`).join('');
   }
   return `<div class="pc2 pcf-${fr}${it.img ? ' pfi' : ''}${ZP_INS[fr] ? ' fit' : ''}">${fr === 'pc_army' ? '<i class="tag"></i>' : ''}<div class="ph ${photo ? '' : 'empty'}" style="${ZP_INS[fr] ? `inset:${ZP_INS[fr][0]}% ${ZP_INS[fr][1]}% ${ZP_INS[fr][2]}% ${ZP_INS[fr][3]}%;border-radius:4cqw;` : ''}${photo ? `background-image:url('${photo}')` : ''}">${photo ? '' : (mini ? '' : '사진을 넣어주세요')}</div>${ov}<div class="lay">${sk}</div>${d.cap ? `<div class="cap">${esc(String(d.cap).slice(0, 24))}</div>` : ''}</div>`;
