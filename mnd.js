@@ -179,19 +179,13 @@ const MI = { b: '<path d="M12 3v3M5.6 7.6l2 2M18.4 7.6l-2 2M3 14h3M18 14h3M7 14a
 const mic = k => `<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${MI[k]}</svg>`;
 /* 식단표 색상 테마 (길찾기와 같은 4가지) */
 const mlPal = () => (window.ZT_PAL || {});
-const mlTh = () => { let k = 'army'; try { k = localStorage.getItem('zt_mlth') || 'army'; } catch (e) { } return mlPal()[k] || mlPal().army || { p: '#2B3426', t: '#EEF2E8', s: ['#2B3426', '#6B7B5C', '#E4E8DD'] }; };
+const mlTh = () => { let k = 'army'; try { k = localStorage.getItem('zt_th') || localStorage.getItem('zt_mlth') || 'army'; } catch (e) { } return mlPal()[k] || mlPal().army || { p: '#2B3426', t: '#EEF2E8', s: ['#2B3426', '#6B7B5C', '#E4E8DD'] }; };
 window.mlApplyTh = function () {
   const m = document.getElementById('modal-menu'), T = mlTh(); if (!m) return;
   m.style.setProperty('--mp', T.p); m.style.setProperty('--mt', T.t); m.style.setProperty('--ma', T.s[2] || T.t);
   const b = document.getElementById('ml-thb'); if (b) b.innerHTML = T.s.map(c => `<i style="background:${c}"></i>`).join('');
 };
-window.mlThemePick = function () {
-  let cur = 'army'; try { cur = localStorage.getItem('zt_mlth') || 'army'; } catch (e) { }
-  const ov = document.createElement('div'); ov.className = 'ml-thov'; ov.onclick = e => { if (e.target === ov) ov.remove(); };
-  ov.innerHTML = `<div class="ml-thbox"><b>식단표 색상 테마</b>${Object.entries(mlPal()).map(([k, T]) => `<button data-k="${k}" class="${k === cur ? 'on' : ''}"><span>${T.s.map(c => `<i style="background:${c}"></i>`).join('')}</span>${T.n}</button>`).join('')}</div>`;
-  ov.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { try { localStorage.setItem('zt_mlth', b.dataset.k); } catch (e) { } ov.remove(); mlApplyTh(); });
-  document.body.appendChild(ov);
-};
+window.mlThemePick = function () { if (window.ztThemePick) ztThemePick(); };
 window.mealCards = function (r, date, hint) {
   r = r || {}; const has = ['b', 'l', 'n', 'sp'].some(k => (r[k] || []).length);
   if (!has) return `<div class="ml-empty"><span class="ml-ic l" style="margin:0 auto;width:52px;height:52px;border-radius:17px"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 3v8a2 2 0 0 0 2 2v8M7 3v5M11 3v5M17 3c-1.7 0-3 2.2-3 5s1.3 4 3 4v9"/></svg></span><b>이 날 식단이 아직 없어요</b><p>${hint ? E(hint) : '식단이 올라오면 여기에 보여요'}</p></div>`;
