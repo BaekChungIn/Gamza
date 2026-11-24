@@ -42,6 +42,30 @@ const css = `
 .mf-ok{width:100%;height:54px;border-radius:16px;background:#191F28;color:#fff;font-size:16px;font-weight:800}
 .mf-sub{width:100%;height:50px;border-radius:16px;background:#F2F4F6;color:#4E5968;font-size:15px;font-weight:700;margin-top:8px}
 .ml-meal{background:#F7F8FA;border-radius:16px;padding:14px 16px;margin-top:10px}
+.ml-wk .ml-nav{width:36px;height:36px;border-radius:12px;background:#F2F4F6;color:#4E5968;display:flex;align-items:center;justify-content:center}
+.ml-days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:12px}
+.ml-days button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 9px;border-radius:14px;position:relative}
+.ml-days i{font-style:normal;font-size:11px;font-weight:700;color:#8B95A1}.ml-days b{font-size:16px;font-weight:800;color:#191F28}
+.ml-days .we i{color:#E8788F}
+.ml-days .td::after{content:'';position:absolute;bottom:3px;left:50%;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:#3DB37D}
+.ml-days .on{background:#191F28}.ml-days .on i{color:rgba(255,255,255,.6)}.ml-days .on b{color:#fff}.ml-days .on.td::after{background:#7FE0A8}
+.ml-pill{height:36px;padding:0 14px;border-radius:12px;background:#F2F4F6;font-size:13px;font-weight:700;color:#333D4B;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.ml-card{background:#fff;border-radius:24px;padding:18px 18px 16px;border:1px solid rgba(107,123,92,.06);box-shadow:0 8px 24px rgba(107,123,92,.04),0 2px 8px rgba(0,0,0,.02)}
+.ml-card.now{border-color:#3DB37D;box-shadow:0 0 0 2px rgba(61,179,125,.15),0 8px 24px rgba(61,179,125,.08)}
+.ml-hd{display:flex;align-items:center;gap:11px;margin-bottom:12px}
+.ml-ic{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ml-ic.b{background:#FFF4DE;color:#E9A23B}.ml-ic.l{background:#E7F6EE;color:#2F9E6A}.ml-ic.n{background:#ECEBFB;color:#6A5FD8}.ml-ic.sp{background:#FFE9EF;color:#E8607F}
+.ml-hd b{font-size:16px;font-weight:800;display:block;line-height:1.2}.ml-hd small{font-size:12px;color:#8B95A1;font-weight:600}
+.ml-now{margin-left:auto;font-size:11px;font-weight:800;color:#fff;background:#3DB37D;padding:4px 9px;border-radius:99px}
+.ml-items{display:flex;flex-wrap:wrap;gap:6px}
+.ml-items span{font-size:14px;font-weight:600;color:#333D4B;background:#F5F6F8;border-radius:10px;padding:7px 11px;line-height:1.25}
+.ml-items span.main{background:#191F28;color:#fff;font-weight:700}
+.ml-items span.g{background:transparent;border:1px solid #E5E8EB;color:#6B7684;font-weight:500}
+.ml-empty{background:#fff;border-radius:24px;padding:30px 20px;text-align:center;border:1px solid rgba(107,123,92,.06)}
+.ml-empty b{display:block;font-size:16px;font-weight:800;margin-top:10px}.ml-empty p{font-size:13px;color:#8B95A1;margin-top:4px;line-height:1.5}
+.ml-find{border-radius:24px;padding:20px;background:linear-gradient(140deg,#E6F6EE,#F6FBF8);border:1px solid rgba(61,179,125,.15)}
+.ml-find .go{margin-top:14px;width:100%;height:48px;border-radius:15px;background:#191F28;color:#fff;font-size:15px;font-weight:800}
+.ml-src{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#6B7684;font-weight:600}
 .ml-meal b{font-size:13px}.ml-meal div{font-size:13px;color:#4E5968;line-height:1.6;margin-top:4px}
 `;
 const st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
@@ -142,17 +166,29 @@ async function loadUnit(u, d) {
   const { data } = await sb.from('meal_days').select('d,b,l,n,sp').eq('unit', u).gte('d', from).lte('d', to); const m = {}; (data || []).forEach(r => m[r.d] = r); return (ML.days[k] = m);
 }
 const items = a => (a || []).map(x => `<span class="inline-block bg-[#F5F6F8] rounded-full px-3 py-1 text-[12px] m-0.5">${E(x)}</span>`).join('');
+/* 식단 카드 (홈 카드와 같은 모양) · 지금 끼니는 초록 테두리 · 첫 메인 메뉴는 진하게 · 밥 · 김치 같은 기본 반찬은 옅게 */
+const MI = { b: '<path d="M12 3v3M5.6 7.6l2 2M18.4 7.6l-2 2M3 14h3M18 14h3M7 14a5 5 0 0 1 10 0M2 18h20M6 21h12"/>', l: '<circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/>', n: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>', sp: '<path d="M12 3l2.4 5 5.4.6-4 3.7 1.1 5.4L12 15l-4.9 2.7 1.1-5.4-4-3.7 5.4-.6z"/>' };
+const mic = k => `<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${MI[k]}</svg>`;
+window.mealCards = function (r, date, hint) {
+  r = r || {}; const has = ['b', 'l', 'n', 'sp'].some(k => (r[k] || []).length);
+  if (!has) return `<div class="ml-empty"><span class="ml-ic l" style="margin:0 auto;width:52px;height:52px;border-radius:17px"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 3v8a2 2 0 0 0 2 2v8M7 3v5M11 3v5M17 3c-1.7 0-3 2.2-3 5s1.3 4 3 4v9"/></svg></span><b>이 날 식단이 아직 없어요</b><p>${hint ? E(hint) : '식단이 올라오면 여기에 보여요'}</p></div>`;
+  const now = new Date(), h = now.getHours(), cur = date === ymdK(now) ? (h < 9 ? 'b' : h < 14 ? 'l' : h < 20 ? 'n' : '') : '';
+  const one = (k, t, sub) => { const v = [...new Set((r[k] || []).map(x => String(x).trim()).filter(Boolean))]; if (!v.length) return ''; let mainDone = false;
+    const chips = v.map(x => { const g = GENERIC.test(x.replace(/\s/g, '')); const c = !g && !mainDone && k !== 'sp' ? (mainDone = true, 'main') : g ? 'g' : ''; return { x, c, g }; }).sort((a, b) => a.g - b.g);
+    return `<div class="ml-card${cur === k ? ' now' : ''}"><div class="ml-hd"><span class="ml-ic ${k}">${mic(k)}</span><div><b>${t}</b><small>${sub}</small></div>${cur === k ? '<span class="ml-now">지금</span>' : ''}</div><div class="ml-items">${chips.map(o => `<span class="${o.c}">${E(o.x)}</span>`).join('')}</div></div>`; };
+  return one('b', '아침', '조식') + one('l', '점심', '중식') + one('n', '저녁', '석식') + one('sp', '특식', '오늘의 특별 메뉴');
+};
 /* 식단표 화면 위에 덧붙여요 (renderMenu 끝에서 불러요) */
 window.mndMenuPatch = async function () {
   sync(); const u = mealUnit(), cards = q('menu-cards'), ub = q('menu-unit'); if (!cards) return;
   if (!u) {
-    cards.insertAdjacentHTML('afterbegin', `<div class="toss-card !p-5" style="background:linear-gradient(135deg,#EAF7F0,#F7FBF9)"><div class="text-[15px] font-extrabold">🍚 우리 부대 식단표 찾기</div><div class="text-[12.5px] text-[#4E5968] mt-1 leading-relaxed">오늘 먹은 메뉴만 고르면 국방부 공공데이터에서<br>우리 부대 식단을 찾아 매일 자동으로 보여드려요.</div><button onclick="mealFind()" class="mt-3 w-full h-11 rounded-xl text-white font-bold text-[14px]" style="background:#3DB37D">식단표 찾기</button></div>`);
+    cards.insertAdjacentHTML('afterbegin', `<div class="ml-find"><div class="flex items-center gap-3"><span class="ml-ic l" style="background:#fff"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h18a9 9 0 0 1-18 0zM9 3c0 2 2 2 2 4M14 3c0 2 2 2 2 4"/></svg></span><div><div class="text-[16px] font-extrabold">우리 부대 식단표 찾기</div><div class="text-[12.5px] text-[#4E5968] mt-0.5">국방부 공공데이터 · 매일 자동으로 보여드려요</div></div></div><div class="text-[13px] text-[#4E5968] mt-3 leading-relaxed">오늘 먹은 메뉴 몇 개만 고르면 우리 부대를 찾아드려요.</div><button onclick="mealFind()" class="go">식단표 찾기</button></div>`);
     return;
   }
   const date = q('menu-date-input').value, m = await loadUnit(u, date), r = m[date], U = await units();
-  ub.innerHTML = `<span class="inline-flex gap-1 items-start">${PIN}<span>${E(U[u] || ('제' + u + '부대'))} · 국방부 공공데이터 <button onclick="mealFind()" class="font-bold text-[#3DB37D] ml-1">부대 바꾸기</button></span></span>`;
-  if (!r) { cards.insertAdjacentHTML('afterbegin', `<div class="text-[12px] text-[#8B95A1] bg-white rounded-2xl px-4 py-3">이 날짜의 공공데이터 식단이 아직 없어요. 직접 입력한 식단이 있으면 아래에 보여요.</div>`); return; }
-  cards.innerHTML = [['🌅', '조식', r.b], ['☀️', '중식', r.l], ['🌙', '석식', r.n]].map(([i, t, v]) => `<div class="toss-card !p-5"><div class="text-[14px] font-extrabold mb-2">${i} ${t}</div>${v && v.length ? items(v) : '<div class="text-[12px] text-[#8B95A1]">식단 정보가 없어요</div>'}</div>`).join('') + (r.sp && r.sp.length ? `<div class="toss-card !p-5"><div class="text-[14px] font-extrabold mb-2">🎉 특식</div>${items(r.sp)}</div>` : '');
+  ub.innerHTML = `<div class="ml-src">${PIN}<span class="truncate">${E(U[u] || ('제' + u + '부대'))}</span><span style="color:#B0B8C1">·</span><span>국방부 공공데이터</span><button onclick="mealFind()" class="ml-auto font-bold text-[#3DB37D] whitespace-nowrap">부대 바꾸기</button></div>`;
+  if (!r) { if (!cards.querySelector('.ml-card')) cards.innerHTML = mealCards({}, date, '국방부에 이 날짜 식단이 아직 안 올라왔어요'); return; }
+  cards.innerHTML = mealCards(r, date);
 };
 
 /* ---------- 식단표 찾기 (오늘 먹은 메뉴로 우리 부대 찾기) ---------- */

@@ -940,7 +940,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
 </div>
 <div id="modal-route" class="fixed inset-0 z-[85] hidden flex-col" style="background:var(--bg-main)">
  <div class="relative flex items-center justify-between px-4 pb-3" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeModal('modal-route')" class="w-10 h-10 rounded-full bg-white border border-[#E5E8EB] font-bold text-[18px]" aria-label="뒤로">‹</button><div class="ios-t" style="top:max(14px,env(safe-area-inset-top));line-height:40px">집으로 가는 방법</div><div class="w-10 h-10"></div></div>
- <div id="route-body" class="flex-1 overflow-y-auto no-scrollbar px-4 pb-10"><div id="route-results"></div></div>
+ <div id="route-body" class="flex-1 overflow-y-auto no-scrollbar px-4 pb-10"><div id="rt-mapw"><div id="rt-map"></div></div><div id="route-results"></div></div>
 </div>
 <div id="rt-load" class="rl hidden">
  <div class="rl-car"><img src="rl_car.png" alt="" class="rl-body"><img src="rl_wheelL.png" alt="" class="rl-w" style="left:8.93%;top:61.2%"><img src="rl_wheelR.png" alt="" class="rl-w" style="left:69.06%;top:61.2%"></div>
@@ -1005,8 +1005,11 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
    <div class="flex items-center justify-between px-4 py-3 bg-white"><button onclick="closeModal('modal-menu')" class="w-10 h-10 rounded-full bg-[#F5F6F8] text-xl font-bold">‹</button><div class="font-bold text-[17px]">🍚 식단표</div><button id="menu-edit-btn" onclick="menuEditToggle()" class="text-[13px] font-bold text-[var(--mil-green)] w-10">편집</button></div>
    <div class="flex-1 overflow-y-auto no-scrollbar px-5 py-4 space-y-3">
     <div id="menu-unit" class="text-[12px] text-[#8B95A1]"></div>
-    <div class="flex items-center justify-between"><button onclick="menuGo(-1)" class="w-10 h-10 rounded-full bg-white shadow-sm font-bold">◀</button><div id="menu-date-label" class="text-[16px] font-extrabold"></div><button onclick="menuGo(1)" class="w-10 h-10 rounded-full bg-white shadow-sm font-bold">▶</button></div>
-    <div class="flex gap-2 items-center"><button onclick="menuSet(ymd(new Date()))" class="text-[12px] font-bold bg-white border border-[#E5E8EB] rounded-full px-3 py-1.5">오늘</button><button onclick="menuSet(ymd(new Date(Date.now()+864e5)))" class="text-[12px] font-bold bg-white border border-[#E5E8EB] rounded-full px-3 py-1.5">내일</button><input type="date" id="menu-date-input" onchange="menuSet(this.value)" class="text-[12px] font-bold bg-white border border-[#E5E8EB] rounded-full px-3 py-1 outline-none flex-1"></div>
+    <div class="toss-card !p-4 ml-wk">
+     <div class="flex items-center justify-between"><button onclick="menuGo(-7)" class="ml-nav" aria-label="지난주"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><div id="menu-date-label" class="text-[16px] font-extrabold tracking-tight"></div><button onclick="menuGo(7)" class="ml-nav" aria-label="다음주"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button></div>
+     <div id="menu-week" class="ml-days"></div>
+     <div class="flex gap-2 mt-3"><button onclick="menuSet(ymd(new Date()))" class="ml-pill">오늘</button><button onclick="menuSet(ymd(new Date(Date.now()+864e5)))" class="ml-pill">내일</button><label class="ml-pill flex-1 relative"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>날짜 고르기<input type="date" id="menu-date-input" onchange="menuSet(this.value)" class="absolute inset-0 w-full" style="opacity:0;position:absolute;inset:0"></label></div>
+    </div>
     <div id="menu-cards" class="space-y-3"></div>
     <div id="menu-edit" class="hidden toss-card !p-5 space-y-3">
      <div class="bg-[var(--mil-green-light)] rounded-xl p-3 space-y-2"><div class="text-[13px] font-extrabold">📥 공공데이터포털 식단 가져오기</div><p class="text-[11px] text-[#4E5968] leading-relaxed">① 아래 버튼으로 공공데이터포털에서 우리 부대 '식단정보' CSV를 내려받고 ② 파일을 선택하면 날짜별로 한꺼번에 자동 등록돼요. (부대가 데이터를 공개한 경우에만 있어요)</p><a id="menu-dg-link" target="_blank" rel="noopener" href="https://www.data.go.kr/tcs/dss/selectDataSetList.do?keyword=%EA%B5%AD%EB%B0%A9%EB%B6%80+%EC%8B%9D%EB%8B%A8%EC%A0%95%EB%B3%B4" class="block text-center bg-white border border-[#E5E8EB] rounded-lg py-2.5 text-[12px] font-bold text-[var(--mil-green)]">공공데이터포털에서 우리 부대 찾기 ▶</a><label id="menu-import-lbl" class="block text-center bg-[var(--mil-green)] text-white rounded-lg py-2.5 text-[12px] font-bold cursor-pointer">CSV 파일 선택해서 가져오기<input type="file" accept=".csv,text/csv,text/plain" class="hidden" onchange="importMenuCsv(this)"></label></div><div class="text-[14px] font-extrabold">이 날 식단 입력</div>
@@ -3469,24 +3472,32 @@ function rtLine(o, b, ci) {
   o.legs.forEach((x, i) => {
     if (x.from && i > 0 && o.legs[i - 1].to !== x.from) h += `<div class="rt-n" style="--k:${k++}"><i></i><span>${esc(x.from)}</span><em>승차</em></div>`;
     h += `<div class="rt-r" style="--k:${k++}"><div class="rt-ic ${x.t}">${rico(x.t)}</div><div class="rt-t"><b>${legLabel(x)}</b> <span>${fmtM(x.min)}${x.tr ? ` · 환승 ${x.tr}회` : ''}</span></div>${x.cost ? `<div class="rt-c">${W(x.cost)}</div>` : ''}</div>`;
+    if (x.t !== 'walk') h += `<div class="rt-live" data-lk="${o._i}-${i}"></div>`;
     if (x.to && i < o.legs.length - 1 && x.to !== b.name) h += `<div class="rt-n" style="--k:${k++}"><i></i><span>${esc(x.to)}</span><em>${x.t === 'ktx' || x.big ? '도착' : '하차'}</em></div>`;
   });
   return h + `<div class="rt-n end" style="--k:${k++}"><i></i><span>${esc(b.name)}</span><em>도착</em></div></div>`;
 }
+function rtCardHTML(x, i) {
+  const { b, opts } = routeCtx, fast = Math.min(...opts.map(o => o.min)), cheap = Math.min(...opts.map(o => o.cost));
+  return `<div class="rt-card"><div class="flex justify-between items-start mb-3 gap-2"><div class="text-[15px] font-extrabold flex items-center gap-1.5 min-w-0"><span class="rt-hd">${rico(x.icon)}</span><span class="truncate">${i + 1}번 · ${esc(x.n)}</span></div><div class="flex gap-1 flex-shrink-0">${x.min === fast ? '<span class="text-[10px] font-bold bg-[#191F28] text-white px-2 py-0.5 rounded-full">최단</span>' : ''}${x.cost === cheap ? '<span class="text-[10px] font-bold bg-[var(--mil-green)] text-white px-2 py-0.5 rounded-full">최저가</span>' : ''}</div></div>
+  <div class="grid gap-1 mb-2 rt-sum" style="grid-template-columns:1.35fr 1.15fr .65fr .85fr"><div><i>총 소요</i><b>${fmtM(x.min)}</b></div><div><i>총 비용</i><b>${W(x.cost)}</b></div><div><i>환승</i><b>${x.tr}회</b></div><div><i>도보</i><b>${x.walk ? fmtM(x.walk) : '없음'}</b></div></div>
+  ${rtLine(x, b, 0)}
+  <div class="text-[11.5px] text-[#4E5968] space-y-0.5 mb-2.5">${x.lines.map(l => `<div>· ${esc(l)}</div>`).join('')}</div>
+  <div class="flex flex-wrap gap-2 items-center">${x.links.map(l => `<a target="_blank" rel="noopener" href="${safeUrl(l[1])}" class="text-[11.5px] font-bold bg-[#F5F6F8] rounded-lg px-3 py-1.5 text-[var(--mil-green)]">${l[0]}</a>`).join('')}<button onclick="rtRefresh(${i})" class="rt-refresh ml-auto"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>실시간 새로고침</button></div></div>`;
+}
 function renderRoute() {
   const { a, b, km, opts } = routeCtx, box = q('route-results'), fast = Math.min(...opts.map(x => x.min)), cheap = Math.min(...opts.map(x => x.cost));
-  const L = [...opts].sort((x, y) => routeSort === 'time' ? x.min - y.min : x.cost - y.cost);
+  const L = [...opts].sort((x, y) => routeSort === 'time' ? x.min - y.min : x.cost - y.cost); L.forEach((x, i) => x._i = i);
   const nv = m => `https://map.naver.com/p/directions/${a.lng},${a.lat},${encodeURIComponent(a.name)}/${b.lng},${b.lat},${encodeURIComponent(b.name)}/-/${m}`;
   box.classList.toggle('rt-anim', routeAnim); routeAnim = false;
-  box.innerHTML = `<div class="text-[12px] font-bold mb-1 rt-fade">${esc(a.name)} → ${esc(b.name)}</div><div class="text-[11px] text-[#8B95A1] mb-3 rt-fade">직선 약 ${Math.round(km)}km · 출발지에서 도착지까지 <b>문 앞~문 앞 전체 시간</b> 기준 예상치예요. 실제 출발 시각·요금은 각 시간표 링크에서 확인하세요.</div>
-  <div class="flex gap-2 mb-3 rt-fade" style="--i:1"><button onclick="routeSort='time';renderRoute()" class="rt-sort ${routeSort === 'time' ? 'on' : ''}">${rico('clock')}빠른 순</button><button onclick="routeSort='cost';renderRoute()" class="rt-sort ${routeSort === 'cost' ? 'on' : ''}">${rico('wallet')}저렴한 순</button></div>
-  <div class="space-y-3">${L.map((x, i) => `<div class="bg-[#F5F6F8] rounded-2xl p-4 border border-[#E5E8EB] rt-fade" style="--i:${i + 2}"><div class="flex justify-between items-start mb-3"><div class="text-[14px] font-extrabold flex items-center gap-1.5"><span class="rt-hd">${rico(x.icon)}</span>${i + 1}번 · ${esc(x.n)}</div><div class="flex gap-1">${x.min === fast ? '<span class="text-[10px] font-bold bg-[#191F28] text-white px-2 py-0.5 rounded-full">최단</span>' : ''}${x.cost === cheap ? '<span class="text-[10px] font-bold bg-[var(--mil-green)] text-white px-2 py-0.5 rounded-full">최저가</span>' : ''}</div></div>
-  <div class="grid gap-1 mb-1 rt-sum" style="grid-template-columns:1.35fr 1.15fr .65fr .85fr"><div><i>총 소요</i><b>${fmtM(x.min)}</b></div><div><i>총 비용</i><b>${W(x.cost)}</b></div><div><i>환승</i><b>${x.tr}회</b></div><div><i>도보</i><b>${x.walk ? fmtM(x.walk) : '없음'}</b></div></div>
-  ${rtLine(x, b, i + 2)}
-  <div class="text-[11px] text-[#4E5968] space-y-0.5 mb-2">${x.lines.map(l => `<div>· ${esc(l)}</div>`).join('')}</div>
-  <div class="flex flex-wrap gap-2">${x.links.map(l => `<a target="_blank" rel="noopener" href="${safeUrl(l[1])}" class="text-[11px] font-bold bg-white border border-[#E5E8EB] rounded-lg px-3 py-1.5 text-[var(--mil-green)]">${l[0]}</a>`).join('')}</div></div>`).join('')}</div>
-  <div class="grid grid-cols-2 gap-2 mt-3"><a target="_blank" rel="noopener" href="https://map.kakao.com/link/by/publictransit/${encodeURIComponent(a.name)},${a.lat},${a.lng}/${encodeURIComponent(b.name)},${b.lat},${b.lng}" class="block text-center bg-[#FEE500] text-[#191F28] rounded-xl py-3 text-[12px] font-bold">카카오맵에서 정확히 보기</a><a target="_blank" rel="noopener" href="${nv('transit')}" class="block text-center bg-[#03C75A] text-white rounded-xl py-3 text-[12px] font-bold">네이버지도에서 보기</a></div>
-  <p class="text-[10px] text-[#8B95A1] mt-3">※ 구간별 시간·요금·환승 횟수는 거리 기반 추정이에요. 열차·버스 실제 출발 시각과 정확한 요금, 막차는 위 링크(코레일톡·SRT·고속버스·시외버스·지도 앱)에서 확인하세요.</p>`;
+  box.innerHTML = `<div class="flex items-end justify-between gap-2 mb-2.5 rt-fade"><div class="min-w-0"><div class="text-[15px] font-extrabold truncate">${esc(a.name)} → ${esc(b.name)}</div><div class="text-[11.5px] text-[#8B95A1] mt-0.5">직선 약 ${Math.round(km)}km · 문 앞~문 앞 기준 · 옆으로 넘겨서 비교해요</div></div></div>
+  <div class="flex gap-2 mb-2.5 rt-fade" style="--i:1"><button onclick="routeSort='time';renderRoute()" class="rt-sort ${routeSort === 'time' ? 'on' : ''}">${rico('clock')}빠른 순</button><button onclick="routeSort='cost';renderRoute()" class="rt-sort ${routeSort === 'cost' ? 'on' : ''}">${rico('wallet')}저렴한 순</button></div>
+  <div id="rt-tabs" class="rt-tabs rt-fade" style="--i:2">${L.map((x, i) => `<button onclick="rtPg(${i})" class="${i === 0 ? 'on' : ''}"><em>${i + 1}</em>${rico(x.icon)}<span>${esc(x.n)}</span><small>${fmtM(x.min)}</small></button>`).join('')}</div>
+  <div id="rt-pager" class="rt-pager rt-fade" style="--i:3" onscroll="rtPgSync(this)">${L.map((x, i) => `<div class="rt-page">${rtCardHTML(x, i)}</div>`).join('')}</div>
+  <div id="rt-dots" class="rt-dots">${L.map((_, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('')}</div>
+  <div class="grid grid-cols-2 gap-2 mt-2"><a target="_blank" rel="noopener" href="https://map.kakao.com/link/by/publictransit/${encodeURIComponent(a.name)},${a.lat},${a.lng}/${encodeURIComponent(b.name)},${b.lat},${b.lng}" class="block text-center bg-[#FEE500] text-[#191F28] rounded-xl py-3 text-[12px] font-bold">카카오맵 앱으로 보기</a><a target="_blank" rel="noopener" href="${nv('transit')}" class="block text-center bg-[#03C75A] text-white rounded-xl py-3 text-[12px] font-bold">네이버지도에서 보기</a></div>
+  <p class="text-[10.5px] text-[#8B95A1] mt-3 leading-relaxed">※ 지도의 선은 갈아타는 역·터미널을 잇는 대략적인 길이에요(자동차는 카카오내비 실제 경로). 버스 도착 · 지하철 도착 · 고속/시외버스 · 열차 시간표는 국토교통부(TAGO)·서울시 실시간 정보예요. 표시된 소요 시간·요금 중 시간표가 없는 구간은 거리 기반 추정이에요.</p>`;
+  if (typeof rtSet === 'function') rtSet(L, a, b);
 }
 const picks = { start: null, end: null, unit: null }, sugCache = {}, sugT = {};
 const inId = w => w === 'unit' ? 'set-unit-addr' : 'route-' + w;
@@ -3563,7 +3574,7 @@ async function calcRoute() {
   } catch (x) { err.innerHTML = '<div class="bg-[#FFF0F3] text-[#D94867] text-[12px] font-bold rounded-xl p-3 mt-3">위치 검색에 실패했어요. 잠시 후 다시 시도해주세요.</div>'; }
   finally {
     await sleep(Math.max(0, 2300 - (Date.now() - t0)));
-    if (ok) { routeAnim = true; renderRoute(); openM('modal-route'); q('route-body').scrollTop = 0; await sleep(350); }
+    if (ok) { routeAnim = true; renderRoute(); openM('modal-route'); q('route-body').scrollTop = 0; await sleep(350); if (typeof rtShow === 'function') rtShow(); }
     ov.classList.add('rl-out'); await sleep(800); ov.classList.add('hidden'); routeBusy = false;
   }
 }
@@ -3595,10 +3606,12 @@ function menuGo(n) { const d = pd(menuDate); d.setDate(d.getDate() + n); menuSet
 function menuEditToggle() { menuEdit = !menuEdit; renderMenu(); }
 function renderMenu() {
   const S = S_(), isM = me.gender === 'M', dt = pd(menuDate), today = ymd(new Date()), tm = ymd(new Date(Date.now() + 864e5)), m = menus[menuDate] || {};
-  q('menu-date-input').value = menuDate; q('menu-date-label').innerText = `${dt.getMonth() + 1}월 ${dt.getDate()}일 (${'일월화수목금토'[dt.getDay()]})${menuDate === today ? ' · 오늘' : menuDate === tm ? ' · 내일' : ''}`;
+  q('menu-date-input').value = menuDate; q('menu-date-label').innerText = `${dt.getMonth() + 1}월 ${dt.getDate()}일 ${'일월화수목금토'[dt.getDay()]}요일${menuDate === today ? ' · 오늘' : menuDate === tm ? ' · 내일' : ''}`;
+  { const w0 = new Date(dt); w0.setDate(dt.getDate() - ((dt.getDay() + 6) % 7)); q('menu-week').innerHTML = Array.from({ length: 7 }, (_, i) => { const d = new Date(w0); d.setDate(w0.getDate() + i); const k = ymd(d); return `<button onclick="menuSet('${k}')" class="${k === menuDate ? 'on' : ''}${k === today ? ' td' : ''}${i > 4 ? ' we' : ''}"><i>${'월화수목금토일'[i]}</i><b>${d.getDate()}</b></button>`; }).join(''); }
   q('menu-unit').innerHTML = S && S.unit_name ? `📍 ${esc(S.unit_name)}` : (isM ? `<button onclick="closeModal('modal-menu');openSettings();setGo('unit')" class="font-bold text-[var(--mil-green)]">자대를 등록하면 부대명이 표시돼요 ▶</button>` : '');
   q('menu-dg-link').href = 'https://www.data.go.kr/tcs/dss/selectDataSetList.do?keyword=' + encodeURIComponent('국방부 식단정보 ' + ((S && S.unit_name) || '')); q('menu-edit-btn').classList.toggle('hidden', !isM); q('menu-edit').classList.toggle('hidden', !(isM && menuEdit));
-  q('menu-cards').innerHTML = [['🌅', '조식', m.breakfast], ['☀️', '중식', m.lunch], ['🌙', '석식', m.dinner]].map(([i, t, v]) => `<div class="toss-card !p-5"><div class="text-[14px] font-extrabold mb-2">${i} ${t}</div>${v ? (v.split(/\s*[,\n\/]\s*/).filter(Boolean).map(x => `<span class="inline-block bg-[#F5F6F8] rounded-full px-3 py-1 text-[12px] m-0.5">${esc(x)}</span>`).join('')) : '<div class="text-[12px] text-[#8B95A1]">등록된 식단이 없어요 (군인 계정: 우측 위 편집 → CSV 가져오기)</div>'}</div>`).join('');
+  { const sp = v => String(v || '').split(/\s*[,\n\/]\s*/).filter(Boolean), r = { b: sp(m.breakfast), l: sp(m.lunch), n: sp(m.dinner) };
+    q('menu-cards').innerHTML = typeof mealCards === 'function' ? mealCards(r, menuDate, isM ? '우측 위 편집에서 직접 적을 수 있어요' : '') : ''; }
   if (isM && menuEdit) { q('menu-in-b').value = m.breakfast || ''; q('menu-in-l').value = m.lunch || ''; q('menu-in-d').value = m.dinner || ''; }
   if (me.is_admin && !q('menu-adm')) q('menu-edit').insertAdjacentHTML('afterbegin', `<div id="menu-adm" class="rounded-xl p-3 space-y-2" style="background:#EAF7F0"><div class="text-[13px] font-extrabold">🛠 관리자 · 공공데이터 식단 파일 올리기</div><p class="text-[11px] text-[#4E5968]">국방부 공공데이터에서 내려받은 '제○○○○부대 식단' CSV 파일들을 한꺼번에 골라요. 파일 이름의 부대 번호로 저장돼요.</p><label class="block text-center h-10 leading-10 rounded-xl text-white text-[13px] font-bold" style="background:#3DB37D"><input type="file" accept=".csv,text/csv,.json,application/json" multiple class="hidden" onchange="mealAdminImport(this)">CSV 파일 고르기</label></div>`);
   if (me.is_admin) q('menu-edit-btn').classList.remove('hidden');
