@@ -94,12 +94,10 @@ function buildOpts(km, c) {
 /* ================= 집으로 가는 길 · 카카오맵 + 실시간 ================= */
 const RT = { map: null, kind: '', objs: [], idx: 0, live: {}, car: {}, L: [], A: null, B: null };
 const RC = { car: '#3182F6', taxi: '#F2A900', bus: '#2FB36E', big: '#7B5CF5', metro: '#1F7AE0', ktx: '#E5484D', walk: '#8B95A1' };
-const legColor = x => (x.t === 'bus' && x.big ? RC.big : RC[x.t] || '#191F28');
+const legColor = x => { const T = rtTh(); return x.t === 'walk' ? '#9AA3AD' : (x.t === 'car' || x.t === 'ktx' || x.big) ? T.l1 : T.l2; };
 const rtCk = x => `${x.a.lat},${x.a.lng}>${x.b.lat},${x.b.lng}`;
 (function () {
   const css = `
-#rt-mapw{position:sticky;top:0;z-index:6;margin:0 -16px 12px;padding:2px 16px 10px;background:var(--bg-main)}
-#rt-map{height:min(34vh,260px);border-radius:22px;overflow:hidden;background:#E9EEF2;position:relative;box-shadow:0 6px 18px rgba(0,0,0,.06)}
 .rt-mapx{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;color:#8B95A1;font-weight:700}
 .rt-tabs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -16px 10px;padding:2px 16px}.rt-tabs::-webkit-scrollbar{display:none}
 .rt-tabs button{flex-shrink:0;display:flex;align-items:center;gap:6px;height:42px;padding:0 13px 0 6px;border-radius:14px;background:#fff;border:1px solid #E5E8EB;font-size:13px;font-weight:700;color:#4E5968;white-space:nowrap}
@@ -168,7 +166,7 @@ async function rtDraw(i) {
   const o = RT.L[i]; if (!o || !(await rtMapInit())) return;
   const { segs, stops } = rtSegs(o), A = RT.A, B = RT.B, M = RT.map;
   RT.objs.forEach(x => { try { RT.kind === 'k' ? x.setMap(null) : M.removeLayer(x); } catch (e) { } }); RT.objs = [];
-  const pin = (p, cls, t) => `<div class="rt-pin ${cls}">${t}</div>`, dot = s => `<div class="rt-dot" style="--c:${s.c}"><i></i><span>${esc(s.n)}</span></div>`;
+  const pin = (p, cls, t) => `<div class="rt-pin ${cls}" style="${cls === 'e' ? `background:${rtTh().e};border-color:${rtTh().e}` : ''}">${t}</div>`, dot = s => `<div class="rt-dot" style="--c:${s.c}"><i></i><span>${esc(s.n)}</span></div>`;
   if (RT.kind === 'k') {
     const K = kakao.maps, LL = p => new K.LatLng(p[0], p[1]), bd = new K.LatLngBounds();
     segs.forEach(s => {
@@ -178,23 +176,25 @@ async function rtDraw(i) {
     });
     stops.forEach(s => { const ov = new K.CustomOverlay({ position: new K.LatLng(s.p.lat, s.p.lng), content: dot(s), xAnchor: 0, yAnchor: 0, zIndex: 2 }); ov.setMap(M); RT.objs.push(ov); });
     [[A, 's', '출발'], [B, 'e', '도착']].forEach(([p, c, t]) => { const ov = new K.CustomOverlay({ position: new K.LatLng(p.lat, p.lng), content: pin(p, c, t), yAnchor: 1, zIndex: 3 }); ov.setMap(M); RT.objs.push(ov); bd.extend(new K.LatLng(p.lat, p.lng)); });
-    M.relayout(); M.setBounds(bd, 46, 28, 22, 28);
+    RT.bd = bd; M.relayout(); M.setBounds(bd, rtTopPad(), 30, rtSheetVis() + 24, 30);
   } else {
     const Lf = window.L, all = [];
     segs.forEach(s => { if (!s.dash) RT.objs.push(Lf.polyline(s.pts, { color: '#fff', weight: s.w + 4, opacity: .95 }).addTo(M)); RT.objs.push(Lf.polyline(s.pts, { color: s.c, weight: s.w, opacity: .95, dashArray: s.dash ? '6 7' : null }).addTo(M)); all.push(...s.pts); });
     stops.forEach(s => RT.objs.push(Lf.marker([s.p.lat, s.p.lng], { icon: Lf.divIcon({ className: '', html: dot(s), iconSize: [0, 0] }) }).addTo(M)));
     [[A, 's', '출발'], [B, 'e', '도착']].forEach(([p, c, t]) => { RT.objs.push(Lf.marker([p.lat, p.lng], { icon: Lf.divIcon({ className: '', html: `<div style="transform:translate(-50%,-100%)">${pin(p, c, t)}</div>`, iconSize: [0, 0] }) }).addTo(M)); all.push([p.lat, p.lng]); });
-    M.invalidateSize(); M.fitBounds(all, { padding: [36, 28] });
+    RT.bdl = all; M.invalidateSize(); M.fitBounds(all, { paddingTopLeft: [30, rtTopPad()], paddingBottomRight: [30, rtSheetVis() + 24] });
   }
 }
 /* ---- 실시간: 버스 도착 · 지하철 도착 · 고속/시외버스 · 기차 시간표 · 자동차 실제 경로 ---- */
 function rtCall(body) {
   const k = JSON.stringify(body); if (RT.live[k]) return RT.live[k];
-  return (RT.live[k] = (async () => { try { const r = await sb.functions.invoke('transit-live', { body }); return r.data || { error: (r.error && r.error.message) || 'error' }; } catch (e) { return { error: String(e) }; } })());
+  return (RT.live[k] = (async () => { try { const r = await sb.functions.invoke('transit-live', { body }); if (r.data) return r.data;
+    let m = (r.error && r.error.message) || 'error'; try { const c = r.error && r.error.context; if (c && c.status) m = `HTTP ${c.status} · ` + ((await c.text()) || '').slice(0, 80); } catch (e) { }
+    if (/401|JWT|Unauthorized/i.test(m)) m += ' (함수 Verify JWT 설정 확인)'; if (/404|not found/i.test(m)) m += ' (transit-live 함수 이름 확인)'; return { error: m }; } catch (e) { return { error: String(e) }; } })());
 }
 const nowHM = (add) => { const d = new Date(Date.now() + (add || 0) * 6e4); return [String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'), d.getDate() !== new Date().getDate()]; };
 const lvHead = t => `<div class="lv-h"><i></i>${t}</div>`;
-const lvErr = r => /없음/.test((r && r.error) || '') ? `${lvHead('실시간')}<div class="lv-x">실시간 정보를 준비하고 있어요</div>` : `${lvHead('실시간')}<div class="lv-x">지금은 정보를 불러오지 못했어요${r && r.note ? ' · ' + esc(r.note) : ''}</div>`;
+const lvErr = r => /없음/.test((r && r.error) || '') ? `${lvHead('실시간')}<div class="lv-x">실시간 정보를 준비하고 있어요 (${esc(String(r.error).replace(/ 없음/, ''))} 필요)</div>` : `${lvHead('실시간')}<div class="lv-x">지금은 정보를 불러오지 못했어요${r && (r.note || r.error) ? `<br><span style="font-size:11px;color:#B0B8C1">${esc(String(r.note || r.error).slice(0, 90))}</span>` : ''}</div>`;
 function lvSched(r, at, label) {
   if (!r || r.error) return lvErr(r);
   const [ready, nextDay] = nowHM(at + 10), list = nextDay ? [] : (r.items || []).filter(x => x.dep >= ready), fare = x => x.fare ? ` · ${W(x.fare)}` : '';
@@ -237,13 +237,14 @@ function rtFitH() { const p = document.getElementById('rt-pager'); if (!p) retur
 function rtSel(i) {
   RT.idx = i; document.querySelectorAll('#rt-tabs button').forEach((b, k) => b.classList.toggle('on', k === i)); document.querySelectorAll('#rt-dots i').forEach((b, k) => b.classList.toggle('on', k === i));
   const t = document.querySelectorAll('#rt-tabs button')[i]; if (t) t.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+  const bd = document.getElementById('route-body'); if (bd && bd.scrollTop > 0) bd.scrollTo({ top: 0, behavior: 'smooth' });
   rtFitH(); rtDraw(i); rtLive(i); rtTrains(i);
 }
 window.rtPg = i => { const p = document.getElementById('rt-pager'); if (!p) return; p.scrollTo({ left: i * p.clientWidth, behavior: 'smooth' }); rtSel(i); };
 window.rtPgSync = el => { const i = Math.round(el.scrollLeft / Math.max(1, el.clientWidth)); if (i !== RT.idx) rtSel(i); };
 window.rtRefresh = i => { RT.live = {}; const o = RT.L[i]; if (o) { o._live = 0; rtLive(i, true); } };
-window.rtSet = (L, a, b) => { RT.L = L; RT.A = a; RT.B = b; RT.lines = {}; rtTrainsOff(); L.forEach(o => o._live = 0); RT.idx = 0; requestAnimationFrame(() => { rtFitH(); rtDraw(0); rtLive(0); }); };
-window.rtShow = () => { if (RT.map) { try { RT.kind === 'k' ? RT.map.relayout() : RT.map.invalidateSize(); } catch (e) { } } rtDraw(RT.idx); rtFitH(); };
+window.rtSet = (L, a, b) => { rtApplyTh(); if (!RT.sheetInit) { RT.sheetInit = 1; rtSheet(1, true); } RT.L = L; RT.A = a; RT.B = b; RT.lines = {}; rtTrainsOff(); L.forEach(o => o._live = 0); RT.idx = 0; requestAnimationFrame(() => { rtFitH(); rtDraw(0); rtLive(0); }); };
+window.rtShow = () => { rtSheet(RT.snap, true); if (RT.map) { try { RT.kind === 'k' ? RT.map.relayout() : RT.map.invalidateSize(); } catch (e) { } } rtDraw(RT.idx); rtFitH(); };
 
 /* ---- 지도 위 실시간 열차 (서울 실시간 열차 위치 · 30초마다) ---- */
 const SUBL = { '1001': ['1호선', '#0052A4'], '1002': ['2호선', '#00A84D'], '1003': ['3호선', '#EF7C1C'], '1004': ['4호선', '#00A5DE'], '1005': ['5호선', '#996CAC'], '1006': ['6호선', '#CD7C2F'], '1007': ['7호선', '#747F00'], '1008': ['8호선', '#E6186C'], '1009': ['9호선', '#BDB092'], '1061': ['중앙선', '#77C4A3'], '1063': ['경의중앙선', '#77C4A3'], '1065': ['공항철도', '#0090D2'], '1067': ['경춘선', '#0C8E72'], '1075': ['수인분당선', '#FABE00'], '1077': ['신분당선', '#D4003B'], '1092': ['우이신설선', '#B0CE18'], '1093': ['서해선', '#8FC31F'], '1081': ['경강선', '#003DA5'], '1032': ['GTX-A', '#9A6292'] };
@@ -293,7 +294,99 @@ window.rtZoomMetro = i => {
   const o = RT.L[i]; if (!o || !RT.map) return; const P = [];
   o.legs.filter(x => x.t === 'metro' && x.a).forEach(x => P.push([x.a.lat, x.a.lng], [x.b.lat, x.b.lng]));
   (RT.tpts || []).forEach(p => P.push(p)); if (!P.length) return;
-  const m = document.getElementById('route-body'); if (m) m.scrollTo({ top: 0, behavior: 'smooth' });
-  if (RT.kind === 'k') { const bd = new kakao.maps.LatLngBounds(); P.forEach(p => bd.extend(new kakao.maps.LatLng(p[0], p[1]))); RT.map.setBounds(bd, 40, 40, 30, 40); }
-  else RT.map.fitBounds(P, { padding: [36, 36] });
+  rtSheet(0); setTimeout(() => { if (RT.kind === 'k') { const bd = new kakao.maps.LatLngBounds(); P.forEach(p => bd.extend(new kakao.maps.LatLng(p[0], p[1]))); RT.map.setBounds(bd, rtTopPad(), 40, rtSheetVis() + 24, 40); } else RT.map.fitBounds(P, { paddingTopLeft: [36, rtTopPad()], paddingBottomRight: [36, rtSheetVis() + 24] }); }, 340);
 };
+
+/* ================= 전체 지도 + 아래에서 올라오는 시트 · 색상 테마 ================= */
+const ZT_PAL = window.ZT_PAL = {
+  army: { n: '짬타이거', p: '#2B3426', t: '#EEF2E8', a: '#6B7B5C', l1: '#2B3426', l2: '#8FA36B', e: '#B5523B', s: ['#2B3426', '#6B7B5C', '#E4E8DD'] },
+  wine: { n: '와인 밀크', p: '#930400', t: '#FFF7E6', a: '#95BAEB', l1: '#930400', l2: '#5E8FD6', e: '#930400', s: ['#930400', '#FFF7E6', '#95BAEB'] },
+  choco: { n: '버터 초코', p: '#432F2E', t: '#FEF5D6', a: '#C4DAE8', l1: '#432F2E', l2: '#6E9CC0', e: '#D49A12', s: ['#432F2E', '#FEEFB8', '#C4DAE8'] },
+  mint: { n: '민트 초코', p: '#684F48', t: '#E6F2F4', a: '#F9E7C7', l1: '#684F48', l2: '#6FA7B4', e: '#C98B5A', s: ['#684F48', '#D6E9ED', '#F9E7C7'] }
+};
+const thGet = k => { try { return localStorage.getItem(k) || 'army'; } catch (e) { return 'army'; } };
+const rtTh = () => ZT_PAL[thGet('zt_rtth')] || ZT_PAL.army;
+window.rtThemeDots = () => `<span class="rt-dots3">${rtTh().s.map(c => `<i style="background:${c}"></i>`).join('')}</span>`;
+function rtApplyTh() {
+  const m = document.getElementById('modal-route'), T = rtTh(); if (!m) return;
+  m.style.setProperty('--tp', T.p); m.style.setProperty('--tt', T.t); m.style.setProperty('--ta', T.a); m.style.setProperty('--te', T.e); m.style.setProperty('--tl2', T.l2);
+}
+window.rtThemePick = () => {
+  const cur = thGet('zt_rtth'), ov = document.createElement('div'); ov.className = 'rt-thov'; ov.onclick = e => { if (e.target === ov) ov.remove(); };
+  ov.innerHTML = `<div class="rt-thbox"><b>색상 테마</b>${Object.entries(ZT_PAL).map(([k, T]) => `<button data-k="${k}" class="${k === cur ? 'on' : ''}"><span class="rt-dots3 big">${T.s.map(c => `<i style="background:${c}"></i>`).join('')}</span>${T.n}</button>`).join('')}</div>`;
+  ov.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { try { localStorage.setItem('zt_rtth', b.dataset.k); } catch (e) { } ov.remove(); rtApplyTh(); const t = document.querySelector('.rt-thb'); if (t) t.innerHTML = rtThemeDots(); rtDraw(RT.idx); });
+  document.getElementById('modal-route').appendChild(ov);
+};
+/* 시트: 아래 · 중간 · 거의 전체 3단계, 손잡이를 끌어서 올리고 내려요 */
+const rtSnaps = () => { const H = window.innerHeight; return [Math.round(H * .36), Math.round(H * .58), Math.round(H - Math.max(70, (window.visualViewport ? 0 : 0) + 70))]; };
+RT.snap = 1;
+function rtSheetVis() { const s = document.getElementById('rt-sheet'); return s ? Math.min(s.offsetHeight, window.innerHeight * .62) : 300; }
+function rtTopPad() { return 86; }
+function rtSheet(i, noAnim) {
+  const s = document.getElementById('rt-sheet'); if (!s) return; RT.snap = Math.max(0, Math.min(2, i)); s.style.transition = noAnim ? 'none' : 'height .34s cubic-bezier(.2,.9,.3,1)'; s.style.height = rtSnaps()[RT.snap] + 'px';
+  clearTimeout(RT.refit); RT.refit = setTimeout(rtRefit, noAnim ? 0 : 360);
+}
+function rtRefit() { if (!RT.map) return; try { if (RT.kind === 'k' && RT.bd) { RT.map.relayout(); RT.map.setBounds(RT.bd, rtTopPad(), 30, rtSheetVis() + 24, 30); } else if (RT.bdl) { RT.map.invalidateSize(); RT.map.fitBounds(RT.bdl, { paddingTopLeft: [30, rtTopPad()], paddingBottomRight: [30, rtSheetVis() + 24] }); } } catch (e) { } }
+(function () {
+  let st = null;
+  document.addEventListener('pointerdown', e => { const h = e.target.closest && e.target.closest('#rt-shead'); if (!h || e.target.closest('button,#rt-tabs')) { if (!(e.target.closest && e.target.closest('.rt-grab'))) return; } const s = document.getElementById('rt-sheet'); st = { y: e.clientY, h: s.offsetHeight, t: Date.now() }; s.style.transition = 'none'; });
+  document.addEventListener('pointermove', e => { if (!st) return; const s = document.getElementById('rt-sheet'), S = rtSnaps(); s.style.height = Math.max(S[0] * .7, Math.min(S[2], st.h - (e.clientY - st.y))) + 'px'; });
+  const end = e => { if (!st) return; const s = document.getElementById('rt-sheet'), h = s.offsetHeight, v = (st.y - e.clientY) / Math.max(1, Date.now() - st.t), S = rtSnaps(); st = null;
+    let i = S.reduce((b, x, k) => Math.abs(x - h) < Math.abs(S[b] - h) ? k : b, 0); if (v > .5) i = Math.min(2, RT.snap + 1); if (v < -.5) i = Math.max(0, RT.snap - 1); rtSheet(i); };
+  document.addEventListener('pointerup', end); document.addEventListener('pointercancel', end);
+  window.addEventListener('resize', () => { if (document.getElementById('rt-sheet')) rtSheet(RT.snap, true); });
+})();
+(function () { const st = document.createElement('style'); st.textContent = `
+#modal-route{--tp:#2B3426;--tt:#EEF2E8;--ta:#6B7B5C;--te:#B5523B;--tl2:#8FA36B}
+#rt-map{position:absolute;inset:0;background:#E9EEF2}
+.rt-topbar{position:absolute;left:12px;right:12px;z-index:8;display:flex;gap:8px;align-items:center;pointer-events:none}
+.rt-fab{pointer-events:auto;width:46px;height:46px;border-radius:16px;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.14);display:flex;align-items:center;justify-content:center;color:#191F28;flex-shrink:0}
+.rt-od{pointer-events:auto;flex:1;min-width:0;height:46px;border-radius:16px;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.14);display:flex;align-items:center;gap:7px;padding:0 14px;font-size:15px}
+.rt-od b{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:0 1 auto}.rt-od i{font-style:normal;color:#B0B8C1;font-weight:800}
+.rt-od .o,.rt-od .d{width:9px;height:9px;border-radius:50%;flex-shrink:0;background:#191F28}.rt-od .d{background:var(--te)}
+.rt-sheet{position:absolute;left:0;right:0;bottom:0;z-index:9;height:58vh;background:#fff;border-radius:26px 26px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.14);display:flex;flex-direction:column}
+.rt-shead{flex-shrink:0;touch-action:none;border-bottom:1px solid #F2F3F5}
+.rt-grab{height:22px;display:flex;align-items:center;justify-content:center;cursor:grab}.rt-grab i{width:44px;height:5px;border-radius:3px;background:#D1D6DB}
+.rt-hrow{display:flex;align-items:center;gap:10px;padding:0 16px 10px}
+.rt-seg{display:flex;background:#F2F4F6;border-radius:12px;padding:3px}.rt-seg button{height:34px;padding:0 13px;border-radius:9px;font-size:14px;font-weight:700;color:#6B7684}.rt-seg button.on{background:#fff;color:#191F28;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.rt-km{font-size:13px;color:#8B95A1;font-weight:600}
+.rt-thb{margin-left:auto;height:34px;padding:0 10px;border-radius:12px;background:#F2F4F6;display:flex;align-items:center}
+.rt-dots3{display:inline-flex}.rt-dots3 i{width:14px;height:14px;border-radius:50%;border:2px solid #fff;margin-left:-4px;box-shadow:0 0 0 1px rgba(0,0,0,.06)}.rt-dots3 i:first-child{margin-left:0}
+.rt-dots3.big i{width:22px;height:22px;margin-left:-6px}
+#modal-route .rt-tabs{margin:0;padding:0 16px 12px}
+#modal-route .rt-tabs button{height:46px;font-size:14.5px;border-radius:15px}
+#modal-route .rt-tabs button.on{background:var(--tp);border-color:var(--tp)}
+.rt-sbody{flex:1;overflow-y:auto;overscroll-behavior:contain;padding-bottom:max(24px,env(safe-area-inset-bottom))}
+#modal-route .rt-pager{margin:0}
+#modal-route .rt-card{border:0;box-shadow:none;border-radius:0;padding:16px 2px 4px;background:transparent}
+.rt-big{font-size:30px;font-weight:900;letter-spacing:-.8px;line-height:1.1;color:#191F28}
+.rt-arr{font-size:15px;color:#4E5968;font-weight:600;margin-top:5px}
+.rt-badge{font-size:12px;font-weight:800;padding:4px 9px;border-radius:99px;background:var(--tp);color:#fff}.rt-badge.s{background:var(--tt);color:var(--tp);box-shadow:inset 0 0 0 1px var(--tp)}
+.rt-chain{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin:14px 0 6px}
+.rt-chain .ri{width:17px;height:17px}
+.rt-cv{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--tt);color:var(--tp)}
+.rt-cv.ktx,.rt-cv.car,.rt-cv.big{background:var(--tp);color:#fff}
+.rt-cw{display:inline-flex;align-items:center;gap:1px;height:32px;padding:0 7px 0 4px;border-radius:10px;background:#F2F4F6;color:#4E5968;font-size:13px;font-weight:800}
+.rt-cs{font-style:normal;color:#B0B8C1;font-weight:800;font-size:15px}
+.rt-steps{margin-top:8px}
+#modal-route .rt-n{padding:8px 0}#modal-route .rt-n span{font-size:16.5px}#modal-route .rt-n em{font-size:13px}
+#modal-route .rt-n i{width:20px;height:20px;border-color:var(--tp)}#modal-route .rt-n.end i{background:var(--te);border-color:var(--te)}
+#modal-route .rt-r{padding:10px 0}#modal-route .rt-t{font-size:16px}#modal-route .rt-c{font-size:15px}
+#modal-route .rt-ic{width:32px;height:32px;border-radius:11px;color:var(--tp);border-color:#E5E8EB;margin-left:-6px}#modal-route .rt-ic .ri{width:18px;height:18px}
+#modal-route .rt-live{margin:2px 0 8px 36px;padding:12px 14px;border-radius:16px;background:var(--tt);font-size:14.5px}
+#modal-route .rt-live .lv-h{font-size:12.5px;color:var(--ta)}#modal-route .rt-live .lv-h i{background:var(--tp);box-shadow:0 0 0 3px color-mix(in srgb,var(--tp) 20%,transparent)}
+#modal-route .rt-live .lv-rec{font-size:17px}#modal-route .rt-live .lv-rec em{color:var(--te)}
+#modal-route .rt-live .lv-sub{font-size:13.5px}#modal-route .rt-live .lv-x{font-size:14px}
+#modal-route .rt-live .lv-ch span{font-size:14px;padding:6px 10px;border-radius:11px}#modal-route .rt-live .lv-ch span b{color:var(--te)}
+.rt-notes{font-size:13.5px;color:#4E5968;line-height:1.6;margin-top:10px}
+.rt-link{font-size:13.5px;font-weight:800;background:var(--tt);color:var(--tp);border-radius:11px;padding:8px 12px}
+#modal-route .rt-refresh{font-size:13px;padding:8px 11px;border-radius:11px}
+#modal-route .rt-dots i.on{background:var(--tp)}
+.rt-ext{display:block;text-align:center;border-radius:14px;padding:13px 0;font-size:14px;font-weight:800}.rt-ext.k{background:#FEE500;color:#191F28}.rt-ext.n{background:#03C75A;color:#fff}
+.rt-foot{font-size:11.5px;color:#8B95A1;line-height:1.55;padding:12px 18px 0}
+.rt-thov{position:absolute;inset:0;z-index:20;background:rgba(0,0,0,.3);display:flex;align-items:flex-end}
+.rt-thbox{width:100%;background:#fff;border-radius:24px 24px 0 0;padding:20px 16px max(20px,env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rt-thbox b{grid-column:1/-1;font-size:18px;font-weight:900;margin-bottom:4px}
+.rt-thbox button{display:flex;align-items:center;gap:10px;height:58px;padding:0 14px;border-radius:16px;background:#F7F8FA;font-size:15px;font-weight:800;color:#191F28;border:2px solid transparent}
+.rt-thbox button.on{border-color:#191F28;background:#fff}
+#modal-route .rt-pin.s{background:#191F28}`; document.head.appendChild(st); })();

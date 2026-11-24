@@ -938,9 +938,10 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
  <div class="px-4 pb-3"><div id="gma-tabs" class="gm-seg"></div></div>
  <div id="gma-list" class="flex-1 overflow-y-auto no-scrollbar px-4 pb-8 space-y-3"></div>
 </div>
-<div id="modal-route" class="fixed inset-0 z-[85] hidden flex-col" style="background:var(--bg-main)">
- <div class="relative flex items-center justify-between px-4 pb-3" style="padding-top:max(14px,env(safe-area-inset-top))"><button onclick="closeModal('modal-route')" class="w-10 h-10 rounded-full bg-white border border-[#E5E8EB] font-bold text-[18px]" aria-label="뒤로">‹</button><div class="ios-t" style="top:max(14px,env(safe-area-inset-top));line-height:40px">집으로 가는 방법</div><div class="w-10 h-10"></div></div>
- <div id="route-body" class="flex-1 overflow-y-auto no-scrollbar px-4 pb-10"><div id="rt-mapw"><div id="rt-map"></div></div><div id="route-results"></div></div>
+<div id="modal-route" class="fixed inset-0 z-[85] hidden" style="background:#E9EEF2;overflow:hidden">
+ <div id="rt-map"></div>
+ <div class="rt-topbar" style="top:max(12px,env(safe-area-inset-top))"><button onclick="closeModal('modal-route')" class="rt-fab" aria-label="뒤로"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><div id="rt-od" class="rt-od"></div></div>
+ <div id="rt-sheet" class="rt-sheet"><div id="rt-shead" class="rt-shead"></div><div id="route-body" class="rt-sbody no-scrollbar"><div id="route-results"></div></div></div>
 </div>
 <div id="rt-load" class="rl hidden">
  <div class="rl-car"><img src="rl_car.png" alt="" class="rl-body"><img src="rl_wheelL.png" alt="" class="rl-w" style="left:8.93%;top:61.2%"><img src="rl_wheelR.png" alt="" class="rl-w" style="left:69.06%;top:61.2%"></div>
@@ -1002,7 +1003,7 @@ svg.sf-icon{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;st
   </div></div>
   <div id="modal-menu" class="fixed inset-0 z-50 bg-[var(--bg-main)] hidden flex-col">
   <div class="max-w-md mx-auto w-full h-full flex flex-col" style="padding-top:env(safe-area-inset-top)">
-   <div class="flex items-center justify-between px-4 py-3 bg-white"><button onclick="closeModal('modal-menu')" class="w-10 h-10 rounded-full bg-[#F5F6F8] text-xl font-bold">‹</button><div class="font-bold text-[17px]">🍚 식단표</div><button id="menu-edit-btn" onclick="menuEditToggle()" class="text-[13px] font-bold text-[var(--mil-green)] w-10">편집</button></div>
+   <div class="flex items-center justify-between px-4 py-3 bg-white"><button onclick="closeModal('modal-menu')" class="w-10 h-10 rounded-full bg-[#F5F6F8] text-xl font-bold">‹</button><div class="font-bold text-[17px]">🍚 식단표</div><div class="flex items-center gap-1"><button onclick="mlThemePick()" class="ml-thb" aria-label="색상 테마" id="ml-thb"></button><button id="menu-edit-btn" onclick="menuEditToggle()" class="text-[13px] font-bold w-10" style="color:var(--mp,#2B3426)">편집</button></div></div>
    <div class="flex-1 overflow-y-auto no-scrollbar px-5 py-4 space-y-3">
     <div id="menu-unit" class="text-[12px] text-[#8B95A1]"></div>
     <div class="toss-card !p-4 ml-wk">
@@ -3479,24 +3480,26 @@ function rtLine(o, b, ci) {
 }
 function rtCardHTML(x, i) {
   const { b, opts } = routeCtx, fast = Math.min(...opts.map(o => o.min)), cheap = Math.min(...opts.map(o => o.cost));
-  return `<div class="rt-card"><div class="flex justify-between items-start mb-3 gap-2"><div class="text-[15px] font-extrabold flex items-center gap-1.5 min-w-0"><span class="rt-hd">${rico(x.icon)}</span><span class="truncate">${i + 1}번 · ${esc(x.n)}</span></div><div class="flex gap-1 flex-shrink-0">${x.min === fast ? '<span class="text-[10px] font-bold bg-[#191F28] text-white px-2 py-0.5 rounded-full">최단</span>' : ''}${x.cost === cheap ? '<span class="text-[10px] font-bold bg-[var(--mil-green)] text-white px-2 py-0.5 rounded-full">최저가</span>' : ''}</div></div>
-  <div class="grid gap-1 mb-2 rt-sum" style="grid-template-columns:1.35fr 1.15fr .65fr .85fr"><div><i>총 소요</i><b>${fmtM(x.min)}</b></div><div><i>총 비용</i><b>${W(x.cost)}</b></div><div><i>환승</i><b>${x.tr}회</b></div><div><i>도보</i><b>${x.walk ? fmtM(x.walk) : '없음'}</b></div></div>
-  ${rtLine(x, b, 0)}
-  <div class="text-[11.5px] text-[#4E5968] space-y-0.5 mb-2.5">${x.lines.map(l => `<div>· ${esc(l)}</div>`).join('')}</div>
-  <div class="flex flex-wrap gap-2 items-center">${x.links.map(l => `<a target="_blank" rel="noopener" href="${safeUrl(l[1])}" class="text-[11.5px] font-bold bg-[#F5F6F8] rounded-lg px-3 py-1.5 text-[var(--mil-green)]">${l[0]}</a>`).join('')}<button onclick="rtRefresh(${i})" class="rt-refresh ml-auto"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>실시간 새로고침</button></div></div>`;
+  const arr = new Date(Date.now() + x.min * 6e4), ap = `${arr.getHours() < 12 ? '오전' : '오후'} ${(arr.getHours() % 12) || 12}:${String(arr.getMinutes()).padStart(2, '0')}`, dd = Math.floor((arr - new Date(new Date().toDateString())) / 864e5);
+  const chain = x.legs.map(l => l.t === 'walk' ? `<span class="rt-cw">${rico('walk')}${Math.round(l.min)}</span>` : `<span class="rt-cv ${l.t}${l.big ? ' big' : ''}">${rico(l.t === 'bus' && l.big ? 'bus' : l.t)}</span>`).join('<i class="rt-cs">›</i>');
+  return `<div class="rt-card"><div class="flex items-start justify-between gap-2"><div class="min-w-0"><div class="rt-big">${fmtM(x.min)}</div><div class="rt-arr">${dd > 0 ? (dd === 1 ? '내일 ' : dd + '일 뒤 ') : ''}${ap} 도착 · ${W(x.cost)}${x.tr ? ` · 환승 ${x.tr}회` : ''}${x.walk ? ` · 도보 ${fmtM(x.walk)}` : ''}</div></div><div class="flex gap-1 flex-shrink-0 mt-1.5">${x.min === fast ? '<span class="rt-badge">최단</span>' : ''}${x.cost === cheap ? '<span class="rt-badge s">최저가</span>' : ''}</div></div>
+  <div class="rt-chain">${chain}</div>
+  <div class="rt-steps">${rtLine(x, b, 0)}</div>
+  <div class="rt-notes">${x.lines.map(l => `<div>· ${esc(l)}</div>`).join('')}</div>
+  <div class="flex flex-wrap gap-2 items-center mt-3">${x.links.map(l => `<a target="_blank" rel="noopener" href="${safeUrl(l[1])}" class="rt-link">${l[0]}</a>`).join('')}<button onclick="rtRefresh(${i})" class="rt-refresh ml-auto"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>새로고침</button></div></div>`;
 }
 function renderRoute() {
-  const { a, b, km, opts } = routeCtx, box = q('route-results'), fast = Math.min(...opts.map(x => x.min)), cheap = Math.min(...opts.map(x => x.cost));
+  const { a, b, km, opts } = routeCtx, box = q('route-results');
   const L = [...opts].sort((x, y) => routeSort === 'time' ? x.min - y.min : x.cost - y.cost); L.forEach((x, i) => x._i = i);
   const nv = m => `https://map.naver.com/p/directions/${a.lng},${a.lat},${encodeURIComponent(a.name)}/${b.lng},${b.lat},${encodeURIComponent(b.name)}/-/${m}`;
-  box.classList.toggle('rt-anim', routeAnim); routeAnim = false;
-  box.innerHTML = `<div class="flex items-end justify-between gap-2 mb-2.5 rt-fade"><div class="min-w-0"><div class="text-[15px] font-extrabold truncate">${esc(a.name)} → ${esc(b.name)}</div><div class="text-[11.5px] text-[#8B95A1] mt-0.5">직선 약 ${Math.round(km)}km · 문 앞~문 앞 기준 · 옆으로 넘겨서 비교해요</div></div></div>
-  <div class="flex gap-2 mb-2.5 rt-fade" style="--i:1"><button onclick="routeSort='time';renderRoute()" class="rt-sort ${routeSort === 'time' ? 'on' : ''}">${rico('clock')}빠른 순</button><button onclick="routeSort='cost';renderRoute()" class="rt-sort ${routeSort === 'cost' ? 'on' : ''}">${rico('wallet')}저렴한 순</button></div>
-  <div id="rt-tabs" class="rt-tabs rt-fade" style="--i:2">${L.map((x, i) => `<button onclick="rtPg(${i})" class="${i === 0 ? 'on' : ''}"><em>${i + 1}</em>${rico(x.icon)}<span>${esc(x.n)}</span><small>${fmtM(x.min)}</small></button>`).join('')}</div>
-  <div id="rt-pager" class="rt-pager rt-fade" style="--i:3" onscroll="rtPgSync(this)">${L.map((x, i) => `<div class="rt-page">${rtCardHTML(x, i)}</div>`).join('')}</div>
+  routeAnim = false;
+  q('rt-od').innerHTML = `<span class="o"></span><b>${esc(a.name)}</b><i>›</i><span class="d"></span><b>${esc(b.name)}</b>`;
+  q('rt-shead').innerHTML = `<div class="rt-grab"><i></i></div><div class="rt-hrow"><div class="rt-seg"><button onclick="routeSort='time';renderRoute()" class="${routeSort === 'time' ? 'on' : ''}">빠른 순</button><button onclick="routeSort='cost';renderRoute()" class="${routeSort === 'cost' ? 'on' : ''}">저렴한 순</button></div><span class="rt-km">직선 ${Math.round(km)}km</span><button onclick="rtThemePick()" class="rt-thb" aria-label="색상 테마">${typeof rtThemeDots === 'function' ? rtThemeDots() : ''}</button></div>
+  <div id="rt-tabs" class="rt-tabs">${L.map((x, i) => `<button onclick="rtPg(${i})" class="${i === 0 ? 'on' : ''}"><em>${i + 1}</em>${rico(x.icon)}<span>${esc(x.n)}</span><small>${fmtM(x.min)}</small></button>`).join('')}</div>`;
+  box.innerHTML = `<div id="rt-pager" class="rt-pager" onscroll="rtPgSync(this)">${L.map((x, i) => `<div class="rt-page">${rtCardHTML(x, i)}</div>`).join('')}</div>
   <div id="rt-dots" class="rt-dots">${L.map((_, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('')}</div>
-  <div class="grid grid-cols-2 gap-2 mt-2"><a target="_blank" rel="noopener" href="https://map.kakao.com/link/by/publictransit/${encodeURIComponent(a.name)},${a.lat},${a.lng}/${encodeURIComponent(b.name)},${b.lat},${b.lng}" class="block text-center bg-[#FEE500] text-[#191F28] rounded-xl py-3 text-[12px] font-bold">카카오맵 앱으로 보기</a><a target="_blank" rel="noopener" href="${nv('transit')}" class="block text-center bg-[#03C75A] text-white rounded-xl py-3 text-[12px] font-bold">네이버지도에서 보기</a></div>
-  <p class="text-[10.5px] text-[#8B95A1] mt-3 leading-relaxed">※ 지도의 선은 갈아타는 역·터미널을 잇는 대략적인 길이에요(자동차는 카카오내비 실제 경로). 버스 도착 · 지하철 도착 · 고속/시외버스 · 열차 시간표는 국토교통부(TAGO)·서울시 실시간 정보예요. 표시된 소요 시간·요금 중 시간표가 없는 구간은 거리 기반 추정이에요.</p>`;
+  <div class="grid grid-cols-2 gap-2 mt-3 px-4"><a target="_blank" rel="noopener" href="https://map.kakao.com/link/by/publictransit/${encodeURIComponent(a.name)},${a.lat},${a.lng}/${encodeURIComponent(b.name)},${b.lat},${b.lng}" class="rt-ext k">카카오맵 앱으로 보기</a><a target="_blank" rel="noopener" href="${nv('transit')}" class="rt-ext n">네이버지도에서 보기</a></div>
+  <p class="rt-foot">※ 지도의 선은 갈아타는 역·터미널을 잇는 대략적인 길이에요(자동차는 카카오내비 실제 경로). 버스 도착 · 지하철 도착 · 고속/시외버스 · 열차 시간표는 국토교통부(TAGO)·서울시 실시간 정보예요. 시간표가 없는 구간의 시간·요금은 거리 기반 추정이에요.</p>`;
   if (typeof rtSet === 'function') rtSet(L, a, b);
 }
 const picks = { start: null, end: null, unit: null }, sugCache = {}, sugT = {};
