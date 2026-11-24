@@ -226,16 +226,22 @@ window.mealSave = async function (u) {
 window.mealAdminImport = async function (inp) {
   const files = [...inp.files]; inp.value = ''; if (!files.length) return; let ok = 0, bad = [];
   for (const f of files) {
-    const m = f.name.match(/(\d{3,5})\s*부대/) || f.name.match(/(\d{4})/); if (!m) { bad.push(f.name); continue; } const code = m[1];
+    const m = /KIDA/i.test(f.name) ? [0, 'KIDA'] : /훈련소/.test(f.name) ? [0, 'ATC'] : (f.name.match(/(\d{3,5})\s*부대/) || f.name.match(/(\d{4})/)); if (!m) { bad.push(f.name); continue; } const code = m[1];
     const buf = await f.arrayBuffer(); let t = new TextDecoder('utf-8').decode(buf); if (t.includes('�')) { try { t = new TextDecoder('euc-kr').decode(buf); } catch (e) { } }
-    const rows = parseCSV(t.replace(/^﻿/, '')); if (rows.length < 2) { bad.push(f.name); continue; }
-    const H = rows[0].map(x => x.trim()), ix = k => H.findIndex(h => h.includes(k) && !/열량|칼로리|kcal/i.test(h)), di = H.findIndex(h => /날짜|일자|dates/i.test(h)), bi = ix('조식'), li = ix('중식'), ni = ix('석식'), si = ix('특식');
+    let rows; t = t.replace(/^﻿/, '');
+    if (/\.json$/i.test(f.name) || /^\s*[\[{]/.test(t)) { /* 공공데이터 포털에서 받은 JSON: 안에 있는 표(객체 배열)를 찾아요 */
+      let J; try { J = JSON.parse(t); } catch (e) { bad.push(f.name); continue; }
+      const find = v => Array.isArray(v) ? (v.length && typeof v[0] === 'object' && !Array.isArray(v[0]) ? v : null) : v && typeof v === 'object' ? Object.values(v).map(find).find(Boolean) : null;
+      const A = find(J); if (!A) { bad.push(f.name); continue; } const H = Object.keys(A[0]); rows = [H].concat(A.map(o => H.map(h => o[h] == null ? '' : String(o[h]))));
+    } else rows = parseCSV(t);
+    if (rows.length < 2) { bad.push(f.name); continue; }
+    const H = rows[0].map(x => x.trim()), ix = k => H.findIndex(h => h.includes(k) && !/열량|칼로리|kcal/i.test(h)), di = H.findIndex(h => /날짜|일자|dates/i.test(h)), ix2 = (a, b) => { const i = ix(a); return i >= 0 ? i : H.findIndex(h => h.toLowerCase() === b); }, bi = ix2('조식', 'brst'), li = ix2('중식', 'lunc'), ni = ix2('석식', 'dinr'), si = ix2('특식', 'adspcfd');
     if (di < 0) { bad.push(f.name); continue; }
     const cl = v => (v || '').replace(/\([0-9.,\s]*\)/g, '').trim(), days = {}; let cur = null;
     rows.slice(1).forEach(r => { const mm = (r[di] || '').match(/(\d{4})\D?(\d{1,2})\D?(\d{1,2})/); if (mm) cur = `${mm[1]}-${mm[2].padStart(2, '0')}-${mm[3].padStart(2, '0')}`; if (!cur) return;
       const D0 = days[cur] ??= { unit: code, d: cur, b: [], l: [], n: [], sp: [] }; [[bi, 'b'], [li, 'l'], [ni, 'n'], [si, 'sp']].forEach(([i, k]) => { if (i < 0) return; String(r[i] || '').split(/\s*[,\n\/]\s*/).map(cl).filter(Boolean).forEach(x => { if (!D0[k].includes(x)) D0[k].push(x); }); }); });
     const out = Object.values(days); if (!out.length) { bad.push(f.name); continue; }
-    await sb.from('meal_units').upsert({ code, name: '제' + code + '부대', active: true });
+    await sb.from('meal_units').upsert({ code, name: ({ KIDA: '국방대학교 (KIDA)', ATC: '육군훈련소' })[code] || '제' + code + '부대', active: true, days: out.length });
     for (let i = 0; i < out.length; i += 300) { const { error } = await sb.from('meal_days').upsert(out.slice(i, i + 300)); if (error) { bad.push(f.name + ' (' + error.message + ')'); break; } }
     ok++;
   }
