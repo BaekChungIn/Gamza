@@ -228,7 +228,7 @@ function rtLive(i, force) {
       if (RT.idx === i) rtDraw(i);
     });
     else if (x.t === 'bus' && !x.big) rtCall({ action: 'bus', lat: +x.a.lat.toFixed(4), lng: +x.a.lng.toFixed(4) }).then(r => put(lvBus(r)));
-    else if (x.t === 'metro') rtCall({ action: 'subway', st: x.from || x.a.name }).then(r => put(lvSub(r)));
+    else if (x.t === 'metro') rtCall({ action: 'subway', st: x.from || x.a.name }).then(r => { put(lvSub(r)); const ids = [...new Set(((r && r.items) || []).map(z => z.lid).filter(z => SUBL[z]))]; if (ids.length) { RT.lines[i] = [...new Set([...(RT.lines[i] || []), ...ids])].slice(0, 2); if (RT.idx === i) rtTrains(i); } });
     else if (x.t === 'bus' && x.big) rtCall({ action: 'exp', from: x.from, to: x.to }).then(r => put(lvSched(r, at, '버스')));
     else if (x.t === 'ktx') rtCall({ action: 'train', from: x.from, to: x.to, kind: /KTX/.test(x.tx || '') ? 'ktx' : 'itx' }).then(r => put(lvSched(r, at, /KTX/.test(x.tx || '') ? 'KTX' : '열차')));
   });
@@ -237,10 +237,63 @@ function rtFitH() { const p = document.getElementById('rt-pager'); if (!p) retur
 function rtSel(i) {
   RT.idx = i; document.querySelectorAll('#rt-tabs button').forEach((b, k) => b.classList.toggle('on', k === i)); document.querySelectorAll('#rt-dots i').forEach((b, k) => b.classList.toggle('on', k === i));
   const t = document.querySelectorAll('#rt-tabs button')[i]; if (t) t.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
-  rtFitH(); rtDraw(i); rtLive(i);
+  rtFitH(); rtDraw(i); rtLive(i); rtTrains(i);
 }
 window.rtPg = i => { const p = document.getElementById('rt-pager'); if (!p) return; p.scrollTo({ left: i * p.clientWidth, behavior: 'smooth' }); rtSel(i); };
 window.rtPgSync = el => { const i = Math.round(el.scrollLeft / Math.max(1, el.clientWidth)); if (i !== RT.idx) rtSel(i); };
 window.rtRefresh = i => { RT.live = {}; const o = RT.L[i]; if (o) { o._live = 0; rtLive(i, true); } };
-window.rtSet = (L, a, b) => { RT.L = L; RT.A = a; RT.B = b; L.forEach(o => o._live = 0); RT.idx = 0; requestAnimationFrame(() => { rtFitH(); rtDraw(0); rtLive(0); }); };
+window.rtSet = (L, a, b) => { RT.L = L; RT.A = a; RT.B = b; RT.lines = {}; rtTrainsOff(); L.forEach(o => o._live = 0); RT.idx = 0; requestAnimationFrame(() => { rtFitH(); rtDraw(0); rtLive(0); }); };
 window.rtShow = () => { if (RT.map) { try { RT.kind === 'k' ? RT.map.relayout() : RT.map.invalidateSize(); } catch (e) { } } rtDraw(RT.idx); rtFitH(); };
+
+/* ---- 지도 위 실시간 열차 (서울 실시간 열차 위치 · 30초마다) ---- */
+const SUBL = { '1001': ['1호선', '#0052A4'], '1002': ['2호선', '#00A84D'], '1003': ['3호선', '#EF7C1C'], '1004': ['4호선', '#00A5DE'], '1005': ['5호선', '#996CAC'], '1006': ['6호선', '#CD7C2F'], '1007': ['7호선', '#747F00'], '1008': ['8호선', '#E6186C'], '1009': ['9호선', '#BDB092'], '1061': ['중앙선', '#77C4A3'], '1063': ['경의중앙선', '#77C4A3'], '1065': ['공항철도', '#0090D2'], '1067': ['경춘선', '#0C8E72'], '1075': ['수인분당선', '#FABE00'], '1077': ['신분당선', '#D4003B'], '1092': ['우이신설선', '#B0CE18'], '1093': ['서해선', '#8FC31F'], '1081': ['경강선', '#003DA5'], '1032': ['GTX-A', '#9A6292'] };
+RT.lines = {}; RT.tobj = []; RT.poll = null;
+RT.stC = (() => { try { return JSON.parse(localStorage.getItem('zt_stc') || '{}'); } catch (e) { return {}; } })();
+(function () { const st = document.createElement('style'); st.textContent = `.rt-train{display:flex;align-items:center;gap:3px;transform:translate(-50%,-50%);pointer-events:none}
+.rt-train b{width:22px;height:22px;border-radius:8px;background:var(--c);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.3);border:2px solid #fff}
+.rt-train b svg{width:13px;height:13px}.rt-train span{font-size:10px;font-weight:800;color:#191F28;background:rgba(255,255,255,.9);border-radius:6px;padding:1px 4px;white-space:nowrap}
+.rt-train.ar b{animation:rtTr 1.4s infinite}@keyframes rtTr{50%{box-shadow:0 0 0 6px rgba(0,0,0,0),0 0 0 3px var(--c)}}
+.rt-train.d1{margin-left:14px}.rt-train.d0{margin-left:-14px}`; document.head.appendChild(st); })();
+const TRN = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 10h14M9 21l1.5-3M15 21l-1.5-3"/></svg>';
+function rtTrainsOff() { clearTimeout(RT.poll); RT.poll = null; RT.tobj.forEach(x => { try { RT.kind === 'k' ? x.setMap(null) : RT.map.removeLayer(x); } catch (e) { } }); RT.tobj = []; }
+function stGeo(n) {
+  n = String(n || '').replace(/\(.*?\)/g, '').replace(/역$/, '').trim(); if (!n) return Promise.resolve(null);
+  if (n in RT.stC) return Promise.resolve(RT.stC[n]);
+  if (!(window.kakao && kakao.maps && kakao.maps.services && kakao.maps.services.Places)) return Promise.resolve(null);
+  return new Promise(res => new kakao.maps.services.Places().keywordSearch(n + '역', (d, st) => {
+    const L = st === kakao.maps.services.Status.OK ? d : [], x = L.find(p => p.place_name.replace(/\s/g, '').startsWith(n + '역')) || L[0];
+    const v = x ? [+(+x.y).toFixed(5), +(+x.x).toFixed(5)] : null; RT.stC[n] = v; try { localStorage.setItem('zt_stc', JSON.stringify(RT.stC)); } catch (e) { } res(v);
+  }, { category_group_code: 'SW8' }));
+}
+async function rtTrains(i) {
+  rtTrainsOff(); const ids = RT.lines[i]; if (!ids || !ids.length || RT.idx !== i || !RT.map) return;
+  const shown = () => { const m = document.getElementById('modal-route'); return m && !m.classList.contains('hidden') && document.visibilityState === 'visible'; };
+  if (!shown()) return;
+  const add = [];
+  for (const lid of ids) {
+    const [line, col] = SUBL[lid]; let r; try { r = (await sb.functions.invoke('transit-live', { body: { action: 'pos', line } })).data; } catch (e) { r = null; }
+    if (!r || !r.trains) continue;
+    const T = r.trains, q2 = [...T]; const work = async () => { while (q2.length) { const t = q2.shift(); const p = await stGeo(t.st); if (p) add.push({ t, p, col, line }); } };
+    await Promise.all([work(), work(), work(), work()]);
+  }
+  if (RT.idx !== i || !shown()) return; rtTrainsOff();
+  add.forEach(({ t, p, col }) => {
+    const html = `<div class="rt-train d${t.ud === '1' ? 1 : 0}${t.s === '1' ? ' ar' : ''}" style="--c:${col}"><b>${TRN}</b><span>${esc(String(t.tnm).replace(/역$/, ''))}${t.ex ? ' 급행' : ''}</span></div>`;
+    if (RT.kind === 'k') { const ov = new kakao.maps.CustomOverlay({ position: new kakao.maps.LatLng(p[0], p[1]), content: html, xAnchor: 0, yAnchor: 0, zIndex: 4 }); ov.setMap(RT.map); RT.tobj.push(ov); }
+    else if (window.L) RT.tobj.push(window.L.marker(p, { icon: window.L.divIcon({ className: '', html, iconSize: [0, 0] }) }).addTo(RT.map));
+  });
+  const box = document.querySelector(`#rt-pager .rt-page:nth-child(${i + 1}) .rt-trn`) || (() => { const lv = [...document.querySelectorAll(`#rt-pager [data-lk^="${i}-"]`)].find(e => /지하철/.test(e.textContent)); if (!lv) return null; const d = document.createElement('div'); d.className = 'rt-trn lv-sub'; lv.appendChild(d); return d; })();
+  RT.tpts = add.map(x => x.p);
+  if (box) box.innerHTML = add.length ? `<div class="flex items-center gap-2 mt-1.5"><span>지도에 열차 ${add.length}대 · 30초마다 새로 고쳐요</span><button onclick="rtZoomMetro(${i})" class="rt-refresh ml-auto" style="background:#191F28;color:#fff">지도에서 열차 보기</button></div>` : '';
+  RT.poll = setTimeout(() => rtTrains(i), 30000);
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && RT.L.length) rtTrains(RT.idx); });
+
+window.rtZoomMetro = i => {
+  const o = RT.L[i]; if (!o || !RT.map) return; const P = [];
+  o.legs.filter(x => x.t === 'metro' && x.a).forEach(x => P.push([x.a.lat, x.a.lng], [x.b.lat, x.b.lng]));
+  (RT.tpts || []).forEach(p => P.push(p)); if (!P.length) return;
+  const m = document.getElementById('route-body'); if (m) m.scrollTo({ top: 0, behavior: 'smooth' });
+  if (RT.kind === 'k') { const bd = new kakao.maps.LatLngBounds(); P.forEach(p => bd.extend(new kakao.maps.LatLng(p[0], p[1]))); RT.map.setBounds(bd, 40, 40, 30, 40); }
+  else RT.map.fitBounds(P, { padding: [36, 36] });
+};
