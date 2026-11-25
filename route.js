@@ -534,3 +534,129 @@ window.rtTmap = async (a, b) => {
   // 같은 이름 · 같은 시간 경로는 하나만
   const seen = new Set(); return { opts: opts.filter(o => { const k = o.n + '|' + o.min; if (seen.has(k)) return false; seen.add(k); return true; }) };
 };
+
+/* ================= ODsay 대중교통 길찾기 (하루 1,000번 무료 · 웹 키) =================
+   도시 안: 한 번에 문 앞~문 앞 경로
+   도시 사이(시외·고속·KTX): ODsay 는 역↔역 · 터미널↔터미널만 줘서
+   [부대 → 출발역] + [역 ↔ 역] + [도착역 → 집] 세 번 찾아서 이어 붙여요.
+   그다음 지금 시각 기준 실제 시간표(TAGO)로 기다리는 시간까지 더해서 빠른 순으로 줄 세워요. */
+const OD = { key: null, cache: {} };
+async function odKey() {
+  if (OD.key !== null) return OD.key;
+  try { const r = await sb.functions.invoke('transit-live', { body: { action: 'cfg' } }); OD.key = (r.data && r.data.odsay) || ''; } catch (e) { OD.key = ''; }
+  return OD.key;
+}
+async function odCall(sx, sy, ex, ey) {
+  const k = [sx, sy, ex, ey].map(v => (+v).toFixed(4)).join(',');
+  if (OD.cache[k]) return OD.cache[k];
+  try { const c = JSON.parse(localStorage.getItem('zt_od:' + k) || 'null'); if (c && Date.now() - c.t < 30 * 6e4) return (OD.cache[k] = Promise.resolve(c.r)); } catch (e) { }
+  return (OD.cache[k] = (async () => {
+    const key = await odKey(); if (!key) throw new Error('ODSAY_WEB_KEY 없음');
+    const u = `https://api.odsay.com/v1/api/searchPubTransPathT?lang=0&OPT=0&SearchType=0&SearchPathType=0&SX=${sx}&SY=${sy}&EX=${ex}&EY=${ey}&apiKey=${encodeURIComponent(key)}`;
+    const j = await (await fetch(u)).json();
+    const er = j.error && (Array.isArray(j.error) ? j.error[0] : j.error);
+    if (er) { const m = String(er.message || er.msg || '오류'); if (/limit|초과|LimitExceed|-8/i.test(String(er.code) + m) && !/-98/.test(String(er.code))) throw new Error('ODsay 오늘 무료 사용량(30번)을 다 썼어요'); if (/-98|가까/.test(String(er.code) + m)) return { near: true }; throw new Error('ODsay ' + (er.code || '') + ' ' + m); }
+    if (!j.result) throw new Error('ODsay 응답 없음');
+    try { Object.keys(localStorage).filter(x => x.startsWith('zt_od:')).slice(0, -10).forEach(x => localStorage.removeItem(x)); localStorage.setItem('zt_od:' + k, JSON.stringify({ t: Date.now(), r: j.result })); } catch (e) { }
+    return j.result;
+  })().catch(e => { delete OD.cache[k]; throw e; }));
+}
+const odNum = v => { const n = parseFloat(v); return isFinite(n) ? n : null; };
+const odSub = n => String(n || '').replace(/^수도권\s*/, '').replace(/^(\d+)$/, '$1호선');
+/* 이름으로 역·터미널 좌표 찾기 (ODsay 도시간 응답에 좌표가 없을 때) */
+const odGeoC = {};
+function odGeo(name, kind) {
+  const q = String(name || '').trim(); if (!q) return Promise.resolve(null); const key = q + '|' + kind; if (odGeoC[key]) return odGeoC[key];
+  return (odGeoC[key] = new Promise(res => {
+    if (!(window.kakao && kakao.maps && kakao.maps.services)) return res(null);
+    const term = kind === 'train' ? (/역$/.test(q) ? q : q + '역') : (/터미널|정류|공항/.test(q) ? q : q + ' 버스터미널');
+    new kakao.maps.services.Places().keywordSearch(term, (d, st) => { const x = st === kakao.maps.services.Status.OK && d[0]; res(x ? { lat: +x.y, lng: +x.x, name: q } : null); });
+  }));
+}
+/* ODsay subPath 배열 → 앱 다리(legs) */
+function odLegs(sub, A, B) {
+  const legs = [];
+  sub.forEach((s, i) => {
+    const t = +s.trafficType, min = Math.max(1, Math.round(+s.sectionTime || 0));
+    const pt = (x, y, n) => (odNum(x) != null && odNum(y) != null ? { lat: odNum(y), lng: odNum(x), name: n || '' } : null);
+    const a = pt(s.startX, s.startY, s.startName), b = pt(s.endX, s.endY, s.endName);
+    const st = s.passStopList && (s.passStopList.stations || s.passStopList.station); const path = Array.isArray(st) ? st.map(z => [odNum(z.y), odNum(z.x)]).filter(p => p[0] != null && p[1] != null) : [];
+    const ln = (s.lane && (Array.isArray(s.lane) ? s.lane : [s.lane])) || [];
+    const base = { min, cost: 0, a, b, from: s.startName || '', to: s.endName || '', path, stops: +s.stationCount || 0 };
+    if (t === 3) legs.push(Object.assign(base, { t: 'walk', from: '', to: '', dist: +s.distance || 0 }));
+    else if (t === 1) legs.push(Object.assign(base, { t: 'metro', tx: `${odSub(ln[0] && ln[0].name)}${base.stops ? ` · ${base.stops}개 역` : ''}`, color: '' }));
+    else if (t === 2) { const nos = [...new Set(ln.map(z => String(z.busNo || '').replace(/\s/g, '')).filter(Boolean))]; legs.push(Object.assign(base, { t: 'bus', tx: `${nos[0] || ''}번 버스${base.stops ? ` · ${base.stops}개 정류장` : ''}`, nos })); }
+    else if (t === 4) legs.push(Object.assign(base, { t: 'ktx', tx: String(s.trainType || s.trainTypeName || (ln[0] && ln[0].name) || '열차').replace(/\s+/g, ' ') }));
+    else if (t === 5 || t === 6) legs.push(Object.assign(base, { t: 'bus', big: 1, tx: t === 5 ? '고속버스' : '시외버스' }));
+    else if (t === 7) legs.push(Object.assign(base, { t: 'ktx', tx: '항공' }));
+    else legs.push(Object.assign(base, { t: 'walk', from: '', to: '' }));
+  });
+  // 도보 구간 좌표는 앞뒤 구간으로 채워요
+  legs.forEach((x, i) => { if (!x.a) x.a = i ? legs[i - 1].b : A; if (!x.b) x.b = legs[i + 1] && legs[i + 1].a ? legs[i + 1].a : B; });
+  return legs;
+}
+const odBest = r => (r && Array.isArray(r.path) ? r.path.slice().sort((x, y) => (+x.info.totalTime) - (+y.info.totalTime))[0] : null);
+/* 부대→출발역, 도착역→집: ODsay 를 더 부르지 않고 거리로 계산해요 (무료 하루 30번이라 아껴요). 버스 실시간 도착은 그대로 붙어요 */
+function odEst(A, B) {
+  const km = rhav(A, B); if (km < 0.7) return { legs: [{ t: 'walk', min: Math.max(2, Math.round(km * 15)), cost: 0, a: A, b: B, from: '', to: '' }], fare: 0 };
+  const L = (typeof lPlan === 'function' ? lPlan(A, B) : lDirect(A, B)).map(x => Object.assign({}, x, { est: 1 }));
+  return { legs: L, fare: L.reduce((t, x) => t + (x.cost || 0), 0) };
+}
+async function odLocal(A, B) {   // 도시 안 구간 (가까우면 걷기)
+  const km = rhav(A, B); if (km < 0.7) return { legs: [{ t: 'walk', min: Math.max(2, Math.round(km * 15)), cost: 0, a: A, b: B, from: '', to: '' }], fare: 0 };
+  try { const r = await odCall(A.lng, A.lat, B.lng, B.lat); if (r.near) return { legs: [{ t: 'walk', min: Math.round(km * 15), cost: 0, a: A, b: B, from: '', to: '' }], fare: 0 };
+    const p = odBest(r); if (!p || (+r.searchType) !== 0) throw 0; return { legs: odLegs(p.subPath || [], A, B), fare: +p.info.payment || 0 };
+  } catch (e) { return { legs: [{ t: 'taxi', min: Math.round(km / 30 * 60 + 5), cost: Math.round(4800 + Math.max(0, km - 1.6) * 1000), tx: '택시 (대중교통 없음)', a: A, b: B, from: '', to: '' }], fare: 0, taxi: 1 }; }
+}
+function odWrap(legs, fare, srcNote) {
+  const m = []; legs.forEach(x => { const p = m[m.length - 1]; if (p && p.t === 'walk' && x.t === 'walk') { p.min += x.min; p.b = x.b; } else m.push(x); });
+  const veh = m.filter(x => x.t !== 'walk'), main = veh.slice().sort((x, y) => y.min - x.min)[0] || m[0];
+  const label = x => x.t === 'ktx' ? String(x.tx || '열차').split(' ')[0] : x.t === 'bus' && x.big ? x.tx : x.t === 'metro' ? '전철' : x.t === 'taxi' ? '택시' : '버스';
+  const n = veh.map(label).filter((x, k, A) => x !== A[k - 1]).join(' + ') || '도보';
+  return { n, icon: main.t === 'ktx' ? 'ktx' : main.t === 'metro' ? 'metro' : main.t === 'taxi' ? 'taxi' : 'bus', legs: m, min: m.reduce((s, x) => s + x.min, 0), cost: fare + m.reduce((s, x) => s + (x.t === 'taxi' ? x.cost : 0), 0),
+    walk: m.filter(x => x.t === 'walk').reduce((s, x) => s + x.min, 0), tr: Math.max(0, veh.length - 1), src: 'odsay', lines: [srcNote, ...veh.filter(x => x.big || x.t === 'ktx').map(x => `${x.tx} ${x.from} → ${x.to} · 약 ${fmtM(x.min)}`)], links: [] };
+}
+/* 지금 시각 기준: 첫 시외·고속·열차의 실제 출발 시각까지 기다리는 시간을 더해요 */
+async function odTimeRank(opts) {
+  const nowMin = (() => { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); })();
+  await Promise.all(opts.map(async o => {
+    let before = 0, j = -1; for (let i = 0; i < o.legs.length; i++) { const x = o.legs[i]; if (x.big || (x.t === 'ktx' && !/항공|SRT/.test(x.tx))) { j = i; break; } before += x.min; }
+    if (j < 0) return; const x = o.legs[j];
+    try {
+      const r = await Promise.race([rtCall(x.t === 'ktx' ? { action: 'train', from: x.from, to: x.to, kind: /KTX/.test(x.tx) ? 'ktx' : 'itx' } : { action: 'exp', from: x.from, to: x.to }), new Promise(res => setTimeout(() => res(null), 6000))]);
+      if (!r || r.error || !(r.items || []).length) return;
+      const ready = nowMin + before + 10, hm = s => { const [h, m] = String(s).split(':').map(Number); return h * 60 + m; };
+      const nx = r.items.map(t => Object.assign({}, t, { d: hm(t.dep), a: hm(t.arr) })).filter(t => t.d >= ready)[0];
+      if (!nx) { o.noMore = 1; return; }
+      const ride = ((nx.a - nx.d) + 1440) % 1440 || x.min, wait = nx.d - (nowMin + before);
+      o.wait = wait; o.min = o.min - x.min + ride + wait; x.min = ride; x.waitNote = `${nx.dep} 출발 ${x.tx} 기준 · 약 ${wait}분 대기 포함`;
+      o.lines.splice(1, 0, `지금 출발하면 ${nx.dep} ${nx.g || ''} ${x.tx}를 타요 (도착 ${nx.arr})`);
+    } catch (e) { }
+  }));
+  return opts.sort((a, b) => (a.noMore || 0) - (b.noMore || 0) || a.min - b.min);
+}
+window.rtOdsay = async (A, B) => {
+  try {
+    const r = await odCall(A.lng, A.lat, B.lng, B.lat);
+    if (r.near) return { err: '출발지와 도착지가 너무 가까워요' };
+    const paths = (r.path || []).slice().sort((x, y) => (+x.info.totalTime) - (+y.info.totalTime));
+    if (!paths.length) return { err: 'ODsay 경로 없음' };
+    if ((+r.searchType) === 0) return { opts: paths.slice(0, 6).map(p => odWrap(odLegs(p.subPath || [], A, B), +p.info.payment || 0, 'ODsay 대중교통 길찾기 · 실제 노선')) };
+    // 도시 사이: 빠른 경로 5개만 앞뒤를 이어 붙여요 (사용량 아끼기)
+    const out = [];
+    for (const p of paths.slice(0, 5)) {
+      const sub = p.subPath || []; if (!sub.length) continue;
+      const mid = odLegs(sub, null, null);
+      const f = sub[0], l = sub[sub.length - 1], kindF = +f.trafficType === 4 ? 'train' : 'bus', kindL = +l.trafficType === 4 ? 'train' : 'bus';
+      const S = mid[0].a && mid[0].a.lat ? mid[0].a : await odGeo(f.startName || (p.info && p.info.firstStartStation), kindF);
+      const E = mid[mid.length - 1].b && mid[mid.length - 1].b.lat ? mid[mid.length - 1].b : await odGeo(l.endName || (p.info && p.info.lastEndStation), kindL);
+      if (!S || !E) continue;
+      mid[0].a = mid[0].a || S; mid[mid.length - 1].b = mid[mid.length - 1].b || E;
+      mid.forEach((x, i) => { if (!x.a) x.a = i ? mid[i - 1].b : S; if (!x.b) x.b = mid[i + 1] ? mid[i + 1].a : E; });
+      const L1 = odEst(A, Object.assign({}, S, { name: f.startName })), L2 = odEst(Object.assign({}, E, { name: l.endName }), B);
+      out.push(odWrap(L1.legs.concat(mid, L2.legs), (+p.info.payment || 0) + L1.fare + L2.fare, 'ODsay 대중교통 길찾기 · 역(터미널) 사이는 실제 노선, 부대↔역 · 역↔집은 거리로 계산했어요'));
+    }
+    if (!out.length) return { err: 'ODsay 경로를 이어 붙이지 못했어요' };
+    const seen = new Set(); return { opts: (await odTimeRank(out)).filter(o => { const k = o.n + '|' + o.legs.filter(x => x.big || x.t === 'ktx').map(x => x.from).join(); if (seen.has(k)) return false; seen.add(k); return true; }) };
+  } catch (e) { return { err: String((e && e.message) || e) }; }
+};

@@ -3495,13 +3495,13 @@ function renderRoute() {
   const nv = m => `https://map.naver.com/p/directions/${a.lng},${a.lat},${encodeURIComponent(a.name)}/${b.lng},${b.lat},${encodeURIComponent(b.name)}/-/${m}`;
   routeAnim = false;
   q('rt-od').innerHTML = `<span class="o"></span><b>${esc(a.name)}</b><i>›</i><span class="d"></span><b>${esc(b.name)}</b>`;
-  q('rt-shead').innerHTML = `<div class="rt-grab"><i></i></div><div class="rt-hrow"><div class="rt-seg"><button onclick="routeSort='time';renderRoute()" class="${routeSort === 'time' ? 'on' : ''}">빠른 순</button><button onclick="routeSort='cost';renderRoute()" class="${routeSort === 'cost' ? 'on' : ''}">저렴한 순</button></div><span class="rt-km">${routeCtx.src === 'tmap' ? '실시간 대중교통 경로' : `직선 ${Math.round(km)}km · 추정`}</span><button onclick="rtThemePick()" class="rt-thb" aria-label="색상 테마">${typeof rtThemeDots === 'function' ? rtThemeDots() : ''}</button></div>
+  q('rt-shead').innerHTML = `<div class="rt-grab"><i></i></div><div class="rt-hrow"><div class="rt-seg"><button onclick="routeSort='time';renderRoute()" class="${routeSort === 'time' ? 'on' : ''}">빠른 순</button><button onclick="routeSort='cost';renderRoute()" class="${routeSort === 'cost' ? 'on' : ''}">저렴한 순</button></div><span class="rt-km">${routeCtx.src === 'odsay' || routeCtx.src === 'tmap' ? '지금 출발 기준 실제 경로' : `직선 ${Math.round(km)}km · 추정`}</span><button onclick="rtThemePick()" class="rt-thb" aria-label="색상 테마">${typeof rtThemeDots === 'function' ? rtThemeDots() : ''}</button></div>
   <div id="rt-tabs" class="rt-tabs">${L.map((x, i) => `<button onclick="rtPg(${i})" class="${i === 0 ? 'on' : ''}"><em>${i + 1}</em>${rico(x.icon)}<span>${esc(x.n)}</span><small>${fmtM(x.min)}</small></button>`).join('')}</div>`;
   box.innerHTML = `<div id="rt-pager" class="rt-pager" onscroll="rtPgSync(this)">${L.map((x, i) => `<div class="rt-page">${rtCardHTML(x, i)}</div>`).join('')}</div>
   <div id="rt-dots" class="rt-dots">${L.map((_, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('')}</div>
   <div class="grid grid-cols-2 gap-2 mt-3 px-4"><a target="_blank" rel="noopener" href="https://map.kakao.com/link/by/publictransit/${encodeURIComponent(a.name)},${a.lat},${a.lng}/${encodeURIComponent(b.name)},${b.lat},${b.lng}" class="rt-ext k">카카오맵 앱으로 보기</a><a target="_blank" rel="noopener" href="${nv('transit')}" class="rt-ext n">네이버지도에서 보기</a></div>
-  ${routeCtx.src !== 'tmap' && routeCtx.err ? `<p class="rt-foot" style="color:#B5523B">실제 대중교통 경로를 못 불러와서 거리로 추정했어요 · ${esc(String(routeCtx.err).slice(0, 80))}</p>` : ''}
-  <p class="rt-foot">※ 대중교통 경로는 TMAP(SK) 대중교통 길찾기, 자동차는 카카오내비 실제 경로예요. 버스 도착 · 지하철 도착 · 고속/시외버스 · 열차 시간표는 국토교통부(TAGO)·서울시 실시간 정보예요. 시간표가 없는 구간의 시간·요금은 거리 기반 추정이에요.</p>`;
+  ${routeCtx.src === 'est' && routeCtx.err ? `<p class="rt-foot" style="color:#B5523B">실제 대중교통 경로를 못 불러와서 거리로 추정했어요 · ${esc(String(routeCtx.err).slice(0, 80))}</p>` : ''}
+  <p class="rt-foot">※ 대중교통 경로는 ODsay 대중교통 길찾기(시외·고속·열차 구간은 실제 시간표로 기다리는 시간까지 계산), 자동차는 카카오내비 실제 경로예요. 버스 도착 · 지하철 도착 · 고속/시외버스 · 열차 시간표는 국토교통부(TAGO)·서울시 실시간 정보예요. 시간표가 없는 구간의 시간·요금은 거리 기반 추정이에요.</p>`;
   if (typeof rtSet === 'function') rtSet(L, a, b);
 }
 const picks = { start: null, end: null, unit: null }, sugCache = {}, sugT = {};
@@ -3577,8 +3577,13 @@ async function calcRoute() {
     else { const km = hav(a, b); if (km < 0.3) err.innerHTML = '<div class="text-[12px] text-[#D94867] font-bold mt-3">출발지와 도착지가 거의 같아요.</div>';
       else { routeCtx = { a, b, km }; routeCtx.opts = buildOpts(km, routeCtx); routeCtx.src = 'est'; routeCtx.err = '';
         /* TMAP 실제 대중교통 경로 (지금 시각 기준). 자동차·택시는 카카오내비로 따로 계산해요 */
-        if (typeof rtTmap === 'function') { const tm = await Promise.race([rtTmap(a, b), sleep(12000).then(() => ({ err: '시간 초과' }))]);
-          if (tm && tm.opts && tm.opts.length) { routeCtx.opts = tm.opts.concat(routeCtx.opts.filter(o => o.legs.some(l => l.t === 'car' || l.t === 'taxi'))); routeCtx.src = 'tmap'; } else routeCtx.err = (tm && tm.err) || ''; }
+        /* ODsay(하루 1,000번 무료)로 먼저, 안 되면 TMAP, 그래도 안 되면 거리 추정 */
+        const keepCar = routeCtx.opts.filter(o => o.legs.some(l => l.t === 'car' || l.t === 'taxi'));
+        let tm = typeof rtOdsay === 'function' ? await Promise.race([rtOdsay(a, b), sleep(20000).then(() => ({ err: 'ODsay 시간 초과' }))]) : null;
+        if (tm && tm.opts && tm.opts.length) { routeCtx.opts = tm.opts.concat(keepCar); routeCtx.src = 'odsay'; }
+        else { routeCtx.err = (tm && tm.err) || '';
+          if (typeof rtTmap === 'function') { const t2 = await Promise.race([rtTmap(a, b), sleep(12000).then(() => ({ err: '시간 초과' }))]);
+            if (t2 && t2.opts && t2.opts.length) { routeCtx.opts = t2.opts.concat(keepCar); routeCtx.src = 'tmap'; } } }
         ok = true; } }
   } catch (x) { err.innerHTML = '<div class="bg-[#FFF0F3] text-[#D94867] text-[12px] font-bold rounded-xl p-3 mt-3">위치 검색에 실패했어요. 잠시 후 다시 시도해주세요.</div>'; }
   finally {
