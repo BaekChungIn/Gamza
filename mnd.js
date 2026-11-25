@@ -164,7 +164,7 @@ window.mndNear = () => {
 /* ================= 부대 식단 (국방부 공공데이터) ================= */
 const ML = { days: {}, unit: null, units: {}, synced: false };
 const GENERIC = /^(밥|쌀밥|백미밥|잡곡밥|현미밥|흑미밥|보리밥|김치|배추김치|깍두기|총각김치|열무김치|우유|흰우유|저지방우유|맛김|조미김|김|요구르트|빵|식빵|잼|딸기잼|케찹|시리얼)$/;
-const mealUnit = () => { const S = typeof S_ === 'function' ? S_() : null; return (S && S.meal_unit) || (window.me && me.meal_unit) || null; };
+const mealUnit = () => { const S = typeof S_ === 'function' ? S_() : null; return (S && S.meal_unit) || (typeof me !== 'undefined' && me && me.meal_unit) || null; };
 const ymdK = d => { const z = new Date(d.getTime() - d.getTimezoneOffset() * 6e4); return z.toISOString().slice(0, 10); };
 async function units() { if (Object.keys(ML.units).length) return ML.units; let { data, error } = await sb.from('meal_units').select('code,name,days').eq('active', true); if (error) ({ data } = await sb.from('meal_units').select('code,name').eq('active', true)); /* 식단이 실제로 받아진 부대만 */ (data || []).filter(u => u.days == null || u.days > 0).forEach(u => ML.units[u.code] = u.name); return ML.units; }
 function sync() { if (ML.synced) return; ML.synced = true; try { sb.functions.invoke('mnd-meal', { body: { action: 'sync' } }).then(r => { if (r && r.data && r.data.units) { ML.days = {}; if (q('modal-menu').classList.contains('flex')) renderMenu(); } }).catch(() => { }); } catch (e) { } }
@@ -306,7 +306,7 @@ window.mealAdminImport = async function (inp) {
 /* ================= 국방부 공공데이터 자동 최신화 ================= */
 (function () {
   const go = async () => {
-    if (!window.sb || !window.me) return setTimeout(go, 1500);
+    if (typeof sb === 'undefined' || !sb || typeof me === 'undefined' || !me || !me.id) return setTimeout(go, 1500);
     try {
       const { data } = await sb.from('mnd_cache').select('kind,data,at');
       let ch = false; (data || []).forEach(r => { if (r.data && (Array.isArray(r.data) ? r.data.length : Object.keys(r.data).length)) { window.MND[r.kind] = r.data; ch = true; } });

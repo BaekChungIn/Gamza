@@ -399,3 +399,103 @@ window.ztThemePick = () => {
   ov.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { thSet(b.dataset.k); ov.remove(); try { rtApplyTh(); if (window.mlApplyTh) mlApplyTh(); if (typeof openSettings === 'function' && document.getElementById('modal-settings') && !document.getElementById('modal-settings').classList.contains('hidden')) openSettings(); } catch (e) { } if (typeof zpToast === 'function') zpToast(`${ZT_PAL[b.dataset.k].n} 테마로 저장했어요`); });
   document.body.appendChild(ov);
 };
+
+/* ================= 친구 위치 지도 ================= */
+const FM = { map: null, kind: '', objs: [], list: [], mine: null, share: false, at: null, poll: null, watch: null, lastUp: 0 };
+(function () { const st = document.createElement('style'); st.textContent = `
+#modal-fmap{position:fixed;inset:0;z-index:88;background:#E9EEF2;display:none;overflow:hidden}
+#fm-map{position:absolute;inset:0}
+.fm-top{position:absolute;left:12px;right:12px;top:max(12px,env(safe-area-inset-top));z-index:5;display:flex;gap:8px;align-items:center}
+.fm-title{flex:1;height:42px;border-radius:15px;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.14);display:flex;align-items:center;padding:0 14px;font-size:15px;font-weight:800;gap:8px}
+.fm-share{height:42px;border-radius:15px;padding:0 12px;font-size:12.5px;font-weight:800;box-shadow:0 4px 14px rgba(0,0,0,.14);display:flex;align-items:center;gap:6px;background:#fff;color:#4E5968}
+.fm-share i{width:8px;height:8px;border-radius:50%;background:#B0B8C1}.fm-share.on{background:var(--tp,#2B3426);color:#fff}.fm-share.on i{background:#7FE0A8;box-shadow:0 0 0 3px rgba(127,224,168,.3)}
+.fm-bottom{position:absolute;left:0;right:0;bottom:0;z-index:5;padding:0 0 max(14px,env(safe-area-inset-bottom))}
+.fm-me{position:absolute;right:14px;bottom:calc(100% + 10px);width:44px;height:44px;border-radius:15px;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.16);display:flex;align-items:center;justify-content:center;color:#191F28}
+.fm-list{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:4px 14px}.fm-list::-webkit-scrollbar{display:none}
+.fm-chip{flex-shrink:0;display:flex;align-items:center;gap:9px;background:#fff;border-radius:18px;padding:8px 14px 8px 8px;box-shadow:0 4px 14px rgba(0,0,0,.12);text-align:left}
+.fm-chip .ph{width:38px;height:38px;border-radius:13px;overflow:hidden;background:#F2F4F6;flex-shrink:0}
+.fm-chip b{display:block;font-size:14px;font-weight:800;color:#191F28;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fm-chip small{font-size:11.5px;color:#8B95A1;font-weight:600}
+.fm-card{margin:0 14px;background:#fff;border-radius:22px;padding:18px;box-shadow:0 6px 20px rgba(0,0,0,.14)}
+.fm-card b{font-size:16px;font-weight:900}.fm-card p{font-size:13px;color:#4E5968;margin-top:5px;line-height:1.5}
+.fm-card .go{margin-top:12px;width:100%;height:46px;border-radius:14px;background:var(--tp,#2B3426);color:#fff;font-size:14.5px;font-weight:800}
+.fm-pin{display:flex;flex-direction:column;align-items:center;transform:translateY(-6px)}
+.fm-pin .ph{width:46px;height:46px;border-radius:50%;overflow:hidden;background:#fff;border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.3)}
+.fm-pin.me .ph{border-color:#3182F6}
+.fm-pin span{margin-top:3px;background:#191F28;color:#fff;font-size:11px;font-weight:800;padding:2px 7px;border-radius:8px;white-space:nowrap}
+.fm-pin.me span{background:#3182F6}.fm-pin.old .ph{filter:grayscale(.7);opacity:.85}`; document.head.appendChild(st); })();
+const fmAgo = t => { if (!t) return ''; const m = Math.max(0, Math.round((Date.now() - Date.parse(t)) / 6e4)); return m < 1 ? '방금' : m < 60 ? m + '분 전' : m < 1440 ? Math.floor(m / 60) + '시간 전' : Math.floor(m / 1440) + '일 전'; };
+function fmEl() {
+  let m = document.getElementById('modal-fmap'); if (m) return m;
+  m = document.createElement('div'); m.id = 'modal-fmap';
+  m.innerHTML = `<div id="fm-map"></div><div class="fm-top"><button onclick="fmClose()" class="rt-fab" aria-label="뒤로" style="pointer-events:auto"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><div class="fm-title">친구 위치</div><button id="fm-share" class="fm-share" onclick="fmShareToggle()"><i></i><span>공유 꺼짐</span></button></div><div class="fm-bottom"><button class="fm-me" onclick="fmFocusMe()" aria-label="내 위치"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button><div id="fm-low"></div></div>`;
+  document.body.appendChild(m); return m;
+}
+window.fmOpen = async () => {
+  const m = fmEl(); try { const T = rtTh(); m.style.setProperty('--tp', T.p); } catch (e) { } m.style.display = 'block';
+  if (!(await fmMapInit())) return;
+  try { const { data } = await sb.rpc('my_loc_share'); const r = (data || [])[0]; FM.share = !!(r && r.share); } catch (e) { FM.share = false; }
+  fmShareUI(); if (FM.share) fmWatch(); else fmLocateOnce();
+  await fmLoad(); fmFit(); clearInterval(FM.poll); FM.poll = setInterval(fmLoad, 30000);
+};
+window.fmClose = () => { const m = document.getElementById('modal-fmap'); if (m) m.style.display = 'none'; clearInterval(FM.poll); if (FM.watch != null) { navigator.geolocation.clearWatch(FM.watch); FM.watch = null; } };
+async function fmMapInit() {
+  const el = document.getElementById('fm-map'); if (FM.map && FM.el === el) { try { FM.kind === 'k' ? FM.map.relayout() : FM.map.invalidateSize(); } catch (e) { } return true; }
+  FM.el = el;
+  try { if (typeof kakaoReady === 'function' && await kakaoReady()) { FM.kind = 'k'; FM.map = new kakao.maps.Map(el, { center: new kakao.maps.LatLng(37.55, 127.0), level: 9 }); return true; } } catch (e) { }
+  if (await leafReady()) { FM.kind = 'l'; FM.map = window.L.map(el, { zoomControl: false }).setView([37.55, 127.0], 9); window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap' }).addTo(FM.map); return true; }
+  el.innerHTML = '<div class="rt-mapx">지도를 불러오지 못했어요</div>'; return false;
+}
+function fmShareUI() {
+  const b = document.getElementById('fm-share'); if (b) { b.classList.toggle('on', FM.share); b.querySelector('span').textContent = FM.share ? '내 위치 공유 중' : '공유 꺼짐'; }
+  const low = document.getElementById('fm-low'); if (!low) return;
+  const chips = FM.list.map((P, i) => `<button class="fm-chip" onclick="fmFocus(${i})"><span class="ph">${typeof frAvatar === 'function' ? frAvatar(P) : ''}</span><span><b>${esc(P.nickname || '친구')}</b><small>${fmAgo(P.at)}</small></span></button>`).join('');
+  low.innerHTML = (FM.share ? '' : `<div class="fm-card" style="margin-bottom:10px"><b>내 위치를 친구들에게 공유할까요?</b><p>수락한 친구에게만 보이고, 언제든 끌 수 있어요. 끄면 저장된 위치도 바로 지워져요.<br><span style="color:#B5523B;font-weight:700">부대 안에서는 보안을 위해 공유를 꺼주세요.</span></p><button class="go" onclick="fmShareToggle()">위치 공유 시작</button></div>`)
+    + (FM.list.length ? `<div class="fm-list">${chips}</div>` : `<div class="fm-card"><b>아직 위치를 공유한 친구가 없어요</b><p>친구가 이 화면에서 '위치 공유 시작'을 누르면 지도에 프로필이 떠요.</p></div>`);
+}
+async function fmLoad() {
+  try { const { data, error } = await sb.rpc('friend_locs_list'); if (!error) FM.list = (data || []).filter(x => isFinite(x.lat) && isFinite(x.lng)); } catch (e) { }
+  fmDraw(); fmShareUI();
+}
+function fmDraw() {
+  if (!FM.map) return; FM.objs.forEach(o => { try { FM.kind === 'k' ? o.setMap(null) : FM.map.removeLayer(o); } catch (e) { } }); FM.objs = [];
+  const add = (lat, lng, html, z) => {
+    if (FM.kind === 'k') { const ov = new kakao.maps.CustomOverlay({ position: new kakao.maps.LatLng(lat, lng), content: html, yAnchor: 1, zIndex: z }); ov.setMap(FM.map); FM.objs.push(ov); }
+    else FM.objs.push(window.L.marker([lat, lng], { icon: window.L.divIcon({ className: '', html: `<div style="transform:translate(-50%,-100%)">${html}</div>`, iconSize: [0, 0] }), zIndexOffset: z }).addTo(FM.map));
+  };
+  FM.list.forEach(P => { const old = Date.now() - Date.parse(P.at) > 6 * 3600e3; add(P.lat, P.lng, `<div class="fm-pin${old ? ' old' : ''}"><div class="ph">${typeof frAvatar === 'function' ? frAvatar(P) : ''}</div><span>${esc(P.nickname || '친구')} · ${fmAgo(P.at)}</span></div>`, 3); });
+  if (FM.mine) add(FM.mine[0], FM.mine[1], `<div class="fm-pin me"><div class="ph">${typeof myAvatarHTML === 'function' ? myAvatarHTML() : ''}</div><span>나${FM.share ? '' : ' (공유 안 함)'}</span></div>`, 4);
+}
+function fmFit() {
+  const P = FM.list.map(x => [x.lat, x.lng]).concat(FM.mine ? [FM.mine] : []); if (!P.length || !FM.map) return;
+  if (P.length === 1) return fmCenter(P[0], 4);
+  if (FM.kind === 'k') { const bd = new kakao.maps.LatLngBounds(); P.forEach(p => bd.extend(new kakao.maps.LatLng(p[0], p[1]))); FM.map.setBounds(bd, 110, 50, 200, 50); }
+  else FM.map.fitBounds(P, { paddingTopLeft: [50, 110], paddingBottomRight: [50, 200] });
+}
+function fmCenter(p, lv) { if (FM.kind === 'k') { FM.map.setLevel(lv || 4); FM.map.panTo(new kakao.maps.LatLng(p[0], p[1])); } else FM.map.setView(p, 15); }
+window.fmFocus = i => { const P = FM.list[i]; if (P) fmCenter([P.lat, P.lng], 3); };
+window.fmFocusMe = () => { if (FM.mine) fmCenter(FM.mine, 3); else fmLocateOnce(true); };
+function fmGot(pos, push) {
+  FM.mine = [pos.coords.latitude, pos.coords.longitude]; fmDraw();
+  if (push && FM.share && Date.now() - FM.lastUp > 45000) { FM.lastUp = Date.now(); sb.rpc('set_my_loc', { la: FM.mine[0], ln: FM.mine[1], ac: Math.round(pos.coords.accuracy || 0) }).then(() => { }, () => { }); }
+}
+function fmLocateOnce(center) {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(p => { fmGot(p, true); if (center) fmCenter(FM.mine, 3); }, () => { if (center && typeof zpToast === 'function') zpToast('위치 권한을 허용하면 내 위치가 보여요'); }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 });
+}
+function fmWatch() { if (!navigator.geolocation || FM.watch != null) return; FM.lastUp = 0; FM.watch = navigator.geolocation.watchPosition(p => fmGot(p, true), () => { }, { enableHighAccuracy: true, maximumAge: 20000, timeout: 20000 }); }
+window.fmShareToggle = async () => {
+  if (!FM.share) {
+    if (!navigator.geolocation) return showAlert('위치를 쓸 수 없어요', '이 기기에서는 위치 기능을 쓸 수 없어요.');
+    const ok = await new Promise(res => navigator.geolocation.getCurrentPosition(p => { FM.mine = [p.coords.latitude, p.coords.longitude]; FM.acc = p.coords.accuracy; res(true); }, () => res(false), { enableHighAccuracy: true, timeout: 12000 }));
+    if (!ok) return showAlert('위치 권한이 필요해요', '휴대폰 설정에서 브라우저(사파리)의 위치 접근을 허용해 주세요.');
+    const { error } = await sb.rpc('set_loc_share', { on_: true }); if (error) return showAlert('오류', '잠시 후 다시 시도해주세요.');
+    await sb.rpc('set_my_loc', { la: FM.mine[0], ln: FM.mine[1], ac: Math.round(FM.acc || 0) }); FM.lastUp = Date.now();
+    FM.share = true; try { localStorage.setItem('zt_locshare', '1'); } catch (e) { } fmWatch(); fmDraw(); fmShareUI(); fmCenter(FM.mine, 4); if (typeof zpToast === 'function') zpToast('친구들에게 내 위치를 공유하고 있어요');
+  } else {
+    if (!(await zConfirm('위치 공유를 끌까요?\n저장된 내 위치도 지워져요.', { ok: '공유 끄기' }))) return;
+    await sb.rpc('set_loc_share', { on_: false }); FM.share = false; try { localStorage.removeItem('zt_locshare'); } catch (e) { }
+    if (FM.watch != null) { navigator.geolocation.clearWatch(FM.watch); FM.watch = null; } fmDraw(); fmShareUI(); if (typeof zpToast === 'function') zpToast('위치 공유를 껐어요');
+  }
+};
+/* 공유를 켜둔 사람은 앱을 열 때마다 위치를 한 번 새로 올려요 (앱을 닫으면 멈춰요) */
+(function () { let n = 0; const go = () => { if (typeof sb === 'undefined' || !sb || typeof me === 'undefined' || !me || !me.id) { if (n++ < 20) setTimeout(go, 2000); return; } let on = false; try { on = localStorage.getItem('zt_locshare') === '1'; } catch (e) { } if (on && navigator.geolocation) navigator.geolocation.getCurrentPosition(p => sb.rpc('set_my_loc', { la: p.coords.latitude, ln: p.coords.longitude, ac: Math.round(p.coords.accuracy || 0) }).then(() => { }, () => { }), () => { }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }); }; setTimeout(go, 3000); })();
