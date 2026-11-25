@@ -93,8 +93,9 @@ function buildOpts(km, c) {
 
 /* ================= 집으로 가는 길 · 카카오맵 + 실시간 ================= */
 const RT = { map: null, kind: '', objs: [], idx: 0, live: {}, car: {}, L: [], A: null, B: null };
+RT.C = { walk: '#9AA3AD' };
 const RC = { car: '#3182F6', taxi: '#F2A900', bus: '#2FB36E', big: '#7B5CF5', metro: '#1F7AE0', ktx: '#E5484D', walk: '#8B95A1' };
-const legColor = x => { const T = rtTh(); return x.t === 'walk' ? '#9AA3AD' : (x.t === 'car' || x.t === 'ktx' || x.big) ? T.l1 : T.l2; };
+const legColor = x => { const T = rtTh(); return x.t === 'walk' ? '#9AA3AD' : (x.t === 'car' || x.t === 'ktx' || x.big) ? T.l1 : x.t === 'metro' && x.color ? x.color : T.l2; };
 const rtCk = x => `${x.a.lat},${x.a.lng}>${x.b.lat},${x.b.lng}`;
 (function () {
   const css = `
@@ -134,10 +135,11 @@ function rtCurve(a, b, k) {
 function rtSegs(o) {
   const A = RT.A, B = RT.B, segs = [], stops = []; let cur = A;
   o.legs.forEach((x, i) => {
+    if (x.t === 'walk' && x.path && x.path.length > 1) { segs.push({ pts: x.path, c: RT.C.walk, dash: 1, w: 3 }); cur = x.b || cur; return; }
     if (!x.a || !x.b || x.t === 'walk') return;
     if (rhav(cur, x.a) > .05) segs.push({ pts: [[cur.lat, cur.lng], [x.a.lat, x.a.lng]], c: RC.walk, dash: 1, w: 3 });
     const real = (x.t === 'car' || x.t === 'taxi') && RT.car[rtCk(x)];
-    const pts = real ? real.path : rhav(x.a, x.b) < 2 ? [[x.a.lat, x.a.lng], [x.b.lat, x.b.lng]] : rtCurve(x.a, x.b, x.t === 'ktx' ? .07 : (i % 2 ? -.1 : .1));
+    const pts = x.path && x.path.length > 1 ? x.path : real ? real.path : rhav(x.a, x.b) < 2 ? [[x.a.lat, x.a.lng], [x.b.lat, x.b.lng]] : rtCurve(x.a, x.b, x.t === 'ktx' ? .07 : (i % 2 ? -.1 : .1));
     segs.push({ pts, c: legColor(x), w: x.big || x.t === 'ktx' || x.t === 'car' ? 6 : 5 });
     if (x.t !== 'car' && x.t !== 'taxi') [[x.a, x.from], [x.b, x.to]].forEach(([p, n]) => { n = n || p.name; if (n && n !== A.name && n !== B.name && !stops.some(s => s.n === n)) stops.push({ p, n, c: legColor(x) }); });
     cur = x.b;
@@ -203,8 +205,10 @@ function lvSched(r, at, label) {
   const rec = list[0];
   return head + `<div class="lv-rec">추천 <em>${rec.dep}</em> ${esc(rec.g)}${rec.no ? ' ' + esc(rec.no) + '호' : ''} · 도착 ${rec.arr}</div><div class="lv-sub">지금 출발하면 ${ready}쯤 도착해서 여유 있게 탈 수 있어요${fare(rec)}</div>${list.length > 1 ? `<div class="lv-ch">${list.slice(1, 6).map(x => `<span>${x.dep} <small style="color:#8B95A1">${esc(x.g)}</small></span>`).join('')}</div>` : ''}`;
 }
-function lvBus(r) {
-  if (!r || r.error) return lvErr(r); const S = (r.stops || []).filter(s => s.arr.length);
+function lvBus(r, nos) {
+  if (!r || r.error) return lvErr(r);
+  if (nos && nos.length) { const want = a => nos.some(n => String(a.no).replace(/\s/g, '').split('(')[0] === n); const R = (r.stops || []).map(s => Object.assign({}, s, { arr: s.arr.filter(want) })).filter(s => s.arr.length); if (R.length) r = Object.assign({}, r, { stops: R }); else if ((r.stops || []).some(s => s.arr.length)) return lvHead('실시간 버스 도착') + `<div class="lv-x">${esc(nos.join(' · '))}번은 지금 도착 예정 정보가 없어요</div>`; }
+  const S = (r.stops || []).filter(s => s.arr.length);
   if (!S.length) return lvHead('실시간 버스') + `<div class="lv-x">${(r.stops || []).length ? `${esc(r.stops[0].stop)} 정류장에 곧 오는 버스 정보가 없어요` : '근처 정류장을 찾지 못했어요'}</div>`;
   return lvHead('실시간 버스 도착') + S.map(s => `<div style="margin-top:4px"><b>${esc(s.stop)}</b> <span style="color:#8B95A1;font-size:11.5px">${s.dist}m</span><div class="lv-ch">${s.arr.slice(0, 5).map(a => `<span>${esc(a.no)}번 <b>${a.min ? a.min + '분 뒤' : '곧 도착'}</b>${a.left ? ` <small style="color:#8B95A1">${a.left}정거장 전</small>` : ''}</span>`).join('')}</div></div>`).join('');
 }
@@ -227,9 +231,11 @@ function rtLive(i, force) {
       put(lvHead('카카오내비 실제 경로') + `<div class="lv-rec">${fmtM(r.min)} · ${r.km}km</div><div class="lv-sub">${r.toll ? `통행료 ${W(r.toll)}` : '통행료 없음'}${x.t === 'taxi' && r.taxi ? ` · 택시비 약 ${W(r.taxi)}` : ''} · 지금 교통 상황 기준</div>`);
       if (RT.idx === i) rtDraw(i);
     });
-    else if (x.t === 'bus' && !x.big) rtCall({ action: 'bus', lat: +x.a.lat.toFixed(4), lng: +x.a.lng.toFixed(4) }).then(r => put(lvBus(r)));
+    else if (x.t === 'bus' && !x.big) rtCall({ action: 'bus', lat: +x.a.lat.toFixed(4), lng: +x.a.lng.toFixed(4) }).then(r => put(lvBus(r, x.nos)));
     else if (x.t === 'metro') rtCall({ action: 'subway', st: x.from || x.a.name }).then(r => { put(lvSub(r)); const ids = [...new Set(((r && r.items) || []).map(z => z.lid).filter(z => SUBL[z]))]; if (ids.length) { RT.lines[i] = [...new Set([...(RT.lines[i] || []), ...ids])].slice(0, 2); if (RT.idx === i) rtTrains(i); } });
     else if (x.t === 'bus' && x.big) rtCall({ action: 'exp', from: x.from, to: x.to }).then(r => put(lvSched(r, at, '버스')));
+    else if (x.t === 'ktx' && /SRT/.test(x.tx || '') && !/KTX/.test(x.tx || '')) put(lvHead('SRT') + `<div class="lv-x">SRT 시간표는 SRT 앱 · 웹에서 확인해요</div>`);
+    else if (x.t === 'ktx' && /항공|여객선/.test(x.tx || '')) put('');
     else if (x.t === 'ktx') rtCall({ action: 'train', from: x.from, to: x.to, kind: /KTX/.test(x.tx || '') ? 'ktx' : 'itx' }).then(r => put(lvSched(r, at, /KTX/.test(x.tx || '') ? 'KTX' : '열차')));
   });
 }
@@ -278,6 +284,8 @@ async function rtTrains(i) {
     await Promise.all([work(), work(), work(), work()]);
   }
   if (RT.idx !== i || !shown()) return; rtTrainsOff();
+  { const ML = RT.L[i].legs.filter(x => x.t === 'metro' && x.a && x.b); if (ML.length) { let la0 = 90, la1 = -90, lo0 = 180, lo1 = -180; ML.forEach(x => (x.path && x.path.length ? x.path : [[x.a.lat, x.a.lng], [x.b.lat, x.b.lng]]).forEach(([la, lo]) => { la0 = Math.min(la0, la); la1 = Math.max(la1, la); lo0 = Math.min(lo0, lo); lo1 = Math.max(lo1, lo); }));
+    const m = .03; for (let k = add.length - 1; k >= 0; k--) { const [la, lo] = add[k].p; if (la < la0 - m || la > la1 + m || lo < lo0 - m || lo > lo1 + m) add.splice(k, 1); } } }
   add.forEach(({ t, p, col }) => {
     const html = `<div class="rt-train d${t.ud === '1' ? 1 : 0}${t.s === '1' ? ' ar' : ''}" style="--c:${col}"><b>${TRN}</b><span>${esc(String(t.tnm).replace(/역$/, ''))}${t.ex ? ' 급행' : ''}</span></div>`;
     if (RT.kind === 'k') { const ov = new kakao.maps.CustomOverlay({ position: new kakao.maps.LatLng(p[0], p[1]), content: html, xAnchor: 0, yAnchor: 0, zIndex: 4 }); ov.setMap(RT.map); RT.tobj.push(ov); }
@@ -418,10 +426,10 @@ const FM = { map: null, kind: '', objs: [], list: [], mine: null, share: false, 
 .fm-card{margin:0 14px;background:#fff;border-radius:22px;padding:18px;box-shadow:0 6px 20px rgba(0,0,0,.14)}
 .fm-card b{font-size:16px;font-weight:900}.fm-card p{font-size:13px;color:#4E5968;margin-top:5px;line-height:1.5}
 .fm-card .go{margin-top:12px;width:100%;height:46px;border-radius:14px;background:var(--tp,#2B3426);color:#fff;font-size:14.5px;font-weight:800}
-.fm-pin{display:flex;flex-direction:column;align-items:center;transform:translateY(-6px)}
+.fm-pin{display:flex;flex-direction:column-reverse;align-items:center;position:relative;padding-bottom:9px}.fm-pin::after{content:'';position:absolute;bottom:0;left:50%;margin-left:-6px;border:6px solid transparent;border-bottom:0;border-top:9px solid #fff;filter:drop-shadow(0 2px 1px rgba(0,0,0,.2))}.fm-pin.me::after{border-top-color:#3182F6}
 .fm-pin .ph{width:46px;height:46px;border-radius:50%;overflow:hidden;background:#fff;border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.3)}
 .fm-pin.me .ph{border-color:#3182F6}
-.fm-pin span{margin-top:3px;background:#191F28;color:#fff;font-size:11px;font-weight:800;padding:2px 7px;border-radius:8px;white-space:nowrap}
+.fm-pin span{margin-bottom:3px;background:#191F28;color:#fff;font-size:11px;font-weight:800;padding:2px 7px;border-radius:8px;white-space:nowrap}
 .fm-pin.me span{background:#3182F6}.fm-pin.old .ph{filter:grayscale(.7);opacity:.85}`; document.head.appendChild(st); })();
 const fmAgo = t => { if (!t) return ''; const m = Math.max(0, Math.round((Date.now() - Date.parse(t)) / 6e4)); return m < 1 ? '방금' : m < 60 ? m + '분 전' : m < 1440 ? Math.floor(m / 60) + '시간 전' : Math.floor(m / 1440) + '일 전'; };
 function fmEl() {
@@ -499,3 +507,30 @@ window.fmShareToggle = async () => {
 };
 /* 공유를 켜둔 사람은 앱을 열 때마다 위치를 한 번 새로 올려요 (앱을 닫으면 멈춰요) */
 (function () { let n = 0; const go = () => { if (typeof sb === 'undefined' || !sb || typeof me === 'undefined' || !me || !me.id) { if (n++ < 20) setTimeout(go, 2000); return; } let on = false; try { on = localStorage.getItem('zt_locshare') === '1'; } catch (e) { } if (on && navigator.geolocation) navigator.geolocation.getCurrentPosition(p => sb.rpc('set_my_loc', { la: p.coords.latitude, ln: p.coords.longitude, ac: Math.round(p.coords.accuracy || 0) }).then(() => { }, () => { }), () => { }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }); }; setTimeout(go, 3000); })();
+
+/* ================= TMAP 대중교통 길찾기 → 앱 경로 모양으로 ================= */
+window.rtTmap = async (a, b) => {
+  let r; try { r = (await sb.functions.invoke('transit-live', { body: { action: 'plan', a: { lat: a.lat, lng: a.lng }, b: { lat: b.lat, lng: b.lng } } })).data; } catch (e) { return { err: String(e) }; }
+  if (!r || r.error || !Array.isArray(r.items)) return { err: (r && r.error) || 'no data' };
+  const P = p => ({ lat: p.lat, lng: p.lng, name: p.name });
+  const subName = s => String(s || '').replace(/^수도권\s*/, '').replace(/^(\d+)$/, '$1호선');
+  const opts = r.items.filter(it => it.legs && it.legs.length).map(it => {
+    const legs = it.legs.map(l => {
+      const base = { min: l.min, cost: 0, a: P(l.from), b: P(l.to), from: l.from.name, to: l.to.name, path: l.path, color: l.color, stops: l.stops };
+      if (l.mode === 'WALK') return Object.assign(base, { t: 'walk', from: '', to: '' });
+      if (l.mode === 'BUS') { const nos = [l.route].concat(l.lanes || []).map(x => String(x).split(':').pop().replace(/\s/g, '')).filter(Boolean); return Object.assign(base, { t: 'bus', tx: `${nos[0] || ''}번 버스${l.stops ? ` · ${l.stops}개 정류장` : ''}`, nos: [...new Set(nos)] }); }
+      if (l.mode === 'SUBWAY') return Object.assign(base, { t: 'metro', tx: `${subName(l.route)}${l.stops ? ` · ${l.stops}개 역` : ''}` });
+      if (l.mode === 'EXPRESSBUS') return Object.assign(base, { t: 'bus', big: 1, tx: /고속/.test(l.route) || l.type === 23 ? '고속버스' : '시외버스' });
+      if (l.mode === 'TRAIN') return Object.assign(base, { t: 'ktx', tx: l.route || '열차' });
+      return Object.assign(base, { t: 'ktx', tx: l.mode === 'AIRPLANE' ? '항공' : l.mode === 'FERRY' ? '여객선' : (l.route || '이동') });
+    });
+    const veh = legs.filter(x => x.t !== 'walk'), main = veh.slice().sort((x, y) => y.min - x.min)[0] || legs[0];
+    const label = x => x.t === 'ktx' ? (x.tx || '열차').split(' ')[0] : x.t === 'bus' && x.big ? x.tx : x.t === 'metro' ? '전철' : '버스';
+    const n = veh.map(label).filter((x, k, A) => x !== A[k - 1]).join(' + ') || '도보';
+    const icon = main.t === 'ktx' ? 'ktx' : main.t === 'metro' ? 'metro' : 'bus';
+    return { n, icon, legs, min: it.min, cost: it.fare, walk: it.walk, tr: it.tr, src: 'tmap',
+      lines: ['TMAP 대중교통 길찾기 · 지금 출발 기준 실제 노선이에요', ...veh.filter(x => x.big || x.t === 'ktx').map(x => `${x.tx} ${x.from} → ${x.to} · 약 ${fmtM(x.min)}`)], links: [] };
+  });
+  // 같은 이름 · 같은 시간 경로는 하나만
+  const seen = new Set(); return { opts: opts.filter(o => { const k = o.n + '|' + o.min; if (seen.has(k)) return false; seen.add(k); return true; }) };
+};
