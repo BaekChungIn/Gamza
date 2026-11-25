@@ -249,7 +249,7 @@ function rtSel(i) {
 window.rtPg = i => { const p = document.getElementById('rt-pager'); if (!p) return; p.scrollTo({ left: i * p.clientWidth, behavior: 'smooth' }); rtSel(i); };
 window.rtPgSync = el => { const i = Math.round(el.scrollLeft / Math.max(1, el.clientWidth)); if (i !== RT.idx) rtSel(i); };
 window.rtRefresh = i => { RT.live = {}; const o = RT.L[i]; if (o) { o._live = 0; rtLive(i, true); } };
-window.rtSet = (L, a, b) => { rtApplyTh(); if (!RT.sheetInit) { RT.sheetInit = 1; rtSheet(1, true); } RT.L = L; RT.A = a; RT.B = b; RT.lines = {}; rtTrainsOff(); L.forEach(o => o._live = 0); RT.idx = 0; requestAnimationFrame(() => { rtFitH(); rtDraw(0); rtLive(0); }); };
+window.rtSet = (L, a, b) => { RT.tOn = false; rtApplyTh(); if (!RT.sheetInit) { RT.sheetInit = 1; rtSheet(1, true); } RT.L = L; RT.A = a; RT.B = b; RT.lines = {}; rtTrainsOff(); L.forEach(o => o._live = 0); RT.idx = 0; requestAnimationFrame(() => { rtFitH(); rtDraw(0); rtLive(0); }); };
 window.rtShow = () => { rtSheet(RT.snap, true); if (RT.map) { try { RT.kind === 'k' ? RT.map.relayout() : RT.map.invalidateSize(); } catch (e) { } } rtDraw(RT.idx); rtFitH(); };
 
 /* ---- 지도 위 실시간 열차 (서울 실시간 열차 위치 · 30초마다) ---- */
@@ -274,6 +274,9 @@ function stGeo(n) {
 }
 async function rtTrains(i) {
   rtTrainsOff(); const ids = RT.lines[i]; if (!ids || !ids.length || RT.idx !== i || !RT.map) return;
+  const tbox = () => document.querySelector(`#rt-pager .rt-page:nth-child(${i + 1}) .rt-trn`) || (() => { const lv = [...document.querySelectorAll(`#rt-pager [data-lk^="${i}-"]`)].find(e => /지하철/.test(e.textContent)); if (!lv) return null; const d = document.createElement('div'); d.className = 'rt-trn lv-sub'; lv.appendChild(d); return d; })();
+  /* 열차 아이콘은 버튼을 눌렀을 때만 (지도가 복잡해지지 않게) */
+  if (!RT.tOn) { const bx = tbox(); if (bx) bx.innerHTML = `<div class="flex items-center gap-2 mt-1.5"><span>이 구간 열차가 지금 어디 있는지 볼 수 있어요</span><button onclick="rtTrainsShow(${i})" class="rt-refresh ml-auto" style="background:#191F28;color:#fff">지도에서 열차 보기</button></div>`; rtFitH(); return; }
   const shown = () => { const m = document.getElementById('modal-route'); return m && !m.classList.contains('hidden') && document.visibilityState === 'visible'; };
   if (!shown()) return;
   const add = [];
@@ -293,7 +296,7 @@ async function rtTrains(i) {
   });
   const box = document.querySelector(`#rt-pager .rt-page:nth-child(${i + 1}) .rt-trn`) || (() => { const lv = [...document.querySelectorAll(`#rt-pager [data-lk^="${i}-"]`)].find(e => /지하철/.test(e.textContent)); if (!lv) return null; const d = document.createElement('div'); d.className = 'rt-trn lv-sub'; lv.appendChild(d); return d; })();
   RT.tpts = add.map(x => x.p);
-  if (box) box.innerHTML = add.length ? `<div class="flex items-center gap-2 mt-1.5"><span>지도에 열차 ${add.length}대 · 30초마다 새로 고쳐요</span><button onclick="rtZoomMetro(${i})" class="rt-refresh ml-auto" style="background:#191F28;color:#fff">지도에서 열차 보기</button></div>` : '';
+  if (box) box.innerHTML = `<div class="flex items-center gap-2 mt-1.5"><span>${add.length ? `이 구간 열차 ${add.length}대 · 30초마다 새로 고쳐요` : '지금 이 구간에 다니는 열차가 없어요'}</span><button onclick="rtTrainsHide(${i})" class="rt-refresh ml-auto">열차 숨기기</button></div>`;
   RT.poll = setTimeout(() => rtTrains(i), 30000);
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && RT.L.length) rtTrains(RT.idx); });
@@ -660,3 +663,6 @@ window.rtOdsay = async (A, B) => {
     const seen = new Set(); return { opts: (await odTimeRank(out)).filter(o => { const k = o.n + '|' + o.legs.filter(x => x.big || x.t === 'ktx').map(x => x.from).join(); if (seen.has(k)) return false; seen.add(k); return true; }) };
   } catch (e) { return { err: String((e && e.message) || e) }; }
 };
+
+window.rtTrainsShow = i => { RT.tOn = true; rtTrains(i).then(() => rtZoomMetro(i)); };
+window.rtTrainsHide = i => { RT.tOn = false; rtTrainsOff(); rtTrains(i); };
