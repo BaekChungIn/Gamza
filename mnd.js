@@ -50,6 +50,9 @@ const css = `
 .ml-thbox b{grid-column:1/-1;font-size:18px;font-weight:900;margin-bottom:4px}
 .ml-thbox button{display:flex;align-items:center;gap:10px;height:58px;padding:0 14px;border-radius:16px;background:#F7F8FA;font-size:15px;font-weight:800;color:#191F28;border:2px solid transparent}.ml-thbox button.on{border-color:#191F28;background:#fff}
 .ml-thbox i{width:22px;height:22px;border-radius:50%;border:2px solid #fff;margin-left:-6px;box-shadow:0 0 0 1px rgba(0,0,0,.06)}.ml-thbox span{display:inline-flex;padding-left:6px}
+.ml-set{width:100%;background:#fff;border-radius:24px 24px 0 0;padding:20px 18px max(20px,env(safe-area-inset-bottom))}
+.ml-set button{display:flex;align-items:center;gap:12px;width:100%;padding:14px 2px;border-bottom:1px solid #F2F4F6;text-align:left;background:none}
+.ml-set button:last-child{border-bottom:0}
 .ml-wk .ml-nav{width:36px;height:36px;border-radius:12px;background:#F2F4F6;color:#4E5968;display:flex;align-items:center;justify-content:center}
 .ml-days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:12px}
 .ml-days button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 9px;border-radius:14px;position:relative}
@@ -204,7 +207,7 @@ window.mndMenuPatch = async function () {
     return;
   }
   const date = q('menu-date-input').value, m = await loadUnit(u, date), r = m[date], U = await units();
-  ub.innerHTML = `<div class="ml-src">${PIN}<span class="truncate">${E(U[u] || ('제' + u + '부대'))}</span><span style="color:#B0B8C1">·</span><span>국방부 공공데이터</span><button onclick="mealFind()" class="ml-auto font-bold whitespace-nowrap" style="color:var(--mp)">부대 바꾸기</button></div>`;
+  ub.innerHTML = `<div class="ml-src">${PIN}<span class="truncate">${E(U[u] || ('제' + u + '부대'))}</span><span style="color:#B0B8C1">·</span><span>국방부 공공데이터</span><button onclick="mealSettings()" class="ml-auto font-bold whitespace-nowrap" style="color:var(--mp)">부대 설정</button></div>`;
   if (!r) { if (!cards.querySelector('.ml-card')) cards.innerHTML = mealCards({}, date, '국방부에 이 날짜 식단이 아직 안 올라왔어요'); return; }
   cards.innerHTML = mealCards(r, date);
 };
@@ -269,11 +272,26 @@ window.mealList = async function (only) {
   mfBody(`<div class="mf-t">${Array.isArray(only) ? '후보가 몇 개 남았어요.<br>우리 부대를 골라주세요' : '부대 번호로 고르기'}</div><p class="text-[14px] text-[#8B95A1] mt-2">국방부 공공데이터에 식단을 공개한 부대예요</p><input class="mnd-in" placeholder="부대 번호 (예: 6176)" oninput="document.querySelectorAll('.mf-u').forEach(b=>b.style.display=b.dataset.c.includes(this.value.trim())?'':'none')"><div class="mt-3">${C.map(c => `<button class="mf-u w-full flex items-center justify-between py-4 border-b border-[#F2F3F5] text-[15px] font-bold" data-c="${E(c)}" onclick="mfFound('${E(c)}')">${E(ML.units[c] || c)}<span style="color:#B0B8C1">›</span></button>`).join('') || '<div class="text-center text-[13px] text-[#8B95A1] py-10">아직 등록된 부대가 없어요</div>'}</div>`, 100);
 };
 window.mfFound = mfFound;
+/* 식단 설정: 부대 바꾸기 · 번호로 직접 등록 · 부대 삭제 */
+window.mealSettings = async function () {
+  const u = mealUnit(), U = await units(), nm = u ? (U[u] || ('제' + u + '부대')) : '';
+  const ov = document.createElement('div'); ov.className = 'ml-thov'; ov.onclick = e => { if (e.target === ov) ov.remove(); };
+  const row = (ic, t, d, f, red) => `<button data-f="${f}" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px 4px;border-bottom:1px solid #F2F4F6;text-align:left"><span style="width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:${red ? '#FFEDEB' : 'var(--mt,#EEF2E8)'};color:${red ? '#D63B2F' : 'var(--mp,#2B3426)'};flex-shrink:0">${ic}</span><span style="flex:1"><b style="display:block;font-size:15px;color:${red ? '#D63B2F' : '#191F28'}">${t}</b><span style="font-size:12.5px;color:#8B95A1">${d}</span></span><span style="color:#B0B8C1;font-size:18px">›</span></button>`;
+  const sv = p => `<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+  ov.innerHTML = `<div class="ml-set"><b style="display:block;font-size:18px;font-weight:900;margin-bottom:4px">식단 설정</b><p style="font-size:13px;color:#8B95A1;margin-bottom:6px">${u ? `지금 연결된 부대 · <b style="color:#191F28">${E(nm)}</b>` : '아직 연결된 부대가 없어요'}</p>
+    ${row(sv('<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>'), u ? '부대 바꾸기' : '메뉴로 부대 찾기', '오늘 먹은 메뉴를 고르면 우리 부대를 찾아줘요', 'find')}
+    ${row(sv('<path d="M4 9h16M4 15h16M10 3L8 21M16 3l-2 18"/>'), '부대 번호로 직접 등록', '부대 번호(예: 6176)를 알면 바로 연결해요', 'list')}
+    ${u ? row(sv('<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>'), '부대 삭제', '연결을 끊고 식단을 직접 적어서 써요', 'del', 1) : ''}</div>`;
+  ov.querySelectorAll('[data-f]').forEach(b => b.onclick = async () => { const f = b.dataset.f; ov.remove();
+    if (f === 'find') mealFind(); else if (f === 'list') mealList();
+    else if (f === 'del') { if (!(await zConfirm(`${nm} 연결을 끊을까요?\n공공데이터 식단 대신 직접 적은 식단이 보여요.`, { ok: '부대 삭제' }))) return; await mealSave(null); } });
+  document.body.appendChild(ov);
+};
 window.mealSave = async function (u) {
   const { error } = await sb.from('profiles').update({ meal_unit: u }).eq('id', me.id);
   if (error) return showAlert('오류', '저장하지 못했어요. 잠시 후 다시 시도해주세요.');
   me.meal_unit = u; const S = typeof S_ === 'function' ? S_() : null; if (S && S.id === me.id) S.meal_unit = u;
-  mealClose(); if (typeof zpToast === 'function') zpToast('우리 부대 식단표를 연결했어요'); if (q('modal-menu').classList.contains('flex')) renderMenu(); else openMenu();
+  try { mealClose(); } catch (e) { } if (typeof zpToast === 'function') zpToast(u ? '우리 부대 식단표를 연결했어요' : '부대 연결을 끊었어요'); if (q('modal-menu').classList.contains('flex')) renderMenu(); else openMenu();
 };
 
 /* ---------- 관리자: 내려받은 공공데이터 식단 파일(CSV) 한꺼번에 올리기 ---------- */

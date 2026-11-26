@@ -1,3 +1,17 @@
+/* transit-live 함수 부르기: 대시보드에서 다른 주소(예: rapid-handler)로 만들어졌어도 찾아가요 */
+const TL_NAMES = ['transit-live', 'rapid-handler'];
+let TL_OK = null;
+async function tlInvoke(opt) {
+  const names = TL_OK ? [TL_OK] : TL_NAMES; let last = null;
+  for (const n of names) {
+    const r = await sb.functions.invoke(n, opt);
+    const st = r.error && r.error.context && r.error.context.status;
+    if (st === 404 && !TL_OK) { last = r; continue; }
+    TL_OK = n; return r;
+  }
+  return last;
+}
+window.tlInvoke = tlInvoke;
 /* 집으로가기 · 구간별 이동 경로 추정 (K=KTX·SRT역, T=시외·고속버스 터미널, M=수도권 전철역) — 좌표·시간·요금은 모두 추정치 */
 const RH = [
 ['서울',37.555,126.972,'KTM'],['용산',37.530,126.965,'KM'],['청량리',37.580,127.047,'KM'],['수서',37.487,127.102,'K'],['영등포',37.516,126.907,'KM'],['광명',37.416,126.885,'KM'],['행신',37.612,126.834,'KM'],
@@ -190,7 +204,7 @@ async function rtDraw(i) {
 /* ---- 실시간: 버스 도착 · 지하철 도착 · 고속/시외버스 · 기차 시간표 · 자동차 실제 경로 ---- */
 function rtCall(body) {
   const k = JSON.stringify(body); if (RT.live[k]) return RT.live[k];
-  return (RT.live[k] = (async () => { try { const r = await sb.functions.invoke('transit-live', { body }); if (r.data) return r.data;
+  return (RT.live[k] = (async () => { try { const r = await tlInvoke({ body }); if (r.data) return r.data;
     let m = (r.error && r.error.message) || 'error'; try { const c = r.error && r.error.context; if (c && c.status) m = `HTTP ${c.status} · ` + ((await c.text()) || '').slice(0, 80); } catch (e) { }
     if (/401|JWT|Unauthorized/i.test(m)) m += ' (함수 Verify JWT 설정 확인)'; if (/404|not found/i.test(m)) m += ' (transit-live 함수 이름 확인)'; return { error: m }; } catch (e) { return { error: String(e) }; } })());
 }
@@ -281,7 +295,7 @@ async function rtTrains(i) {
   if (!shown()) return;
   const add = [];
   for (const lid of ids) {
-    const [line, col] = SUBL[lid]; let r; try { r = (await sb.functions.invoke('transit-live', { body: { action: 'pos', line } })).data; } catch (e) { r = null; }
+    const [line, col] = SUBL[lid]; let r; try { r = (await tlInvoke({ body: { action: 'pos', line } })).data; } catch (e) { r = null; }
     if (!r || !r.trains) continue;
     const T = r.trains, q2 = [...T]; const work = async () => { while (q2.length) { const t = q2.shift(); const p = await stGeo(t.st); if (p) add.push({ t, p, col, line }); } };
     await Promise.all([work(), work(), work(), work()]);
@@ -513,7 +527,7 @@ window.fmShareToggle = async () => {
 
 /* ================= TMAP 대중교통 길찾기 → 앱 경로 모양으로 ================= */
 window.rtTmap = async (a, b) => {
-  let r; try { r = (await sb.functions.invoke('transit-live', { body: { action: 'plan', a: { lat: a.lat, lng: a.lng }, b: { lat: b.lat, lng: b.lng } } })).data; } catch (e) { return { err: String(e) }; }
+  let r; try { r = (await tlInvoke({ body: { action: 'plan', a: { lat: a.lat, lng: a.lng }, b: { lat: b.lat, lng: b.lng } } })).data; } catch (e) { return { err: String(e) }; }
   if (!r || r.error || !Array.isArray(r.items)) return { err: (r && r.error) || 'no data' };
   const P = p => ({ lat: p.lat, lng: p.lng, name: p.name });
   const subName = s => String(s || '').replace(/^수도권\s*/, '').replace(/^(\d+)$/, '$1호선');
@@ -546,7 +560,7 @@ window.rtTmap = async (a, b) => {
 const OD = { key: null, cache: {} };
 async function odKey() {
   if (OD.key !== null) return OD.key;
-  try { const r = await sb.functions.invoke('transit-live', { body: { action: 'cfg' } }); OD.key = (r.data && r.data.odsay) || ''; } catch (e) { OD.key = ''; }
+  try { const r = await tlInvoke({ body: { action: 'cfg' } }); OD.key = (r.data && r.data.odsay) || ''; } catch (e) { OD.key = ''; }
   return OD.key;
 }
 async function odCall(sx, sy, ex, ey) {
