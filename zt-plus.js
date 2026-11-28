@@ -1036,12 +1036,14 @@ function zpCardRects(H) {
         for (let p = el.parentElement; p && p !== root; p = p.parentElement) if (seen.has(p)) return;
         const cs = getComputedStyle(el); if (cs.display === 'none' || cs.visibility === 'hidden') return;
         const bg = cs.backgroundColor, m = bg.match(/rgba?\(([^)]+)\)/), a = m ? (m[1].split(',')[3] === undefined ? 1 : parseFloat(m[1].split(',')[3])) : 0;
-        if (a > 0.3 || (cs.backgroundImage && cs.backgroundImage !== 'none') || el.classList.contains('cw')) { seen.add(el); zpCardEls.push(el); }
+        /* 둥근 카드 · 버튼만 (배경색만 있는 넓은 틀은 빼요 → 카드 옆에 흰 사각형이 생기던 원인) */
+        const rad = parseFloat(cs.borderTopLeftRadius) || 0;
+        if ((a > 0.3 || (cs.backgroundImage && cs.backgroundImage !== 'none') || el.classList.contains('cw')) && (rad >= 8 || el.classList.contains('cw'))) { el._zr = Math.min(rad, el.offsetHeight / 2, el.offsetWidth / 2); seen.add(el); zpCardEls.push(el); }
       });
     }
   }
   const out = [];
-  zpCardEls.forEach(el => { const r = el.getBoundingClientRect(); if (r.width && r.bottom > 0 && r.top < H) out.push(r); });
+  zpCardEls.forEach(el => { const r = el.getBoundingClientRect(); if (r.width && r.bottom > 0 && r.top < H && r.right > 0 && r.left < innerWidth) out.push({ left: r.left, top: r.top, width: r.width, height: r.height, rad: el._zr || 0 }); });
   return out;
 }
 function zpWxFrame() {
@@ -1074,7 +1076,7 @@ function zpWxFrame() {
   } else if (k === 'sun') {
     for (const p of P) { p.y -= p.v; p.w += .03; p.x += Math.sin(p.w) * .3; if (p.y < -10) { p.y = H + 10; p.x = Math.random() * W; } const a = .25 + Math.sin(p.w * 2) * .2; g.fillStyle = `rgba(242,186,73,${a})`; g.beginPath(); g.arc(p.x, p.y, p.r, 0, 6.283); g.fill(); }
   } else if (k === 'cloud' || k === 'fog') {
-    for (const p of P) { p.x += p.v; if (p.x - p.rw > W) p.x = -p.rw; const gr = g.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.rw); gr.addColorStop(0, k === 'fog' ? 'rgba(200,208,218,.22)' : 'rgba(190,200,212,.18)'); gr.addColorStop(1, 'rgba(190,200,212,0)'); g.fillStyle = gr; g.beginPath(); g.ellipse(p.x, p.y, p.rw, p.rh, 0, 0, 6.283); g.fill(); }
+    for (const p of P) { p.x += p.v; if (p.x - p.rw > W) p.x = -p.rw; /* 가장자리까지 부드럽게 사라지게 (예전엔 타원 끝이 잘려서 선처럼 보였어요) */ g.save(); g.translate(p.x, p.y); g.scale(1, p.rh / p.rw); const gr = g.createRadialGradient(0, 0, 0, 0, 0, p.rw); gr.addColorStop(0, k === 'fog' ? 'rgba(200,208,218,.18)' : 'rgba(190,200,212,.14)'); gr.addColorStop(.6, k === 'fog' ? 'rgba(200,208,218,.08)' : 'rgba(190,200,212,.06)'); gr.addColorStop(1, 'rgba(190,200,212,0)'); g.fillStyle = gr; g.beginPath(); g.arc(0, 0, p.rw, 0, 6.283); g.fill(); g.restore(); }
   } else {
     g.strokeStyle = 'rgba(110,140,180,.38)'; g.lineWidth = 1.2; g.lineCap = 'round'; g.beginPath();
     for (const p of P) { p.y += p.v; p.x -= p.v * .18; if (p.y > H || p.x < -20) { p.y = -20; p.x = Math.random() * W * 1.2; } g.moveTo(p.x, p.y); g.lineTo(p.x + p.l * .18, p.y - p.l); }
@@ -1083,7 +1085,10 @@ function zpWxFrame() {
   }
   g.restore();
   /* 카드 · 창 위에 그려진 건 지워요 (겹치는 카드가 있어도 확실하게) */
-  ex.forEach(r => g.clearRect(r.left - 3, r.top - 3, r.width + 6, r.height + 6));
+  /* 카드 모양 그대로(둥근 모서리) 지워요 → 사각형 자국이 안 남아요 */
+  g.save(); g.globalCompositeOperation = 'destination-out'; g.fillStyle = '#000';
+  ex.forEach(r => { g.beginPath(); if (g.roundRect) g.roundRect(r.left - 1, r.top - 1, r.width + 2, r.height + 2, r.rad + 1); else g.rect(r.left, r.top, r.width, r.height); g.fill(); });
+  g.restore();
   if (k === 'snow' && rc) {   // 프로필 카드 윗면에 쌓이는 눈 (카드 밖, 위쪽에만)
     g.fillStyle = '#fff'; g.shadowColor = 'rgba(120,140,170,.35)'; g.shadowBlur = 4; g.beginPath(); g.moveTo(rc.left + 14, rc.top);
     const n = Math.ceil(rc.width / 4);
