@@ -50,23 +50,23 @@ async function getRows(code: string, a: number, b: number): Promise<{ total: num
 async function syncUnit(code: string, from: string, to: string) {
   const first = await getRows(code, 1, 5);
   const total = first.total; if (!total) return 0;
-  // 부대마다 날짜 순서가 뒤죽박죽이라 (예: 2136부대) 전부 받아요 · 1000줄씩 3개 동시에
-  const pages: number[] = []; for (let a = 1; a <= Math.min(total, 15000); a += 1000) pages.push(a);
-  let rows: any[] = []; let pi = 0;
-  await Promise.all(Array.from({ length: 3 }, async () => { while (pi < pages.length) { const a = pages[pi++]; const r = (await getRows(code, a, Math.min(total, a + 999))).rows; rows = rows.concat(r); } }));
-  // 국방부가 늦게 올리는 부대도 있어서, 오늘 기준이 아니라 '가장 최근 식단'부터 5주 전까지는 꼭 저장해요
-  let maxD = ''; for (const r of rows) { const d = pdate(r.dates ?? r.DATES ?? r.Dates); if (d && d > maxD) maxD = d; }
-  if (maxD) { const m = new Date(maxD + 'T00:00:00Z'); const f2 = ymd(new Date(m.getTime() - 35 * 864e5)); if (f2 < from) from = f2; }
+  // 부대마다 날짜 순서가 뒤죽박죽이라 전부 훑어요. 메모리를 아끼려고 1000줄씩 받아서 바로 날짜별로 정리하고 버려요.
   const days: Record<string, { b: string[]; l: string[]; n: string[]; sp: string[] }> = {};
-  let cur: string | null = null;
-  for (const r of rows) {
-    const k: Record<string, any> = {}; for (const [x, v] of Object.entries(r)) k[x.toLowerCase()] = v;
-    const d = pdate(k.dates); if (d) cur = d; if (!cur || cur < from || cur > to) continue;
-    const D = days[cur] ??= { b: [], l: [], n: [], sp: [] };
-    const add = (arr: string[], v: unknown) => { const t = clean(v); if (t && !arr.includes(t) && arr.length < 15) arr.push(t); };
-    add(D.b, k.brst); add(D.l, k.lunc); add(D.n, k.dinr); add(D.sp, k.adspcfd);
+  let maxD = '';
+  const lim = ymd(new Date(Date.now() - 400 * 864e5));   // 1년 넘은 옛날 식단은 건너뛰어요
+  for (let a = 1; a <= Math.min(total, 15000); a += 1000) {
+    const rows = (await getRows(code, a, Math.min(total, a + 999))).rows; let cur: string | null = null;
+    for (const r of rows) {
+      const d = pdate(r.dates ?? r.DATES ?? r.Dates); if (d) cur = d; if (!cur || cur < lim || cur > to) continue;
+      if (cur > maxD) maxD = cur;
+      const D = days[cur] ??= { b: [], l: [], n: [], sp: [] };
+      const add = (arr: string[], v: unknown) => { const t = clean(v); if (t && !arr.includes(t) && arr.length < 15) arr.push(t); };
+      add(D.b, r.brst ?? r.BRST); add(D.l, r.lunc ?? r.LUNC); add(D.n, r.dinr ?? r.DINR); add(D.sp, r.adspcfd ?? r.ADSPCFD);
+    }
   }
-  const up = Object.entries(days).map(([d, v]) => ({ unit: code, d, ...v }));
+  // 오늘 기준 20일 전 또는 '가장 최근 식단'부터 5주 전 중 더 이른 날부터 저장 (국방부가 늦게 올리는 부대)
+  if (maxD) { const f2 = ymd(new Date(Date.parse(maxD + 'T00:00:00Z') - 35 * 864e5)); if (f2 < from) from = f2; }
+  const up = Object.entries(days).filter(([d]) => d >= from).map(([d, v]) => ({ unit: code, d, ...v }));
   for (let i = 0; i < up.length; i += 300) { const { error } = await admin.from('meal_days').upsert(up.slice(i, i + 300)); if (error) throw error; }
   const { count } = await admin.from('meal_days').select('d', { count: 'exact', head: true }).eq('unit', code);
   await admin.from('meal_units').update({ days: count ?? up.length }).eq('code', code);
@@ -122,20 +122,25 @@ Deno.serve(async (req) => {
       if (!body.force && st && st.at && Date.now() - Date.parse(st.at) < 24 * 3600e3) return json({ skipped: true, at: st.at });
       return json({ ok: true, data: await syncData() });
     }
-    const { data: st } = await admin.from('meal_sync').select('at').eq('id', 1).maybeSingle();
-    if (!body.force && st && st.at && Date.now() - Date.parse(st.at) < 6 * 3600e3) return json({ skipped: true, at: st.at });
-    await admin.from('meal_sync').upsert({ id: 1, at: new Date().toISOString() });
     const now = new Date(Date.now() + 9 * 3600e3), from = ymd(new Date(now.getTime() - 20 * 864e5)), to = ymd(new Date(now.getTime() + 45 * 864e5));
-    // svc 칸에 서비스 이름을 적어둔 부대는 그 이름으로 가져와요 (SQL 한 줄로 고칠 수 있게)
-    let { data: units, error: ue } = await admin.from('meal_units').select('code,svc').eq('active', true);
+    // svc 칸에 서비스 이름을 적어둔 부대는 그 이름으로 가져와요
+    let { data: units, error: ue } = await admin.from('meal_units').select('code,svc,synced_at').eq('active', true);
     if (ue) ({ data: units } = await admin.from('meal_units').select('code').eq('active', true));
     for (const u of units ?? []) if ((u as any).svc) svcOk[u.code] = String((u as any).svc).trim();
-    const out: Record<string, number | string> = {};
-    // 부대가 많아서 6곳씩 동시에 받아요
-    const list = (units ?? []).map((u) => u.code); let i = 0;
-    const work = async () => { while (i < list.length) { const c = list[i++]; try { out[c] = await syncUnit(c, from, to); } catch (e) { out[c] = 'X ' + String((e as Error).message || e).slice(0, 60); } } };
-    await Promise.all(Array.from({ length: 6 }, work));
-    return json({ ok: true, units: out });
+    // 부대가 많고 식단이 길어서 한 번에 다 하면 시간 초과가 나요.
+    // → 오래전에 받은 부대부터 한 번에 최대 4곳(30초)만 받고, 나머지는 다음 호출 때 이어서 해요.
+    const only = body.unit ? [String(body.unit)] : null;
+    const old = (u: any) => !u.synced_at || Date.now() - Date.parse(u.synced_at) > 6 * 3600e3;
+    let list = (units ?? []).filter((u: any) => only ? only.includes(u.code) : (body.force || old(u)))
+      .sort((x: any, y: any) => String(x.synced_at || '').localeCompare(String(y.synced_at || ''))).map((u: any) => u.code);
+    if (!list.length) return json({ skipped: true, msg: '모든 부대가 6시간 안에 업데이트됐어요' });
+    const t0 = Date.now(), out: Record<string, number | string> = {}; let i = 0;
+    const work = async () => { while (i < list.length && Date.now() - t0 < 30e3 && Object.keys(out).length < (only ? 1 : 4)) { const c = list[i++];
+      try { out[c] = await syncUnit(c, from, to); } catch (e) { out[c] = 'X ' + String((e as Error).message || e).slice(0, 60); }
+      try { await admin.from('meal_units').update({ synced_at: new Date().toISOString() }).eq('code', c); } catch { /* */ } } };
+    await work();   // 한 곳씩 차례로 (자원 한도 때문에 동시에 받지 않아요)
+    const left = list.length - Object.keys(out).length;
+    return json({ ok: true, units: out, left, msg: left ? `${left}곳 남았어요 · 한 번 더 Send 하면 이어서 받아요` : '전부 받았어요' });
   } catch (e) {
     return json({ error: String((e as Error).message || e) }, 500);
   }
