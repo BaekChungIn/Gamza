@@ -54,16 +54,21 @@ async function syncUnit(code: string, from: string, to: string) {
   const days: Record<string, { b: string[]; l: string[]; n: string[]; sp: string[] }> = {};
   let maxD = '';
   const lim = ymd(new Date(Date.now() - 400 * 864e5));   // 1년 넘은 옛날 식단은 건너뛰어요
-  for (let a = 1; a <= Math.min(total, 15000); a += 1000) {
-    const rows = (await getRows(code, a, Math.min(total, a + 999))).rows; let cur: string | null = null;
+  const eat = (rows: any[]) => { let cur: string | null = null;
     for (const r of rows) {
       const d = pdate(r.dates ?? r.DATES ?? r.Dates); if (d) cur = d; if (!cur || cur < lim || cur > to) continue;
       if (cur > maxD) maxD = cur;
       const D = days[cur] ??= { b: [], l: [], n: [], sp: [] };
       const add = (arr: string[], v: unknown) => { const t = clean(v); if (t && !arr.includes(t) && arr.length < 15) arr.push(t); };
       add(D.b, r.brst ?? r.BRST); add(D.l, r.lunc ?? r.LUNC); add(D.n, r.dinr ?? r.DINR); add(D.sp, r.adspcfd ?? r.ADSPCFD);
-    }
-  }
+    } };
+  // 1000줄씩 4쪽을 동시에 받아요 (한 쪽씩 받으면 큰 부대는 1분 넘게 걸려서 시간 초과가 났어요)
+  const starts: number[] = []; for (let a = 1; a <= Math.min(total, 15000); a += 1000) starts.push(a);
+  let k = 0;
+  const pull = async () => { while (k < starts.length) { const a = starts[k++];
+    let rows: any[] = []; for (let t = 0; t < 2; t++) { try { rows = (await getRows(code, a, Math.min(total, a + 999))).rows; break; } catch (e) { if (t) throw e; } }
+    eat(rows); } };
+  await Promise.all([pull(), pull(), pull(), pull()]);
   // 오늘 기준 20일 전 또는 '가장 최근 식단'부터 5주 전 중 더 이른 날부터 저장 (국방부가 늦게 올리는 부대)
   if (maxD) { const f2 = ymd(new Date(Date.parse(maxD + 'T00:00:00Z') - 35 * 864e5)); if (f2 < from) from = f2; }
   const up = Object.entries(days).filter(([d]) => d >= from).map(([d, v]) => ({ unit: code, d, ...v }));
