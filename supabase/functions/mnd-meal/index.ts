@@ -135,8 +135,9 @@ Deno.serve(async (req) => {
     // 부대가 많고 식단이 길어서 한 번에 다 하면 시간 초과가 나요.
     // → 오래전에 받은 부대부터 한 번에 최대 4곳(30초)만 받고, 나머지는 다음 호출 때 이어서 해요.
     const only = body.unit ? [String(body.unit)] : null;
-    const old = (u: any) => !u.synced_at || Date.now() - Date.parse(u.synced_at) > 6 * 3600e3;
-    let list = (units ?? []).filter((u: any) => only ? only.includes(u.code) : (body.force || old(u)))
+    // force 는 '30분 안에 받은 부대'는 빼요 (안 그러면 남은 개수가 안 줄어요)
+    const old = (u: any) => !u.synced_at || Date.now() - Date.parse(u.synced_at) > (body.force ? 30 * 60e3 : 6 * 3600e3);
+    let list = (units ?? []).filter((u: any) => only ? only.includes(u.code) : old(u))
       .sort((x: any, y: any) => String(x.synced_at || '').localeCompare(String(y.synced_at || ''))).map((u: any) => u.code);
     if (!list.length) return json({ skipped: true, msg: '모든 부대가 6시간 안에 업데이트됐어요' });
     const t0 = Date.now(), out: Record<string, number | string> = {}; let i = 0;
